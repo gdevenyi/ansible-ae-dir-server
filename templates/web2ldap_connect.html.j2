@@ -1,0 +1,27 @@
+<h1>{text_heading}</h1>
+
+{text_error}
+
+<h2>Normal use</h2>
+<p>
+  <a href="/web2ldap?ldapi://%2Fusr%2Flocal%2Fopenldap%2Fvar%2Frun%2Fldapi/ou=ae-dir????bindname=">Local AE-DIR via LDAPI</a>
+  (if in doubt, click this!)
+</p>
+
+<h2>&AElig;-DIR providers</h2>
+<ul>
+{% for replica in groups['ae-dir-providers'] %}
+  <li>
+    <a href="/web2ldap?ldaps://{{ replica }}/ou=ae-dir????bindname=">AE-DIR on {{ replica }}</a>
+  </li>
+{% endfor %}
+</ul>
+
+<h2>&AElig;-DIR consumers</h2>
+<ul>
+{% for replica in groups['ae-dir-consumers'] %}
+  <li>
+    <a href="/web2ldap?ldaps://{{ replica }}/ou=ae-dir????bindname=">AE-DIR on {{ replica }}</a>
+  </li>
+{% endfor %}
+</ul>

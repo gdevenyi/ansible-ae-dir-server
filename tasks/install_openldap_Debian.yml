@@ -1,0 +1,32 @@
+---
+# install OpenLDAP packages
+
+- name: "Add LTB OpenLDAP repository key from {{ ltb_openldap_repo_key }}"
+  apt_key:
+    url: "{{ ltb_openldap_repo_key }}"
+    state: present
+  when: ansible_os_family == 'Debian'
+
+- name: "Add LTB OpenLDAP Debian repository {{ ltb_openldap_repo_source }}"
+  apt_repository:
+    repo: "{{ ltb_openldap_repo_source }}"
+    state: present
+    update_cache: yes
+
+- name: Install LTB OpenLDAP packages and dependencies
+  apt:
+    name: "{{ item }}"
+    state: installed
+    update_cache: yes
+    install_recommends: no
+    dpkg_options: 'force-confold,force-confdef'
+  notify:
+  - restart slapd
+  with_items:
+  - openldap-ltb
+  - openldap-ltb-contrib-overlays
+  - openldap-ltb-mdb-utils
+  - openldap-ltb-ppm
+  - openldap-ltb-check-password
+  - cracklib-runtime
+

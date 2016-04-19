@@ -1,0 +1,23 @@
+# Apply AE-DIR configuration to web2ldap
+
+- name: Create web2ldapcnf/local.py for AE-DIR
+  template:
+    src: "web2ldapcnf_local.py.j2"
+    dest: "{{ web2ldap_cnfdir }}/local.py"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Create connect template for AE-DIR
+  template:
+    src: "web2ldap_connect.html.j2"
+    dest: "{{ web2ldap_templates }}/connect.html"
+    owner: root
+    group: root
+    mode: 0644
+
+#- name: web2ldap templates for AE-DIR
+#  template: src="{{ item }}.j2" dest="{{ web2ldap_templates }}/ae-dir/{{ item }}" owner=root group=root mode=0644
+#  with_items:
+#  - 
+

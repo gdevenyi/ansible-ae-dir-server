@@ -1,0 +1,211 @@
+#
+# stroeder.com.schema found on
+# http://www.stroeder.com/ldap/schema/stroeder.com.schema
+#
+
+#---------------------------------------------------------------------------
+# AUX person schema
+#---------------------------------------------------------------------------
+
+#
+# Date of birth:
+# syntax YYYY-MM-DD, see ISO 8601
+#
+attributetype ( stroeder-com-pub-ldap-at:2
+      NAME ( 'dateOfBirth' )
+      DESC 'Date of birth (format YYYY-MM-DD, see ISO 8601)'
+      EQUALITY caseExactIA5Match
+      SUBSTR caseExactIA5SubstringsMatch
+      SINGLE-VALUE
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{10} )
+
+#
+# Place of birth
+#
+attributetype ( stroeder-com-pub-ldap-at:12
+      NAME 'birthPlace'
+      DESC 'Place of birth'
+      SUP l
+      SINGLE-VALUE )
+
+#
+# birth name (last name at time of birth)
+#
+attributetype ( stroeder-com-pub-ldap-at:14
+      NAME 'birthName'
+      DESC 'Last name at time of birth, e.g. maiden name'
+      SUP sn
+      SINGLE-VALUE )
+
+#
+# The following data items and codes are used (see ISO 5218):
+# 	Not known	0
+# 	Male		1
+# 	Female		2
+# 	Not specified	9
+#
+attributetype ( stroeder-com-pub-ldap-at:7
+      NAME 'gender'
+      DESC 'Representation of human sex (see ISO 5218)'
+      EQUALITY integerMatch
+      SINGLE-VALUE
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.27{1} )
+
+#
+# Business title describing the kind of job a person does
+# (consider this to be different from title!)
+#
+attributetype ( stroeder-com-pub-ldap-at:9
+      NAME ( 'businessTitle' )
+      DESC 'Business title describing the kind of job a person does'
+      SUP title )
+
+#
+# Academic title a person is allowed to use
+#
+attributetype ( stroeder-com-pub-ldap-at:15
+      NAME ( 'academicTitle' )
+      DESC 'Academic title a person is allowed to use'
+      SUP title )
+
+#
+# A nick name of a person (similar to eduPersonNickname)
+# (consider this to be different from uid (alias userid)!)
+#
+attributetype ( stroeder-com-pub-ldap-at:10
+      NAME 'nickName'
+      DESC 'A nick name of a person'
+      SUP name )
+
+#
+# value added tax ID of company within EU:
+# It consists of '<country code> <national vat-ID>'
+# (see http://www.bff-online.de/ust/useg/usegid.html)
+#
+attributetype ( stroeder-com-pub-ldap-at:11
+      NAME 'euVATId'
+      DESC 'value added tax ID of company within EU'
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{20}
+      EQUALITY caseIgnoreIA5Match )
+
+#
+# labeled bank arrangement consisting of BIC and IBAN ()
+# an optional additional textual label is separated by a single '#'
+# The format:
+# BIC:<BIC>,IBAN:<IBAN>#<Label>
+# <BIC>    the Bank Information Code
+# <IBAN>   the International Bank Account Number
+# <Label>  a textual description of DirectoryString syntax
+attributetype ( stroeder-com-pub-ldap-at:13
+      NAME 'labeledBICandIBAN'
+      DESC 'international bank arrangement consisting of BIC, IBAN and optional label (format: "BIC:<BIC>,IBAN:<IBAN>#<Label>")'
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{100}
+      EQUALITY caseIgnoreMatch )
+
+#
+# delegatesTo
+#
+attributetype ( stroeder-com-pub-ldap-at:17
+      NAME 'delegatesTo'
+      DESC 'DN of entity to which tasks are delegated'
+      SUP distinguishedName )
+
+
+#
+# This is intended to be used as a supplement for inetOrgPerson
+#
+objectclass ( stroeder-com-pub-ldap-oc:1
+      NAME 'msPerson'
+      DESC 'Supplement class for person entries'
+      AUXILIARY
+      MAY ( c $ gender $ businessTitle $ personalTitle $ dateOfBirth $
+            uniqueIdentifier $ nickName $ organizationalStatus $ userClass $
+            buildingName $ houseIdentifier $ labeledBICandIBAN $ employeeType $
+            birthName $ birthPlace $ euVATId $ delegatesTo $ serialNumber ) )
+
+#
+# This is intended to be used as a supplement for organization
+#
+objectclass ( stroeder-com-pub-ldap-oc:8
+      NAME 'msOrganization'
+      DESC 'Supplement class for organizations/companies'
+      AUXILIARY
+      MAY ( c $ mail $ labeledURI $ euVATId $ labeledBICandIBAN $ 
+            displayName $ organizationalStatus ) )
+
+
+#
+# tax ID of person or company within Germany
+#
+attributetype ( stroeder-com-pub-ldap-at:666
+      NAME 'germanTaxId'
+      DESC 'tax ID of person or company within Germany'
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{20}
+      EQUALITY caseIgnoreMatch )
+
+
+#---------------------------------------------------------------------------
+# musician schema
+#---------------------------------------------------------------------------
+
+attributetype ( stroeder-com-pub-ldap-at:3
+      NAME 'musicalInstrument'
+      DESC 'Commonly used name of a musical instrument.'
+      SUP name )
+
+attributetype ( stroeder-com-pub-ldap-at:4
+      NAME 'musicalOrchestra'
+      DESC 'Commonly used name of a musical orchestra or band.'
+      SUP name )
+
+attributetype ( stroeder-com-pub-ldap-at:5
+      NAME 'musicalArtistName'
+      DESC 'Commonly used artist name of this individual.'
+      SUP name )
+
+objectclass ( stroeder-com-pub-ldap-oc:6
+      NAME 'musician'
+      DESC 'Musician'
+      AUXILIARY
+      MAY ( musicalInstrument $ musicalOrchestra $ musicalArtistName ) )
+
+#---------------------------------------------------------------------------
+# germanBankArrangement schema
+#---------------------------------------------------------------------------
+
+attributetype ( stroeder-com-pub-ldap-at:661
+      NAME 'germanBankAccountNumber'
+      DESC 'The 8-digits number of a german bank account without spaces'
+      SINGLE-VALUE
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.36{10} )
+
+attributetype ( stroeder-com-pub-ldap-at:662
+      NAME 'germanBankCode'
+      DESC 'The 8-digits number of a german bank code (BLZ) without spaces'
+      SINGLE-VALUE
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.36{8} )
+
+attributetype ( stroeder-com-pub-ldap-at:663
+      NAME 'germanBankName'
+      DESC 'The name of a german bank registered in the BLZ table published by Deutsche Bundesbank.'
+      SINGLE-VALUE
+      SUP name )
+
+attributetype ( stroeder-com-pub-ldap-at:664
+      NAME 'germanBankAccountInfo'
+      DESC 'Composed field containing a one-line human-readable representation of all necessary information.'
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+attributetype ( stroeder-com-pub-ldap-at:665
+      NAME 'germanBankAccountHolder'
+      DESC 'The name of the holder of a german bank account commonly used as recipient name.'
+      SINGLE-VALUE
+      SUP name )
+
+objectclass ( stroeder-com-pub-ldap-oc:660
+      NAME 'germanBankArrangement'
+      DESC 'German bank account information'
+      AUXILIARY
+      MUST ( germanBankAccountNumber $ germanBankCode )
+      MAY ( germanBankAccountHolder $ germanBankName $ germanBankAccountInfo ) )
+

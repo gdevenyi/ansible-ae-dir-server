@@ -1,0 +1,60 @@
+---
+# defaults file for roles/ae-dir
+
+# which Debian repo to use for LTB OpenLDAP builds
+ltb_openldap_repo_source: "deb http://ltb-project.org/debian/{{ ansible_distribution_release }} {{ ansible_distribution_release }} main"
+ltb_openldap_repo_key: "http://ltb-project.org/wiki/lib/RPM-GPG-KEY-LTB-project"
+
+# Some paths
+openldap_prefix: "/usr/local/openldap"
+openldap_bin: "{{ openldap_prefix }}/bin"
+openldap_conf_prefix: "{{ openldap_prefix }}/etc/openldap"
+openldap_schema_prefix: "{{ openldap_prefix }}/etc/openldap/schema"
+openldap_sbin: "{{ openldap_prefix }}/sbin"
+openldap_defaults: "/etc/default/slapd"
+openldap_data: "{{ openldap_prefix }}/var/openldap-data"
+openldap_conf_file: "{{ openldap_conf_prefix }}/slapd.conf"
+
+# All additional schema files needed
+openldap_schema_files:
+  - ae-dir.schema
+  - draft-findlay-ldap-groupofentries.schema
+  - draft-stroeder-mailboxrelatedobject.schema
+  - draft-stroeder-namedobject.schema
+  - init.schema
+  - mspwdreset.schema
+  - oath-ldap.schema
+  - openssh-lpk_openldap.schema
+  - rfc2307bis.schema
+  - stroeder.com-oid-macros.schema
+  - stroeder.com.schema
+  - sudoers.schema
+
+# Provider replicas hostnames
+openldap_providers: []
+
+# The server certificate and key files
+openldap_cert_filename: "{{ ansible_fqdn }}.crt"
+openldap_key_filename: "{{ ansible_fqdn }}.key"
+
+# The full path names on the target system
+openldap_cacert_pathname: "{{ openldap_conf_prefix }}/tls/{{ openldap_cacert_filename }}"
+openldap_cert_pathname: "{{ openldap_conf_prefix }}/tls/{{ openldap_cert_filename }}"
+openldap_key_pathname: "{{ openldap_conf_prefix }}/tls/{{ openldap_key_filename }}"
+openldap_dhparam_pathname: "{{ openldap_conf_prefix }}/tls/slapd.dhparam"
+
+# Suffix of subject-DNs in TLS server certificates
+openldap_tls_cert_suffix: "ou=ITS,o=My Example Org.,c=DE"
+
+# which messages to send to syslog
+# normal for production: stats
+openldap_log_level: "stats stats2"
+
+# how many worker threads are started
+# RAM needed per thread: 4MB on 32 bit systems, 8MB on 64 bit systems
+# rule-of-thumb: 4 per real CPU core
+openldap_threads: 8
+
+# Database parameters
+openldap_db_accesslog_maxsize: 4000000
+openldap_db_um_maxsize: 4000000

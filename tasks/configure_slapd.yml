@@ -1,0 +1,39 @@
+# Apply AE-DIR configuration to OpenLDAP's slapd
+
+- name: Delete the dynamic configuration directory
+  file: path={{ openldap_conf_prefix }}/slapd.d state=absent
+
+- name: Create OpenLDAP data directory
+  file: path="{{ openldap_data }}" state=directory owner=ldap group=ldap mode=0750
+
+- name: Create database directories
+  file: path="{{ openldap_data }}/{{ item }}" state=directory owner=ldap group=ldap mode=0750
+  with_items:
+    - accesslog
+    - um
+  notify:
+  - restart slapd
+
+- name: Install OpenLDAP schema files
+  copy: src="{{ item }}" dest="{{ openldap_schema_prefix }}/{{ item }}" owner=root group=root mode=0644
+  with_items: "{{ openldap_schema_files }}"
+  notify:
+  - restart slapd
+
+- name: Create /etc/default/slapd
+  template: src="default_slapd.j2" dest="/etc/default/slapd" owner=ldap group=ldap mode=0644
+  notify:
+  - restart slapd
+
+- name: "Create slapd.conf based on role-specific template slapd-{{ openldap_role }}.conf.j2"
+  template: src="slapd-{{ openldap_role }}.conf.j2" dest="{{ openldap_conf_file }}" owner=ldap group=ldap mode=0640
+  notify:
+  - restart slapd
+
+- name: ensure slapd is running (and enable it at boot)
+  service: name=slapd state=started enabled=yes
+
+- name: Create ldap.conf from template
+  template: src="ldap.conf.j2" dest="{{ openldap_conf_prefix }}/ldap.conf" owner=root group=root mode=0644
+  notify:
+  - restart slapd

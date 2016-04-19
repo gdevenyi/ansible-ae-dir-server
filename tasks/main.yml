@@ -1,0 +1,18 @@
+---
+# tasks file for roles/ae-dir
+- name: "Install OpenLDAP packages"
+  include: "install_openldap_{{ ansible_os_family }}.yml"
+  when: ansible_os_family == 'Debian'
+
+- name: "TLS configuration for OpenLDAP slapd"
+  include: tls_files.yml
+
+#- include: install_check_mk.yml
+
+- name: "Configure OpenLDAP slapd for AE-DIR"
+  include: configure_slapd.yml
+
+- name: "Configure web2ldap for AE-DIR"
+  include: configure_web2ldap.yml
+  when: openldap_role == 'p'
+
