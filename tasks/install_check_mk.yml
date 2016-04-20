@@ -13,7 +13,12 @@
   - python-pyasn1-modules
 
 - name: Install check_mk
-  apt: name=check-mk-agent state=installed update_cache=yes install_recommends=no dpkg_options='force-confold,force-confdef'
+  apt:
+    name: check-mk-agent
+    state: installed
+    update_cache: yes
+    install_recommends: no
+    dpkg_options: 'force-confold,force-confdef'
   when: ansible_os_family == 'Debian'
 
 - name: Install check_mk monitoring Python script
