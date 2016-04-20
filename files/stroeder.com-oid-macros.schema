@@ -9,4 +9,3 @@ objectidentifier stroeder-com-pub-ldap-at stroeder-com-pub-ldap:4
 objectidentifier stroeder-com-pub-ldap-oc stroeder-com-pub-ldap:6
 objectidentifier stroeder-com-pub-ae-dir stroeder-com-public:389.100
 
-objectidentifier stroeder-com-private stroeder-com:2
