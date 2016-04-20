@@ -9,7 +9,7 @@
     group: root
     mode: 0644
 
-- name: Create connect template for AE-DIR
+- name: Create connect AE-DIR landing page on https://{{ ansible_fqdn }}/web2ldap
   template:
     src: "web2ldap_connect.html.j2"
     dest: "{{ web2ldap_templates }}/connect.html"
