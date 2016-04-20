@@ -1,6 +1,23 @@
 ---
 # defaults file for roles/ae-dir
 
+
+#---------------------------------------------------------------------------
+# AE-DIR parameters
+#---------------------------------------------------------------------------
+
+aedir_min_uid: 30000
+
+aedir_min_gid: 30000
+
+aedir_global_gid: 10000
+
+aedir_suffix: ou=ae-dir
+
+#---------------------------------------------------------------------------
+# OpenLDAP parameters
+#---------------------------------------------------------------------------
+
 # which Debian repo to use for LTB OpenLDAP builds
 ltb_openldap_repo_source: "deb http://ltb-project.org/debian/{{ ansible_distribution_release }} {{ ansible_distribution_release }} main"
 ltb_openldap_repo_key: "http://ltb-project.org/wiki/lib/RPM-GPG-KEY-LTB-project"

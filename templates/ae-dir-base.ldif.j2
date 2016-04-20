@@ -1,0 +1,311 @@
+#---------------------------------------------------------------------------
+# This is the base tree structure for AE-DIR
+# You should load this data initially to the database
+# with suffix {{ aedir_suffix }}
+# As a root user just use this command:
+# ldapadd -H ldapi:// -f
+#
+# { ansible_managed }
+#---------------------------------------------------------------------------
+version: 1
+
+dn: {{ aedir_suffix }}
+aeStatus: 0
+description:: w4YtRElSIC0gQXV0aG9yaXplZCBFbnRpdGllcyBEaXJlY3Rvcnk=
+objectClass: organizationalUnit
+objectClass: aeRoot
+ou: ae-dir
+
+#---------------------------------------------------------------------------
+#
+#---------------------------------------------------------------------------
+#
+dn: cn=people,{{ aedir_suffix }}
+aeStatus: 0
+cn: people
+description: People and orga entries (e.g. synced from HR)
+objectClass: namedObject
+objectClass: aeObject
+objectClass: aeZone
+
+dn: cn=global,{{ aedir_suffix }}
+aeStatus: 0
+cn: global
+description: Global stuff
+objectClass: namedObject
+objectClass: aeObject
+objectClass: aeZone
+
+dn: cn=global-users,cn=global,{{ aedir_suffix }}
+aeStatus: 0
+cn: global-users
+description: Primary POSIX dummy group for all AE-DIR user accounts
+gidNumber: {{ aedir_global_gid }}
+objectClass: top
+objectClass: groupOfEntries
+objectClass: posixGroup
+objectClass: aeObject
+objectClass: aeGroup
+
+dn: cn=ae,{{ aedir_suffix }}
+aeStatus: 0
+cn: ae
+description:: w4YtRElSIG1hbmFnZW1lbnQ=
+objectClass: namedObject
+objectClass: aeObject
+objectClass: aeZone
+
+#---------------------------------------------------------------------------
+# password policy entries
+#---------------------------------------------------------------------------
+#
+dn: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
+cn: ppolicy-systems
+objectClass: namedPolicy
+objectClass: pwdPolicy
+pwdAllowUserChange: FALSE
+pwdAttribute: userPassword
+pwdCheckQuality: 2
+pwdInHistory: 3
+pwdLockout: FALSE
+pwdMinLength: 24
+pwdMustChange: FALSE
+
+dn: cn=ppolicy-users,cn=ae,{{ aedir_suffix }}
+cn: ppolicy-users
+objectClass: namedPolicy
+objectClass: pwdPolicy
+pwdAllowUserChange: TRUE
+pwdAttribute: userPassword
+pwdCheckQuality: 2
+pwdExpireWarning: 864000
+pwdFailureCountInterval: 1800
+pwdGraceAuthNLimit: 0
+pwdInHistory: 10
+pwdLockout: TRUE
+pwdLockoutDuration: 20
+pwdMaxAge: 7776000
+pwdMaxFailure: 6
+pwdMinAge: 7200
+pwdMinLength: 12
+pwdMustChange: FALSE
+pwdSafeModify: FALSE
+
+#---------------------------------------------------------------------------
+# AE groups
+#---------------------------------------------------------------------------
+#
+dn: cn=ae-admins,cn=ae,{{ aedir_suffix }}
+aeStatus: 0
+cn: ae-admins
+description:: R3JvdXAgbWVtYmVycyBjYW4gbWFuYWdlIGFsbCDDhi1ESVIgZW50cmllcw==
+gidNumber: {{ aedir_min_gid+1 }}
+objectClass: top
+objectClass: groupOfEntries
+objectClass: posixGroup
+objectClass: aeObject
+objectClass: aeGroup
+
+dn: cn=ae-auditors,cn=ae,{{ aedir_suffix }}
+aeStatus: 0
+cn: ae-auditors
+description:: R3JvdXAgbWVtYmVycyBjYW4gcmVhZCBhbGwgw4YtRElSIGVudHJpZXM=
+gidNumber: {{ aedir_min_gid+2 }}
+objectClass: top
+objectClass: groupOfEntries
+objectClass: posixGroup
+objectClass: aeObject
+objectClass: aeGroup
+
+dn: cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}
+aeStatus: 0
+cn: ae-login-proxies
+description: Members are central login components which are allowed to see all users/groups and must determine login user/target relation themselves
+gidNumber: {{ aedir_min_gid+5 }}
+objectClass: top
+objectClass: groupOfEntries
+objectClass: posixGroup
+objectClass: aeObject
+objectClass: aeGroup
+
+dn: cn=ae-system-admins,cn=ae,{{ aedir_suffix }}
+aeStatus: 0
+cn: ae-system-admins
+description: Members are system admins for AE-DIR servers
+gidNumber: {{ aedir_min_gid+6 }}
+objectClass: top
+objectClass: groupOfEntries
+objectClass: posixGroup
+objectClass: aeObject
+objectClass: aeGroup
+
+dn: uid=system_pwd_self_service,cn=ae,{{ aedir_suffix }}
+aeStatus: 0
+cn: Password self-service application
+description: The system user allowed to set attributes during user password reset (msPwdResetObject) over LDAPI
+gidNumber: 998
+homeDirectory: /home/system_pwd_self_service
+loginShell: /bin/true
+objectClass: account
+objectClass: aeObject
+objectClass: aeService
+objectClass: posixAccount
+objectClass: ldapPublicKey
+pwdPolicySubentry: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
+uid: system_pwd_self_service
+uidNumber: 998
+
+dn: uid=system_person_sync,cn=ae,{{ aedir_suffix }}
+aeStatus: 0
+cn: Personnel data sync process
+description: The system user allowed to maintain aePerson entries over LDAPI
+gidNumber: 999
+homeDirectory: /home/system_person_sync
+loginShell: /bin/true
+objectClass: account
+objectClass: aeObject
+objectClass: aeService
+objectClass: posixAccount
+objectClass: ldapPublicKey
+pwdPolicySubentry: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
+uid: system_person_sync
+uidNumber: 999
+
+dn: cn=ae-sudo-system-admins,cn=ae,{{ aedir_suffix }}
+cn: ae-sudo-system-admins
+objectClass: top
+objectClass: sudoRole
+objectClass: aeObject
+objectClass: aeSudoRule
+description: su - root for AE-DIR system admins
+sudoRunAsUser: ALL
+aeStatus: 0
+sudoCommand: ALL
+sudoHost: ALL
+sudoUser: %ae-system-admins
+
+dn: cn=ae-dir-servers,cn=ae,{{ aedir_suffix }}
+aeStatus: 0
+description:: w4YtRElSIHByb3ZpZGVycw==
+objectClass: aeObject
+objectClass: aeSrvGroup
+cn: ae-dir-servers
+aeSetupGroups: cn=ae-system-admins,cn=ae,{{ aedir_suffix }}
+aeLoginGroups: cn=ae-system-admins,cn=ae,{{ aedir_suffix }}
+aeLogStoreGroups: cn=ae-system-admins,cn=ae,{{ aedir_suffix }}
+aeVisibleSudoers: cn=ae-sudo-system-admins,cn=ae,{{ aedir_suffix }}
+
+#---------------------------------------------------------------------------
+# aeHost entries for all AE-DIR server systems
+#---------------------------------------------------------------------------
+#
+{% for replica in groups['ae-dir-providers'] %}
+dn: host={{ replica }},cn=ae-dir-servers,cn=ae,{{ aedir_suffix }}
+host: {{ replica }}
+aeStatus: 0
+objectClass: device
+objectClass: aeDevice
+objectClass: aeObject
+objectClass: aeHost
+objectClass: ldapPublicKey
+pwdPolicySubentry: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
+cn: {{ replica.split('.')[0] }}
+aeTicketId: INITIAL-42
+description: AE-DIR provider replica host {{ replica }}
+
+{% endfor %}
+{% for replica in groups['ae-dir-consumers'] %}
+dn: host={{ replica }},cn=ae-dir-servers,cn=ae,{{ aedir_suffix }}
+host: {{ replica }}
+aeStatus: 0
+objectClass: device
+objectClass: aeDevice
+objectClass: aeObject
+objectClass: aeHost
+objectClass: ldapPublicKey
+pwdPolicySubentry: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
+cn: {{ replica.split('.')[0] }}
+aeTicketId: INITIAL-42
+description: AE-DIR consumer replica host {{ replica }}
+
+{% endfor %}
+#
+#---------------------------------------------------------------------------
+# aeService entries for all AE-DIR slapd replicas
+#---------------------------------------------------------------------------
+#
+{% for replica in groups['ae-dir-providers'] %}
+dn: uid=system_slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
+uid: system_slapd_{{ replica.split('.')[0] }}
+pwdPolicySubentry: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
+objectClass: account
+objectClass: aeObject
+objectClass: aeService
+objectClass: pkiUser
+objectClass: posixAccount
+aeStatus: 0
+description: AE-DIR slapd provider running on {{ replica }}
+homeDirectory: /home/system_slapd_{{ replica.split('.')[0] }}
+cn: slapd_{{ replica }}
+uidNumber: {{ aedir_min_uid + loop.index }}
+gidNumber: {{ aedir_min_gid+6 }}
+seeAlso: cn={{ replica }},{{ openldap_tls_cert_suffix }}
+
+{% endfor %}
+{% for replica in groups['ae-dir-consumers'] %}
+dn: uid=system_slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
+uid: system_slapd_{{ replica.split('.')[0] }}
+pwdPolicySubentry: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
+objectClass: account
+objectClass: aeObject
+objectClass: aeService
+objectClass: pkiUser
+objectClass: posixAccount
+aeStatus: 0
+description: AE-DIR slapd provider running on {{ replica }}
+homeDirectory: /home/system_slapd_{{ replica.split('.')[0] }}
+cn: slapd_{{ replica }}
+uidNumber: {{ aedir_min_uid + groups['ae-dir-consumers']|length + loop.index }}
+gidNumber: {{ aedir_min_gid+6 }}
+seeAlso: cn={{ replica }},{{ openldap_tls_cert_suffix }}
+
+{% endfor %}
+#
+#---------------------------------------------------------------------------
+# AE-DIR slapd replica groups
+#---------------------------------------------------------------------------
+#
+dn: cn=ae-providers,cn=ae,{{ aedir_suffix }}
+aeStatus: 0
+cn: ae-providers
+description: Members of this group are AE-DIR provider replicas
+gidNumber: {{ aedir_min_gid+4 }}
+objectClass: top
+objectClass: groupOfEntries
+objectClass: posixGroup
+objectClass: aeObject
+objectClass: aeGroup
+{% for replica in groups['ae-dir-providers'] %}
+member: uid=system_slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
+memberUID: system_slapd_{{ replica.split('.')[0] }}
+{% endfor %}
+
+dn: cn=ae-replicas,cn=ae,{{ aedir_suffix }}
+aeStatus: 0
+cn: ae-replicas
+description: Members of this group are AE-DIR replicas (providers and consumers)
+gidNumber: {{ aedir_min_gid+3 }}
+objectClass: top
+objectClass: groupOfEntries
+objectClass: posixGroup
+objectClass: aeObject
+objectClass: aeGroup
+{% for replica in groups['ae-dir-providers'] %}
+member: uid=system_slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
+memberUID: system_slapd_{{ replica.split('.')[0] }}
+{% endfor %}
+{% for replica in groups['ae-dir-consumers'] %}
+member: uid=system_slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
+memberUID: system_slapd_{{ replica.split('.')[0] }}
+{% endfor %}
+

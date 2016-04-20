@@ -65,6 +65,15 @@
   notify:
   - restart slapd
 
+- name: "Create ae-dir-base.ldif from template"
+  template:
+    src: "ae-dir-base.ldif.j2"
+    dest: "{{ openldap_conf_prefix }}/ae-dir-base.ldif"
+    owner: root
+    group: ldap
+    mode: 0640
+  when: openldap_role == 'p'
+
 - name: Create client config file (ldap.conf) from template
   template:
     src: "ldap.conf.j2"
