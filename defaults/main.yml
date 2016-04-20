@@ -21,7 +21,6 @@ openldap_schema_files:
   - draft-findlay-ldap-groupofentries.schema
   - draft-stroeder-mailboxrelatedobject.schema
   - draft-stroeder-namedobject.schema
-  - init.schema
   - mspwdreset.schema
   - oath-ldap.schema
   - openssh-lpk_openldap.schema
