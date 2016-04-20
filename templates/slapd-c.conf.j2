@@ -20,6 +20,7 @@ modulepath :/usr/local/openldap/libexec/openldap
 
 moduleload back_mdb
 moduleload back_monitor
+moduleload back_sock
 
 #---------------------------------------------------------------------------
 # Load dynamic overlay modules:
@@ -98,6 +99,9 @@ authz-regexp
 authz-regexp
   "cn=([a-zA-Z0-9.-]+),{{ openldap_tls_cert_suffix }}"
   "ldap:///ou=ae-dir??sub?(&(objectClass=aeHost)(host=$1)(aeStatus=0))"
+authz-regexp
+  "cn=([a-zA-Z0-9.-]+)"
+  "ldap:///ou=ae-dir??sub?(&(objectClass=aeHost)(host=$1)(aeStatus=0))"
 
 #---------------------------------------------------------------------------
 # Global access control and security restrictions
@@ -109,9 +113,7 @@ require bind LDAPv3 strong
 # SSF value for ldapi://
 localSSF 256
 # minimum required SSF value (security strength factor)
-#security ssf=128
-# no TLS required because of IPMI console on AMD servers
-security ssf=0
+security ssf=128
 
 # allow all bound users to read rootDSE
 access to
@@ -186,6 +188,9 @@ access
 
 # for counting search results without retrieving them
 #overlay noopsrch
+
+# for dereferencing control
+overlay deref
 
 #######################################################################
 # Database for ou=ae-dir
@@ -267,6 +272,17 @@ index uniqueIdentifier eq
 index employeeNumber eq
 index aePerson eq
 
+# Meta data
+index aeTicketId eq
+
+# hardware devices
+index serialNumber eq,sub
+index aeHwSerialNumber eq,sub
+
+#---------------------------------------------------------------------------
+# search/time limits for ou=ae-dir
+#---------------------------------------------------------------------------
+
 # no limits for Æ admins
 limits
   group/aeGroup/member="cn=ae-admins,cn=ae,ou=ae-dir"
@@ -300,13 +316,25 @@ limits
 # This purposely also affects open LDAP connections!
 #------------------------------------------------------------------
 
+# block access to all other stuff (except userPassword)
 access to
   dn.subtree="ou=ae-dir"
+  attrs=!simpleSecurityObject
     by set="user/aeStatus & [0]" break
     by * auth
 
-# Access control for various password attributes
-#---------------------------------------------------------------------------
+
+# Safety net for bugs in OATH-LDAP bind proxy:
+# Block auth access to password of OTP users because their simple bind request
+# must only be validated on providers
+#------------------------------------------------------------------
+
+access to
+  dn.subtree="ou=ae-dir"
+  attrs=userPassword
+  filter="(&(objectClass=aeUser)(ae=0)(objectClass=oathUser)(oathToken=*))"
+    by group/aeGroup/member="cn=ae-admins,cn=ae,ou=ae-dir" break
+    by * none
 
 # Active users may authenticate via LDAP simple bind and change own password
 access to
@@ -317,10 +345,14 @@ access to
     by * auth
 
 # Subordinate aeHost and aeService entries beneath aeSrvGroup entries
+# Important note:
+# aeService entries running locally on AE-DIR servers MUST NOT have
+# userPassword attribute at all because they always MUST connect via LDAPI
+# and bind with SASL/EXTERNAL
 access to
   dn.regex="^.+,cn=([a-z0-9]+),ou=ae-dir$"
   attrs=userPassword
-  filter="(&(|(objectClass=aeHost)(objectClass=aeService))(aeStatus=0))"
+  filter="(&(|(objectClass=aeHost)(objectClass=aeService))(aeStatus=0)(!(|(uidNumber<=9999)(gidNumber<=9999))))"
     by group/aeGroup/member="cn=ae-admins,cn=ae,ou=ae-dir" =sx
     by group/aeGroup/member.expand="cn=${d1}-admins,cn=${d1},ou=ae-dir" =sx
     by set="user/entryDN & this/-1/aeSetupGroups/member" =sx
@@ -332,7 +364,7 @@ access to
   attrs=userPassword,pwdHistory
     by * none
 
-
+#---------------------------------------------------------------------------
 # General ACLs
 # This MUST be below ACLs for password attrs!
 #---------------------------------------------------------------------------
@@ -345,6 +377,12 @@ access to
     by group/aeGroup/member="cn=ae-auditors,cn=ae,ou=ae-dir" read
     by * break
 
+# Block access to archived entries from here no matter what
+access to
+  dn.subtree="ou=ae-dir"
+  filter="(aeStatus=2)"
+    by * none
+
 # Global stuff
 #------------------------------------------------------------------
 
@@ -353,18 +391,28 @@ access to
   attrs=entry,objectClass,entryUUID,modifyTimestamp,cn,gidNumber,description
     by users read
 
+# HR entries
+#------------------------------------------------------------------
+
+# Give read access to referencing personal user accounts and zone admins
+access to
+  dn.onelevel="cn=people,ou=ae-dir"
+    by set="user/aePerson & this/entryDN" read
+    by set="user/entryDN & ([ldap:///ou=ae-dir?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(member=] + user/entryDN + [))])/member" read
+    by * none
+
 # Security zones
 #------------------------------------------------------------------
 
-# Delegated administration for zone subtrees is on consumers
-# stripped down to reviewing all entries within a zone
+# Delegated administration for zone subtrees on consumers is
+# stripped down to reviewing all entries within a zone by the zone admins/auditors
 access to
   dn.regex="^.*cn=([a-z0-9]+),ou=ae-dir$"
     by group/aeGroup/member.expand="cn=${d1}-admins,cn=${d1},ou=ae-dir" read
     by group/aeGroup/member.expand="cn=${d1}-auditors,cn=${d1},ou=ae-dir" read
     by * break
 
-# Inactive entries not visible to normal users/systems
+# Inactive entries not visible to normal users/systems from here
 #---------------------------------------------------------------------------
 
 access to
@@ -378,8 +426,9 @@ access to
 # Give read access to POSIX groups to servers
 access to
   dn.subtree="ou=ae-dir"
-  attrs=entry,objectClass,entryUUID,modifyTimestamp,cn,gidNumber,member,memberUID,description
   filter="(objectClass=posixGroup)"
+  attrs=entry,objectClass,entryUUID,modifyTimestamp,cn,gidNumber,member,memberUID
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,ou=ae-dir" read
     by set="user/-1/aeLoginGroups & this/entryDN" read
     by set="user/-1/aeVisibleGroups & this/entryDN" read
     by set="user/-1/aeProxyFor/aeLoginGroups & this/entryDN" read
@@ -397,11 +446,26 @@ access to
     by set="user/aeSrvGroup/aeVisibleSudoers & this/entryDN" read
     by * none
 
-# Give read access to SSH public keys to servers which allow SSH login for the user's groups
+# Give read access to SSH public keys to servers which
+# shall allow login for the user's groups
 access to
   dn.subtree="ou=ae-dir"
   filter="(objectClass=ldapPublicKey)"
   attrs=sshPublicKey
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,ou=ae-dir" read
+    by set="user/-1/aeLoginGroups/member & this/entryDN" read
+    by set="user/-1/aeProxyFor/aeLoginGroups/member & this/entryDN" read
+    by set="user/aeSrvGroup/aeLoginGroups/member & this/entryDN" read
+    by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups/member & this/entryDN" read
+    by * break
+
+# Give read access to loginShell to servers which
+# shall allow login for the user's groups
+access to
+  dn.subtree="ou=ae-dir"
+  filter="(objectClass=posixAccount)"
+  attrs=loginShell
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,ou=ae-dir" read
     by set="user/-1/aeLoginGroups/member & this/entryDN" read
     by set="user/-1/aeProxyFor/aeLoginGroups/member & this/entryDN" read
     by set="user/aeSrvGroup/aeLoginGroups/member & this/entryDN" read
@@ -430,6 +494,7 @@ access to
   dn.subtree="ou=ae-dir"
   filter="(objectClass=aeHost)"
   attrs=entry,objectClass,cn,host
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,ou=ae-dir" read
     by set="user/-1/aeProxyFor & this/-1/entryDN" read
     by set="user/aeSrvGroup/aeProxyFor & this/-1/entryDN" read
     by * break
@@ -441,17 +506,26 @@ access to
 access to
   dn.subtree="ou=ae-dir"
   filter="(objectClass=posixAccount)"
-  attrs=entry,objectClass,entryUUID,modifyTimestamp,uid,uidNumber,gidNumber,homeDirectory,loginShell,gecos
+  attrs=entry,objectClass,entryUUID,modifyTimestamp,uid,uidNumber,gidNumber,homeDirectory,gecos
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,ou=ae-dir" read
     by set="user/-1/aeLoginGroups/member & this/entryDN" read
     by set="user/-1/aeVisibleGroups/member & this/entryDN" read
     by set="user/-1/aeProxyFor/aeLoginGroups/member & this/entryDN" read
+    by set="user/aeSrvGroup/aeLoginGroups/member & this/entryDN" read
+    by set="user/aeSrvGroup/aeVisibleGroups/member & this/entryDN" read
+    by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups/member & this/entryDN" read
     by * break
+
+# Access to pwdChangedTime for SSH key sync
 access to
   dn.subtree="ou=ae-dir"
   filter="(&(objectClass=posixAccount)(objectClass=ldapPublicKey))"
   attrs=pwdChangedTime
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,ou=ae-dir" read
     by set="user/-1/aeLoginGroups/member & this/entryDN" search
     by set="user/-1/aeProxyFor/aeLoginGroups/member & this/entryDN" search
+    by set="user/aeSrvGroup/aeLoginGroups/member & this/entryDN" search
+    by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups/member & this/entryDN" search
     by * break
 
 # Read access to specific memberOf *values* to all aeHost entries
