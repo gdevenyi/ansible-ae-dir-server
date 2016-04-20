@@ -64,3 +64,10 @@ w2lapp.schema.syntaxes.syntax_registry.registerAttrType(
     w2lapp.schema.plugins.aedir.AE_PERSON_OID, # aePerson
   ],
 )
+
+import w2lapp.schema.plugins.posixautogen
+#w2lapp.schema.plugins.posixautogen.HomeDirectory.homeDirectoryTemplate = '/home/{uid}'
+w2lapp.schema.plugins.posixautogen.AutogenUIDNumber.minNewValue = {{ aedir_min_uid }}L
+w2lapp.schema.plugins.posixautogen.AutogenUIDNumber.maxNewValue = {{ aedir_max_uid }}L
+w2lapp.schema.plugins.posixautogen.AutogenGIDNumber.minNewValue = {{ aedir_min_gid }}L
+w2lapp.schema.plugins.posixautogen.AutogenGIDNumber.maxNewValue = {{ aedir_max_gid }}L

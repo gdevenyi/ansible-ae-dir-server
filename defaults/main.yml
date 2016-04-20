@@ -6,13 +6,19 @@
 # AE-DIR parameters
 #---------------------------------------------------------------------------
 
-aedir_min_uid: 30000
-
-aedir_min_gid: 30000
-
-aedir_global_gid: 10000
-
+# base DN / search root for AE-DIR entries
 aedir_suffix: ou=ae-dir
+
+# POSIX-UID number range served by AE-DIR
+aedir_min_uid: 30000
+aedir_max_uid: 59999
+
+# POSIX-GID number range served by AE-DIR
+aedir_min_gid: 30000
+aedir_max_gid: 59999
+
+# fixed primary POSIX-GID in all posixAccount entries
+aedir_global_gid: 10000
 
 #---------------------------------------------------------------------------
 # OpenLDAP parameters
