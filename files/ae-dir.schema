@@ -366,6 +366,12 @@ ditcontentrule ( ae-dir-oc:6.2
 # Original person entries
 #-----------------------------------------------------------------------
 
+attributetype ( ae-dir-at:9
+  NAME 'aeSourceUri'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: URI of data source for synced person entry'
+  SUP labeledURI )
+
 objectclass ( ae-dir-oc:8
   NAME 'aePerson'
   X-ORIGIN 'AE-DIR'
@@ -373,7 +379,7 @@ objectclass ( ae-dir-oc:8
   STRUCTURAL
   SUP ( inetOrgPerson $ aeObject )
   MUST ( givenName $ mail )
-  MAY ( uniqueIdentifier $ employeeNumber ) )
+  MAY ( aeSourceUri $ uniqueIdentifier $ employeeNumber ) )
 
 ditcontentrule ( ae-dir-oc:8
   NAME 'aePerson-dcr'
