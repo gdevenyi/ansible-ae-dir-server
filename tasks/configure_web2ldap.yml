@@ -1,3 +1,4 @@
+---
 # Apply AE-DIR configuration to web2ldap
 
 - name: Create web2ldapcnf/local.py for AE-DIR
