@@ -63,7 +63,10 @@ openldap_key_filename: "{{ ansible_fqdn }}.key"
 openldap_cacert_pathname: "{{ openldap_conf_prefix }}/tls/{{ openldap_cacert_filename }}"
 openldap_cert_pathname: "{{ openldap_conf_prefix }}/tls/{{ openldap_cert_filename }}"
 openldap_key_pathname: "{{ openldap_conf_prefix }}/tls/{{ openldap_key_filename }}"
+
+# for generating DH parameters for perfect forward secrecy
 openldap_dhparam_pathname: "{{ openldap_conf_prefix }}/tls/slapd.dhparam"
+openldap_dhparam_numbits: 2048
 
 # Suffix of subject-DNs in TLS server certificates
 openldap_tls_cert_suffix: "ou=ITS,o=My Example Org.,c=DE"

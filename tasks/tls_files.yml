@@ -2,31 +2,57 @@
 # Install TLS related files
 
 - name: Create TLS directory
-  file: path="{{ openldap_conf_prefix }}/tls" state=directory owner=root group=ldap mode=0755
+  file:
+    path: "{{ openldap_conf_prefix }}/tls"
+    state: directory
+    owner: root
+    group: ldap
+    mode: 0755
   notify:
   - restart slapd
 
 - name: CA certificate file
-  copy: src="{{ openldap_cacert_filename }}" dest="{{ openldap_cacert_pathname }}" owner=root group=ldap mode=0644
+  copy:
+    src: "{{ openldap_cacert_filename }}"
+    dest: "{{ openldap_cacert_pathname }}"
+    owner: root
+    group: ldap
+    mode: 0644
   notify:
   - restart slapd
 
 - name: TLS server certificate file
-  copy: src="{{ openldap_cert_filename }}" dest="{{ openldap_cert_pathname }}" owner=root group=ldap mode=0640
+  copy:
+    src: "{{ openldap_cert_filename }}"
+    dest: "{{ openldap_cert_pathname }}"
+    owner: root
+    group: ldap
+    mode: 0640
   notify:
   - restart slapd
 
 - name: TLS server key file
-  copy: src="{{ openldap_key_filename }}" dest="{{ openldap_key_pathname }}" owner=root group=ldap mode=0640
+  copy:
+    src: "{{ openldap_key_filename }}"
+    dest: "{{ openldap_key_pathname }}"
+    owner: root
+    group: ldap
+    mode: 0640
   notify:
   - restart slapd
 
 - name: generate TLS DH parameter file
-  command: /usr/bin/openssl dhparam -out "{{ openldap_dhparam_pathname }}" 2048 creates="{{ openldap_dhparam_pathname }}"
+  command: "/usr/bin/openssl dhparam -out {{ openldap_dhparam_pathname }} {{ openldap_dhparam_numbits }}"
+  args:
+    creates: "{{ openldap_dhparam_pathname }}"
   notify:
   - restart slapd
 
 - name: TLS server key file
-  file: path="{{ openldap_dhparam_pathname }}" owner=root group=ldap mode=0640
+  file:
+    path: "{{ openldap_dhparam_pathname }}"
+    owner: root
+    group: ldap
+    mode: 0640
   notify:
   - restart slapd
