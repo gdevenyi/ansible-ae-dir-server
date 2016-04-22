@@ -265,7 +265,7 @@ aeStatus: 0
 description: AE-DIR slapd provider running on {{ replica }}
 homeDirectory: /home/system_slapd_{{ replica.split('.')[0] }}
 cn: slapd_{{ replica }}
-uidNumber: {{ aedir_min_uid + groups['ae-dir-consumers']|length + loop.index }}
+uidNumber: {{ aedir_min_uid + groups['ae-dir-consumers']|length + 1 + loop.index }}
 gidNumber: {{ aedir_global_gid }}
 seeAlso: cn={{ replica }},{{ openldap_tls_cert_suffix }}
 
