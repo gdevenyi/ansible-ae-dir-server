@@ -58,6 +58,13 @@ openldap_providers: []
 # List of servers to be added to rootDSE attribute altServer (see RFC 4512)
 openldap_rootdse_alt_servers: []
 
+# The CA certificate file for validating the server certs
+openldap_cacert_filename: "slapd-cacerts.pem"
+
+# Suffix expected in subject-DN of server and client certs
+# for authz-regexp directive and pkiUser/seeAlso attributes
+openldap_tls_cert_suffix: "OU=ITS,O=Example,C=DE"
+
 # The server certificate and key files
 openldap_cert_filename: "{{ inventory_hostname }}.crt"
 openldap_key_filename: "{{ inventory_hostname }}.key"
