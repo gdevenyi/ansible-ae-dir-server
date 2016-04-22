@@ -52,6 +52,9 @@ openldap_schema_files:
   - stroeder.com.schema
   - sudoers.schema
 
+# Provider replicas hostnames
+openldap_providers: []
+
 # List of servers to be added to rootDSE attribute altServer (see RFC 4512)
 openldap_rootdse_alt_servers: []
 
