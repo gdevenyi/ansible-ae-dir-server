@@ -1,0 +1,6 @@
+dn: 
+#defaultNamingContext: {{ aedir_suffix }}
+{% for alt_server in openldap_rootdse_alt_servers %}
+altServer: ldaps://{{ alt_server }}
+{% endfor%}
+
