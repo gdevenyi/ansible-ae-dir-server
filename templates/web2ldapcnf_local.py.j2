@@ -18,11 +18,9 @@ import w2lapp.schema.syntaxes
 
 # Which IP addresses are allowed to access monitor page
 web2ldapcnf.monitor.access_allowed = [
-  '127.0.0.0/255.0.0.0',
-  '::1',
-  'fe00::0',
-  '10.0.0.0/255.0.0.0',
-#  '0.0.0.0/0.0.0.0','::0',
+{% for allowed in web2ldap_monitor_access_allowed %}
+  '{{ allowed }}',
+{% endfor %}
 ]
 
 #-----------------------------------------------------------------------
