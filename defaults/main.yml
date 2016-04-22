@@ -52,12 +52,12 @@ openldap_schema_files:
   - stroeder.com.schema
   - sudoers.schema
 
-# Provider replicas hostnames
-openldap_providers: []
+# List of servers to be added to rootDSE attribute altServer (see RFC 4512)
+openldap_rootdse_alt_servers: []
 
 # The server certificate and key files
-openldap_cert_filename: "{{ ansible_fqdn }}.crt"
-openldap_key_filename: "{{ ansible_fqdn }}.key"
+openldap_cert_filename: "{{ inventory_hostname }}.crt"
+openldap_key_filename: "{{ inventory_hostname }}.key"
 
 # The full path names on the target system
 openldap_cacert_pathname: "{{ openldap_conf_prefix }}/tls/{{ openldap_cacert_filename }}"
