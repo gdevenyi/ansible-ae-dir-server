@@ -8,8 +8,11 @@
     owner: root
     group: root
     mode: 0644
+#    validate: "PYTHONPATH={{ web2ldap_etc }}:{{ web2ldap_prefix }}/pylib {{ web2ldap_prefix }}/bin/python %s"
+  notify:
+    - restart web server
 
-- name: Create connect AE-DIR landing page on https://{{ ansible_fqdn }}/web2ldap
+- name: Create connect AE-DIR landing page on https://{{ inventory_hostname }}/web2ldap
   template:
     src: "web2ldap_connect.html.j2"
     dest: "{{ web2ldap_templates }}/connect.html"
@@ -20,5 +23,5 @@
 #- name: web2ldap templates for AE-DIR
 #  template: src="{{ item }}.j2" dest="{{ web2ldap_templates }}/ae-dir/{{ item }}" owner=root group=root mode=0644
 #  with_items:
-#  - 
+#  -
 
