@@ -49,6 +49,9 @@ loglevel {{ openldap_log_level }}
 # number of worker threads used
 threads {{ openldap_threads }}
 
+# additional rootDSE attributes in external LDIF file
+rootDSE {{ openldap_conf_prefix }}/rootDSE.ldif
+
 #---------------------------------------------------------------------------
 # password hash parameters
 #---------------------------------------------------------------------------

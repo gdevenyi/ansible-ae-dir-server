@@ -62,8 +62,17 @@
     owner: root
     group: ldap
     mode: 0640
+#    validate: "{{ openldap_sbin }}/slaptest %s"
   notify:
   - restart slapd
+
+- name: "Create rootDSE.ldif from template"
+  template:
+    src: "rootDSE.ldif.j2"
+    dest: "{{ openldap_conf_prefix }}/rootDSE.ldif"
+    owner: root
+    group: ldap
+    mode: 0644
 
 - name: "Create ae-dir-base.ldif from template"
   template:
