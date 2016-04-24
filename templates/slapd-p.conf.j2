@@ -8,8 +8,8 @@
 include {{ openldap_schema_prefix }}/init.schema
 
 # Where PID and arg files are stored
-pidfile /usr/local/openldap/var/run/slapd.pid
-argsfile /usr/local/openldap/var/run/slapd.args
+pidfile {{ openldap_rundir }}/slapd.pid
+argsfile {{ openldap_rundir }}/slapd.args
 
 # Where to find OpenLDAP's dynamic modules
 modulepath :/usr/local/openldap/libexec/openldap
