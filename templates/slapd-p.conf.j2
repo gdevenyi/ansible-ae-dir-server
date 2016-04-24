@@ -403,13 +403,13 @@ access to
 
 # Active users may authenticate via LDAP simple bind and change own password
 access to
-  dn.regex="^.+,cn=([a-z0-9]+),ou=ae-dir$"
+  dn.regex="^uid=.+,cn=([a-z0-9]+),ou=ae-dir$"
   attrs=userPassword
   filter="(&(objectClass=aeUser)(aeStatus=0))"
-    by group/aeGroup/member="cn=ae-admins,cn=ae,ou=ae-dir" =swx
-    by group/aeGroup/member.expand="cn=${d1}-admins,cn=${d1},ou=ae-dir" =swx
-    by dn.base="uid=system_passwd_self_service,cn=ae,ou=ae-dir" =wx
-    by self =wx
+    by group/aeGroup/member="cn=ae-admins,cn=ae,ou=ae-dir" =sw
+    by group/aeGroup/member.expand="cn=${d1}-admins,cn=${d1},ou=ae-dir" =w
+    by dn.base="uid=system_passwd_self_service,cn=ae,ou=ae-dir" =w
+    by self =w
     by * auth
 
 # Subordinate aeHost and aeService entries beneath aeSrvGroup entries
@@ -417,10 +417,10 @@ access to
   dn.regex="^.+,cn=([a-z0-9]+),ou=ae-dir$"
   attrs=userPassword
   filter="(&(|(objectClass=aeHost)(objectClass=aeService))(aeStatus=0))"
-    by group/aeGroup/member="cn=ae-admins,cn=ae,ou=ae-dir" =swx
-    by group/aeGroup/member.expand="cn=${d1}-zone-admins,cn=${d1},ou=ae-dir" =swx
-    by set="user/entryDN & this/-1/aeSetupGroups/member" =swx
-    by set="user/entryDN & this/aeSrvGroup/aeSetupGroups/member" =swx
+    by group/aeGroup/member="cn=ae-admins,cn=ae,ou=ae-dir" =sw
+    by group/aeGroup/member.expand="cn=${d1}-zone-admins,cn=${d1},ou=ae-dir" =sw
+    by set="user/entryDN & this/-1/aeSetupGroups/member" =sw
+    by set="user/entryDN & this/aeSrvGroup/aeSetupGroups/member" =sw
     by * auth
 
 # no access to userPassword and pwdHistory as last catch

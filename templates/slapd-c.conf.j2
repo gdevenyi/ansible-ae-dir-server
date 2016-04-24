@@ -356,10 +356,10 @@ access to
   dn.regex="^.+,cn=([a-z0-9]+),ou=ae-dir$"
   attrs=userPassword
   filter="(&(|(objectClass=aeHost)(objectClass=aeService))(aeStatus=0)(!(|(uidNumber<=9999)(gidNumber<=9999))))"
-    by group/aeGroup/member="cn=ae-admins,cn=ae,ou=ae-dir" =sx
-    by group/aeGroup/member.expand="cn=${d1}-admins,cn=${d1},ou=ae-dir" =sx
-    by set="user/entryDN & this/-1/aeSetupGroups/member" =sx
-    by set="user/entryDN & this/aeSrvGroup/aeSetupGroups/member" =sx
+    by group/aeGroup/member="cn=ae-admins,cn=ae,ou=ae-dir" =s
+    by group/aeGroup/member.expand="cn=${d1}-zone-admins,cn=${d1},ou=ae-dir" =s
+    by set="user/entryDN & this/-1/aeSetupGroups/member" =s
+    by set="user/entryDN & this/aeSrvGroup/aeSetupGroups/member" =s
     by * auth
 
 # no access to userPassword and pwdHistory as last catch
