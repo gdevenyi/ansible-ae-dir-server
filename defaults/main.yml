@@ -39,6 +39,10 @@ openldap_rundir: "{{ openldap_prefix }}/var/run"
 openldap_data: "{{ openldap_prefix }}/var/openldap-data"
 openldap_conf_file: "{{ openldap_conf_prefix }}/slapd.conf"
 
+# Directories with dynamically loadable modules
+openldap_module_paths:
+  - "{{ openldap_prefix }}/libexec/openldap"
+
 # All additional schema files needed
 openldap_schema_files:
   - ae-dir.schema

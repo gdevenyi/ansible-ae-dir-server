@@ -12,7 +12,7 @@ pidfile {{ openldap_rundir }}/slapd.pid
 argsfile {{ openldap_rundir }}/slapd.args
 
 # Where to find OpenLDAP's dynamic modules
-modulepath :/usr/local/openldap/libexec/openldap
+modulepath {{ openldap_module_paths|join(':') }}
 
 #---------------------------------------------------------------------------
 # Load dynamic backend modules:
@@ -286,13 +286,13 @@ index aeHwSerialNumber eq,sub
 # search/time limits for ou=ae-dir
 #---------------------------------------------------------------------------
 
-# no limits for Æ admins
+# no limits for AE admins
 limits
   group/aeGroup/member="cn=ae-admins,cn=ae,ou=ae-dir"
     time=unlimited
     size=unlimited
 
-# no limits for Æ auditors
+# no limits for AE auditors
 limits
   group/aeGroup/member="cn=ae-auditors,cn=ae,ou=ae-dir"
     time=unlimited
@@ -373,7 +373,7 @@ access to
 #---------------------------------------------------------------------------
 
 # Global first-catch ACLs which fire no matter what else happens afterwards...
-# Æ admins can manage everything else, Æ auditors can read everything else
+# AE admins can manage everything else, AE auditors can read everything else
 access to
   dn.subtree="ou=ae-dir"
     by group/aeGroup/member="cn=ae-admins,cn=ae,ou=ae-dir" read
