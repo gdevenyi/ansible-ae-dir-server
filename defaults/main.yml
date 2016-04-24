@@ -35,6 +35,7 @@ openldap_conf_prefix: "{{ openldap_prefix }}/etc/openldap"
 openldap_schema_prefix: "{{ openldap_prefix }}/etc/openldap/schema"
 openldap_sbin: "{{ openldap_prefix }}/sbin"
 openldap_defaults: "/etc/default/slapd"
+openldap_rundir: "{{ openldap_prefix }}/var/run"
 openldap_data: "{{ openldap_prefix }}/var/openldap-data"
 openldap_conf_file: "{{ openldap_conf_prefix }}/slapd.conf"
 
@@ -77,9 +78,6 @@ openldap_key_pathname: "{{ openldap_conf_prefix }}/tls/{{ openldap_key_filename 
 # for generating DH parameters for perfect forward secrecy
 openldap_dhparam_pathname: "{{ openldap_conf_prefix }}/tls/slapd.dhparam"
 openldap_dhparam_numbits: 2048
-
-# Suffix of subject-DNs in TLS server certificates
-openldap_tls_cert_suffix: "ou=ITS,o=My Example Org.,c=DE"
 
 # which messages to send to syslog
 # normal for production: stats
