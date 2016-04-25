@@ -411,8 +411,8 @@ access to
 # stripped down to reviewing all entries within a zone by the zone admins/auditors
 access to
   dn.regex="^.*cn=([a-z0-9]+),ou=ae-dir$"
-    by group/aeGroup/member.expand="cn=${d1}-admins,cn=${d1},ou=ae-dir" read
-    by group/aeGroup/member.expand="cn=${d1}-auditors,cn=${d1},ou=ae-dir" read
+    by group/aeGroup/member.expand="cn=${d1}-zone-admins,cn=${d1},ou=ae-dir" read
+    by group/aeGroup/member.expand="cn=${d1}-zone-auditors,cn=${d1},ou=ae-dir" read
     by * break
 
 # Inactive entries not visible to normal users/systems from here

@@ -407,7 +407,7 @@ access to
   attrs=userPassword
   filter="(&(objectClass=aeUser)(aeStatus=0))"
     by group/aeGroup/member="cn=ae-admins,cn=ae,ou=ae-dir" =sw
-    by group/aeGroup/member.expand="cn=${d1}-admins,cn=${d1},ou=ae-dir" =w
+    by group/aeGroup/member.expand="cn=${d1}-zone-admins,cn=${d1},ou=ae-dir" =w
     by dn.base="uid=system_passwd_self_service,cn=ae,ou=ae-dir" =w
     by self =w
     by * auth
