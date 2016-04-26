@@ -47,8 +47,8 @@ SYNCREPL_HYSTERESIS_CRIT = 10.0
 
 # Exception used to catch all exceptions
 # (set to None to get tracebacks of unhandled exceptions)
-#CATCH_ALL_EXCEPTION = Exception
-CATCH_ALL_EXCEPTION = None
+CATCH_ALL_EXCEPTION = Exception
+#CATCH_ALL_EXCEPTION = None
 
 # acceptable count of all outstanding operations
 # Using None disables checking the warn/critical level
