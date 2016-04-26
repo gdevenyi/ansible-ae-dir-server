@@ -85,7 +85,7 @@ openldap_dhparam_numbits: 2048
 
 # which messages to send to syslog
 # normal for production: stats
-openldap_log_level: "stats stats2"
+openldap_log_level: "stats"
 
 # how many worker threads are started
 # RAM needed per thread: 4MB on 32 bit systems, 8MB on 64 bit systems
