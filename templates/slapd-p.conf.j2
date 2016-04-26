@@ -632,7 +632,7 @@ access to
 # aeUser entries not archived
 access to
   dn.regex="^uid=([a-zA-Z0-9_.-]+),cn=([a-z0-9]+),ou=ae-dir$"
-  filter="(&(objectClass=aeUser)(!(aeStatus=2)))"
+  filter="(objectClass=aeUser)"
   attrs=!msPwdResetObject
     by group/aeGroup/member.expand="cn=${d2}-zone-admins,cn=${d2},ou=ae-dir" write
     by group/aeGroup/member.expand="cn=${d2}-zone-auditors,cn=${d2},ou=ae-dir" read
