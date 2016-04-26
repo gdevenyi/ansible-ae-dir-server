@@ -47,8 +47,8 @@ SYNCREPL_HYSTERESIS_CRIT = 10.0
 
 # Exception used to catch all exceptions
 # (set to None to get tracebacks of unhandled exceptions)
-CATCH_ALL_EXCEPTION = Exception
-#CATCH_ALL_EXCEPTION = None
+#CATCH_ALL_EXCEPTION = Exception
+CATCH_ALL_EXCEPTION = None
 
 # acceptable count of all outstanding operations
 # Using None disables checking the warn/critical level
@@ -555,13 +555,13 @@ class SlapdCheck(LocalCheck):
       _,config_tls_attrs = ldap_conn.search_ext_s(
         config_context,
         ldap.SCOPE_BASE,
+        '(objectClass=*)',
         [
           'olcTLSCACertificateFile',
           'olcTLSCertificateFile',
           'olcTLSCertificateKeyFile',
         ],
-        '(objectClass=*)',
-      )
+      )[0]
 
     try:
       ldaps_conn = SlapdCheckLDAPObject(
@@ -578,13 +578,24 @@ class SlapdCheck(LocalCheck):
         (ldap.OPT_X_TLS_CERTFILE,'olcTLSCertificateFile'),
         (ldap.OPT_X_TLS_KEYFILE,'olcTLSCertificateKeyFile'),
       ):
-        ldaps_conn.set_option(ldap_option,config_tls_attrs[attr_type])
+        tls_file_name = config_tls_attrs[attr_type][0]
+        # provoke IOError if non-existing file is referenced
+        open(tls_file_name,'rb')
+        ldaps_conn.set_option(ldap_option,tls_file_name)
       # Reinitialize SSL context
       ldaps_conn.set_option(ldap.OPT_X_TLS_NEWCTX,0)
       # Send SASL/EXTERNAL bind request which really opens the connection
       ldaps_conn.sasl_interactive_bind_s('',ldap.sasl.sasl({}, 'EXTERNAL'))
     except LDAPError,e:
-      self.result_line(2,'LdapSelfConnection',check_output='LDAPError connecting to %s: %s' % (repr(ldaps_uri),str(e)))
+      self.result_line(
+        2,
+        'LdapSelfConnection',
+        check_output='LDAPError connecting to %s: %s %s' % (
+          repr(ldaps_uri),
+          str(e),
+          config_tls_attrs,
+        )
+      )
     except CATCH_ALL_EXCEPTION,e:
       self.result_line(3,'LdapSelfConnection',check_output='Exception while connecting to %s: %s' % (repr(ldaps_uri),str(e)))
     else:
