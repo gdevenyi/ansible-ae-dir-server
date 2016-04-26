@@ -7,7 +7,7 @@
 - name: "TLS configuration for OpenLDAP slapd"
   include: tls_files.yml
 
-#- include: install_check_mk.yml
+- include: install_check_mk.yml
 
 - name: "Configure OpenLDAP slapd for AE-DIR"
   include: configure_slapd.yml
