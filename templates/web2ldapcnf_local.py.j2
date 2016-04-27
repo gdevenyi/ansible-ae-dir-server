@@ -63,6 +63,9 @@ w2lapp.schema.syntaxes.syntax_registry.registerAttrType(
   ],
 )
 
+# Check hostname in DNS and reverse DNS
+w2lapp.schema.plugins.aedir.AEHostname.host_lookup=2
+
 import w2lapp.schema.plugins.posixautogen
 #w2lapp.schema.plugins.posixautogen.HomeDirectory.homeDirectoryTemplate = '/home/{uid}'
 w2lapp.schema.plugins.posixautogen.AutogenUIDNumber.minNewValue = {{ aedir_min_uid }}L
