@@ -202,6 +202,8 @@ class CheckStateFile:
 
   def __init__(self,state_filename):
     self._state_filename = state_filename
+    if not os.path.isfile(self._state_filename):
+      self.write_state({})
     self.d = self.read_state()
 
   def read_state(self):
