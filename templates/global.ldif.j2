@@ -1,0 +1,112 @@
+dn: cn=global-sudo-default,cn=global,ou=ae-dir
+objectClass: top
+objectClass: sudoRole
+objectClass: aeObject
+objectClass: aeSudoRule
+aeStatus: 0
+sudoHost: ALL
+description: SUDO global defaults
+sudoOption: env_reset
+cn: global-sudo-default
+
+dn: cn=global-all-zone-admins,cn=global,ou=ae-dir
+cn: global-all-zone-admins
+description: This group is updated to contain all zone admins
+gidNumber: 39998
+memberURL: ldap:///ou=ae-dir?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins))
+objectClass: top
+objectClass: groupOfEntries
+objectClass: posixGroup
+objectClass: aeObject
+objectClass: aeGroup
+aeStatus: 0
+
+dn: cn=global-all-zone-auditors,cn=global,ou=ae-dir
+cn: global-all-zone-auditors
+description: This group is updated to contain all zone auditors
+gidNumber: 39999
+memberURL: ldap:///ou=ae-dir?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-auditors))
+objectClass: top
+objectClass: groupOfEntries
+objectClass: posixGroup
+objectClass: aeObject
+objectClass: aeGroup
+aeStatus: 0
+
+dn: cn=ae-uid-blacklist,cn=ae,ou=ae-dir
+description: This entry contains a blacklist for 'uid' values
+cn: ae-uid-blacklist
+objectClass: namedObject
+objectClass: uidObject
+objectClass: labeledURIObject
+uid: admin
+uid: administrator
+uid: aedir
+uid: ae-dir
+uid: at
+uid: avahi
+uid: backup
+uid: bin
+uid: cat
+uid: daemon
+uid: ejbca
+uid: ftp
+uid: games
+uid: gast
+uid: guest
+uid: help
+uid: httpd
+uid: ldap
+uid: lp
+uid: mail
+uid: man
+uid: messagebus
+uid: msad
+uid: msdn
+uid: mysql
+uid: mysqld
+uid: news
+uid: nobody
+uid: ntp
+uid: openldap
+uid: oracle
+uid: pdns
+uid: pki
+uid: polkitd
+uid: postfix
+uid: pseudo
+uid: qa
+uid: qs
+uid: rattatat
+uid: ref
+uid: reference
+uid: root
+uid: sod
+uid: spider
+uid: spiderman
+uid: sshd
+uid: statd
+uid: sudo
+uid: sudoers
+uid: super
+uid: superman
+uid: support
+uid: test
+uid: tester
+uid: tftp
+uid: toor
+uid: uucp
+uid: web2ldap
+uid: webldappwd
+uid: www-data
+uid: wwwrun
+
+dn: cn=ae-uid-badwords,cn=ae,ou=ae-dir
+cn: ae-uid-badwords
+labeledURI: https://github.com/mozilla/kitsune/blob/master/kitsune/configs/username-blacklist.txt bad word lists
+objectClass: namedObject
+objectClass: uidObject
+objectClass: labeledURIObject
+description: UID blacklist containing bad words
+uid: xrated
+
