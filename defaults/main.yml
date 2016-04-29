@@ -20,6 +20,10 @@ aedir_max_gid: 59999
 # fixed primary POSIX-GID in all posixAccount entries
 aedir_global_gid: "{{ aedir_min_uid }}"
 
+# Parameters for generating user names
+aedir_username_length: 4
+aedir_username_gen_trials: 15
+
 #---------------------------------------------------------------------------
 # OpenLDAP parameters
 #---------------------------------------------------------------------------

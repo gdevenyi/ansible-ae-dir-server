@@ -72,3 +72,7 @@ w2lapp.schema.plugins.posixautogen.AutogenUIDNumber.minNewValue = {{ aedir_min_u
 w2lapp.schema.plugins.posixautogen.AutogenUIDNumber.maxNewValue = {{ aedir_max_uid }}L
 w2lapp.schema.plugins.posixautogen.AutogenGIDNumber.minNewValue = {{ aedir_min_gid }}L
 w2lapp.schema.plugins.posixautogen.AutogenGIDNumber.maxNewValue = {{ aedir_max_gid }}L
+
+# Parameters for generating user names
+w2lapp.schema.plugins.aedir.AEUserId.maxLen = {{ aedir_username_length }}L
+w2lapp.schema.plugins.aedir.AEUserId.maxGenTrials = {{ aedir_username_gen_trials }}L

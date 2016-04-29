@@ -20,6 +20,16 @@
     group: root
     mode: 0644
 
+- name: install AE-DIR plugin module for web2ldap
+  copy:
+    src: "aedir.py"
+    dest: "{{ web2ldap_pylib }}/w2lapp/schema/plugins/aedir.py"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart web server
+
 #- name: web2ldap templates for AE-DIR
 #  template: src="{{ item }}.j2" dest="{{ web2ldap_templates }}/ae-dir/{{ item }}" owner=root group=root mode=0644
 #  with_items:
