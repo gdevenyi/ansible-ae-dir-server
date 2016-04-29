@@ -867,6 +867,8 @@ access to
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,ou=ae-dir" read
     by set="user/-1/aeLoginGroups/member & this/entryDN" search
     by set="user/-1/aeProxyFor/aeLoginGroups/member & this/entryDN" search
+    by set="user/aeSrvGroup/aeLoginGroups/member & this/entryDN" search
+    by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups/member & this/entryDN" search
     by * break
 
 # Read access to specific memberOf *values* to all aeHost entries
@@ -991,10 +993,11 @@ overlay constraint
 
 # Check sub-tree wide uniqueness of certain attributes
 unique_uri "ldap:///ou=ae-dir?uid,uidNumber,homeDirectory?sub?(objectClass=*)"
-unique_uri "ldap:///ou=ae-dir?cn?sub"
-#unique_uri "ldap:///ou=ae-dir?gidNumber?sub?(objectClass=aeGroup)"
 unique_uri "ldap:///ou=ae-dir?ipHostNumber,host,aeFqdn?sub?(objectClass=*)"
 unique_uri "ldap:///ou=people,ou=ae-dir?employeeNumber,uniqueIdentifier?sub"
+# these two constraints are not possible with effective filter
+unique_uri "ldap:///ou=ae-dir?cn?sub?(!(|(objectClass=aePerson)(objectClass=aeUser)))"
+#unique_uri "ldap:///ou=ae-dir?gidNumber?sub?(objectClass=aeGroup)"
 
 constraint_attribute
   host
@@ -1092,10 +1095,23 @@ constraint_attribute
   uri "ldap:///cn=people,ou=ae-dir?entryDN?one?(objectClass=aePerson)"
   restrict="ldap:///ou=ae-dir??sub?(objectClass=aeUser)"
 
-# restrict aeProxyFor to reference solely aeSrvGroup in same zone
+# restrict aeProxyFor in aeSrvGroup entry to reference solely active non-proxy aeSrvGroup in same zone
+constraint_attribute
+  aeProxyFor
+  uri "ldap:///ou=ae-dir?entryDN?sub?(&(objectClass=aeSrvGroup)(aeStatus=0)(!(aeProxyFor=*)))"
+  restrict="ldap:///ou=ae-dir??sub?(objectClass=aeSrvGroup)"
 constraint_attribute aeProxyFor,entryDN set
   "this/aeProxyFor/-1/entryDN & this/entryDN/-1/entryDN"
   restrict="ldap:///ou=ae-dir??sub?(objectClass=aeSrvGroup)"
+
+# restrict aeSrvGroup in aeHost entry to reference solely active aeSrvGroup in same zone
+constraint_attribute
+  aeSrvGroup
+  uri "ldap:///ou=ae-dir?entryDN?sub?(&(objectClass=aeSrvGroup)(aeStatus=0))"
+  restrict="ldap:///ou=ae-dir??sub?(objectClass=aeSrvGroup)"
+constraint_attribute aeSrvGroup,entryDN set
+  "this/aeSrvGroup/-1/entryDN & this/entryDN/-1/entryDN"
+  restrict="ldap:///ou=ae-dir??sub?(objectClass=aeHost)"
 
 # restrict references from user groups to have only personal and system user accounts as members
 constraint_attribute
