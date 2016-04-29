@@ -58,6 +58,18 @@ description: SUDO global defaults
 sudoOption: env_reset
 cn: global-sudo-default
 
+dn: cn=ae,{{ aedir_suffix }}
+aeStatus: 0
+cn: ae
+description:: w4YtRElSIG1hbmFnZW1lbnQ=
+objectClass: namedObject
+objectClass: aeObject
+objectClass: aeZone
+
+#---------------------------------------------------------------------------
+# black-list entries
+#---------------------------------------------------------------------------
+#
 dn: cn=ae-uid-blacklist,cn=ae,{{ aedir_suffix }}
 description: This entry contains a blacklist for 'uid' values
 cn: ae-uid-blacklist
@@ -134,14 +146,6 @@ objectClass: uidObject
 objectClass: labeledURIObject
 description: UID blacklist containing bad words
 uid: xrated
-
-dn: cn=ae,{{ aedir_suffix }}
-aeStatus: 0
-cn: ae
-description:: w4YtRElSIG1hbmFnZW1lbnQ=
-objectClass: namedObject
-objectClass: aeObject
-objectClass: aeZone
 
 #---------------------------------------------------------------------------
 # password policy entries
