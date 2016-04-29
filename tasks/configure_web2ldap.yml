@@ -3,7 +3,7 @@
 
 - name: Create web2ldapcnf/local.py for AE-DIR
   template:
-    src: "web2ldapcnf_local.py.j2"
+    src: "{{ aedir_web2ldap_cnf_local }}"
     dest: "{{ web2ldap_cnfdir }}/local.py"
     owner: root
     group: root
@@ -14,7 +14,7 @@
 
 - name: Create connect AE-DIR landing page on https://{{ inventory_hostname }}/web2ldap
   template:
-    src: "web2ldap_connect.html.j2"
+    src: "{{ aedir_web2ldap_connect_template }}"
     dest: "{{ web2ldap_templates }}/connect.html"
     owner: root
     group: root

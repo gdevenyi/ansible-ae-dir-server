@@ -99,3 +99,12 @@ openldap_threads: 8
 # Database parameters
 openldap_db_accesslog_maxsize: 4000000
 openldap_db_um_maxsize: 4000000
+
+
+#---------------------------------------------------------------------------
+# web2ldap parameters
+#---------------------------------------------------------------------------
+
+# Jinja template names used
+aedir_web2ldap_cnf_local: "web2ldapcnf_local.py.j2"
+aedir_web2ldap_connect_template: "web2ldap_connect.html.j2"
