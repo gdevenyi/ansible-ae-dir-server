@@ -47,6 +47,94 @@ objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
 
+dn: cn=global-sudo-default,cn=global,{{ aedir_suffix }}
+objectClass: top
+objectClass: sudoRole
+objectClass: aeObject
+objectClass: aeSudoRule
+aeStatus: 0
+sudoHost: ALL
+description: SUDO global defaults
+sudoOption: env_reset
+cn: global-sudo-default
+
+dn: cn=ae-uid-blacklist,cn=ae,{{ aedir_suffix }}
+description: This entry contains a blacklist for 'uid' values
+cn: ae-uid-blacklist
+objectClass: namedObject
+objectClass: uidObject
+objectClass: labeledURIObject
+uid: admin
+uid: administrator
+uid: aedir
+uid: ae-dir
+uid: at
+uid: avahi
+uid: backup
+uid: bin
+uid: cat
+uid: daemon
+uid: ejbca
+uid: ftp
+uid: games
+uid: gast
+uid: guest
+uid: help
+uid: httpd
+uid: ldap
+uid: lp
+uid: mail
+uid: man
+uid: messagebus
+uid: msad
+uid: msdn
+uid: mysql
+uid: mysqld
+uid: news
+uid: nobody
+uid: ntp
+uid: openldap
+uid: oracle
+uid: pdns
+uid: pki
+uid: polkitd
+uid: postfix
+uid: pseudo
+uid: qa
+uid: qs
+uid: rattatat
+uid: ref
+uid: reference
+uid: root
+uid: sod
+uid: spider
+uid: spiderman
+uid: sshd
+uid: statd
+uid: sudo
+uid: sudoers
+uid: super
+uid: superman
+uid: support
+uid: test
+uid: tester
+uid: tftp
+uid: toor
+uid: uucp
+uid: web2ldap
+uid: webldappwd
+uid: www-data
+uid: wwwrun
+
+dn: cn=ae-uid-badwords,cn=ae,{{ aedir_suffix }}
+cn: ae-uid-badwords
+labeledURI: https://github.com/mozilla/kitsune/blob/master/kitsune/configs/username-blacklist.txt bad word lists
+objectClass: namedObject
+objectClass: uidObject
+objectClass: labeledURIObject
+description: UID blacklist containing bad words
+uid: xrated
+
 dn: cn=ae,{{ aedir_suffix }}
 aeStatus: 0
 cn: ae
@@ -121,7 +209,7 @@ dn: cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}
 aeStatus: 0
 cn: ae-login-proxies
 description: Members are central login components which are allowed to see all users/groups and must determine login user/target relation themselves
-gidNumber: {{ aedir_min_gid+5 }}
+gidNumber: {{ aedir_min_gid+3 }}
 objectClass: top
 objectClass: groupOfEntries
 objectClass: posixGroup
@@ -132,7 +220,7 @@ dn: cn=ae-system-admins,cn=ae,{{ aedir_suffix }}
 aeStatus: 0
 cn: ae-system-admins
 description: Members are system admins for AE-DIR servers
-gidNumber: {{ aedir_min_gid+6 }}
+gidNumber: {{ aedir_min_gid+4 }}
 objectClass: top
 objectClass: groupOfEntries
 objectClass: posixGroup
@@ -194,6 +282,30 @@ aeSetupGroups: cn=ae-system-admins,cn=ae,{{ aedir_suffix }}
 aeLoginGroups: cn=ae-system-admins,cn=ae,{{ aedir_suffix }}
 aeLogStoreGroups: cn=ae-system-admins,cn=ae,{{ aedir_suffix }}
 aeVisibleSudoers: cn=ae-sudo-system-admins,cn=ae,{{ aedir_suffix }}
+
+dn: cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}
+cn: ae-all-zone-admins
+description: This group is updated to contain all zone admins
+gidNumber: {{ aedir_min_gid+5 }}
+memberURL: ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins))
+objectClass: top
+objectClass: groupOfEntries
+objectClass: posixGroup
+objectClass: aeObject
+objectClass: aeGroup
+aeStatus: 0
+
+dn: cn=ae-all-zone-auditors,cn=ae,{{ aedir_suffix }}
+cn: ae-all-zone-auditors
+description: This group is updated to contain all zone auditors
+gidNumber: {{ aedir_min_gid+6 }}
+memberURL: ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-auditors))
+objectClass: top
+objectClass: groupOfEntries
+objectClass: posixGroup
+objectClass: aeObject
+objectClass: aeGroup
+aeStatus: 0
 
 #---------------------------------------------------------------------------
 # aeHost entries for all AE-DIR server systems
@@ -279,7 +391,7 @@ dn: cn=ae-providers,cn=ae,{{ aedir_suffix }}
 aeStatus: 0
 cn: ae-providers
 description: Members of this group are AE-DIR provider replicas
-gidNumber: {{ aedir_min_gid+4 }}
+gidNumber: {{ aedir_min_gid+7 }}
 objectClass: top
 objectClass: groupOfEntries
 objectClass: posixGroup
@@ -294,7 +406,7 @@ dn: cn=ae-replicas,cn=ae,{{ aedir_suffix }}
 aeStatus: 0
 cn: ae-replicas
 description: Members of this group are AE-DIR replicas (providers and consumers)
-gidNumber: {{ aedir_min_gid+3 }}
+gidNumber: {{ aedir_min_gid+8 }}
 objectClass: top
 objectClass: groupOfEntries
 objectClass: posixGroup
