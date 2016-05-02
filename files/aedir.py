@@ -127,6 +127,7 @@ class AEUserId(IA5String):
   reobj = re.compile('^%s$' % (UID_LETTERS))
 
   def __init__(self,sid,form,ls,dn,schema,attrType,attrValue,entry=None):
+    IA5String.__init__(self,sid,form,ls,dn,schema,attrType,attrValue,entry=entry)
     self.minLen = self.maxLen
 
   def _genUid(self):

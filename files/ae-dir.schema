@@ -94,6 +94,62 @@ objectclass ( ae-dir-oc:21
   MUST ( aeStatus )
   MAY ( description $ aeNotBefore $ aeNotAfter $ aeTicketId ) )
 
+# UID and GID number pools
+#-----------------------------------------------------------------------
+
+attributetype ( ae-dir-at:17
+  NAME 'aePosixId'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: POSIX id value'
+  SINGLE-VALUE
+  EQUALITY integerMatch
+  ORDERING integerOrderingMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 )
+
+attributetype ( ae-dir-at:17.1
+  NAME 'aeUidNumberMin'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: minimum uidNumber value'
+  SUP aePosixId )
+
+attributetype ( ae-dir-at:17.2
+  NAME 'aeUidNumberMax'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: maximum uidNumber value'
+  SUP aePosixId )
+
+attributetype ( ae-dir-at:17.3
+  NAME 'aeUidNumberNext'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: next uidNumber value'
+  SUP aePosixId )
+
+attributetype ( ae-dir-at:17.4
+  NAME 'aeGidNumberMin'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: minimum gidNumber value'
+  SUP aePosixId )
+
+attributetype ( ae-dir-at:17.5
+  NAME 'aeGidNumberMax'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: maximum gidNumber value'
+  SUP aePosixId )
+
+attributetype ( ae-dir-at:17.6
+  NAME 'aeGidNumberNext'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: next gidNumber value'
+  SUP aePosixId )
+
+objectclass ( ae-dir-oc:23
+  NAME 'aePosixIdRanges'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: POSIX UID/GID pool'
+  AUXILIARY
+  MAY ( aeUidNumberMin $ aeUidNumberMax $ aeUidNumberNext $
+        aeGidNumberMin $ aeGidNumberMax $ aeGidNumberNext ) )
+
 # search root entry
 #-----------------------------------------------------------------------
 
@@ -101,9 +157,19 @@ objectclass ( ae-dir-oc:22
   NAME 'aeRoot'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: Top-level search root entry'
-  SUP organizationalUnit
+  SUP ( organizationalUnit )
   MUST ( aeStatus )
   MAY ( description $ aeNotBefore $ aeNotAfter $ aeTicketId ) )
+
+ditcontentrule ( ae-dir-oc:22
+  NAME 'aeRoot-dcr'
+  AUX ( aePosixIdRanges )
+  NOT ( businessCategory $ destinationIndicator $
+        facsimileTelephoneNumber $ internationaliSDNNumber $ l $
+        physicalDeliveryOfficeName $ postalAddress $ postalCode $
+        postOfficeBox $ preferredDeliveryMethod $ registeredAddress $
+        searchGuide $ seeAlso $ st $ street $ teletexTerminalIdentifier $
+        telexNumber $ userPassword $ x121Address ) )
 
 # Zones
 #-----------------------------------------------------------------------
@@ -118,6 +184,7 @@ objectclass ( ae-dir-oc:20
 
 ditcontentrule ( ae-dir-oc:20
   NAME 'aeZone-dcr'
+  AUX ( aePosixIdRanges )
   NOT ( uniqueIdentifier ) )
 
 # Group entries
