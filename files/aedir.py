@@ -121,14 +121,17 @@ class AEUserId(IA5String):
   oid = 'AEUserId-oid'
   desc = 'AE-DIR: User name'
   maxValues = 1
-  maxLen = 4
-  maxGenTrials = 15
+  maxLen = 5
+  maxCollisionChecks = 15
   UID_LETTERS = 'abcdefghijklmnopqrstuvwxyz'
   reobj = re.compile('^%s$' % (UID_LETTERS))
 
+  def __init__(self,sid,form,ls,dn,schema,attrType,attrValue,entry=None):
+    self.minLen = self.maxLen
+
   def _genUid(self):
-    gen_trials = 0
-    while gen_trials < self.maxGenTrials:
+    gen_collisions = 0
+    while gen_collisions < self.maxCollisionChecks:
       # generate new random UID candidate
       uid_candidate = ldaputil.passwd.RandomString(self.maxLen,self.UID_LETTERS)
       # check whether UID candidate already exists
@@ -140,9 +143,9 @@ class AEUserId(IA5String):
       )
       if not uid_result:
         return uid_candidate
-      gen_trials += 1
+      gen_collisions += 1
     raise w2lapp.core.ErrorExit(
-      u'Gave up generating new unique <em>uid</em> after %d attempts.' % (gen_trials)
+      u'Gave up generating new unique <em>uid</em> after %d attempts.' % (gen_collisions)
     )
     return  # _genUid()
 
