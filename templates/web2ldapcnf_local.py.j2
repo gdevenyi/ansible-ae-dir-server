@@ -43,6 +43,10 @@ w2lapp.schema.plugins.aedir.AEDisplayNamePerson.compose_templates = (
   '{givenName} {sn}',
 )
 
+# Enable sending the session tracking control with every LDAP request
+# which reveals the browser's IP address to the LDAP server
+web2ldapcnf.hosts.ldap_def['_'].session_track_control=1
+
 # Quick&dirty set slapd's CA cert as trusted cert in web2ldap
 web2ldapcnf.hosts.ldap_def['_'].tls_options[ldap.OPT_X_TLS_CACERTFILE] = '{{ openldap_cacert_pathname }}'
 
