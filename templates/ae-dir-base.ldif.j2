@@ -247,38 +247,24 @@ objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
 
-dn: uid=system_pwd_self_service,cn=ae,{{ aedir_suffix }}
+{% for s in aedir_ldapi_services %}
+dn: uid={{ s.uid }},cn=ae,{{ aedir_suffix }}
 aeStatus: 0
-cn: Password self-service application
-description: The system user allowed to set attributes during user password reset (msPwdResetObject) over LDAPI
-gidNumber: 998
-homeDirectory: /home/system_pwd_self_service
+uid: {{ s.uid }}
+cn: {{ s.cn }}
+description: {{ s.cn }}
+uidNumber: {{ s.uid_number }}
+gidNumber: {{ s.gid_number }}
+homeDirectory: /home/{{ s.uid }}
 loginShell: /bin/true
 objectClass: account
 objectClass: aeObject
 objectClass: aeService
 objectClass: posixAccount
 objectClass: ldapPublicKey
-pwdPolicySubentry: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
-uid: system_pwd_self_service
-uidNumber: 998
+pwdPolicySubentry: cn=ppolicy-sasl-external,cn=ae,{{ aedir_suffix }}
 
-dn: uid=system_person_sync,cn=ae,{{ aedir_suffix }}
-aeStatus: 0
-cn: Personnel data sync process
-description: The system user allowed to maintain aePerson entries over LDAPI
-gidNumber: 999
-homeDirectory: /home/system_person_sync
-loginShell: /bin/true
-objectClass: account
-objectClass: aeObject
-objectClass: aeService
-objectClass: posixAccount
-objectClass: ldapPublicKey
-pwdPolicySubentry: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
-uid: system_person_sync
-uidNumber: 999
-
+{% endfor %}
 dn: cn=ae-sudo-system-admins,cn=ae,{{ aedir_suffix }}
 cn: ae-sudo-system-admins
 objectClass: top

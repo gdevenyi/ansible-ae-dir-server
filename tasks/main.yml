@@ -13,6 +13,9 @@
 - name: "Configure OpenLDAP slapd for AE-DIR"
   include: configure_slapd.yml
 
+- name: "Configure OpenLDAP slapd for AE-DIR"
+  include: system_accounts.yml
+
 - name: "Configure web2ldap for AE-DIR"
   include: configure_web2ldap.yml
   when: openldap_role == 'p'

@@ -24,6 +24,21 @@ aedir_global_gid: "{{ aedir_min_uid }}"
 aedir_username_length: 4
 aedir_username_gen_trials: 15
 
+# Usernames and POSIX-UID/-GID numbers for system accounts of services
+# running on providers and accessing AE-DIR via LDAPI
+# (should be outside ranges defined above)
+aedir_ldapi_services:
+  - uid: system_pwd_self_service
+    cn: Password self-service application
+    uid_number: 998
+    gid_number: 998
+    description: The system user allowed to set attributes during user password reset (msPwdResetObject) over LDAPI
+  - uid: system_person_sync
+    cn: Personnel data sync process
+    uid_number: 999
+    gid_number: 999
+    description: The system user allowed to maintain aePerson entries over LDAPI
+
 #---------------------------------------------------------------------------
 # OpenLDAP parameters
 #---------------------------------------------------------------------------

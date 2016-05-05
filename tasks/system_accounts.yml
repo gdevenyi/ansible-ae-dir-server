@@ -1,0 +1,27 @@
+---
+# Add system accounts
+
+- name: "Add local system account groups for services running accessing AE-DIR providers via LDAPI"
+  group:
+    name: "{{ item.uid }}"
+    gid: "{{ item.gid_number }}"
+    state: present
+    system: yes
+  with_items:
+    "{{ aedir_ldapi_services }}"
+  when: openldap_role == 'p'
+
+- name: "Add local system accounts for services running accessing AE-DIR providers via LDAPI"
+  user:
+    name: "{{ item.uid }}"
+    comment: "{{ item.description }}"
+    uid: "{{ item.uid_number }}"
+    group: "{{ item.gid_number }}"
+    shell: "/bin/true"
+    state: present
+    system: yes
+    createhome: no
+  with_items:
+    "{{ aedir_ldapi_services }}"
+  when: openldap_role == 'p'
+
