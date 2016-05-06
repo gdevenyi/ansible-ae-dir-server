@@ -129,7 +129,7 @@ security ssf=128
 access to
   dn.base=""
   attrs=objectClass
-    by * search
+    by * search break
 access to
   dn.base=""
   attrs=entry
@@ -143,7 +143,7 @@ access to
 # allow admin access to read all search bases
 access to
   dn.base=""
-  attrs=namingContexts
+  attrs=namingContexts,configContext,monitorContext
     by group/aeGroup/member="cn=ae-admins,cn=ae,ou=ae-dir" read
     by group/aeGroup/member="cn=ae-auditors,cn=ae,ou=ae-dir" read
     by dn.exact="cn=root,ou=ae-dir" read
