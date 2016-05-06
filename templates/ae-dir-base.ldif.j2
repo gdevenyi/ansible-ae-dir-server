@@ -296,6 +296,7 @@ gidNumber: {{ aedir_min_gid+5 }}
 memberURL: ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins))
 objectClass: top
 objectClass: groupOfEntries
+objectClass: groupOfURLs
 objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
@@ -308,6 +309,7 @@ gidNumber: {{ aedir_min_gid+6 }}
 memberURL: ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-auditors))
 objectClass: top
 objectClass: groupOfEntries
+objectClass: groupOfURLs
 objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
