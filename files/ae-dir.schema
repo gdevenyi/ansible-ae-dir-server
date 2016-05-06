@@ -445,7 +445,7 @@ objectclass ( ae-dir-oc:8
   DESC 'AE-DIR: person class'
   STRUCTURAL
   SUP ( inetOrgPerson $ aeObject )
-  MUST ( givenName $ mail )
+  MUST ( givenName )
   MAY ( aeSourceUri $ uniqueIdentifier $ employeeNumber ) )
 
 ditcontentrule ( ae-dir-oc:8
