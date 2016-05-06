@@ -118,18 +118,42 @@ authz-regexp
 # Global access control and security restrictions
 #---------------------------------------------------------------------------
 
-disallow bind_anon
-require bind LDAPv3 strong
+require LDAPv3
 
 # SSF value for ldapi://
 localSSF 256
 # minimum required SSF value (security strength factor)
 security ssf=128
 
-# allow all bound users to read rootDSE
+# allow anonymous access to read standard search base
+access to
+  dn.base=""
+  attrs=objectClass
+    by * search
+access to
+  dn.base=""
+  attrs=entry
+    by * read
+access to
+  dn.base=""
+  attrs=namingContexts
+  val.regex="^ou=ae-dir$"
+    by * read
+
+# allow admin access to read all search bases
+access to
+  dn.base=""
+  attrs=namingContexts
+    by group/aeGroup/member="cn=ae-admins,cn=ae,ou=ae-dir" read
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,ou=ae-dir" read
+    by dn.exact="cn=root,ou=ae-dir" read
+    by * none
+
+# allow all bound users to read rest of rootDSE
 access to
   dn.base=""
     by users read
+
 # allow all bound users to read subschema subentry
 access to
   dn.base="cn=Subschema"
@@ -141,6 +165,8 @@ access to
 #######################################################################
 
 database config
+
+require strong
 
 access to
   dn.subtree="cn=config"
@@ -157,6 +183,8 @@ database mdb
 
 suffix "cn=accesslog-ae-dir"
 directory {{ openldap_data }}/accesslog
+
+require strong
 
 # Always set rootdn since needed by internally writing overlays
 rootdn "cn=root,cn=accesslog-ae-dir"
@@ -212,6 +240,8 @@ database mdb
 
 suffix "ou=ae-dir"
 directory {{ openldap_data }}/um
+
+require strong
 
 # Always set rootdn since needed by internally writing overlays
 rootdn "cn=root,ou=ae-dir"
@@ -1314,6 +1344,8 @@ mirrormode true
 #######################################################################
 
 database monitor
+
+require strong
 
 access to
   dn.subtree="cn=monitor"
