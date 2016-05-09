@@ -135,6 +135,7 @@ class SyncProcess(object):
         self.error_counter = 0
         self.deactivate_counter = 0
         self.current_time_str = generalized_time(time.time())
+        self.ldap_conn = self.target_ldap_conn()
 
     def get_state(self):
         """
@@ -270,11 +271,6 @@ class SyncProcess(object):
             repr(last_run_timestr)
         )
 
-        # Connect to local AE-DIR
-        #-----------------------------------------------------------------------
-
-        aedir_conn = self.target_ldap_conn()
-
         # Update aeUser entries
         #-----------------------------------------------------------------------
 
@@ -289,20 +285,20 @@ class SyncProcess(object):
             repr(AEDIR_PERSON_BASE),
             repr(aeperson_filterstr)
         )
-        msg_id = aedir_conn.search(
+        msg_id = self.ldap_conn.search(
             AEDIR_PERSON_BASE,
             ldap.SCOPE_ONELEVEL,
             aeperson_filterstr,
             attrlist=AEDIR_AEPERSON_ATTRS,
         )
 
-        for _, res_data, _, _ in aedir_conn.allresults(msg_id):
+        for _, res_data, _, _ in self.ldap_conn.allresults(msg_id):
 
             for aeperson_dn, aeperson_entry in res_data:
 
                 self.aeperson_counter += 1
 
-                aeuser_result = aedir_conn.search_s(
+                aeuser_result = self.ldap_conn.search_s(
                     AEDIR_SEARCHBASE,
                     ldap.SCOPE_SUBTREE,
                     '(&%s(aePerson=%s))' % (AEDIR_AEUSER_FILTERSTR, aeperson_dn),
@@ -350,7 +346,7 @@ class SyncProcess(object):
                             repr(modlist)
                         )
                         try:
-                            aedir_conn.modify_s(aeuser_dn, modlist)
+                            self.ldap_conn.modify_s(aeuser_dn, modlist)
                         except ldap.LDAPError, ldap_err:
                             self.logger.error(
                                 'LDAP error modifying %s: %s',
@@ -367,8 +363,19 @@ class SyncProcess(object):
                             self.modify_counter += 1
 
         # Close LDAP connection
-        aedir_conn.unbind_s()
+        try:
+            self.ldap_conn.unbind_s()
+        except CatchAllException, err:
+            self.logger.warn(
+                'Error while closing LDAP connection to %s: %s',
+                repr(self.ldap_conn._uri),
+                str(err)
+            )
 
+        # Write state
+        self.set_state(self.current_time_str)
+
+        # Output summary
         self.log_summary()
 
         return # run()

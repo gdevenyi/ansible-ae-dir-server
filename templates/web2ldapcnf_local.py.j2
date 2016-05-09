@@ -56,7 +56,7 @@ web2ldapcnf.hosts.ldap_def['_'].tls_options[ldap.OPT_X_TLS_CACERTFILE] = '{{ ope
 # Set select list on connect landing page
 web2ldapcnf.hosts.ldap_uri_list = [
   (
-    'ldapi://%2Fusr%2Flocal%2Fopenldap%2Fvar%2Frun%2Fldapi/ou=ae-dir????bindname=',
+    '{{ openldap_ldapi_uri }}/{{ aedir_suffix }}????bindname=',
     u'Local AE-DIR (LDAPI, needs login)'
   ),
 ]

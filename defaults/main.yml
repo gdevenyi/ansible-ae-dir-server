@@ -39,6 +39,11 @@ aedir_ldapi_services:
     gid_number: 999
     description: The system user allowed to maintain aePerson entries over LDAPI
 
+# Some paths for tools
+aedir_prefix: "/opt/ae-dir"
+aedir_bin: "/opt/ae-dir/bin"
+aedir_rundir: "/opt/ae-dir/run"
+
 #---------------------------------------------------------------------------
 # OpenLDAP parameters
 #---------------------------------------------------------------------------
@@ -57,6 +62,8 @@ openldap_defaults: "/etc/default/slapd"
 openldap_rundir: "{{ openldap_prefix }}/var/run"
 openldap_data: "{{ openldap_prefix }}/var/openldap-data"
 openldap_conf_file: "{{ openldap_conf_prefix }}/slapd.conf"
+openldap_ldapi_socket: "{{ openldap_rundir }}/ldapi"
+openldap_ldapi_uri: "ldapi://{{ openldap_ldapi_socket|urlencode|replace('/','%2F') }}"
 
 # Directories with dynamically loadable modules
 openldap_module_paths:

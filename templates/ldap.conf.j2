@@ -6,7 +6,7 @@
 # {{ ansible_managed }}
 
 BASE ou=ae-dir
-URI ldapi://%2Fusr%2Flocal%2Fopenldap%2Fvar%2Frun%2Fldapi
+URI {{ openldap_ldapi_uri }}
 SASL_MECH EXTERNAL
 
 #SIZELIMIT      12

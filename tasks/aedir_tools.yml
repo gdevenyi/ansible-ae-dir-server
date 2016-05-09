@@ -39,5 +39,5 @@
     user: root
     cron_file: aeperson2aeuser
     hour: "*/12"
-    job: "rm {{ aedir_rundir }}/aeperson2aeuser.state"
+    job: "rm {{ aedir_rundir }}/aeperson2aeuser.state > /dev/null 2>&1 || exit 0"
 
