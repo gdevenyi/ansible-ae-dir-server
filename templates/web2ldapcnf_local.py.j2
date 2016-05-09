@@ -83,3 +83,7 @@ w2lapp.schema.plugins.posixautogen.AutogenGIDNumber.maxNewValue = {{ aedir_max_g
 # Parameters for generating user names
 w2lapp.schema.plugins.aedir.AEUserId.maxLen = {{ aedir_username_length }}L
 w2lapp.schema.plugins.aedir.AEUserId.maxGenTrials = {{ aedir_username_gen_trials }}L
+
+# for using only uid for login
+import ldapsession
+ldapsession.LDAPSession = w2lapp.schema.plugins.aedir.AEDirLDAPSession
