@@ -1,0 +1,43 @@
+---
+# Install some AE-DIR tools
+
+- name: "Create directories for AE-DIR tools"
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - "{{ aedir_prefix }}"
+    - "{{ aedir_bin }}"
+    - "{{ aedir_rundir }}"
+
+- name: Install scripts
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ aedir_bin }}/{{ item }}"
+    owner: root
+    group: root
+    mode: 0750
+  with_items:
+    - aeperson2aeuser.py
+
+- name: Run aeperson2aeuser.py as CRON job
+  cron:
+    name: "aeperson2aeuser"
+    state: present
+    user: root
+    cron_file: aeperson2aeuser
+    minute: "*/5"
+    job: "{{ aedir_bin }}/aeperson2aeuser.py"
+
+- name: Reset aeperson2aeuser.py as CRON job
+  cron:
+    name: "aeperson2aeuser_reset"
+    state: present
+    user: root
+    cron_file: aeperson2aeuser
+    hour: "*/12"
+    job: "rm {{ aedir_rundir }}/aeperson2aeuser.state"
+
