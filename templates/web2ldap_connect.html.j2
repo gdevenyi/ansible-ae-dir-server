@@ -10,7 +10,7 @@
 
 <h2>&AElig;-DIR providers</h2>
 <ul>
-{% for replica in groups['ae-dir-providers'] %}
+{% for replica in openldap_providers %}
   <li>
     <a href="/web2ldap?ldaps://{{ replica }}/{{ aedir_suffix }}????bindname=">&AElig;-DIR on {{ replica }}</a>
   </li>
@@ -19,7 +19,7 @@
 
 <h2>&AElig;-DIR consumers</h2>
 <ul>
-{% for replica in groups['ae-dir-consumers'] %}
+{% for replica in openldap_consumers %}
   <li>
     <a href="/web2ldap?ldaps://{{ replica }}/{{ aedir_suffix }}????bindname=">&AElig;-DIR on {{ replica }}</a>
   </li>
