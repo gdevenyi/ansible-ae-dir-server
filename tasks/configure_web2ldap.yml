@@ -12,7 +12,7 @@
   notify:
     - restart web server
 
-- name: Create connect AE-DIR landing page on https://{{ inventory_hostname }}/web2ldap
+- name: Create connect AE-DIR landing page on https://{{ openldap_service_fqdn }}/web2ldap
   template:
     src: "{{ aedir_web2ldap_connect_template }}"
     dest: "{{ web2ldap_templates }}/connect.html"

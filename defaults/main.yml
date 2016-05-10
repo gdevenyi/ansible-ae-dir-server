@@ -52,6 +52,8 @@ aedir_rundir: "/opt/ae-dir/run"
 ltb_openldap_repo_source: "deb http://ltb-project.org/debian/{{ ansible_distribution_release }} {{ ansible_distribution_release }} main"
 ltb_openldap_repo_key: "http://ltb-project.org/wiki/lib/RPM-GPG-KEY-LTB-project"
 
+openldap_service_fqdn: "{{ inventory_hostname }}"
+
 # Some paths
 openldap_prefix: "/usr/local/openldap"
 openldap_bin: "{{ openldap_prefix }}/bin"
@@ -83,8 +85,11 @@ openldap_schema_files:
   - stroeder.com.schema
   - sudoers.schema
 
-# Provider replicas hostnames
+# Provider replicas service hostnames
 openldap_providers: []
+
+# Provider consumer service hostnames
+openldap_consumers: []
 
 # List of servers to be added to rootDSE attribute altServer (see RFC 4512)
 openldap_rootdse_alt_servers: []
@@ -97,8 +102,8 @@ openldap_cacert_filename: "slapd-cacerts.pem"
 openldap_tls_cert_suffix: "OU=ITS,O=Example,C=DE"
 
 # The server certificate and key files
-openldap_cert_filename: "{{ inventory_hostname }}.crt"
-openldap_key_filename: "{{ inventory_hostname }}.key"
+openldap_cert_filename: "{{ openldap_service_fqdn }}.crt"
+openldap_key_filename: "{{ openldap_service_fqdn }}.key"
 
 # The full path names on the target system
 openldap_cacert_pathname: "{{ openldap_conf_prefix }}/tls/{{ openldap_cacert_filename }}"
