@@ -33,8 +33,10 @@ w2lapp.schema.plugins.aedir.AETicketId.reObj = re.compile('^[A-Z]+-[0-9]+$')
 w2lapp.schema.plugins.aedir.AETicketId.html_tmpl = '<a href="https://issues.example.com/browse/{av}">{av}</a>'
 
 w2lapp.schema.plugins.aedir.AEHostname.html_tmpl = """{av}
-  <a href="https://foreman.example.com/hosts/{av}">foreman</a>
-  <a href="http://checkmk.example.com/network/check_mk/index.py?start_url=%2Fnetwork%2Fcheck_mk%2Fview.py%3Fview_name%3Dhost%26host%3D{av}">check_mk</a>
+  <a title="Lookup host {av} in foreman"
+     href="https://foreman.example.com/hosts/{av}">foreman</a>
+  <a title="Lookup host {av} in check_mk monitoring frontend"
+     href="http://monitoring.example.com/network/check_mk/index.py?start_url=%2Fnetwork%2Fcheck_mk%2Fview.py%3Fview_name%3Dhost%26host%3D{av}">check_mk</a>
 """
 
 w2lapp.schema.plugins.aedir.AEDisplayNamePerson.compose_templates = (
