@@ -33,7 +33,7 @@ objectClass: namedObject
 objectClass: aeObject
 objectClass: aeZone
 
-dn: cn=global,{{ aedir_suffix }}
+dn: cn=pub,{{ aedir_suffix }}
 aeStatus: 0
 cn: global
 description: Global stuff
@@ -41,24 +41,28 @@ objectClass: namedObject
 objectClass: aeObject
 objectClass: aeZone
 
-dn: cn=global-users,cn=global,{{ aedir_suffix }}
+dn: cn=ae-users,cn=pub,{{ aedir_suffix }}
 aeStatus: 0
-cn: global-users
-description: Primary POSIX dummy group for all AE-DIR user accounts
+cn: ae-users
+description: Primary POSIX group for all aeUser and aeSystem entries
 gidNumber: {{ aedir_global_gid }}
 objectClass: top
 objectClass: groupOfEntries
 objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
+aeStatus: 0
 
-dn: cn=global-sudo-default,cn=global,{{ aedir_suffix }}
+dn: cn=sudo-defaults,cn=pub,{{ aedir_suffix }}
 objectClass: top
+objectClass: aeObject
 objectClass: sudoRole
+objectClass: aeSudoRule
+cn: sudo-defaults
 sudoHost: ALL
 description: SUDO global defaults
 sudoOption: env_reset
-cn: global-sudo-default
+aeStatus: 0
 
 dn: cn=ae,{{ aedir_suffix }}
 aeStatus: 0
@@ -161,7 +165,7 @@ objectClass: namedObject
 objectClass: uidObject
 objectClass: labeledURIObject
 description: UID blacklist containing bad words
-uid: xrated
+uid: bad
 
 #---------------------------------------------------------------------------
 # password policy entries
@@ -236,7 +240,7 @@ objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
 
-dn: cn=ae-system-admins,cn=ae,{{ aedir_suffix }}
+dn: cn=ae-sys-admins,cn=ae,{{ aedir_suffix }}
 aeStatus: 0
 cn: ae-system-admins
 description: Members are system admins for AE-DIR servers
@@ -265,7 +269,7 @@ objectClass: ldapPublicKey
 pwdPolicySubentry: cn=ppolicy-sasl-external,cn=ae,{{ aedir_suffix }}
 
 {% endfor %}
-dn: cn=ae-sudo-system-admins,cn=ae,{{ aedir_suffix }}
+dn: cn=ae-sudo-sys-admins,cn=ae,{{ aedir_suffix }}
 cn: ae-sudo-system-admins
 objectClass: top
 objectClass: sudoRole
@@ -284,10 +288,10 @@ description:: w4YtRElSIHByb3ZpZGVycw==
 objectClass: aeObject
 objectClass: aeSrvGroup
 cn: ae-dir-servers
-aeSetupGroups: cn=ae-system-admins,cn=ae,{{ aedir_suffix }}
-aeLoginGroups: cn=ae-system-admins,cn=ae,{{ aedir_suffix }}
-aeLogStoreGroups: cn=ae-system-admins,cn=ae,{{ aedir_suffix }}
-aeVisibleSudoers: cn=ae-sudo-system-admins,cn=ae,{{ aedir_suffix }}
+aeSetupGroups: cn=ae-sys-admins,cn=ae,{{ aedir_suffix }}
+aeLoginGroups: cn=ae-sys-admins,cn=ae,{{ aedir_suffix }}
+aeLogStoreGroups: cn=ae-sys-admins,cn=ae,{{ aedir_suffix }}
+aeVisibleSudoers: cn=ae-sudo-sys-admins,cn=ae,{{ aedir_suffix }}
 
 dn: cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}
 cn: ae-all-zone-admins

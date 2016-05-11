@@ -348,7 +348,7 @@ limits
 
 # no limits for all zone admins
 limits
-  group/aeGroup/member="ae-all-zone-admins,cn=ae,ou=ae-dir"
+  group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,ou=ae-dir"
     time=unlimited
     size=unlimited
 
@@ -513,12 +513,12 @@ access to
   filter="(aeStatus=2)"
     by * none
 
-# Global stuff
+# Public defaults
 #------------------------------------------------------------------
 
 access to
-  dn.base="cn=global-users,cn=global,ou=ae-dir"
-  attrs=entry,objectClass,entryUUID,modifyTimestamp,cn,gidNumber,description
+  dn.subtree="cn=pub,ou=ae-dir"
+  attrs=entry,children,objectClass,entryUUID,modifyTimestamp,cn,description,@posixGroup,@sudoRole
     by users read
 
 # Person entries
