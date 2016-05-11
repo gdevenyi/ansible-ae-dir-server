@@ -1,3 +1,5 @@
+{% set uid_number = aedir_min_uid -%}
+{% set gid_number = aedir_min_gid -%}
 #---------------------------------------------------------------------------
 # This is the base tree structure for AE-DIR
 # You should load this data initially to the database
@@ -45,13 +47,13 @@ dn: cn=ae-users,cn=pub,{{ aedir_suffix }}
 aeStatus: 0
 cn: ae-users
 description: Primary POSIX group for all aeUser and aeSystem entries
-gidNumber: {{ aedir_global_gid }}
+gidNumber: {{ gid_number }}
+{% set gid_number = gid_number+1 -%}
 objectClass: top
 objectClass: groupOfEntries
 objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
-aeStatus: 0
 
 dn: cn=sudo-defaults,cn=pub,{{ aedir_suffix }}
 objectClass: top
@@ -63,6 +65,7 @@ sudoHost: ALL
 description: SUDO global defaults
 sudoOption: env_reset
 aeStatus: 0
+sudoUser: %ae-users
 
 dn: cn=ae,{{ aedir_suffix }}
 aeStatus: 0
@@ -211,7 +214,8 @@ dn: cn=ae-admins,cn=ae,{{ aedir_suffix }}
 aeStatus: 0
 cn: ae-admins
 description:: R3JvdXAgbWVtYmVycyBjYW4gbWFuYWdlIGFsbCDDhi1ESVIgZW50cmllcw==
-gidNumber: {{ aedir_min_gid+1 }}
+gidNumber: {{ gid_number }}
+{% set gid_number = gid_number+1 -%}
 objectClass: top
 objectClass: groupOfEntries
 objectClass: posixGroup
@@ -222,7 +226,8 @@ dn: cn=ae-auditors,cn=ae,{{ aedir_suffix }}
 aeStatus: 0
 cn: ae-auditors
 description:: R3JvdXAgbWVtYmVycyBjYW4gcmVhZCBhbGwgw4YtRElSIGVudHJpZXM=
-gidNumber: {{ aedir_min_gid+2 }}
+gidNumber: {{ gid_number }}
+{% set gid_number = gid_number+1 -%}
 objectClass: top
 objectClass: groupOfEntries
 objectClass: posixGroup
@@ -233,7 +238,8 @@ dn: cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}
 aeStatus: 0
 cn: ae-login-proxies
 description: Members are central login components which are allowed to see all users/groups and must determine login user/target relation themselves
-gidNumber: {{ aedir_min_gid+3 }}
+gidNumber: {{ gid_number }}
+{% set gid_number = gid_number+1 -%}
 objectClass: top
 objectClass: groupOfEntries
 objectClass: posixGroup
@@ -244,7 +250,8 @@ dn: cn=ae-sys-admins,cn=ae,{{ aedir_suffix }}
 aeStatus: 0
 cn: ae-system-admins
 description: Members are system admins for AE-DIR servers
-gidNumber: {{ aedir_min_gid+4 }}
+gidNumber: {{ gid_number }}
+{% set gid_number = gid_number+1 -%}
 objectClass: top
 objectClass: groupOfEntries
 objectClass: posixGroup
@@ -296,7 +303,8 @@ aeVisibleSudoers: cn=ae-sudo-sys-admins,cn=ae,{{ aedir_suffix }}
 dn: cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}
 cn: ae-all-zone-admins
 description: This group is updated to contain all zone admins
-gidNumber: {{ aedir_min_gid+5 }}
+gidNumber: {{ gid_number }}
+{% set gid_number = gid_number+1 -%}
 memberURL: ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins))
 objectClass: top
 objectClass: groupOfEntries
@@ -309,7 +317,8 @@ aeStatus: 0
 dn: cn=ae-all-zone-auditors,cn=ae,{{ aedir_suffix }}
 cn: ae-all-zone-auditors
 description: This group is updated to contain all zone auditors
-gidNumber: {{ aedir_min_gid+6 }}
+gidNumber: {{ gid_number }}
+{% set gid_number = gid_number+1 -%}
 memberURL: ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-auditors))
 objectClass: top
 objectClass: groupOfEntries
@@ -358,7 +367,7 @@ description: AE-DIR consumer replica host {{ replica }}
 # aeService entries for all AE-DIR slapd replicas
 #---------------------------------------------------------------------------
 #
-{% for replica in groups['ae-dir-providers'] %}
+{% for replica in openldap_providers %}
 dn: uid=system_slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
 uid: system_slapd_{{ replica.split('.')[0] }}
 pwdPolicySubentry: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
@@ -371,12 +380,13 @@ aeStatus: 0
 description: AE-DIR slapd provider running on {{ replica }}
 homeDirectory: /home/system_slapd_{{ replica.split('.')[0] }}
 cn: slapd_{{ replica }}
-uidNumber: {{ aedir_min_uid + loop.index }}
+uidNumber: {{ uid_number + loop.index }}
 gidNumber: {{ aedir_global_gid }}
 seeAlso: cn={{ replica }},{{ openldap_tls_cert_suffix }}
 
 {% endfor %}
-{% for replica in groups['ae-dir-consumers'] %}
+{% set uid_number = uid_number + openldap_providers|length -%}
+{% for replica in openldap_consumers %}
 dn: uid=system_slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
 uid: system_slapd_{{ replica.split('.')[0] }}
 pwdPolicySubentry: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
@@ -389,36 +399,23 @@ aeStatus: 0
 description: AE-DIR slapd provider running on {{ replica }}
 homeDirectory: /home/system_slapd_{{ replica.split('.')[0] }}
 cn: slapd_{{ replica }}
-uidNumber: {{ aedir_min_uid + groups['ae-dir-consumers']|length + 1 + loop.index }}
+uidNumber: {{ uid_number + loop.index }}
 gidNumber: {{ aedir_global_gid }}
 seeAlso: cn={{ replica }},{{ openldap_tls_cert_suffix }}
 
 {% endfor %}
+{% set uid_number = uid_number + openldap_consumers|length -%}
 #
 #---------------------------------------------------------------------------
 # AE-DIR slapd replica groups
 #---------------------------------------------------------------------------
 #
-dn: cn=ae-providers,cn=ae,{{ aedir_suffix }}
-aeStatus: 0
-cn: ae-providers
-description: Members of this group are AE-DIR provider replicas
-gidNumber: {{ aedir_min_gid+7 }}
-objectClass: top
-objectClass: groupOfEntries
-objectClass: posixGroup
-objectClass: aeObject
-objectClass: aeGroup
-{% for replica in groups['ae-dir-providers'] %}
-member: uid=system_slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
-memberUID: system_slapd_{{ replica.split('.')[0] }}
-{% endfor %}
-
 dn: cn=ae-replicas,cn=ae,{{ aedir_suffix }}
 aeStatus: 0
 cn: ae-replicas
 description: Members of this group are AE-DIR replicas (providers and consumers)
-gidNumber: {{ aedir_min_gid+8 }}
+gidNumber: {{ gid_number }}
+{% set gid_number = gid_number+1 -%}
 objectClass: top
 objectClass: groupOfEntries
 objectClass: posixGroup
@@ -429,6 +426,22 @@ member: uid=system_slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
 memberUID: system_slapd_{{ replica.split('.')[0] }}
 {% endfor %}
 {% for replica in groups['ae-dir-consumers'] %}
+member: uid=system_slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
+memberUID: system_slapd_{{ replica.split('.')[0] }}
+{% endfor %}
+
+dn: cn=ae-providers,cn=ae,{{ aedir_suffix }}
+aeStatus: 0
+cn: ae-providers
+description: Members of this group are AE-DIR provider replicas
+gidNumber: {{ gid_number }}
+{% set gid_number = gid_number+1 -%}
+objectClass: top
+objectClass: groupOfEntries
+objectClass: posixGroup
+objectClass: aeObject
+objectClass: aeGroup
+{% for replica in groups['ae-dir-providers'] %}
 member: uid=system_slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
 memberUID: system_slapd_{{ replica.split('.')[0] }}
 {% endfor %}
