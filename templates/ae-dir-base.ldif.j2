@@ -332,7 +332,7 @@ aeStatus: 0
 # aeHost entries for all AE-DIR server systems
 #---------------------------------------------------------------------------
 #
-{% for replica in groups['ae-dir-providers'] %}
+{% for replica in openldap_providers %}
 dn: host={{ replica }},cn=ae-dir-servers,cn=ae,{{ aedir_suffix }}
 host: {{ replica }}
 aeStatus: 0
@@ -347,7 +347,7 @@ aeTicketId: INITIAL-42
 description: AE-DIR provider replica host {{ replica }}
 
 {% endfor %}
-{% for replica in groups['ae-dir-consumers'] %}
+{% for replica in openldap_consumers %}
 dn: host={{ replica }},cn=ae-dir-servers,cn=ae,{{ aedir_suffix }}
 host: {{ replica }}
 aeStatus: 0
@@ -421,11 +421,11 @@ objectClass: groupOfEntries
 objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
-{% for replica in groups['ae-dir-providers'] %}
+{% for replica in openldap_providers %}
 member: uid=system_slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
 memberUID: system_slapd_{{ replica.split('.')[0] }}
 {% endfor %}
-{% for replica in groups['ae-dir-consumers'] %}
+{% for replica in openldap_consumers %}
 member: uid=system_slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
 memberUID: system_slapd_{{ replica.split('.')[0] }}
 {% endfor %}
@@ -441,7 +441,7 @@ objectClass: groupOfEntries
 objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
-{% for replica in groups['ae-dir-providers'] %}
+{% for replica in openldap_providers %}
 member: uid=system_slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
 memberUID: system_slapd_{{ replica.split('.')[0] }}
 {% endfor %}
