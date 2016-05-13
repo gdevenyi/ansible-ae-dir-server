@@ -7,7 +7,7 @@
 #---------------------------------------------------------------------------
 
 # base DN / search root for AE-DIR entries
-aedir_suffix: ou=ae-dir
+aedir_suffix: "ou=ae-dir"
 
 # POSIX-UID number range served by AE-DIR
 aedir_min_uid: 30000
