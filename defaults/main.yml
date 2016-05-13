@@ -114,6 +114,10 @@ openldap_key_pathname: "{{ openldap_conf_prefix }}/tls/{{ openldap_service_fqdn 
 openldap_dhparam_pathname: "{{ openldap_conf_prefix }}/tls/slapd.dhparam"
 openldap_dhparam_numbits: 2048
 
+# subject alternative names for gen_csr.sh in OpenSSL syntax
+openldap_csr_subjectaltnames:
+  - "DNS:{{ openldap_service_fqdn }}"
+
 # which messages to send to syslog
 # normal for production: stats
 openldap_log_level: "stats"

@@ -11,6 +11,22 @@
   notify:
   - restart slapd
 
+- name: Create gen_csr.cnf
+  template:
+    src: "gen_csr.cnf.j2"
+    dest: "{{ openldap_conf_prefix }}/tls/gen_csr.cnf"
+    owner: root
+    group: ldap
+    mode: 0600
+
+- name: Create gen_csr.sh
+  template:
+    src: "gen_csr.sh.j2"
+    dest: "{{ openldap_conf_prefix }}/tls/gen_csr.sh"
+    owner: root
+    group: ldap
+    mode: 0700
+
 - name: CA certificate file
   copy:
     src: "{{ openldap_cacert_filename }}"
