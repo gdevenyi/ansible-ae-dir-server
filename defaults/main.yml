@@ -52,6 +52,7 @@ aedir_rundir: "/opt/ae-dir/run"
 ltb_openldap_repo_source: "deb http://ltb-project.org/debian/{{ ansible_distribution_release }} {{ ansible_distribution_release }} main"
 ltb_openldap_repo_key: "http://ltb-project.org/wiki/lib/RPM-GPG-KEY-LTB-project"
 
+# default FQDN in LDAP service URL
 openldap_service_fqdn: "{{ inventory_hostname }}"
 
 # Some paths
