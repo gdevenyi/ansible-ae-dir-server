@@ -28,6 +28,11 @@ aedir_username_gen_trials: 15
 # running on providers and accessing AE-DIR via LDAPI
 # (should be outside ranges defined above)
 aedir_ldapi_services:
+  - uid: ldap
+    cn: OpenLDAP slapd demon user
+    uid_number: 108
+    gid_number: 113
+    description: The system user for running OpenLDAP server process (slapd)
   - uid: system_pwd_self_service
     cn: Password self-service application
     uid_number: 998
