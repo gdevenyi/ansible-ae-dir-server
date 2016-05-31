@@ -1070,11 +1070,12 @@ constraint_attribute
   regex "^[1-9][0-9]{4,}$"
   restrict="ldap:///ou=ae-dir??sub?(objectClass=posixGroup)"
 
-# Posix GID number in posixAccount entries must be exactly 10000 (ldap-users)
+# Posix GID number in posixAccount entries must be exactly {{ aedir_min_uid }}
+# see also group entry cn=ae-users,cn=pub,{{ aedir_suffix }}
 # Exceptional case: aeService entries in zone 'ae' for local LDAPI access
 constraint_attribute
   gidNumber
-  regex "^10000$"
+  regex "^{{ aedir_min_uid }}$"
   restrict="ldap:///ou=ae-dir??sub?(&(objectClass=posixAccount)(!(entryDN:dnOneLevelMatch:=cn=ae,ou=ae-dir)))"
 
 # Treat 'cn' as SINGLE-VALUE by constraint

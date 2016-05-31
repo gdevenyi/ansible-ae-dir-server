@@ -75,6 +75,9 @@ w2lapp.schema.syntaxes.syntax_registry.registerAttrType(
   ],
 )
 
+# gidNumber value assigned to all user and service accounts
+w2lapp.schema.plugins.aedir.GLOBAL_AE_GID = '{{ aedir_min_uid }}'
+
 # Check hostname in DNS and reverse DNS
 w2lapp.schema.plugins.aedir.AEHostname.host_lookup=2
 
