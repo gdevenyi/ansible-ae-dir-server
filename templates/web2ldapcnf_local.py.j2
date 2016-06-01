@@ -88,6 +88,11 @@ w2lapp.schema.plugins.posixautogen.AutogenUIDNumber.maxNewValue = {{ aedir_max_u
 w2lapp.schema.plugins.posixautogen.AutogenGIDNumber.minNewValue = {{ aedir_min_gid }}L
 w2lapp.schema.plugins.posixautogen.AutogenGIDNumber.maxNewValue = {{ aedir_max_gid }}L
 
+# regex patterns for enforcing naming conventions (substring match!)
+w2lapp.schema.plugins.aedir.AECommonNameAEGroup.reObj = re.compile('^{{ aedir_aesrvgroup_cn_regex }}$')
+w2lapp.schema.plugins.aedir.AECommonNameAESrvGroup.reObj = re.compile('^{{ aedir_aegroup_cn_regex }}$')
+w2lapp.schema.plugins.aedir.AECommonNameAESudoRule.reObj = re.compile('^{{ aedir_aesudorule_cn_regex }}$')
+
 # Parameters for generating user names
 w2lapp.schema.plugins.aedir.AEUserId.maxLen = {{ aedir_username_length }}L
 w2lapp.schema.plugins.aedir.AEUserId.maxGenTrials = {{ aedir_username_gen_trials }}L

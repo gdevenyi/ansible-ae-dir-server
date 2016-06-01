@@ -24,7 +24,7 @@ aeGidNumberMin: {{ aedir_min_gid }}
 aeGidNumberMax: {{ aedir_max_gid }}
 
 #---------------------------------------------------------------------------
-#
+# cn=people,{{ aedir_suffix }}
 #---------------------------------------------------------------------------
 #
 dn: cn=people,{{ aedir_suffix }}
@@ -35,6 +35,10 @@ objectClass: namedObject
 objectClass: aeObject
 objectClass: aeZone
 
+#---------------------------------------------------------------------------
+# cn=people,{{ aedir_suffix }}
+#---------------------------------------------------------------------------
+#
 dn: cn=pub,{{ aedir_suffix }}
 aeStatus: 0
 cn: global
@@ -110,7 +114,6 @@ uid: help
 uid: httpd
 uid: inf
 uid: info
-uid: ldap
 uid: lp
 uid: mail
 uid: man

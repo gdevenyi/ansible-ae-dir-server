@@ -844,13 +844,41 @@ class AEZonePrefixCommonName(DirectoryString):
         result = '-'.join((zone_cn,self.attrValue.decode(self._ls.charset)))
     return result # formValue()
 
+
+class AECommonNameAEGroup(AEZonePrefixCommonName):
+  oid = 'AECommonNameAEGroup-oid'
+
 syntax_registry.registerAttrType(
-  AEZonePrefixCommonName.oid,[
+  AECommonNameAEGroup.oid,[
     '2.5.4.3', # cn alias commonName
   ],
   structural_oc_oids=[
     AE_GROUP_OID,    # aeGroup
+  ]
+)
+
+
+class AECommonNameAESrvGroup(AEZonePrefixCommonName):
+  oid = 'AECommonNameAESrvGroup-oid'
+
+syntax_registry.registerAttrType(
+  AECommonNameAESrvGroup.oid,[
+    '2.5.4.3', # cn alias commonName
+  ],
+  structural_oc_oids=[
     AE_SRVGROUP_OID, # aeSrvGroup
+  ]
+)
+
+
+class AECommonNameAESudoRule(AEZonePrefixCommonName):
+  oid = 'AECommonNameAESudoRule-oid'
+
+syntax_registry.registerAttrType(
+  AECommonNameAESudoRule.oid,[
+    '2.5.4.3', # cn alias commonName
+  ],
+  structural_oc_oids=[
     AE_SUDORULE_OID, # aeSudoRule
   ]
 )

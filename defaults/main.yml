@@ -49,6 +49,21 @@ aedir_prefix: "/opt/ae-dir"
 aedir_bin: "/opt/ae-dir/bin"
 aedir_rundir: "/opt/ae-dir/run"
 
+# regex patterns for enforcing naming conventions (substring match!)
+# Important notes:
+# - patterns are also used as substrings of more complex patterns => do not enclose in ^ and $
+# - you should only *relax* patterns for an existing deployment with existing entries!
+# attribute 'cn'
+aedir_aezone_cn_regex: "[a-z0-9]+"
+aedir_aegroup_cn_regex: "[a-z0-9]?[a-z0-9-]+"
+aedir_aesudorule_cn_regex: "{{ aedir_aegroup_cn_regex }}"
+aedir_aesrvgroup_cn_regex: "{{ aedir_aegroup_cn_regex }}"
+# attribute 'uid'
+aedir_aeuser_uid_regex: "[a-z]{{ '{' }}{{ aedir_username_length }}{{ '}' }}+"
+aedir_aeservice_uid_regex: "system_[a-zA-Z0-9_.-]+"
+# attribute 'aeTicketId'
+aeticketid_regex: "[A-Z]+-[0-9]+"
+
 #---------------------------------------------------------------------------
 # OpenLDAP parameters
 #---------------------------------------------------------------------------
