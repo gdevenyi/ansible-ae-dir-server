@@ -24,26 +24,6 @@ aedir_global_gid: "{{ aedir_min_uid }}"
 aedir_username_length: 4
 aedir_username_gen_trials: 15
 
-# Usernames and POSIX-UID/-GID numbers for system accounts of services
-# running on providers and accessing AE-DIR via LDAPI
-# (should be outside ranges defined above)
-aedir_ldapi_services:
-  - uid: ldap
-    cn: OpenLDAP slapd demon user
-    uid_number: 108
-    gid_number: 113
-    description: The system user for running OpenLDAP server process (slapd)
-  - uid: system_pwd_self_service
-    cn: Password self-service application
-    uid_number: 998
-    gid_number: 998
-    description: The system user allowed to set attributes during user password reset (msPwdResetObject) over LDAPI
-  - uid: system_person_sync
-    cn: Personnel data sync process
-    uid_number: 999
-    gid_number: 999
-    description: The system user allowed to maintain aePerson entries over LDAPI
-
 # Some paths for tools
 aedir_prefix: "/opt/ae-dir"
 aedir_bin: "/opt/ae-dir/bin"
@@ -60,9 +40,33 @@ aedir_aesudorule_cn_regex: "{{ aedir_aegroup_cn_regex }}"
 aedir_aesrvgroup_cn_regex: "{{ aedir_aegroup_cn_regex }}"
 # attribute 'uid'
 aedir_aeuser_uid_regex: "[a-z]{{ '{' }}{{ aedir_username_length }}{{ '}' }}+"
-aedir_aeservice_uid_regex: "system_[a-zA-Z0-9_.-]+"
+aedir_aeservice_uid_regex: "[a-zA-Z0-9_.-]+"
 # attribute 'aeTicketId'
 aeticketid_regex: "[A-Z]+-[0-9]+"
+
+# Usernames and POSIX-UID/-GID numbers for system accounts of services
+# running on providers and accessing AE-DIR via LDAPI
+# (should be outside ranges defined above)
+# user names must match aedir_aeservice_uid_regex pattern defined above
+aedir_ldapi_services:
+  # system user which must match UID/GID slapd is running as
+  - uid: ldap
+    cn: OpenLDAP slapd demon user
+    uid_number: 108
+    gid_number: 113
+    description: The system user for running OpenLDAP server process (slapd)
+  # system user for password self-service web application
+  - uid: system_aedir_pwd_self_service
+    cn: Password self-service application
+    uid_number: 998
+    gid_number: 998
+    description: The system user allowed to set attributes during user password reset (msPwdResetObject) over LDAPI
+  # system user for sync processes
+  - uid: system_aedir_sync
+    cn: Personnel data sync process
+    uid_number: 999
+    gid_number: 999
+    description: The system user allowed to maintain aePerson entries over LDAPI
 
 #---------------------------------------------------------------------------
 # OpenLDAP parameters
