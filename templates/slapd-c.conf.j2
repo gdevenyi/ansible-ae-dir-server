@@ -647,7 +647,7 @@ overlay syncprov
 syncprov-checkpoint 1000 2
 syncprov-reloadhint TRUE
 
-{% for provider_replica in openldap_providers %}
+{% for provider_replica in openldap_syncrepl_providers %}
 syncrepl rid=0{{ loop.index }}
   provider=ldaps://{{ provider_replica }}
   type=refreshAndPersist

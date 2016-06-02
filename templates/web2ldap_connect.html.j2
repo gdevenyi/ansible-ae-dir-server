@@ -9,19 +9,31 @@
 </p>
 
 <h2>&AElig;-DIR providers</h2>
-<ul>
-{% for replica in openldap_providers %}
-  <li>
-    <a href="/web2ldap?ldaps://{{ replica }}/{{ aedir_suffix }}????bindname=">&AElig;-DIR on {{ replica }}</a>
-  </li>
+<table>
+{% for host in aedir_provider_hosts %}
+{% set replica = hostvars[host]['openldap_service_fqdn'] -%}
+  <tr>
+    <td>
+      <a href="/web2ldap?ldaps://{{ replica }}/{{ aedir_suffix }}????bindname=">{{ replica }}</a>
+    </td>
+    <td>
+      {{ host }}
+    </td>
+  </tr>
 {% endfor %}
-</ul>
+</table>
 
 <h2>&AElig;-DIR consumers</h2>
-<ul>
-{% for replica in openldap_consumers %}
-  <li>
-    <a href="/web2ldap?ldaps://{{ replica }}/{{ aedir_suffix }}????bindname=">&AElig;-DIR on {{ replica }}</a>
-  </li>
+<table>
+{% for host in aedir_consumer_hosts %}
+{% set replica = hostvars[host]['openldap_service_fqdn'] -%}
+  <tr>
+    <td>
+      <a href="/web2ldap?ldaps://{{ replica }}/{{ aedir_suffix }}????bindname=">{{ replica }}</a>
+    </td>
+    <td>
+      {{ host }}
+    </td>
+  </tr>
 {% endfor %}
-</ul>
+</table>
