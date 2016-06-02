@@ -46,8 +46,11 @@ aeticketid_regex: "[A-Z]+-[0-9]+"
 
 # Usernames and POSIX-UID/-GID numbers for system accounts of services
 # running on providers and accessing AE-DIR via LDAPI
-# (should be outside ranges defined above)
-# user names must match aedir_aeservice_uid_regex pattern defined above
+# Important notes:
+# - uid_number/gid_number should be outside aedir_min_uid/aedir_max_uid range defined above
+# - user names must match aedir_aeservice_uid_regex pattern defined above
+# - do not remove items after initializing a AE-DIR deployment
+# - special care needed for usernames used in OpenLDAP ACLs
 aedir_ldapi_services:
   # system user which must match UID/GID slapd is running as
   - uid: ldap
