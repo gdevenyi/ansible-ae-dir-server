@@ -371,8 +371,8 @@ description: AE-DIR consumer replica host {{ replica }}
 #---------------------------------------------------------------------------
 #
 {% for replica in openldap_providers %}
-dn: uid=system_slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
-uid: system_slapd_{{ replica.split('.')[0] }}
+dn: uid=aedir_slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
+uid: aedir_slapd_{{ replica.split('.')[0] }}
 pwdPolicySubentry: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
 objectClass: account
 objectClass: aeObject
@@ -381,7 +381,7 @@ objectClass: pkiUser
 objectClass: posixAccount
 aeStatus: 0
 description: AE-DIR slapd provider running on {{ replica }}
-homeDirectory: /home/system_slapd_{{ replica.split('.')[0] }}
+homeDirectory: /home/aedir_slapd_{{ replica.split('.')[0] }}
 cn: slapd_{{ replica }}
 uidNumber: {{ uid_number + loop.index }}
 gidNumber: {{ aedir_global_gid }}
@@ -390,8 +390,8 @@ seeAlso: cn={{ replica }},{{ openldap_tls_cert_suffix }}
 {% endfor %}
 {% set uid_number = uid_number + openldap_providers|length -%}
 {% for replica in openldap_consumers %}
-dn: uid=system_slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
-uid: system_slapd_{{ replica.split('.')[0] }}
+dn: uid=aedir_slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
+uid: aedir_slapd_{{ replica.split('.')[0] }}
 pwdPolicySubentry: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
 objectClass: account
 objectClass: aeObject
@@ -400,7 +400,7 @@ objectClass: pkiUser
 objectClass: posixAccount
 aeStatus: 0
 description: AE-DIR slapd provider running on {{ replica }}
-homeDirectory: /home/system_slapd_{{ replica.split('.')[0] }}
+homeDirectory: /home/aedir_slapd_{{ replica.split('.')[0] }}
 cn: slapd_{{ replica }}
 uidNumber: {{ uid_number + loop.index }}
 gidNumber: {{ aedir_global_gid }}
@@ -425,12 +425,12 @@ objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
 {% for replica in openldap_providers %}
-member: uid=system_slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
-memberUID: system_slapd_{{ replica.split('.')[0] }}
+member: uid=aedir_slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
+memberUID: aedir_slapd_{{ replica.split('.')[0] }}
 {% endfor %}
 {% for replica in openldap_consumers %}
-member: uid=system_slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
-memberUID: system_slapd_{{ replica.split('.')[0] }}
+member: uid=aedir_slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
+memberUID: aedir_slapd_{{ replica.split('.')[0] }}
 {% endfor %}
 
 dn: cn=ae-providers,cn=ae,{{ aedir_suffix }}
@@ -445,7 +445,7 @@ objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
 {% for replica in openldap_providers %}
-member: uid=system_slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
-memberUID: system_slapd_{{ replica.split('.')[0] }}
+member: uid=aedir_slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
+memberUID: aedir_slapd_{{ replica.split('.')[0] }}
 {% endfor %}
 

@@ -414,7 +414,7 @@ access to
   attrs=userPassword
   filter="(&(objectClass=oathToken)(aeStatus=0)(pwdPolicySubentry=cn=ppolicy-2fatokens,cn=ae,{{ aedir_suffix }}))"
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =sw
-    by dn.base="uid=system_enroll2fa,cn=ae,{{ aedir_suffix }}" =w
+    by dn.base="uid=ae-dir-enroll2fa,cn=ae,{{ aedir_suffix }}" =w
     by self =z
     by * auth
 
@@ -426,9 +426,9 @@ access to
   dn.subtree="{{ aedir_suffix }}"
   attrs=userPassword
   filter="(&(objectClass=aeUser)(aeStatus=0)(pwdPolicySubentry=cn=ppolicy-users,cn=ae,{{ aedir_suffix }})(objectClass=oathUser)(oathToken=*))"
-    by dn.base="uid=system_oath_binder,cn=ae,{{ aedir_suffix }}" =r
+    by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" =r
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" break
-    by dn.base="uid=system_passwd_self_service,cn=ae,{{ aedir_suffix }}" break
+    by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" break
     by self =w
     by * none
 
@@ -439,7 +439,7 @@ access to
   filter="(&(objectClass=aeUser)(aeStatus=0))"
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =sw
     by group/aeGroup/member.expand="cn=${d1}-zone-admins,cn=${d1},{{ aedir_suffix }}" =w
-    by dn.base="uid=system_passwd_self_service,cn=ae,{{ aedir_suffix }}" =w
+    by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" =w
     by self =w
     by * auth
 
@@ -477,7 +477,7 @@ access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(&(objectClass=oathToken)(aeStatus=0)(oathHOTPCounter>=0))"
   attrs=oathSecret
-    by dn.base="uid=system_oath_binder,cn=ae,{{ aedir_suffix }}" read
+    by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" read
     by * break
 
 access to
@@ -540,7 +540,7 @@ access to
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=oathParams)"
-    by dn.base="uid=system_oath_binder,cn=ae,{{ aedir_suffix }}" read
+    by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" read
     by set="user/objectClass & [aeUser]" read
     by * none
 
@@ -549,7 +549,7 @@ access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=oathUser)"
   attrs=authTimestamp,pwdFailureTime
-    by dn.base="uid=system_oath_binder,cn=ae,{{ aedir_suffix }}" manage
+    by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" manage
     by * break
 
 # read access to password policy DN for OTP validator
@@ -557,7 +557,7 @@ access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=oathUser)"
   attrs=pwdPolicySubentry
-    by dn.base="uid=system_oath_binder,cn=ae,{{ aedir_suffix }}" read
+    by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" read
     by * break
 
 # write access to special status attributes for OTP validator
@@ -565,7 +565,7 @@ access to
   dn.onelevel="cn=oath,{{ aedir_suffix }}"
   filter="(objectClass=oathToken)"
   attrs=oathLastLogin,oathFailureCount,oathLastFailure
-    by dn.base="uid=system_oath_binder,cn=ae,{{ aedir_suffix }}" write
+    by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" write
     by group/aeGroup/member="cn=oath-admins,cn=oath,{{ aedir_suffix }}" write
     by * break
 
@@ -590,7 +590,7 @@ access to
   dn.onelevel="cn=oath,{{ aedir_suffix }}"
   filter="(&(objectClass=oathToken)(aeStatus=0))"
   attrs=oathHOTPCounter
-    by dn.base="uid=system_oath_binder,cn=ae,{{ aedir_suffix }}" write
+    by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" write
     by group/aeGroup/member="cn=oath-admins,cn=oath,{{ aedir_suffix }}" =rz
     by set="user/oathHOTPToken & this/entryDN" read
     by self =rz
@@ -605,7 +605,7 @@ access to
 access to
   dn.onelevel="cn=oath,{{ aedir_suffix }}"
   filter="(objectClass=oathToken)"
-    by dn.base="uid=system_oath_binder,cn=ae,{{ aedir_suffix }}" read
+    by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" read
     by group/aeGroup/member="cn=oath-admins,cn=oath,{{ aedir_suffix }}" write
     by group/aeGroup/member="cn=oath-auditors,cn=oath,{{ aedir_suffix }}" read
     by set="user/oathHOTPToken & this/entryDN" read
@@ -731,7 +731,7 @@ access to
   attrs=objectClass
   filter="(objectClass=aeUser)"
   val=msPwdResetObject
-    by dn.base="uid=system_passwd_self_service,cn=ae,{{ aedir_suffix }}" write
+    by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" write
     by group/aeGroup/member.expand="cn=${d2}-zone-admins,cn=${d1},{{ aedir_suffix }}" read
     by group/aeGroup/member.expand="cn=${d2}-zone-auditors,cn=${d1},{{ aedir_suffix }}" read
     by self read
@@ -744,7 +744,7 @@ access to
   dn.regex="^uid=({{ aedir_aeuser_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
   filter="(objectClass=aeUser)"
   attrs=msPwdResetPasswordHash,msPwdResetAdminPw
-    by dn.base="uid=system_passwd_self_service,cn=ae,{{ aedir_suffix }}" =w
+    by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" =w
     by group/aeGroup/member.expand="cn=${d2}-zone-admins,cn=${d2},{{ aedir_suffix }}" read
     by * none
 
@@ -753,7 +753,7 @@ access to
   dn.regex="^uid=({{ aedir_aeuser_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
   filter="(objectClass=aeUser)"
   attrs=@msPwdResetObject
-    by dn.base="uid=system_passwd_self_service,cn=ae,{{ aedir_suffix }}" write
+    by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" write
     by group/aeGroup/member.expand="cn=${d2}-zone-admins,cn=${d2},{{ aedir_suffix }}" read
     by group/aeGroup/member.expand="cn=${d2}-zone-auditors,cn=${d2},{{ aedir_suffix }}" read
     by self read
@@ -763,7 +763,7 @@ access to
 access to
   filter="(objectClass=aeUser)"
   attrs=entry,uid,aeStatus,objectClass,mail,pwdPolicySubentry
-    by dn.base="uid=system_passwd_self_service,cn=ae,{{ aedir_suffix }}" read
+    by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" read
     by * break
 
 # Allow search access to memberOf for special services
@@ -771,7 +771,7 @@ access to
   filter="(objectClass=aeUser)"
   attrs=memberOf
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" search
-    by dn.base="uid=system_passwd_self_service,cn=ae,{{ aedir_suffix }}" search
+    by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" search
     by * break
 
 # Acess to user, group and sudoers entries

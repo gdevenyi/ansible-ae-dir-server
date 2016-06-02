@@ -56,17 +56,32 @@ aedir_ldapi_services:
     gid_number: 113
     description: The system user for running OpenLDAP server process (slapd)
   # system user for password self-service web application
-  - uid: system_aedir_pwd_self_service
+  # uid is referenced in OpenLDAP ACLs!
+  - uid: ae-dir-pwd
     cn: Password self-service application
     uid_number: 998
     gid_number: 998
     description: The system user allowed to set attributes during user password reset (msPwdResetObject) over LDAPI
   # system user for sync processes
-  - uid: system_aedir_sync
+  - uid: ae-dir-peoplesync
     cn: Personnel data sync process
     uid_number: 999
     gid_number: 999
     description: The system user allowed to maintain aePerson entries over LDAPI
+  # system user for 2FA web application
+  # uid is referenced in OpenLDAP ACLs!
+  - uid: ae-dir-enroll2fa
+    cn: 2FA enrollment application
+    uid_number: 997
+    gid_number: 997
+    description: The system user allowed to maintain aePerson entries over LDAPI
+  # system user for 2FA web application
+  # uid is referenced in OpenLDAP ACLs!
+  - uid: ae-dir-otpverify
+    cn: OATH-LDAP validator demon
+    uid_number: 996
+    gid_number: 996
+    description: The system user allowed to read shared secrets (OATH-LDAP)
 
 #---------------------------------------------------------------------------
 # OpenLDAP parameters
