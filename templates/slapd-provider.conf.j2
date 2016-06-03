@@ -307,6 +307,9 @@ index aeVisibleSudoers eq
 index aeProxyFor pres,eq
 index aeSSHProxyCommand pres,eq,sub
 
+# service attributes
+index aeHost eq
+
 # login-related attributes
 index authTimestamp pres,eq
 index pwdChangedTime pres,eq
@@ -1160,6 +1163,12 @@ constraint_attribute
 constraint_attribute aeSrvGroup,entryDN set
   "this/aeSrvGroup/-1/entryDN & this/entryDN/-1/entryDN"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeHost)"
+
+# restrict aeHost in aeService entry to reference solely active aeHost entry
+constraint_attribute
+  aeSrvGroup
+  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeHost)(aeStatus=0))"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeService)"
 
 # restrict references from user groups to have only personal and system user accounts as members
 constraint_attribute

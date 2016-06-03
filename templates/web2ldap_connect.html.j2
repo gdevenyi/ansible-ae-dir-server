@@ -8,9 +8,10 @@
   (if in doubt, click this!)
 </p>
 
-<h2>&AElig;-DIR providers</h2>
+{% for role in ['provider', 'consumer'] %}
+<h2>&AElig;-DIR {{ role }}(s)</h2>
 <table>
-{% for host in aedir_provider_hosts %}
+{% for host in aedir_hosts[role] %}
 {% set replica = hostvars[host]['openldap_service_fqdn'] -%}
   <tr>
     <td>
@@ -23,17 +24,4 @@
 {% endfor %}
 </table>
 
-<h2>&AElig;-DIR consumers</h2>
-<table>
-{% for host in aedir_consumer_hosts %}
-{% set replica = hostvars[host]['openldap_service_fqdn'] -%}
-  <tr>
-    <td>
-      <a href="/web2ldap?ldaps://{{ replica }}/{{ aedir_suffix }}????bindname=">{{ replica }}</a>
-    </td>
-    <td>
-      {{ host }}
-    </td>
-  </tr>
 {% endfor %}
-</table>

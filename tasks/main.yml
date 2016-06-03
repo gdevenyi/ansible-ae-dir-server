@@ -18,9 +18,9 @@
 
 - name: "Install various AE-DIR tools"
   include: aedir_tools.yml
-  when: openldap_role == 'p'
+  when: openldap_role == 'provider'
 
 - name: "Configure web2ldap for AE-DIR"
   include: configure_web2ldap.yml
-  when: openldap_role == 'p'
+  when: openldap_role == 'provider'
 

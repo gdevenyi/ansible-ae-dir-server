@@ -193,7 +193,18 @@ class AEUser(DynamicDNSelectList):
 
 syntax_registry.registerAttrType(
   AEUser.oid,[
-    AE_OID_PREFIX+'.4.2', # aeOwnerUser
+  ]
+)
+
+
+class AEHost(DynamicDNSelectList):
+  oid = 'AEHost-oid'
+  desc = 'AE-DIR: Host'
+  ldap_url = 'ldap:///_?host?sub?(&(objectClass=aeHost)(aeStatus=0))'
+
+syntax_registry.registerAttrType(
+  AEHost.oid,[
+    AE_OID_PREFIX+'.4.28', # aeHost
   ]
 )
 

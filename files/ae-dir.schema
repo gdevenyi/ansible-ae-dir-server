@@ -14,12 +14,6 @@ attributetype ( ae-dir-at:1
   DESC 'AE-DIR: DN of owner group entry'
   SUP owner )
 
-attributetype ( ae-dir-at:2
-  NAME 'aeOwnerUser'
-  X-ORIGIN 'AE-DIR'
-  DESC 'AE-DIR: DN of owner user entry'
-  SUP owner )
-
 attributetype ( ae-dir-at:3
   NAME 'aeTicketId'
   X-ORIGIN 'AE-DIR'
@@ -312,25 +306,6 @@ objectclass ( ae-dir-oc:13
         aeVisibleGroups $ aeVisibleSudoers $
         aeSSHProxyCommand ) )
 
-# Service user accounts
-#-----------------------------------------------------------------------
-
-objectclass ( ae-dir-oc:4
-  NAME 'aeService'
-  X-ORIGIN 'AE-DIR'
-  DESC 'AE-DIR: Service user'
-  STRUCTURAL
-  SUP ( account $ aeObject )
-  MUST ( uid $ description )
-  MAY ( aeRemoteHost $ aeSrvGroup $ userPassword ) )
-
-ditcontentrule ( ae-dir-oc:4
-  NAME 'aeService-dcr'
-  AUX ( posixAccount $ inetLocalMailRecipient $ pkiUser $ ldapPublicKey $
-        oathHOTPUser $ oathTOTPUser )
-  NOT ( host $ l $ o $ ou ) )
-
-
 # Mailbox entries
 #-----------------------------------------------------------------------
 
@@ -348,6 +323,13 @@ ditcontentrule ( ae-dir-oc:5
 
 # Server and network device entries
 #-----------------------------------------------------------------------
+
+# DN of aeHost entry
+attributetype ( ae-dir-at:28
+  NAME 'aeHost'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: DN of aeHost entry'
+  SUP distinguishedName )
 
 # Generic base attribute type for a fully-qualified domain name
 # NON-ASCII chars are supposed to be IDNA-encoded
@@ -456,3 +438,22 @@ ditcontentrule ( ae-dir-oc:8
         preferredDeliveryMethod $ registeredAddress $ secretary $
         teletexTerminalIdentifier $ telexNumber $  userSMIMECertificate $
         x121Address $ x500UniqueIdentifier $ seeAlso $ userPassword ) )
+
+# Service user accounts
+#-----------------------------------------------------------------------
+
+objectclass ( ae-dir-oc:4
+  NAME 'aeService'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Service user'
+  STRUCTURAL
+  SUP ( account $ aeObject )
+  MUST ( uid $ description )
+  MAY ( aeRemoteHost $ aeHost $ aeSrvGroup $ userPassword ) )
+
+ditcontentrule ( ae-dir-oc:4
+  NAME 'aeService-dcr'
+  AUX ( posixAccount $ inetLocalMailRecipient $ pkiUser $ ldapPublicKey $
+        oathHOTPUser $ oathTOTPUser )
+  NOT ( host $ l $ o $ ou ) )
+
