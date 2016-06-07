@@ -64,7 +64,7 @@
   notify:
   - restart slapd
 
-- name: TLS server key file
+- name: TLS DH parameter file
   file:
     path: "{{ openldap_dhparam_pathname }}"
     owner: root
