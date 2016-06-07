@@ -811,6 +811,19 @@ syntax_registry.registerAttrType(
 )
 
 
+class AECommonNameAEZone(DirectoryString):
+  oid = 'AECommonNameAEZone-oid'
+
+syntax_registry.registerAttrType(
+  AECommonNameAEZone.oid,[
+    '2.5.4.3', # cn alias commonName
+  ],
+  structural_oc_oids=[
+    AE_ZONE_OID,    # aeZone
+  ]
+)
+
+
 class AEZonePrefixCommonName(DirectoryString):
   oid = 'AEZonePrefixCommonName-oid'
   desc = 'AE-DIR: Attribute values have to be prefixed with zone name'
@@ -854,19 +867,6 @@ class AEZonePrefixCommonName(DirectoryString):
       elif self.attrValue in self.special_names:
         result = '-'.join((zone_cn,self.attrValue.decode(self._ls.charset)))
     return result # formValue()
-
-
-class AECommonNameAEZone(AEZonePrefixCommonName):
-  oid = 'AECommonNameAEZone-oid'
-
-syntax_registry.registerAttrType(
-  AECommonNameAEZone.oid,[
-    '2.5.4.3', # cn alias commonName
-  ],
-  structural_oc_oids=[
-    AE_ZONE_OID,    # aeZone
-  ]
-)
 
 
 class AECommonNameAEGroup(AEZonePrefixCommonName):
