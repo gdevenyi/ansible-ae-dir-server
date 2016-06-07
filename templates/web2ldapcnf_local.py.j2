@@ -49,7 +49,7 @@ w2lapp.schema.plugins.aedir.AEDisplayNamePerson.compose_templates = (
 )
 
 # Require the browser to at least connect via HTTPS with strong cipher
-web2ldapcnf.hosts.ldap_def['_'].ssl_minlevel = 1
+#web2ldapcnf.hosts.ldap_def['_'].ssl_minlevel = 1
 
 # Enable sending the session tracking control with every LDAP request
 # which reveals the browser's IP address to the LDAP server
@@ -89,6 +89,7 @@ w2lapp.schema.plugins.posixautogen.AutogenGIDNumber.minNewValue = {{ aedir_min_g
 w2lapp.schema.plugins.posixautogen.AutogenGIDNumber.maxNewValue = {{ aedir_max_gid }}L
 
 # regex patterns for enforcing naming conventions (substring match!)
+w2lapp.schema.plugins.aedir.AECommonNameAEZone.reObj = re.compile('^{{ aedir_aezone_cn_regex }}$')
 w2lapp.schema.plugins.aedir.AECommonNameAEGroup.reObj = re.compile('^{{ aedir_aesrvgroup_cn_regex }}$')
 w2lapp.schema.plugins.aedir.AECommonNameAESrvGroup.reObj = re.compile('^{{ aedir_aegroup_cn_regex }}$')
 w2lapp.schema.plugins.aedir.AECommonNameAESudoRule.reObj = re.compile('^{{ aedir_aesudorule_cn_regex }}$')

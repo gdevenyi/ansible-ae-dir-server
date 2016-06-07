@@ -856,6 +856,19 @@ class AEZonePrefixCommonName(DirectoryString):
     return result # formValue()
 
 
+class AECommonNameAEZone(AEZonePrefixCommonName):
+  oid = 'AECommonNameAEZone-oid'
+
+syntax_registry.registerAttrType(
+  AECommonNameAEZone.oid,[
+    '2.5.4.3', # cn alias commonName
+  ],
+  structural_oc_oids=[
+    AE_ZONE_OID,    # aeZone
+  ]
+)
+
+
 class AECommonNameAEGroup(AEZonePrefixCommonName):
   oid = 'AECommonNameAEGroup-oid'
 
