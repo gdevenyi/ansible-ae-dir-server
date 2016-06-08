@@ -62,7 +62,7 @@
     owner: root
     group: ldap
     mode: 0640
-#    validate: "{{ openldap_sbin }}/slaptest %s"
+    validate: "{{ openldap_sbin }}/slaptest -f %s"
   notify:
   - restart slapd
 

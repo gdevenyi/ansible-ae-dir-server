@@ -8,7 +8,7 @@
     owner: root
     group: root
     mode: 0644
-#    validate: "PYTHONPATH={{ web2ldap_etc }}:{{ web2ldap_prefix }}/pylib {{ web2ldap_prefix }}/bin/python %s"
+    validate: "{{ web2ldap_prefix }}/bin/python %s"
   notify:
     - restart web server
 
