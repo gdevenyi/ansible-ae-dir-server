@@ -85,6 +85,24 @@ aedir_ldapi_services:
     gid_number: 996
     description: The system user allowed to read shared secrets (OATH-LDAP)
 
+# List of aePerson entries to be added to ae-dir-base.ldif
+aedir_init_aepersons:
+  INIT-PERSON-ID-42:
+    given_name: Michael
+    sur_name: Ströder
+    mail: michael@stroeder.com
+
+# List of aeUser entries to be added to ae-dir-base.ldif
+# - user names must match aedir_aeservice_uid_regex pattern defined above
+# - unique_identifier has to be an entry in aedir_init_aepersons
+aedir_init_aeadmins:
+  - uid: msin
+    unique_identifier: INIT-PERSON-ID-42
+    description: initial Æ-DIR admin
+    ticket_id: IAM-42
+
+aedir_init_aeuser:
+
 aedir_hosts:
   # inventory host names of *all* provider hosts
   provider: "{{ groups['ae-dir-providers'] }}"

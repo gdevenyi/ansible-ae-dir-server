@@ -210,6 +210,55 @@ pwdMustChange: FALSE
 pwdSafeModify: FALSE
 
 #---------------------------------------------------------------------------
+# aePerson and aeUser entries for initial AE admin(s)
+#---------------------------------------------------------------------------
+#
+{% for unique_identifier, person_attrs in aedir_init_aepersons.iteritems() %}
+dn: uniqueIdentifier={{ unique_identifier }},cn=people,{{ aedir_suffix }}
+uniqueIdentifier: {{ unique_identifier }}
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+objectClass: aePerson
+objectClass: aeObject
+aeStatus: 0
+cn: {{ person_attrs.given_name }} {{ person_attrs.sur_name }}
+sn: {{ person_attrs.sur_name }}
+givenName: {{ person_attrs.given_name }}
+mail: {{ person_attrs.mail }}
+
+{% endfor %}
+{% for ae_user in aedir_init_aeadmins %}
+dn: uid={{ ae_user.uid }},cn=ae,{{ aedir_suffix }}
+uid: {{ ae_user.uid }}
+uidNumber: {{ uid_number + loop.index }}
+gidNumber: {{ aedir_global_gid }}
+objectClass: account
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+objectClass: aeObject
+objectClass: aeUser
+objectClass: posixAccount
+objectClass: ldapPublicKey
+aeStatus: 0
+aePerson: uniqueIdentifier={{ ae_user.unique_identifier }},cn=people,{{ aedir_suffix }}
+description: {{ ae_user.description }}
+homeDirectory: /home/{{ ae_user.uid }}
+loginShell: /bin/bash
+pwdPolicySubentry: cn=ppolicy-users,cn=ae,ou=ae-dir
+cn: {{ aedir_init_aepersons[ae_user.unique_identifier].given_name }} {{ aedir_init_aepersons[ae_user.unique_identifier].sur_name }}
+displayName: {{ aedir_init_aepersons[ae_user.unique_identifier].given_name }}
+  {{ aedir_init_aepersons[ae_user.unique_identifier].sur_name }}
+  ({{ ae_user.uid }}/{{ uid_number + loop.index }})
+sn: {{ aedir_init_aepersons[ae_user.unique_identifier].sur_name }}
+givenName: {{ aedir_init_aepersons[ae_user.unique_identifier].given_name }}
+mail: {{ aedir_init_aepersons[ae_user.unique_identifier].mail }}
+
+{% endfor %}
+{% set uid_number = uid_number + aedir_init_aeadmins|length -%}
+
+#---------------------------------------------------------------------------
 # AE groups
 #---------------------------------------------------------------------------
 #
@@ -224,6 +273,10 @@ objectClass: groupOfEntries
 objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
+{% for ae_user in aedir_init_aeadmins %}
+member: uid={{ ae_user.uid }},cn=ae,{{ aedir_suffix }}
+memberUID: {{ ae_user.uid }}
+{% endfor %}
 
 dn: cn=ae-auditors,cn=ae,{{ aedir_suffix }}
 aeStatus: 0
