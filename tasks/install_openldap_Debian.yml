@@ -5,7 +5,6 @@
   apt_key:
     url: "{{ ltb_openldap_repo_key }}"
     state: present
-  when: ansible_os_family == 'Debian'
 
 - name: "Add LTB OpenLDAP Debian repository {{ ltb_openldap_repo_source }}"
   apt_repository:
