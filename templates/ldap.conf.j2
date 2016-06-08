@@ -7,8 +7,16 @@
 
 BASE ou=ae-dir
 URI {{ openldap_ldapi_uri }}
+
+# use SASL/EXTERNAL mechanism
 SASL_MECH EXTERNAL
 
-#SIZELIMIT      12
-#TIMELIMIT      15
-DEREF          never
+# TLS cert/key files
+TLS_CACERT {{ openldap_cacert_pathname }}
+TLS_CERT {{ openldap_cert_pathname }}
+TLS_KEY {{ openldap_key_pathname }}
+
+# never dereference aliases
+DEREF never
+# never follow referrals
+REFERRALS off
