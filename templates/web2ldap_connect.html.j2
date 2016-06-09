@@ -11,14 +11,29 @@
 {% for role in ['provider', 'consumer'] %}
 <h2>&AElig;-DIR {{ role }}(s)</h2>
 <table>
+  <tr>
+    <th>Service</th>
+    <th>Host</th>
+    <th>Id</th>
+  </tr>
 {% for host in aedir_hosts[role] %}
-{% set replica = hostvars[host]['openldap_service_fqdn'] -%}
+{% set replica = hostvars[host].get('openldap_service_fqdn',host) -%}
+{% set server_id = hostvars[host].get('openldap_server_id','') -%}
   <tr>
     <td>
       <a href="/web2ldap?ldaps://{{ replica }}/{{ aedir_suffix }}????bindname=">{{ replica }}</a>
     </td>
+{% if replica!=host %}
     <td>
       {{ host }}
+    </td>
+{% else %}
+    <td>
+      -
+    </td>
+{% endif %}
+    <td>
+      {{ server_id }}
     </td>
   </tr>
 {% endfor %}
