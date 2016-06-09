@@ -10,8 +10,18 @@
     mode: 0755
   with_items:
     - "{{ aedir_prefix }}"
+    - "{{ aedir_prefix }}/etc"
     - "{{ aedir_bin }}"
     - "{{ aedir_rundir }}"
+
+- name: "Create ae-dir-base.ldif"
+  template:
+    src: "ae-dir-base.ldif.j2"
+    dest: "{{ aedir_prefix }}/etc/ae-dir-base.ldif"
+    owner: root
+    group: ldap
+    mode: 0640
+  when: openldap_role == 'provider'
 
 - name: Install scripts
   template:
