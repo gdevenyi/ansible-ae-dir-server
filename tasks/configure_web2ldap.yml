@@ -10,7 +10,7 @@
     mode: 0644
     validate: "{{ web2ldap_prefix }}/bin/python %s"
   notify:
-    - restart web server
+    - restart web2ldap
 
 - name: Create connect AE-DIR landing page on https://{{ openldap_service_fqdn }}/web2ldap
   template:
@@ -28,7 +28,7 @@
     group: root
     mode: 0644
   notify:
-    - restart web server
+    - restart web2ldap
 
 #- name: web2ldap templates for AE-DIR
 #  template: src="{{ item }}.j2" dest="{{ web2ldap_templates }}/ae-dir/{{ item }}" owner=root group=root mode=0644
