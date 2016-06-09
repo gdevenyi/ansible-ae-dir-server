@@ -101,8 +101,6 @@ aedir_init_aeadmins:
     description: initial Æ-DIR admin
     ticket_id: IAM-42
 
-aedir_init_aeuser:
-
 aedir_hosts:
   # inventory host names of *all* provider hosts
   provider: "{{ groups['ae-dir-providers'] }}"
