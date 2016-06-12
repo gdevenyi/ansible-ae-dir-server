@@ -1027,8 +1027,10 @@ overlay constraint
 
 # Check sub-tree wide uniqueness of certain attributes
 unique_uri "ldap:///{{ aedir_suffix }}?uid,uidNumber,homeDirectory?sub?(objectClass=*)"
+unique_uri "ldap:///{{ aedir_suffix }}?mailLocalAddress?sub?(objectClass=*)"
+unique_uri "ldap:///{{ aedir_suffix }}?seeAlso?sub?(objectClass=*)"
 unique_uri "ldap:///{{ aedir_suffix }}?ipHostNumber,host,aeFqdn?sub?(objectClass=*)"
-unique_uri "ldap:///ou=people,{{ aedir_suffix }}?employeeNumber,uniqueIdentifier?sub"
+unique_uri "ldap:///ou=people,{{ aedir_suffix }}?employeeNumber,uniqueIdentifier,displayName?sub"
 # these two constraints are not possible with effective filter
 unique_uri "ldap:///{{ aedir_suffix }}?cn?sub?(!(|(objectClass=aePerson)(objectClass=aeUser)))"
 #unique_uri "ldap:///{{ aedir_suffix }}?gidNumber?sub?(objectClass=aeGroup)"
