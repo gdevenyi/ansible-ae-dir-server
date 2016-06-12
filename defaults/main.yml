@@ -152,7 +152,6 @@ openldap_schema_files:
   - stroeder.com.schema
   - sudoers.schema
 
-
 # List of servers to be added to rootDSE attribute altServer (see RFC 4512)
 openldap_rootdse_alt_servers: "{{ aedir_hosts[openldap_role] }}"
 
