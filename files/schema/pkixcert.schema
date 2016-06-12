@@ -1,0 +1,291 @@
+attributetype (1.2.826.0.1.3344810.1.1.60
+        NAME 'x509issuerSerial'
+        DESC 'Used to hold the RDN of a certificate entry, formed by
+              concatenating the AC serial number and issuer fields '
+        EQUALITY distinguishedNameMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.12
+        SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.3.1
+      NAME 'x509version'
+      DESC 'X.509 Version of the certificate, or of the CRL'
+      EQUALITY integerMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+      SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.3.2
+      NAME 'x509serialNumber'
+      DESC 'Unique integer for each certificate issued by a
+            particular CA'
+      EQUALITY integerMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.3.3
+      NAME 'x509signatureAlgorithm'
+      DESC 'OID of the algorithm used by the CA in
+            signing the CRL or the certificate'
+      EQUALITY objectIdentifierMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.38
+      SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.3.4
+      NAME 'x509issuer'
+      DESC 'Distinguished name of the entity who has signed and
+            issued the certificate'
+      EQUALITY distinguishedNameMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.12
+      SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.3.5
+      NAME 'x509validityNotBefore'
+      DESC 'Date on which the certificate validity period begins'
+      EQUALITY generalizedTimeMatch
+      ORDERING generalizedTimeOrderingMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.24
+      SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.3.6
+      NAME 'x509validityNotAfter'
+      DESC 'Date on which the certificate validity period ends'
+      EQUALITY generalizedTimeMatch
+      ORDERING generalizedTimeOrderingMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.24
+      SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.3.7
+      NAME 'x509subject'
+      DESC 'Distinguished name of the entity associated with this
+            public-key'
+      EQUALITY distinguishedNameMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.12
+      SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.3.8
+      NAME 'x509subjectPublicKeyInfoAlgorithm'
+      DESC 'OID identifying the algorithm associated with the certified
+            public key'
+      EQUALITY objectIdentifierMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.38
+      SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.3.11
+      NAME 'x509authorityKeyIdentifier'
+      DESC 'Key Identifier field of the Authority Key Identifier
+            extension'
+      EQUALITY octetStringMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.40
+      SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.3.12
+      NAME 'x509authorityCertIssuer'
+      DESC 'Authority Cert Issuer field of the Authority Key Identifier
+            extension'
+      EQUALITY distinguishedNameMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.12
+      SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.3.13
+      NAME 'x509authorityCertSerialNumber'
+      DESC 'Authority Cert Serial Number field of the
+            Authority Key Identifier extension'
+      EQUALITY integerMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+      SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.3.14
+      NAME 'x509subjectKeyIdentifier'
+      DESC 'Key identifier which must be unique with respect to all
+            key identifiers for the subject'
+      EQUALITY octetStringMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.40
+      SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.3.15
+      NAME 'x509keyUsage'
+      DESC 'Purpose for which the certified public key is used'
+      EQUALITY caseIgnoreIA5Match
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.3.16
+      NAME 'x509policyInformationIdentifier'
+      DESC 'OID which indicates the policy under which the
+            certificate has been issued and the purposes for which
+            the certificate may be used'
+      EQUALITY objectIdentifierMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.38
+      SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.3.17
+      NAME 'x509subjectRfc822Name'
+      DESC 'Internet electronic mail address of the entity
+            associated with this public-key'
+      EQUALITY caseIgnoreIA5Match
+      SUBSTR caseIgnoreIA5SubstringsMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.3.18
+      NAME 'x509subjectDnsName'
+      DESC 'Internet domain name of the entity
+            associated with this public-key'
+      EQUALITY caseIgnoreIA5Match
+      SUBSTR caseIgnoreIA5SubstringsMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.3.19
+      NAME 'x509subjectDirectoryName'
+      DESC 'Distinguished name of the entity
+            associated with this public-key'
+      EQUALITY distinguishedNameMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.12 )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.3.20
+      NAME  'x509subjectURI' 
+      DESC 'Uniform Resource Identifier for the World-Wide Web 
+            of the entity associated with this public-key'
+      EQUALITY caseExactIA5Match
+      SUBSTR caseExactIA5SubstringsMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.3.21
+      NAME 'x509subjectIpAddress'
+      DESC 'Internet Protocol address of the entity
+            associated with this public-key'
+      EQUALITY caseIgnoreIA5Match
+      SUBSTR caseIgnoreIA5SubstringsMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.3.22
+      NAME 'x509subjectRegisteredID'
+      DESC 'OID of any registered object identifying the entity
+            associated with this public-key'
+      EQUALITY objectIdentifierMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.38 )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.3.23
+      NAME 'x509issuerRfc822Name'
+      DESC 'Internet electronic mail address of the entity who has
+            signed and issued the certificate'
+      EQUALITY caseIgnoreIA5Match
+      SUBSTR caseIgnoreIA5SubstringsMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.3.24
+      NAME 'x509issuerDnsName'
+      DESC 'Internet domain name of the entity who has
+            signed and issued the certificate'
+      EQUALITY caseIgnoreIA5Match
+      SUBSTR caseIgnoreIA5SubstringsMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.3.25
+      NAME 'x509issuerDirectoryName'
+      DESC 'Distinguished name of the entity who has
+            signed and issued the certificate'
+      EQUALITY distinguishedNameMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.12 )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.3.26
+      NAME 'x509issuerURI' 
+      DESC 'Uniform Resource Identifier for the World-Wide Web
+            of the entity who has signed and issued the certificate'
+      EQUALITY caseExactIA5Match
+      SUBSTR caseExactIA5SubstringsMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.3.27
+      NAME 'x509issuerIpAddress'
+      DESC 'Internet Protocol address of the entity who has
+            signed and issued the certificate'
+      EQUALITY caseIgnoreIA5Match
+      SUBSTR caseIgnoreIA5SubstringsMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.3.28
+      NAME 'x509issuerRegisteredID'
+      DESC 'OID of any registered object identifying the entity who has
+            signed and issued the certificate'
+      EQUALITY objectIdentifierMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.38 )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.3.29
+      NAME 'x509basicConstraintsCa'
+      DESC 'Identifies whether the subject of the certificate is a
+            CA'
+      EQUALITY booleanMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.7
+      SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.3.30
+      NAME 'x509extKeyUsage'
+      DESC 'Purposes for which the certified public key may be used,
+            identified by an OID'
+      EQUALITY objectIdentifierMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.38 )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.3.32
+      NAME 'x509fullCRLDistributionPointURI'
+      DESC 'URI type of DistributionPointName for the full CRL'
+      EQUALITY caseExactIA5Match
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.4.74
+      NAME 'x509certLocation'
+      DESC 'Pointer to a x509certificate Entry'
+      EQUALITY distinguishedNameMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.12 )
+
+attributetype ( 1.3.6.1.4.1.10126.1.5.4.75
+      NAME 'x509certHolder'
+      DESC 'Pointer to the directory entry of the end entity to which 
+            this certificate was issued'
+      EQUALITY distinguishedNameMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.12 )
+
+objectclass ( 1.3.6.1.4.1.10126.1.5.4.2.1
+      NAME 'x509base'
+      ABSTRACT
+      MAY x509version )
+
+objectclass ( 1.3.6.1.4.1.10126.1.5.4.2.3
+      NAME 'x509PKC'
+      SUP x509base
+      ABSTRACT
+      MUST ( x509serialNumber $ x509signatureAlgorithm $ x509issuer $ 
+             x509validityNotBefore $ x509validityNotAfter $ 
+             x509subjectPublicKeyInfoAlgorithm ) 
+      MAY  ( x509certHolder $ x509issuerSerial ) )
+
+objectclass ( 1.3.6.1.4.1.10126.1.5.4.2.4
+      NAME 'x509userCertificate'
+      SUP x509PKC 
+      STRUCTURAL
+      MUST userCertificate
+      MAY  x509subject )
+
+objectclass ( 1.3.6.1.4.1.10126.1.5.4.2.5
+      NAME 'x509caCertificate'
+      SUP x509PKC
+      STRUCTURAL 
+      MUST ( caCertificate $ x509subject ) )
+
+objectclass ( 1.3.6.1.4.1.10126.1.5.4.2.6 
+      NAME 'x509PKCext'
+      SUP top
+      AUXILIARY
+      MAY  ( x509authorityKeyIdentifier $ 
+             x509authorityCertIssuer $ x509authorityCertSerialNumber $ 
+             x509subjectKeyIdentifier $ x509keyUsage $ 
+             x509policyInformationIdentifier $ 
+             x509subjectRfc822Name $ x509subjectDnsName $ 
+             x509subjectDirectoryName $ x509subjectURI $ 
+             x509subjectIpAddress $ x509subjectRegisteredID $ 
+             x509issuerRfc822Name $ x509issuerDnsName $ 
+             x509issuerDirectoryName $ x509issuerURI $ 
+             x509issuerIpAddress $ x509issuerRegisteredID $ 
+             x509basicConstraintsCa $ x509extKeyUsage $ 
+             x509fullCRLDistributionPointURI ) )
+
+objectclass ( 1.3.6.1.4.1.10126.1.5.4.2.2
+      NAME 'x509certificateHolder'
+      AUXILIARY
+      MAY  ( x509certLocation ) )

@@ -1,0 +1,329 @@
+############################################################################
+# Schema for OATH-LDAP
+# $Revision: 1.5 $
+#
+# Author: Michael Ströder <michael@stroeder.com>
+#
+# This schema is meant to be used along with normal password authentication
+# therefore it does not replace 'userPassword' attribute values.
+#
+#      +--------+
+#      | person |<-----------+
+#      +--------+            |
+#          ^            +----+-----+
+#          |            | account  |
+#          |            +--+----+--+
+#    +-----+-----+         |    |
+#    | oathToken |<--------+    |
+#    +-----+-----+              |
+#          |                    |
+#          V                    V
+#    +-----+------+     +-----------+
+#    | oathParams |     | pwdPolicy |
+#    +------------+     +-----------+
+#
+############################################################################
+
+# OID arc for OATH (RFC 4226 and RFC 6238) beneath stroeder-com-pub-ldap
+#-----------------------------------------------------------------------
+
+objectidentifier oath-ldap 1.3.6.1.4.1.5427.1.389.4226
+objectidentifier oath-ldap-at oath-ldap:4
+objectidentifier oath-ldap-oc oath-ldap:6
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# General
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# Attribute types
+#----------------
+
+attributetype ( oath-ldap-at:1
+  NAME 'oathSecret'
+  DESC 'OATH-LDAP: Shared Secret'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  EQUALITY octetStringMatch
+  SUBSTR octetStringSubstringsMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.40{256} )
+
+attributetype ( oath-ldap-at:2
+  NAME 'oathTokenSerialNumber'
+  DESC 'OATH-LDAP: Proprietary hardware token serial number assigned by vendor'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  SUP serialNumber )
+
+# see spec at http://openauthentication.org/specification/tokenSpecs
+attributetype ( oath-ldap-at:3
+  NAME 'oathTokenIdentifier'
+  DESC 'OATH-LDAP: Globally unique OATH token identifier'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  SUP uniqueIdentifier )
+
+attributetype ( oath-ldap-at:4
+  NAME 'oathParamsEntry'
+  DESC 'OATH-LDAP: DN pointing to OATH parameter/policy object'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  SUP distinguishedName )
+
+attributetype ( oath-ldap-at:5
+  NAME 'oathOTPLength'
+  DESC 'OATH-LDAP: Length of OTP (number of digits)'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  EQUALITY integerMatch
+  ORDERING integerOrderingMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 )
+
+attributetype ( oath-ldap-at:6
+  NAME 'oathHMACAlgorithm'
+  DESC 'OATH-LDAP: HMAC algorithm used for generating OTP values'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  EQUALITY objectIdentifierMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.38 )
+
+attributetype ( oath-ldap-at:7
+  NAME 'oathTimestamp'
+  DESC 'OATH-LDAP: Timestamp (not directly used).'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  EQUALITY generalizedTimeMatch
+  ORDERING generalizedTimeOrderingMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.24 )
+
+attributetype ( oath-ldap-at:7.1
+  NAME 'oathLastFailure'
+  DESC 'OATH-LDAP: Timestamp of last failed OATH validation'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  SUP oathTimestamp )
+
+attributetype ( oath-ldap-at:7.2
+  NAME 'oathLastLogin'
+  DESC 'OATH-LDAP: Timestamp of last successful OATH validation'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  SUP oathTimestamp )
+
+attributetype ( oath-ldap-at:7.3
+  NAME 'oathSecretTime'
+  DESC 'OATH-LDAP: Timestamp of generation of oathSecret attribute.'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  SUP oathTimestamp )
+
+attributetype ( oath-ldap-at:8
+  NAME 'oathSecretMaxAge'
+  DESC 'OATH-LDAP: Time in seconds for which the shared secret (oathSecret) will be valid from oathSecretTime value.'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  EQUALITY integerMatch
+  ORDERING integerOrderingMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 )
+
+attributetype ( oath-ldap-at:11
+  NAME 'oathSecretLength'
+  DESC 'OATH-LDAP: Length of plain-text shared secret (number of bytes)'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  EQUALITY integerMatch
+  ORDERING integerOrderingMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 )
+
+attributetype ( oath-ldap-at:9
+  NAME 'oathToken'
+  DESC 'OATH-LDAP: DN pointing to OATH token object'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  SUP distinguishedName )
+
+attributetype ( oath-ldap-at:10
+  NAME 'oathCounter'
+  DESC 'OATH-LDAP: Counter for OATH data (not directly used)'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  EQUALITY integerMatch
+  ORDERING integerOrderingMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 )
+
+attributetype ( oath-ldap-at:10.1
+  NAME 'oathFailureCount'
+  DESC 'OATH-LDAP: OATH failure counter'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  SUP oathCounter )
+
+attributetype ( oath-ldap-at:10.7
+  NAME 'oathMaxUsageCount'
+  DESC 'OATH-LDAP: Maximum number of times a token can be used'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  SUP oathCounter )
+
+attributetype ( oath-ldap-at:10.5
+  NAME 'oathThrottleLimit'
+  DESC 'OATH-LDAP: Failure throttle limit'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  SUP oathCounter )
+
+# Object classes
+#---------------
+
+# This abstract object class is used as a base class for any OATH user
+objectclass ( oath-ldap-oc:1
+  NAME 'oathUser'
+  DESC 'OATH-LDAP: User Object'
+  X-ORIGIN 'OATH-LDAP'
+  ABSTRACT )
+
+# This object class is used to specify general OATH policy parameters
+objectclass ( oath-ldap-oc:2
+  NAME 'oathParams'
+  DESC 'OATH-LDAP: Parameter object'
+  X-ORIGIN 'OATH-LDAP'
+  ABSTRACT
+  MUST ( oathOTPLength $ oathHMACAlgorithm )
+  MAY ( oathSecretMaxAge $ oathSecretLength $
+        oathMaxUsageCount $ oathThrottleLimit ) )
+
+objectclass ( oath-ldap-oc:3
+  NAME 'oathToken'
+  DESC 'OATH-LDAP: User Object'
+  X-ORIGIN 'OATH-LDAP'
+  ABSTRACT
+  MAY ( oathSecret $ oathSecretTime $
+        oathLastLogin $ oathFailureCount $ oathLastFailure $
+        oathTokenSerialNumber $ oathTokenIdentifier ) )
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# HOTP (see RFC 4226)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# Attribute types
+#----------------
+
+attributetype ( oath-ldap-at:9.1
+  NAME 'oathHOTPToken'
+  DESC 'OATH-LDAP: DN pointing to OATH/HOTP token object'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  SUP oathToken )
+
+attributetype ( oath-ldap-at:10.2
+  NAME 'oathHOTPCounter'
+  DESC 'OATH-LDAP: Counter for HOTP'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  SUP oathCounter )
+
+attributetype ( oath-ldap-at:10.3
+  NAME 'oathHOTPLookAhead'
+  DESC 'OATH-LDAP: Look-ahead window for HOTP'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  SUP oathCounter )
+
+attributetype ( oath-ldap-at:5.1
+  NAME 'oathHOTPParams'
+  DESC 'OATH-LDAP: DN pointing to HOTP parameter object'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  SUP oathParamsEntry )
+
+attributetype ( oath-ldap-at:5.2
+  NAME 'oathTOTPParams'
+  DESC 'OATH-LDAP: DN pointing to TOTP parameter object'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  SUP oathParamsEntry )
+
+# Object classes
+#---------------
+
+objectclass ( oath-ldap-oc:1.1
+  NAME 'oathHOTPUser'
+  DESC 'OATH-LDAP: HOTP user object'
+  X-ORIGIN 'OATH-LDAP'
+  AUXILIARY
+  SUP oathUser
+  MAY ( oathHOTPToken ) )
+
+objectclass ( oath-ldap-oc:2.1
+  NAME 'oathHOTPParams'
+  DESC 'OATH-LDAP: HOTP parameter object'
+  X-ORIGIN 'OATH-LDAP'
+  AUXILIARY
+  SUP oathParams
+  MUST ( oathHOTPLookAhead ) )
+
+objectclass ( oath-ldap-oc:3.1
+  NAME 'oathHOTPToken'
+  DESC 'OATH-LDAP: HOTP token object'
+  X-ORIGIN 'OATH-LDAP'
+  AUXILIARY
+  SUP oathToken
+  MAY ( oathHOTPParams $ oathHOTPCounter ) )
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# TOTP (see RFC 6238)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# Attribute types
+#----------------
+
+attributetype ( oath-ldap-at:9.2
+  NAME 'oathTOTPToken'
+  DESC 'OATH-LDAP: DN pointing to OATH/TOTP token object'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  SUP oathToken )
+
+attributetype ( oath-ldap-at:4.1
+  NAME 'oathTOTPTimeStepPeriod'
+  DESC 'OATH-LDAP: Time window for TOTP (seconds)'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  EQUALITY integerMatch
+  ORDERING integerOrderingMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 )
+
+attributetype ( oath-ldap-at:10.6
+  NAME 'oathTOTPLastTimeStep'
+  DESC 'OATH-LDAP: Last time step seen for TOTP (time/period)'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  SUP oathCounter )
+
+# Object classes
+#---------------
+
+objectclass ( oath-ldap-oc:1.2
+  NAME 'oathTOTPUser'
+  DESC 'OATH-LDAP: TOTP user object'
+  X-ORIGIN 'OATH-LDAP'
+  AUXILIARY
+  SUP oathUser
+  MUST ( oathTOTPToken ) )
+
+objectclass ( oath-ldap-oc:2.2
+  NAME 'oathTOTPParams'
+  DESC 'OATH-LDAP: TOTP parameter object'
+  X-ORIGIN 'OATH-LDAP'
+  AUXILIARY
+  SUP oathParams
+  MUST ( oathTOTPTimeStepPeriod ) )
+
+objectclass ( oath-ldap-oc:3.2
+  NAME 'oathTOTPToken'
+  DESC 'OATH-LDAP: TOTP token'
+  X-ORIGIN 'OATH-LDAP'
+  AUXILIARY
+  SUP oathToken
+  MAY ( oathTOTPParams $ oathTOTPLastTimeStep ) )
+

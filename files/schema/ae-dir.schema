@@ -1,0 +1,459 @@
+#=======================================================================
+# Schema for Æ-DIR -- Yet another LDAP user and systems management
+#=======================================================================
+
+objectidentifier ae-dir-at stroeder-com-pub-ae-dir:4
+objectidentifier ae-dir-oc stroeder-com-pub-ae-dir:6
+
+# Allgemeine Attributtypen
+#-----------------------------------------------------------------------
+
+attributetype ( ae-dir-at:1
+  NAME 'aeOwnerGroup'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: DN of owner group entry'
+  SUP owner )
+
+attributetype ( ae-dir-at:3
+  NAME 'aeTicketId'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Tracker ticket related to last change'
+  SINGLE-VALUE
+  EQUALITY caseIgnoreIA5Match
+  SUBSTR caseIgnoreIA5SubstringsMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{20} )
+
+attributetype ( ae-dir-at:5
+  NAME 'aeStatus'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Status of an entry (-1, 0, 1, 2)'
+  SINGLE-VALUE
+  EQUALITY integerMatch
+  ORDERING integerOrderingMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 )
+
+attributetype ( ae-dir-at:16
+  NAME 'aePerson'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: DN of referenced person entry'
+  SINGLE-VALUE
+  SUP seeAlso )
+
+attributetype ( ae-dir-at:20
+  NAME 'aeVisibleGroups'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: DN(s) of group entries usable with a certain server group, server, or service'
+  SUP distinguishedName )
+
+attributetype ( ae-dir-at:21
+  NAME 'aeVisibleSudoers'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: DN(s) of sudoer entries usable with a certain server group or server'
+  SUP distinguishedName )
+
+attributetype ( ae-dir-at:22
+  NAME 'aeNotBefore'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Begin of time interval for which the entry is valid'
+  SINGLE-VALUE
+  EQUALITY generalizedTimeMatch
+  ORDERING generalizedTimeOrderingMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.24 )
+
+attributetype ( ae-dir-at:23
+  NAME 'aeNotAfter'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: End of time interval for which the entry is valid'
+  SINGLE-VALUE
+  EQUALITY generalizedTimeMatch
+  ORDERING generalizedTimeOrderingMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.24 )
+
+attributetype ( ae-dir-at:8
+  NAME 'aeRemoteHost'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Remote host (client IP or FQDN) used during login'
+  EQUALITY caseIgnoreMatch
+  SUBSTR caseIgnoreSubstringsMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
+
+# Base classes not used directly
+#-----------------------------------------------------------------------
+
+objectclass ( ae-dir-oc:21
+  NAME 'aeObject'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Managed object'
+  ABSTRACT
+  MUST ( aeStatus )
+  MAY ( description $ aeNotBefore $ aeNotAfter $ aeTicketId ) )
+
+# UID and GID number pools
+#-----------------------------------------------------------------------
+
+attributetype ( ae-dir-at:17
+  NAME 'aePosixId'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: POSIX id value'
+  SINGLE-VALUE
+  EQUALITY integerMatch
+  ORDERING integerOrderingMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 )
+
+attributetype ( ae-dir-at:17.1
+  NAME 'aeUidNumberMin'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: minimum uidNumber value'
+  SUP aePosixId )
+
+attributetype ( ae-dir-at:17.2
+  NAME 'aeUidNumberMax'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: maximum uidNumber value'
+  SUP aePosixId )
+
+attributetype ( ae-dir-at:17.3
+  NAME 'aeUidNumberNext'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: next uidNumber value'
+  SUP aePosixId )
+
+attributetype ( ae-dir-at:17.4
+  NAME 'aeGidNumberMin'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: minimum gidNumber value'
+  SUP aePosixId )
+
+attributetype ( ae-dir-at:17.5
+  NAME 'aeGidNumberMax'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: maximum gidNumber value'
+  SUP aePosixId )
+
+attributetype ( ae-dir-at:17.6
+  NAME 'aeGidNumberNext'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: next gidNumber value'
+  SUP aePosixId )
+
+objectclass ( ae-dir-oc:23
+  NAME 'aePosixIdRanges'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: POSIX UID/GID pool'
+  AUXILIARY
+  MAY ( aeUidNumberMin $ aeUidNumberMax $ aeUidNumberNext $
+        aeGidNumberMin $ aeGidNumberMax $ aeGidNumberNext ) )
+
+# search root entry
+#-----------------------------------------------------------------------
+
+objectclass ( ae-dir-oc:22
+  NAME 'aeRoot'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Top-level search root entry'
+  SUP ( organizationalUnit )
+  MUST ( aeStatus )
+  MAY ( description $ aeNotBefore $ aeNotAfter $ aeTicketId ) )
+
+ditcontentrule ( ae-dir-oc:22
+  NAME 'aeRoot-dcr'
+  AUX ( aePosixIdRanges )
+  NOT ( businessCategory $ destinationIndicator $
+        facsimileTelephoneNumber $ internationaliSDNNumber $ l $
+        physicalDeliveryOfficeName $ postalAddress $ postalCode $
+        postOfficeBox $ preferredDeliveryMethod $ registeredAddress $
+        searchGuide $ seeAlso $ st $ street $ teletexTerminalIdentifier $
+        telexNumber $ userPassword $ x121Address ) )
+
+# Zones
+#-----------------------------------------------------------------------
+
+objectclass ( ae-dir-oc:20
+  NAME 'aeZone'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Zone for delegated administration'
+  STRUCTURAL
+  SUP ( namedObject $ aeObject )
+  MUST ( description ) )
+
+ditcontentrule ( ae-dir-oc:20
+  NAME 'aeZone-dcr'
+  AUX ( aePosixIdRanges )
+  NOT ( uniqueIdentifier ) )
+
+# Group entries
+#-----------------------------------------------------------------------
+
+# This allows mixed group schema
+# also "dynamic groups" based on groupOfURLs/memberURL
+objectclass ( ae-dir-oc:1
+  NAME 'aeGroup'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Group entry'
+  STRUCTURAL
+  SUP ( groupOfEntries $ posixGroup $ groupOfURLs $ aeObject )
+  MUST ( description ) )
+
+ditcontentrule ( ae-dir-oc:1
+  NAME 'aeGroup-dcr'
+  NOT ( businessCategory $ o $ ou $ owner $ seeAlso $ userPassword ) )
+
+
+# SUDO rules
+#-----------------------------------------------------------------------
+
+objectclass ( ae-dir-oc:7
+  NAME 'aeSudoRule'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Specific SUDO rule'
+  STRUCTURAL
+  SUP ( sudoRole $ aeObject )
+  MUST ( sudoUser $ description ) )
+
+ditcontentrule ( ae-dir-oc:7
+  NAME 'aeSudoRule-dcr'
+  NOT ( sudoOrder ) )
+
+# Personal user accounts
+#-----------------------------------------------------------------------
+
+objectclass ( ae-dir-oc:2
+  NAME 'aeUser'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: User'
+  STRUCTURAL
+  SUP ( inetOrgPerson $ account $ aeObject )
+  MUST ( uid $ aePerson $ givenName $ displayName )
+  MAY ( aeRemoteHost ) )
+
+ditcontentrule ( ae-dir-oc:2
+  NAME 'aeUser-dcr'
+  AUX ( posixAccount $ inetLocalMailRecipient $ pkiUser $ ldapPublicKey $
+        msPwdResetObject $ oathHOTPUser $ oathTOTPUser )
+  NOT ( audio $ businessCategory $ carLicense $
+        destinationIndicator $ facsimileTelephoneNumber $
+        homePhone $ homePostalAddress $ host $ l $ labeledURI $ manager $
+        o $ ou $ telephoneNumber $ initials $ internationaliSDNNumber $
+        jpegPhoto $ pager $ photo $ physicalDeliveryOfficeName $
+        postalAddress $ postalCode $ postOfficeBox $
+        preferredDeliveryMethod $ preferredLanguage $ registeredAddress $
+        roomNumber $ secretary $ st $ street $
+        teletexTerminalIdentifier $ telexNumber $ title $
+        userPKCS12 $ userSMIMECertificate $
+        x121Address $ x500UniqueIdentifier $
+        departmentNumber $ employeeNumber $ employeeType $ seeAlso $ mobile ) )
+
+
+# Server groups
+#-----------------------------------------------------------------------
+
+attributetype ( ae-dir-at:4
+  NAME 'aeLoginGroups'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: DN of groups of users allowed to do SSH login'
+  SUP aeOwnerGroup )
+
+attributetype ( ae-dir-at:6
+  NAME 'aeSetupGroups'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: DN of groups of users allowed to deploy machine'
+  SUP aeOwnerGroup )
+
+attributetype ( ae-dir-at:7
+  NAME 'aeLogStoreGroups'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: DN of groups of users allowed to deploy machine'
+  SUP aeOwnerGroup )
+
+attributetype ( ae-dir-at:15
+  NAME 'aeLogStorePeriod'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Retention period for log files (seconds, -1=unlimited)'
+  EQUALITY integerMatch
+  ORDERING integerOrderingMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+  SINGLE-VALUE )
+
+attributetype ( ae-dir-at:25
+  NAME 'aeProxyFor'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: DN of server groups this server group is proxy for'
+  SUP distinguishedName )
+
+attributetype ( ae-dir-at:26
+  NAME 'aeSSHProxyCommand'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: SSH proxy command to be used to connect to server within this server group'
+  EQUALITY caseIgnoreMatch
+  SUBSTR caseIgnoreSubstringsMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{32768} )
+
+attributetype ( ae-dir-at:27
+  NAME 'aeSrvGroup'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: DN of server group this server also is member of'
+  SUP distinguishedName )
+
+objectclass ( ae-dir-oc:13
+  NAME 'aeSrvGroup'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Server type/group'
+  STRUCTURAL
+  SUP ( namedObject $ aeObject )
+  MUST ( cn $ description )
+  MAY ( aeSrvGroup $ aeProxyFor $ aeLogStorePeriod $
+        aeSetupGroups $ aeLogStoreGroups $ aeLoginGroups $
+        aeVisibleGroups $ aeVisibleSudoers $
+        aeSSHProxyCommand ) )
+
+# Mailbox entries
+#-----------------------------------------------------------------------
+
+objectclass ( ae-dir-oc:5
+  NAME 'aeMailbox'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Mailbox entry'
+  STRUCTURAL
+  SUP ( applicationProcess $ aeObject ) )
+
+ditcontentrule ( ae-dir-oc:5
+  NAME 'aeMailbox-dcr'
+  AUX ( inetLocalMailRecipient )
+  NOT ( l $ ou $ seeAlso ) )
+
+# Server and network device entries
+#-----------------------------------------------------------------------
+
+# DN of aeHost entry
+attributetype ( ae-dir-at:28
+  NAME 'aeHost'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: DN of aeHost entry'
+  SUP distinguishedName )
+
+# Generic base attribute type for a fully-qualified domain name
+# NON-ASCII chars are supposed to be IDNA-encoded
+# not directly used
+attributetype ( ae-dir-at:10
+  NAME 'aeFqdn'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Arbitrary fully-qualified domain name (IDNA)'
+  SUP associatedDomain
+  SINGLE-VALUE )
+
+# Unique inventory number
+attributetype ( ae-dir-at:11
+  NAME 'aeStockId'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: inventory number'
+  SUP uniqueIdentifier
+  SINGLE-VALUE )
+
+# The hardware serial number assigned by the HW manufacturer
+# typically printed somewhere on the device's case
+attributetype ( ae-dir-at:12
+  NAME 'aeHwSerialNumber'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Serial number of manufacturer'
+  SUP serialNumber
+  SINGLE-VALUE )
+
+attributetype ( ae-dir-at:13
+  NAME 'aeDeviceSlot'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Slot for adaptor card'
+  SUP name
+  SINGLE-VALUE )
+
+attributetype ( ae-dir-at:14
+  NAME 'aeDevicePort'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Port label for adaptor card'
+  SUP name
+  SINGLE-VALUE )
+
+# Generic base object class for a device mounted into a single case
+# not directly used
+objectclass ( ae-dir-oc:6
+  NAME 'aeDevice'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Arbitrary device mounted in a case'
+  STRUCTURAL
+  SUP ( device $ aeObject )
+  MUST ( aeStatus )
+  MAY ( displayName $ aeStockId $ aeHwSerialNumber ) )
+
+# Object class for servers
+objectclass ( ae-dir-oc:6.1
+  NAME 'aeHost'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Single host (server)'
+  STRUCTURAL
+  SUP aeDevice
+  MUST ( host )
+  MAY ( aeSrvGroup $ aeStockId $ userPassword ) )
+
+ditcontentrule ( ae-dir-oc:6.1
+  NAME 'aeHost-dcr'
+  AUX ( posixAccount $ ldapPublicKey $ pkiUser $ ipHost )
+  NOT ( o $ ou $ owner $ seeAlso ) )
+
+# Object class for network adaptors built into servers, switches, routers etc.
+objectclass ( ae-dir-oc:6.2
+  NAME 'aeNwDevice'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Single network adapter built into aeDevice'
+  STRUCTURAL
+  SUP aeDevice
+  MAY ( aeFqdn $ aeDeviceSlot $ aeDevicePort ) )
+
+ditcontentrule ( ae-dir-oc:6.2
+  NAME 'aeNwDevice-dcr'
+  AUX ( ipHost $ ieee802Device $ bootableDevice )
+  NOT ( l $ o $ ou ) )
+
+# Original person entries
+#-----------------------------------------------------------------------
+
+attributetype ( ae-dir-at:9
+  NAME 'aeSourceUri'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: URI of data source for synced person entry'
+  SUP labeledURI )
+
+objectclass ( ae-dir-oc:8
+  NAME 'aePerson'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: person class'
+  STRUCTURAL
+  SUP ( inetOrgPerson $ aeObject )
+  MUST ( givenName )
+  MAY ( aeSourceUri $ uniqueIdentifier $ employeeNumber $ c ) )
+
+ditcontentrule ( ae-dir-oc:8
+  NAME 'aePerson-dcr'
+  AUX ( ldapPublicKey $ msPerson $ pkiUser )
+  NOT ( audio $ carLicense $ destinationIndicator $ homePostalAddress $
+        host $ initials $ internationaliSDNNumber $ pager $ photo $
+        preferredDeliveryMethod $ registeredAddress $ secretary $
+        teletexTerminalIdentifier $ telexNumber $  userSMIMECertificate $
+        x121Address $ x500UniqueIdentifier $ seeAlso $ userPassword ) )
+
+# Service user accounts
+#-----------------------------------------------------------------------
+
+objectclass ( ae-dir-oc:4
+  NAME 'aeService'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Service user'
+  STRUCTURAL
+  SUP ( account $ aeObject )
+  MUST ( uid $ description )
+  MAY ( aeRemoteHost $ aeHost $ aeSrvGroup $ userPassword ) )
+
+ditcontentrule ( ae-dir-oc:4
+  NAME 'aeService-dcr'
+  AUX ( posixAccount $ inetLocalMailRecipient $ pkiUser $ ldapPublicKey $
+        oathHOTPUser $ oathTOTPUser )
+  NOT ( host $ l $ o $ ou ) )
+
