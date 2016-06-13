@@ -547,7 +547,7 @@ objectClass: aeHost
 objectClass: ldapPublicKey
 pwdPolicySubentry: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
 cn: {{ host.split('.')[0] }}
-aeTicketId: INITIAL-42
+aeTicketId: {{ aedir_init_ticket_id }}
 description: AE-DIR provider replica host for {{ service_fqdn }}
 
 dn: uid=ae-dir-slapd_{{ service_hostname }},cn=ae,{{ aedir_suffix }}
