@@ -3,9 +3,9 @@
 # be strict on permissions
 umask 0077
 
-TIMESTAMP="$(date +%s)"
+TIMESTAMP="$(date +%Y%m%d%H%M%S)"
 NEW_CSR_FILE="{{ openldap_conf_prefix }}/tls/{{ openldap_service_fqdn }}.csr-${TIMESTAMP}"
-NEW_KEY_FILE="{{ openldap_conf_prefix }}/tls/{{ openldap_service_fqdn }}.csr-${TIMESTAMP}"
+NEW_KEY_FILE="{{ openldap_conf_prefix }}/tls/{{ openldap_service_fqdn }}.key-${TIMESTAMP}"
 
 # Generate new CSR file with OpenSSL
 /usr/bin/openssl req \
