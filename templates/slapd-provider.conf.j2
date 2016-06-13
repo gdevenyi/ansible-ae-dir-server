@@ -1217,10 +1217,10 @@ constraint_attribute displayName,cn,uid,uidNumber
   set "(this/cn + [ (] + this/uid + [/] + this/uidNumber + [)]) & this/displayName"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeUser)"
 
-# cn in person entry must be composed based on "<givenName> <sn>"
+# cn in aePerson entry must be composed based on "<givenName> <sn>"
 constraint_attribute cn,sn,givenName
   set "(this/givenName + [ ] + this/sn) & this/cn"
-  restrict="ldap:///cn=people,{{ aedir_suffix }}??one"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aePerson)"
 
 # restrict memberUID to be consistent with group membership defined in member
 constraint_attribute memberUID,member
