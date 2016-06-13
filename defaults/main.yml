@@ -85,6 +85,15 @@ aedir_ldapi_services:
     gid_number: 996
     description: The system user allowed to read shared secrets (OATH-LDAP)
 
+# List of aeZone entries to be added to ae-dir-base.ldif
+aedir_init_aezones:
+  people:
+    ticket_id: IAM-42
+    description: People and orga entries
+  example:
+    ticket_id: IAM-42
+    description: Example zone used as playground
+
 # List of aePerson entries to be added to ae-dir-base.ldif
 aedir_init_aepersons:
   INIT-PERSON-ID-42:

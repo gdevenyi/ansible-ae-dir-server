@@ -24,17 +24,19 @@ aeGidNumberMin: {{ aedir_min_gid }}
 aeGidNumberMax: {{ aedir_max_gid }}
 
 #---------------------------------------------------------------------------
-# cn=people,{{ aedir_suffix }}
+# aeZone entries (zone admins/auditors groups are added below)
 #---------------------------------------------------------------------------
 #
-dn: cn=people,{{ aedir_suffix }}
+{% for zone_cn, zone_attrs in aedir_init_aezones.iteritems() %}
+dn: cn={{ zone_cn }},{{ aedir_suffix }}
 aeStatus: 0
-cn: people
+cn: {{ zone_cn }}
 description: People and orga entries
 objectClass: namedObject
 objectClass: aeObject
 objectClass: aeZone
 
+{% endfor %}
 #---------------------------------------------------------------------------
 # cn=pub,{{ aedir_suffix }}
 #---------------------------------------------------------------------------
@@ -612,3 +614,32 @@ member: uid=ae-dir-slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
 memberUID: ae-dir-slapd_{{ replica.split('.')[0] }}
 {% endfor %}
 
+#---------------------------------------------------------------------------
+# Zone admins/auditors groups
+#---------------------------------------------------------------------------
+{% for zone_cn, zone_attrs in aedir_init_aezones.iteritems() %}
+dn: cn={{ zone_cn }}-zone-admins,cn={{ zone_cn }},{{ aedir_suffix }}
+aeStatus: 0
+cn: {{ zone_cn }}-zone-admins
+description: Group members are zone admins who can manage zone '{{ zone_cn }}'
+gidNumber: {{ gid_number }}
+{% set gid_number = gid_number+1 -%}
+objectClass: top
+objectClass: groupOfEntries
+objectClass: posixGroup
+objectClass: aeObject
+objectClass: aeGroup
+
+dn: cn={{ zone_cn }}-zone-auditors,cn={{ zone_cn }},{{ aedir_suffix }}
+aeStatus: 0
+cn: {{ zone_cn }}-zone-auditors
+description: Group members are zone auditors who can read zone '{{ zone_cn }}'
+gidNumber: {{ gid_number }}
+{% set gid_number = gid_number+1 -%}
+objectClass: top
+objectClass: groupOfEntries
+objectClass: posixGroup
+objectClass: aeObject
+objectClass: aeGroup
+
+{% endfor %}
