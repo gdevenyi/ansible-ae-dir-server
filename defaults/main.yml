@@ -92,10 +92,13 @@ aedir_ldapi_services:
 aedir_init_aezones:
   people:
     ticket_id: "{{ aedir_init_ticket_id }}"
-    description: People and orga entries
-  example:
+    description: "People and orga entries"
+  office:
     ticket_id: "{{ aedir_init_ticket_id }}"
-    description: Example zone used as playground
+    description: "Zone for primary office users and groups"
+  otp:
+    ticket_id: "{{ aedir_init_ticket_id }}"
+    description: "Zone for OTP tokens (OATH-LDAP)"
 
 # List of aePerson entries to be added to ae-dir-base.ldif
 aedir_init_aepersons:
