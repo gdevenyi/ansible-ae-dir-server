@@ -321,6 +321,7 @@ uid: bad
 # password policy entries
 #---------------------------------------------------------------------------
 #
+# policy for aeService and aeHost entries
 dn: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
 cn: ppolicy-systems
 objectClass: namedPolicy
@@ -333,6 +334,7 @@ pwdLockout: FALSE
 pwdMinLength: 24
 pwdMustChange: FALSE
 
+# policy for aeUser entries
 dn: cn=ppolicy-users,cn=ae,{{ aedir_suffix }}
 cn: ppolicy-users
 objectClass: namedPolicy
@@ -349,10 +351,11 @@ pwdLockoutDuration: 20
 pwdMaxAge: 7776000
 pwdMaxFailure: 6
 pwdMinAge: 7200
-pwdMinLength: 12
+pwdMinLength: 10
 pwdMustChange: FALSE
 pwdSafeModify: FALSE
 
+# special policy for enrollment passwort of oathToken entries
 dn: cn=ppolicy-otptokens,cn=ae,{{ aedir_suffix }}
 cn: ppolicy-otptokens
 objectClass: namedPolicy
