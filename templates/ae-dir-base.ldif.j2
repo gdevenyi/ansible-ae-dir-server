@@ -31,7 +31,8 @@ aeGidNumberMax: {{ aedir_max_gid }}
 dn: cn={{ zone_cn }},{{ aedir_suffix }}
 aeStatus: 0
 cn: {{ zone_cn }}
-description: People and orga entries
+description: {{ zone_attrs['description'] }}
+aeTicketId: {{ zone_attrs['ticket_id'] }}
 objectClass: namedObject
 objectClass: aeObject
 objectClass: aeZone
@@ -645,6 +646,7 @@ dn: cn={{ zone_cn }}-zone-admins,cn={{ zone_cn }},{{ aedir_suffix }}
 aeStatus: 0
 cn: {{ zone_cn }}-zone-admins
 description: Group members are zone admins who can manage zone '{{ zone_cn }}'
+aeTicketId: {{ zone_attrs['ticket_id'] }}
 gidNumber: {{ gid_number }}
 {% set gid_number = gid_number+1 -%}
 objectClass: top
@@ -657,6 +659,7 @@ dn: cn={{ zone_cn }}-zone-auditors,cn={{ zone_cn }},{{ aedir_suffix }}
 aeStatus: 0
 cn: {{ zone_cn }}-zone-auditors
 description: Group members are zone auditors who can read zone '{{ zone_cn }}'
+aeTicketId: {{ zone_attrs['ticket_id'] }}
 gidNumber: {{ gid_number }}
 {% set gid_number = gid_number+1 -%}
 objectClass: top
