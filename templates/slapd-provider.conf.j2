@@ -283,10 +283,11 @@ index mailRoutingAddress eq
 index entryCSN eq
 index entryUUID eq
 
-# for network management
+# for host and network management
 index macAddress eq
 index ipHostNumber eq
 index host sub,eq
+index aeFqdn sub,eq
 
 # for aeUser
 index aeRemoteHost pres,eq
@@ -1031,9 +1032,9 @@ unique_uri "ldap:///{{ aedir_suffix }}?mailLocalAddress?sub?(objectClass=*)"
 unique_uri "ldap:///{{ aedir_suffix }}?seeAlso?sub?(objectClass=*)"
 unique_uri "ldap:///{{ aedir_suffix }}?ipHostNumber,host,aeFqdn?sub?(objectClass=*)"
 unique_uri "ldap:///ou=people,{{ aedir_suffix }}?employeeNumber,uniqueIdentifier,displayName?sub"
-# these two constraints are not possible with effective filter
-unique_uri "ldap:///{{ aedir_suffix }}?cn?sub?(!(|(objectClass=aePerson)(objectClass=aeUser)))"
-#unique_uri "ldap:///{{ aedir_suffix }}?gidNumber?sub?(objectClass=aeGroup)"
+# these two constraints are only possible with a negation filter
+unique_uri "ldap:///{{ aedir_suffix }}?cn?sub?(!(|(objectClass=aePerson)(objectClass=aeUser)(objectClass=aeNwDevice)))"
+unique_uri "ldap:///{{ aedir_suffix }}?gidNumber?sub?(!(objectClass=posixAccount))"
 
 constraint_attribute
   host
