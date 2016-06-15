@@ -1,14 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-Sets the password of the specified aeUser or aeService referenced by 
+Sets the password of the specified aeUser or aeService referenced by
 uid attribute
 
 This script must run locally run on a Æ-DIR provider
 """
 
 import sys
-import os
 import getpass
 
 # from python-ldap
@@ -17,7 +16,12 @@ import ldap.sasl
 
 LDAP_URI = 'ldapi://%2Fusr%2Flocal%2Fopenldap%2Fvar%2Frun%2Fldapi'
 LDAP_SEARCHBASE = 'ou=ae-dir'
-LDAP_FILTER_TMPL = '(&(|(objectClass=aeUser)(objectClass=aeService)(objectClass=aeHost))(|(uid={0})(host={0})))'
+LDAP_FILTER_TMPL = (
+    '(&'
+    '(|(objectClass=aeUser)(objectClass=aeService)(objectClass=aeHost))'
+    '(|(uid={0})(host={0}))'
+    ')'
+)
 
 try:
     arg_value = sys.argv[1]
@@ -25,8 +29,7 @@ except IndexError:
     sys.stderr.write('Usage: {} <username|hostname>\n'.format(sys.argv[0]))
     sys.exit(9)
 
-
-ldap_filter = LDAP_FILTER_TMPL.format(arg_value)  
+ldap_filter = LDAP_FILTER_TMPL.format(arg_value)
 
 ldap_conn = ldap.initialize(LDAP_URI)
 ldap_conn.sasl_external_bind_s()
@@ -40,10 +43,18 @@ ldap_result = ldap_conn.search_ext_s(
 )
 
 if not ldap_result:
-    sys.stderr.write('No search result found with filter {}\n'.format(repr(ldap_filter)))
+    sys.stderr.write(
+        'No search result found with filter {}\n'.format(
+            repr(ldap_filter)
+        )
+    )
     sys.exit(1)
-elif len(ldap_result)>1:
-    sys.stderr.write('More than one search result found with filter {}\n'.format(repr(ldap_filter)))
+elif len(ldap_result) > 1:
+    sys.stderr.write(
+        'More than one search result found with filter {}\n'.format(
+            repr(ldap_filter)
+        )
+    )
     sys.exit(1)
 
 dn, _ = ldap_result[0]
@@ -51,7 +62,7 @@ dn, _ = ldap_result[0]
 new_password1 = getpass.getpass('new password for {}: '.format(dn))
 new_password2 = getpass.getpass('repeat password: ')
 
-if new_password1!=new_password2:
+if new_password1 != new_password2:
     sys.stderr.write('2nd input for new password differs!\n')
     sys.exit(1)
 
