@@ -14,8 +14,8 @@ import getpass
 import ldap
 import ldap.sasl
 
-LDAP_URI = 'ldapi://%2Fusr%2Flocal%2Fopenldap%2Fvar%2Frun%2Fldapi'
-LDAP_SEARCHBASE = 'ou=ae-dir'
+AEDIR_LDAPI_URI = '{{ openldap_ldapi_uri }}'
+AEDIR_SEARCHBASE = '{{ aedir_suffix }}'
 LDAP_FILTER_TMPL = (
     '(&'
     '(|(objectClass=aeUser)(objectClass=aeService)(objectClass=aeHost))'
@@ -31,11 +31,11 @@ except IndexError:
 
 ldap_filter = LDAP_FILTER_TMPL.format(arg_value)
 
-ldap_conn = ldap.initialize(LDAP_URI)
-ldap_conn.sasl_external_bind_s()
+ldap_conn = ldap.initialize(AEDIR_LDAPI_URI)
+ldap_conn.sasl_interactive_bind_s('', ldap.sasl.sasl({}, 'EXTERNAL'))
 
 ldap_result = ldap_conn.search_ext_s(
-    LDAP_SEARCHBASE,
+    AEDIR_SEARCHBASE,
     ldap.SCOPE_SUBTREE,
     ldap_filter,
     attrlist=['1.1'],

@@ -23,15 +23,17 @@
     mode: 0640
   when: openldap_role == 'provider'
 
-- name: Install scripts
+- name: Install tool scripts
   template:
-    src: "{{ item }}.j2"
+    src: "scripts/{{ item }}.j2"
     dest: "{{ aedir_bin }}/{{ item }}"
     owner: root
     group: root
     mode: 0750
   with_items:
     - aeperson2aeuser.py
+    - ae-add-zone.py
+    - ae-passwd.py
 
 - name: Run aeperson2aeuser.py as CRON job
   cron:

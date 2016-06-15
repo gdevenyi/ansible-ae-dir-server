@@ -1,0 +1,46 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+"""
+Sets the password of the specified aeUser or aeService referenced by
+uid attribute
+
+This script must run locally run on a Æ-DIR provider
+"""
+
+import sys
+
+# from python-ldap
+import ldap
+import ldap.sasl
+
+AEDIR_LDAPI_URI = '{{ openldap_ldapi_uri }}'
+AEDIR_SEARCHBASE = '{{ aedir_suffix }}'
+
+try:
+    zone_cn, ticket_id, zone_desc = map(str.decode, sys.argv[1:])
+except Exception, err:
+    sys.stderr.write('Error: {}\n\n'.format(str(err)))
+    sys.stderr.write(
+        'Usage: {} <zone name> <ticket ID> <description>\n'.format(
+            sys.argv[0]
+        )
+    )
+    sys.exit(9)
+
+ldap_conn = ldap.initialize(AEDIR_LDAPI_URI)
+ldap_conn.sasl_interactive_bind_s('', ldap.sasl.sasl({}, 'EXTERNAL'))
+
+try:
+    ldap_result = ldap_conn.search_ext_s(
+        'cn={},{}'.format(zone_cn, AEDIR_SEARCHBASE),
+        ldap.SCOPE_BASE,
+        '(objectClass=*)',
+        attrlist=['*','+'],
+    )
+except ldap.NO_SUCH_OBJECT:
+    pass
+else:
+    sys.stderr.write('Zone {} already exists\n'.format(zone_cn))
+    sys.exit(9)
+
+ldap_conn.unbind_s()
