@@ -22,7 +22,7 @@ LDAP_FILTER_TMPL = '(&(|(objectClass=aeUser)(objectClass=aeService)(objectClass=
 try:
     arg_value = sys.argv[1]
 except IndexError:
-    sys.stderr.write('You have to provide a username or hostname (FQDN)!\n')
+    sys.stderr.write('Usage: {} <username|hostname>\n'.format(sys.argv[0]))
     sys.exit(9)
 
 
