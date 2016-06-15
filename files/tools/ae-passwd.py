@@ -24,7 +24,9 @@ try:
 except IndexError:
     sys.stderr.write('You have to provide a username or hostname (FQDN)!\n')
     sys.exit(9)
-  
+
+
+ldap_filter = LDAP_FILTER_TMPL.format(arg_value)  
 
 ldap_conn = ldap.initialize(LDAP_URI)
 ldap_conn.sasl_external_bind_s()
@@ -32,16 +34,16 @@ ldap_conn.sasl_external_bind_s()
 ldap_result = ldap_conn.search_ext_s(
     LDAP_SEARCHBASE,
     ldap.SCOPE_SUBTREE,
-    LDAP_FILTER_TMPL.format(arg_value),
+    ldap_filter,
     attrlist=['1.1'],
     sizelimit=2,
 )
 
 if not ldap_result:
-    sys.stderr.write('\n')
+    sys.stderr.write('No search result found with filter {}\n'.format(repr(ldap_filter)))
     sys.exit(1)
 elif len(ldap_result)>1:
-    sys.stderr.write('\n')
+    sys.stderr.write('More than one search result found with filter {}\n'.format(repr(ldap_filter)))
     sys.exit(1)
 
 dn, _ = ldap_result[0]
