@@ -353,6 +353,26 @@ pwdMinLength: 12
 pwdMustChange: FALSE
 pwdSafeModify: FALSE
 
+dn: cn=ppolicy-otptokens,cn=ae,{{ aedir_suffix }}
+cn: ppolicy-otptokens
+objectClass: namedPolicy
+objectClass: pwdPolicy
+pwdAllowUserChange: FALSE
+pwdAttribute: userPassword
+pwdCheckQuality: 1
+pwdExpireWarning: 300
+pwdFailureCountInterval: 10
+pwdGraceAuthNLimit: 0
+pwdInHistory: 10
+pwdLockout: TRUE
+pwdLockoutDuration: 20
+pwdMaxAge: 600
+pwdMaxFailure: 6
+pwdMinAge: 600
+pwdMinLength: 10
+pwdMustChange: FALSE
+pwdSafeModify: FALSE
+
 #---------------------------------------------------------------------------
 # aePerson and aeUser entries for initial AE admin(s)
 #---------------------------------------------------------------------------

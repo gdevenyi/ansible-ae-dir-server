@@ -415,9 +415,9 @@ access to
 access to
   dn.subtree="{{ aedir_suffix }}"
   attrs=userPassword
-  filter="(&(objectClass=oathToken)(aeStatus=0)(pwdPolicySubentry=cn=ppolicy-2fatokens,cn=ae,{{ aedir_suffix }}))"
+  filter="(&(objectClass=oathToken)(aeStatus=0)(pwdPolicySubentry=cn=ppolicy-otptokens,cn=ae,{{ aedir_suffix }}))"
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =sw
-    by dn.base="uid=ae-dir-enroll2fa,cn=ae,{{ aedir_suffix }}" =w
+    by dn.base="uid=ae-dir-otpenroll,cn=ae,{{ aedir_suffix }}" =w
     by self =z
     by * auth
 
@@ -488,7 +488,7 @@ access to
   filter="(&(objectClass=oathToken)(aeStatus=0))"
   attrs=oathSecret
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =sw
-    by group/aeGroup/member="cn=oath-admins,cn=oath,{{ aedir_suffix }}" =z
+    by group/aeGroup/member="cn=otp-admins,cn=otp,{{ aedir_suffix }}" =z
     by self =w
     by * none
 
@@ -565,24 +565,24 @@ access to
 
 # write access to special status attributes for OTP validator
 access to
-  dn.onelevel="cn=oath,{{ aedir_suffix }}"
+  dn.onelevel="cn=otp,{{ aedir_suffix }}"
   filter="(objectClass=oathToken)"
   attrs=oathLastLogin,oathFailureCount,oathLastFailure
     by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" write
-    by group/aeGroup/member="cn=oath-admins,cn=oath,{{ aedir_suffix }}" write
+    by group/aeGroup/member="cn=otp-admins,cn=otp,{{ aedir_suffix }}" write
     by * break
 
 # oathHOTPCounter in token entries may be
 #---------------------------------------------------------------------------
-# 1. read and (only active) deleted by 2FA admins
+# 1. read and (only active) deleted by OTP registration/enrollment admins
 # 1. read and (only active) reset to 0 with enrollment password (self)
 # 2. read and (only active) written by validation service
-# 3. read by 2FA admins
+# 3. read by OTP registration/enrollment admins
 # 4. read by associated users
 
-# allow 2FA admins to add new value 0
+# allow OTP registration/enrollment admins to add new value 0
 access to
-  dn.onelevel="cn=oath,{{ aedir_suffix }}"
+  dn.onelevel="cn=otp,{{ aedir_suffix }}"
   filter="(&(objectClass=oathToken)(aeStatus=0))"
   attrs=oathHOTPCounter
   val/integerMatch="0"
@@ -590,27 +590,27 @@ access to
     by * break
 
 access to
-  dn.onelevel="cn=oath,{{ aedir_suffix }}"
+  dn.onelevel="cn=otp,{{ aedir_suffix }}"
   filter="(&(objectClass=oathToken)(aeStatus=0))"
   attrs=oathHOTPCounter
     by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" write
-    by group/aeGroup/member="cn=oath-admins,cn=oath,{{ aedir_suffix }}" =rz
+    by group/aeGroup/member="cn=otp-admins,cn=otp,{{ aedir_suffix }}" =rz
     by set="user/oathHOTPToken & this/entryDN" read
     by self =rz
     by * none
 
 # Token entries can be
 #---------------------------------------------------------------------------
-# 1. written by 2FA admins
+# 1. written by OTP registration/enrollment admins
 # 2. read by OTP validator
 # 3. read by referencing personal user account
 # 4. read by zone admins of referencing users
 access to
-  dn.onelevel="cn=oath,{{ aedir_suffix }}"
+  dn.onelevel="cn=otp,{{ aedir_suffix }}"
   filter="(objectClass=oathToken)"
     by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" read
-    by group/aeGroup/member="cn=oath-admins,cn=oath,{{ aedir_suffix }}" write
-    by group/aeGroup/member="cn=oath-auditors,cn=oath,{{ aedir_suffix }}" read
+    by group/aeGroup/member="cn=otp-admins,cn=otp,{{ aedir_suffix }}" write
+    by group/aeGroup/member="cn=otp-auditors,cn=otp,{{ aedir_suffix }}" read
     by set="user/oathHOTPToken & this/entryDN" read
     by set="user/entryDN & ([ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(member=] + user/entryDN + [))])/member" read
     by * none
@@ -1278,7 +1278,7 @@ constraint_attribute pwdPolicySubentry
   regex "^cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}$"
   restrict="ldap:///{{ aedir_suffix }}??sub?(|(objectClass=aeServer)(objectClass=aeService))"
 constraint_attribute pwdPolicySubentry
-  regex "^cn=ppolicy-2fatokens,cn=ae,{{ aedir_suffix }}$"
+  regex "^cn=ppolicy-otptokens,cn=ae,{{ aedir_suffix }}$"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=oathToken)"
 
 # restrict memberUID to be consistent with group membership defined in member
