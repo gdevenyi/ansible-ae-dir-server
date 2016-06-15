@@ -574,6 +574,26 @@ cn: {{ host.split('.')[0] }}
 aeTicketId: {{ aedir_init_ticket_id }}
 description: AE-DIR provider replica host for {{ service_fqdn }}
 
+{% for interface in hostvars[host]['ansible_interfaces'] if interface != "lo" %}
+{% set interface_fact = "ansible_{}".format(interface) -%}
+{% set interface_ipv4 = hostvars[host][interface_fact]["ipv4"]["address"] -%}
+{% set interface_fqdn = lookup('dig', '{}/PTR'.format(interface_ipv4))[:-1] -%}
+dn: cn={{ interface }},host={{ host }},cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir_suffix }}
+aeStatus: 0
+aeTicketId: IAM-44
+cn: {{ interface }}
+ipHostNumber: {{ interface_ipv4 }}
+macAddress: {{ hostvars[host][interface_fact]["macaddress"] }}
+aeFqdn: {{ interface_fqdn }}
+objectClass: device
+objectClass: aeObject
+objectClass: aeDevice
+objectClass: aeNwDevice
+objectClass: bootableDevice
+objectClass: ieee802Device
+objectClass: ipHost
+
+{% endfor %}
 dn: uid=ae-dir-slapd_{{ service_hostname }},cn=ae,{{ aedir_suffix }}
 uid: ae-dir-slapd_{{ service_hostname }}
 pwdPolicySubentry: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
