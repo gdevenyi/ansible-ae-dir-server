@@ -322,9 +322,10 @@ uid: bad
 # password policy entries
 #---------------------------------------------------------------------------
 #
-# policy for aeService and aeHost entries
-dn: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
-cn: ppolicy-systems
+# unusable default policy with password expiry after one second!
+dn: cn=ppolicy-default,cn=ae,{{ aedir_suffix }}
+cn: ppolicy-default
+description: Unusable default password policy
 objectClass: namedPolicy
 objectClass: pwdPolicy
 pwdAllowUserChange: FALSE
@@ -334,10 +335,26 @@ pwdInHistory: 3
 pwdLockout: FALSE
 pwdMinLength: 24
 pwdMustChange: FALSE
+pwdMaxAge: 1
+
+# policy for aeService and aeHost entries
+dn: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
+cn: ppolicy-systems
+description: Password policy for hosts and system/service accounts (aeHost and aeService)
+objectClass: namedPolicy
+objectClass: pwdPolicy
+pwdAllowUserChange: FALSE
+pwdAttribute: userPassword
+pwdCheckQuality: 2
+pwdInHistory: 5
+pwdLockout: FALSE
+pwdMinLength: 24
+pwdMustChange: FALSE
 
 # policy for aeUser entries
 dn: cn=ppolicy-users,cn=ae,{{ aedir_suffix }}
 cn: ppolicy-users
+description: Password policy for personal user accounts (aeUser)
 objectClass: namedPolicy
 objectClass: pwdPolicy
 pwdAllowUserChange: TRUE
@@ -346,7 +363,7 @@ pwdCheckQuality: 2
 pwdExpireWarning: 864000
 pwdFailureCountInterval: 1800
 pwdGraceAuthNLimit: 0
-pwdInHistory: 10
+pwdInHistory: 20
 pwdLockout: TRUE
 pwdLockoutDuration: 20
 pwdMaxAge: 7776000
@@ -359,6 +376,7 @@ pwdSafeModify: FALSE
 # special policy for enrollment passwort of oathToken entries
 dn: cn=ppolicy-otptokens,cn=ae,{{ aedir_suffix }}
 cn: ppolicy-otptokens
+description: Password policy for OTP enrollment
 objectClass: namedPolicy
 objectClass: pwdPolicy
 pwdAllowUserChange: FALSE
