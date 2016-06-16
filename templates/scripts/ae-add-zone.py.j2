@@ -8,6 +8,7 @@ This script must run locally run on a Æ-DIR provider
 """
 
 import sys
+import random
 
 # from python-ldap
 import ldap
@@ -16,8 +17,19 @@ import ldap.sasl
 AEDIR_LDAPI_URI = '{{ openldap_ldapi_uri }}'
 AEDIR_SEARCHBASE = '{{ aedir_suffix }}'
 
+PYLDAP_TRACE_LEVEL = 2
+
+#---------------------------------------------------------------------------
+# main()
+#---------------------------------------------------------------------------
+
+ldap._trace_level = PYLDAP_TRACE_LEVEL
+
 try:
-    zone_cn, ticket_id, zone_desc = map(str.decode, sys.argv[1:])
+    zone_cn, ticket_id, zone_desc = [
+        arg.decode().encode('utf-8')
+        for arg in sys.argv[1:]
+    ]
 except Exception, err:
     sys.stderr.write('Error: {}\n\n'.format(str(err)))
     sys.stderr.write(
@@ -27,12 +39,12 @@ except Exception, err:
     )
     sys.exit(9)
 
-ldap_conn = ldap.initialize(AEDIR_LDAPI_URI)
+ldap_conn = ldap.initialize(AEDIR_LDAPI_URI, trace_level=PYLDAP_TRACE_LEVEL)
 ldap_conn.sasl_interactive_bind_s('', ldap.sasl.sasl({}, 'EXTERNAL'))
 
 try:
     ldap_result = ldap_conn.search_ext_s(
-        'cn={},{}'.format(zone_cn, AEDIR_SEARCHBASE),
+        'cn={zone_cn},{AEDIR_SEARCHBASE}'.format(**vars()),
         ldap.SCOPE_BASE,
         '(objectClass=*)',
         attrlist=['*','+'],
@@ -42,5 +54,56 @@ except ldap.NO_SUCH_OBJECT:
 else:
     sys.stderr.write('Zone {} already exists\n'.format(zone_cn))
     sys.exit(9)
+
+ldap_conn.add_s(
+    'cn={zone_cn},{AEDIR_SEARCHBASE}'.format(**vars()),
+    [
+      ('objectClass', ['namedObject', 'aeObject', 'aeZone']),
+      ('aeStatus', ['0']),
+      ('cn', [zone_cn]),
+      ('aeTicketId', [ticket_id]),
+      ('description', [zone_desc]),
+    ]
+)
+
+ldap_conn.add_s(
+    'cn={zone_cn}-zone-admins,cn={zone_cn},{AEDIR_SEARCHBASE}'.format(**vars()),
+    [
+      (
+          'objectClass',
+          [
+              'aeObject',
+              'groupOfEntries',
+              'posixGroup',
+              'aeGroup'
+          ]
+      ),
+      ('aeStatus', ['0']),
+      ('cn', [zone_cn+'-zone-admins']),
+      ('aeTicketId', [ticket_id]),
+      ('description', ["Group members are zone admins who can manage zone '{zone_cn}'".format(**vars())]),
+      ('gidNumber', [str(random.randint(30000, 59999))]),
+    ]
+)
+
+ldap_conn.add_s(
+    'cn={zone_cn}-zone-auditors,cn={zone_cn},{AEDIR_SEARCHBASE}'.format(**vars()),
+    [
+      (
+          'objectClass',
+          [
+              'aeObject',
+              'groupOfEntries',
+              'posixGroup',
+              'aeGroup'
+          ]
+      ),
+      ('aeStatus', ['0']),
+      ('cn', [zone_cn+'-zone-auditors']),
+      ('aeTicketId', [ticket_id]),
+      ('description', ["Group members are zone auditors who can read zone '{zone_cn}'".format(**vars())]),
+      ('gidNumber', [str(random.randint(30000, 59999))]),
+    ]
+)
 
 ldap_conn.unbind_s()
