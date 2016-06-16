@@ -14,14 +14,32 @@ import getpass
 import ldap
 import ldap.sasl
 
+
+AEDIR_TOOLS_CONFIG = '/opt/ae-dir/etc/ae-scripts.conf'
+
 AEDIR_LDAPI_URI = '{{ openldap_ldapi_uri }}'
 AEDIR_SEARCHBASE = '{{ aedir_suffix }}'
 LDAP_FILTER_TMPL = (
-    '(&'
-    '(|(objectClass=aeUser)(objectClass=aeService)(objectClass=aeHost))'
-    '(|(uid={0})(host={0}))'
+    '(|'
+      '(&'
+        '(|(objectClass=aeUser)(objectClass=aeService))'
+        '(uid={0})'
+      ')'
+      '(&'
+        '(objectClass=aeHost)'
+        '(host={0})'
+      ')'
     ')'
 )
+
+PYLDAP_TRACE_LEVEL = 2
+
+#---------------------------------------------------------------------------
+# main()
+#---------------------------------------------------------------------------
+
+ldap._trace_level = PYLDAP_TRACE_LEVEL
+
 
 try:
     arg_value = sys.argv[1]
@@ -31,7 +49,7 @@ except IndexError:
 
 ldap_filter = LDAP_FILTER_TMPL.format(arg_value)
 
-ldap_conn = ldap.initialize(AEDIR_LDAPI_URI)
+ldap_conn = ldap.initialize(AEDIR_LDAPI_URI, trace_level=PYLDAP_TRACE_LEVEL)
 ldap_conn.sasl_interactive_bind_s('', ldap.sasl.sasl({}, 'EXTERNAL'))
 
 ldap_result = ldap_conn.search_ext_s(
