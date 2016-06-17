@@ -323,6 +323,7 @@ index aePerson eq
 
 # Meta data
 index aeTicketId eq
+index aeTag eq
 
 # hardware devices
 index serialNumber eq,sub
@@ -1159,6 +1160,12 @@ constraint_attribute
   uri "ldap:///cn=people,{{ aedir_suffix }}?entryDN?one?(objectClass=aePerson)"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeUser)"
 
+# restrict tag references
+constraint_attribute
+  aeTag
+  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeTag)(aeStatus=0))"
+  restrict="ldap:///{{ aedir_suffix }}??sub?"
+
 # restrict aeProxyFor in aeSrvGroup entry to reference solely active non-proxy aeSrvGroup in same zone
 constraint_attribute
   aeProxyFor
@@ -1325,6 +1332,7 @@ refint_attributes
   aeSrvGroup
   aeLogStoreGroups
   aePerson
+  aeTag
   oathHOTPToken
   oathHOTPParams
   oathTOTPToken

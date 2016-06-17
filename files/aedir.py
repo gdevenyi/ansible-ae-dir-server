@@ -45,6 +45,7 @@ AE_HOST_OID = AE_OID_PREFIX+'.6.6.1'
 AE_SERVICE_OID = AE_OID_PREFIX+'.6.4'
 AE_ZONE_OID = AE_OID_PREFIX+'.6.20'
 AE_PERSON_OID = AE_OID_PREFIX+'.6.8'
+AE_TAG_OID = AE_OID_PREFIX+'.6.24'
 
 # gidNumber value assigned to all user and service accounts
 GLOBAL_AE_GID = '10000'
@@ -343,6 +344,35 @@ syntax_registry.registerAttrType(
   AEProxyFor.oid,[
     AE_OID_PREFIX+'.4.25',  # aeProxyFor
   ]
+)
+
+
+class AETag(DynamicDNSelectList):
+  oid = 'AETag-oid'
+  desc = 'AE-DIR: DN of referenced aeTag entry'
+  ldap_url = 'ldap:///_?cn?sub?(&(objectClass=aeTag)(aeStatus=0))'
+
+syntax_registry.registerAttrType(
+  AETag.oid,[
+    AE_OID_PREFIX+'.4.24',  # aeTag
+  ]
+)
+
+
+class AEEntryDNAETag(DistinguishedName):
+  oid = 'AEEntryDNAETag-oid'
+  desc = 'AE-DIR: entryDN of aeTag entry'
+  ref_attrs = (
+    ('aeTag',u'Tagged',None,u'Search all entries tagged with this tag'),
+  )
+
+syntax_registry.registerAttrType(
+  AEEntryDNAETag.oid,[
+    '1.3.6.1.1.20', # entryDN
+  ],
+  structural_oc_oids=[
+    AE_TAG_OID, # aeTag
+  ],
 )
 
 
@@ -891,6 +921,19 @@ syntax_registry.registerAttrType(
   ],
   structural_oc_oids=[
     AE_SRVGROUP_OID, # aeSrvGroup
+  ]
+)
+
+
+class AECommonNameAETag(AEZonePrefixCommonName):
+  oid = 'AECommonNameAETag-oid'
+
+syntax_registry.registerAttrType(
+  AECommonNameAETag.oid,[
+    '2.5.4.3', # cn alias commonName
+  ],
+  structural_oc_oids=[
+    AE_TAG_OID, # aeTag
   ]
 )
 

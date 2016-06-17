@@ -77,6 +77,27 @@ attributetype ( ae-dir-at:8
   SUBSTR caseIgnoreSubstringsMatch
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
 
+# Tagging
+#-----------------------------------------------------------------------
+
+attributetype ( ae-dir-at:24
+  NAME 'aeTag'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: DN of referenced aeTag entry'
+  SUP distinguishedName )
+
+objectclass ( ae-dir-oc:24
+  NAME 'aeTag'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Tag for marking objects with arbitrary shared information'
+  STRUCTURAL
+  SUP ( namedObject )
+  MUST ( aeStatus $ description ) )
+
+ditcontentrule ( ae-dir-oc:24
+  NAME 'aeTag-dcr'
+  NOT ( uniqueIdentifier ) )
+
 # Base classes not used directly
 #-----------------------------------------------------------------------
 
@@ -86,7 +107,7 @@ objectclass ( ae-dir-oc:21
   DESC 'AE-DIR: Managed object'
   ABSTRACT
   MUST ( aeStatus )
-  MAY ( description $ aeNotBefore $ aeNotAfter $ aeTicketId ) )
+  MAY ( description $ aeNotBefore $ aeNotAfter $ aeTicketId $ aeTag ) )
 
 # UID and GID number pools
 #-----------------------------------------------------------------------
