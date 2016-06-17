@@ -1,10 +1,10 @@
 [ req ]
 
-default_bits            = 2048
-distinguished_name      = csr_dn
+default_bits = 2048
+distinguished_name = csr_dn
 encrypt_rsa_key = no
 encrypt_key = no
-#attributes = csr_attributes
+attributes = csr_attributes
 req_extensions = csr_extensions
 default_md = sha1
 #string_mask = nombstr
@@ -12,6 +12,11 @@ prompt = no
 
 [ csr_dn ]
 
+countryName = "DE"
+stateOrProvinceName = "BW"
+localityName = "Karlsruhe"
+organizationName = "stroeder.com"
+organizationalUnitName = "ITO"
 commonName = "{{ openldap_service_fqdn }}"
 
 [ csr_attributes ]
