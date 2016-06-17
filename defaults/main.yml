@@ -100,6 +100,9 @@ aedir_init_aezones:
     ticket_id: "{{ aedir_init_ticket_id }}"
     description: "Zone for OTP tokens (OATH-LDAP)"
 
+# template file used for generating gen_csr.cnf
+aedir_gen_csr_cnf: "gen_csr.cnf.j2"
+
 # List of aePerson entries to be added to ae-dir-base.ldif
 aedir_init_aepersons:
   INIT-PERSON-ID-42:

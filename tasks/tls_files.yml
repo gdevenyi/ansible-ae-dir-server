@@ -13,7 +13,7 @@
 
 - name: Create gen_csr.cnf
   template:
-    src: "gen_csr.cnf.j2"
+    src: "{{ aedir_gen_csr_cnf }}"
     dest: "{{ openldap_conf_prefix }}/tls/gen_csr.cnf"
     owner: root
     group: ldap
