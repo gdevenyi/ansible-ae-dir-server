@@ -1,16 +1,21 @@
-{% set uid_number = aedir_min_uid -%}
-{% set gid_number = aedir_min_gid -%}
 #---------------------------------------------------------------------------
 # This is the base tree structure for AE-DIR
-# You should load this data initially to the database
+# You should load this data initially but only once (!) to the database
 # with suffix {{ aedir_suffix }}
+#
 # As a root user just use this command:
-# ldapadd -H ldapi:// -f
+# {{ openldap_bin }}/ldapadd -H ldapi:// -f {{ aedir_etc }}/ae-dir-base.ldif
 #
 # {{ ansible_managed }}
 #---------------------------------------------------------------------------
+{% set uid_number = aedir_min_uid -%}
+{% set gid_number = aedir_min_gid -%}
 version: 1
 
+#---------------------------------------------------------------------------
+# create suffix, AE-DIR admin zone and initial tag
+#---------------------------------------------------------------------------
+#
 dn: {{ aedir_suffix }}
 aeStatus: 0
 description:: w4YtRElSIC0gQXV0aG9yaXplZCBFbnRpdGllcyBEaXJlY3Rvcnk=
@@ -23,6 +28,21 @@ aeUidNumberMax: {{ aedir_max_uid }}
 aeGidNumberMin: {{ aedir_min_gid }}
 aeGidNumberMax: {{ aedir_max_gid }}
 
+dn: cn=ae,{{ aedir_suffix }}
+aeStatus: 0
+cn: ae
+description:: w4YtRElSIG1hbmFnZW1lbnQ=
+objectClass: namedObject
+objectClass: aeObject
+objectClass: aeZone
+
+dn: cn=ae-tag-init,cn=ae,{{ aedir_suffix }}
+aeStatus: 0
+cn: ae-tag-init
+description: tag for all entries created during initial load
+objectClass: namedObject
+objectClass: aeTag
+
 #---------------------------------------------------------------------------
 # aeZone entries (zone admins/auditors groups are added below)
 #---------------------------------------------------------------------------
@@ -30,6 +50,7 @@ aeGidNumberMax: {{ aedir_max_gid }}
 {% for zone_cn, zone_attrs in aedir_init_aezones.iteritems() %}
 dn: cn={{ zone_cn }},{{ aedir_suffix }}
 aeStatus: 0
+aeTag: ae-tag-init
 cn: {{ zone_cn }}
 description: {{ zone_attrs['description'] }}
 aeTicketId: {{ zone_attrs['ticket_id'] }}
@@ -44,6 +65,7 @@ objectClass: aeZone
 #
 dn: cn=pub,{{ aedir_suffix }}
 aeStatus: 0
+aeTag: ae-tag-init
 cn: global
 description: Public default entries
 objectClass: namedObject
@@ -52,6 +74,7 @@ objectClass: aeZone
 
 dn: cn=ae-users,cn=pub,{{ aedir_suffix }}
 aeStatus: 0
+aeTag: ae-tag-init
 cn: ae-users
 description: Primary POSIX group for all aeUser and aeSystem entries
 gidNumber: {{ gid_number }}
@@ -72,15 +95,8 @@ sudoHost: ALL
 description: SUDO global defaults
 sudoOption: env_reset
 aeStatus: 0
+aeTag: ae-tag-init
 sudoUser: %ae-users
-
-dn: cn=ae,{{ aedir_suffix }}
-aeStatus: 0
-cn: ae
-description:: w4YtRElSIG1hbmFnZW1lbnQ=
-objectClass: namedObject
-objectClass: aeObject
-objectClass: aeZone
 
 #---------------------------------------------------------------------------
 # black-list entries
@@ -408,6 +424,7 @@ objectClass: inetOrgPerson
 objectClass: aePerson
 objectClass: aeObject
 aeStatus: 0
+aeTag: ae-tag-init
 cn: {{ person_attrs.given_name }} {{ person_attrs.sur_name }}
 sn: {{ person_attrs.sur_name }}
 givenName: {{ person_attrs.given_name }}
@@ -428,6 +445,7 @@ objectClass: aeUser
 objectClass: posixAccount
 objectClass: ldapPublicKey
 aeStatus: 0
+aeTag: ae-tag-init
 aePerson: uniqueIdentifier={{ ae_user.unique_identifier }},cn=people,{{ aedir_suffix }}
 description: {{ ae_user.description }}
 homeDirectory: /home/{{ ae_user.uid }}
@@ -450,6 +468,7 @@ mail: {{ aedir_init_aepersons[ae_user.unique_identifier].mail }}
 #
 dn: cn=ae-admins,cn=ae,{{ aedir_suffix }}
 aeStatus: 0
+aeTag: ae-tag-init
 cn: ae-admins
 description:: R3JvdXAgbWVtYmVycyBjYW4gbWFuYWdlIGFsbCDDhi1ESVIgZW50cmllcw==
 gidNumber: {{ gid_number }}
@@ -466,6 +485,7 @@ memberUID: {{ ae_user.uid }}
 
 dn: cn=ae-auditors,cn=ae,{{ aedir_suffix }}
 aeStatus: 0
+aeTag: ae-tag-init
 cn: ae-auditors
 description:: R3JvdXAgbWVtYmVycyBjYW4gcmVhZCBhbGwgw4YtRElSIGVudHJpZXM=
 gidNumber: {{ gid_number }}
@@ -489,6 +509,7 @@ objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
 aeStatus: 0
+aeTag: ae-tag-init
 
 dn: cn=ae-all-zone-auditors,cn=ae,{{ aedir_suffix }}
 cn: ae-all-zone-auditors
@@ -503,9 +524,11 @@ objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
 aeStatus: 0
+aeTag: ae-tag-init
 
 dn: cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}
 aeStatus: 0
+aeTag: ae-tag-init
 cn: ae-login-proxies
 description: Members are central login components which are allowed to see all users/groups and must determine login user/target relation themselves
 gidNumber: {{ gid_number }}
@@ -518,6 +541,7 @@ objectClass: aeGroup
 
 dn: cn=ae-sys-admins,cn=ae,{{ aedir_suffix }}
 aeStatus: 0
+aeTag: ae-tag-init
 cn: ae-system-admins
 description: Members are system admins for AE-DIR servers
 gidNumber: {{ gid_number }}
@@ -531,6 +555,7 @@ objectClass: aeGroup
 {% for s in aedir_ldapi_services %}
 dn: uid={{ s.uid }},cn=ae,{{ aedir_suffix }}
 aeStatus: 0
+aeTag: ae-tag-init
 uid: {{ s.uid }}
 cn: {{ s.cn }}
 description: {{ s.cn }}
@@ -555,6 +580,7 @@ objectClass: aeSudoRule
 description: su - root for AE-DIR system admins
 sudoRunAsUser: ALL
 aeStatus: 0
+aeTag: ae-tag-init
 sudoCommand: ALL
 sudoHost: ALL
 sudoUser: %ae-system-admins
@@ -567,6 +593,7 @@ sudoUser: %ae-system-admins
 {% set srvgrp_dn = "cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir_suffix }}" -%}
 dn: cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir_suffix }}
 aeStatus: 0
+aeTag: ae-tag-init
 description: AE-DIR {{ role }} hosts
 objectClass: aeObject
 objectClass: aeSrvGroup
@@ -582,6 +609,7 @@ aeVisibleSudoers: cn=ae-sudo-sys-admins,cn=ae,{{ aedir_suffix }}
 dn: host={{ host }},cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir_suffix }}
 host: {{ host }}
 aeStatus: 0
+aeTag: ae-tag-init
 objectClass: device
 objectClass: aeDevice
 objectClass: aeObject
@@ -598,6 +626,7 @@ description: AE-DIR provider replica host for {{ service_fqdn }}
 {% set interface_fqdn = lookup('dig', '{}/PTR'.format(interface_ipv4))[:-1] -%}
 dn: cn={{ interface }},host={{ host }},cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir_suffix }}
 aeStatus: 0
+aeTag: ae-tag-init
 aeTicketId: IAM-44
 cn: {{ interface }}
 ipHostNumber: {{ interface_ipv4 }}
@@ -620,6 +649,7 @@ objectClass: aeService
 objectClass: pkiUser
 objectClass: posixAccount
 aeStatus: 0
+aeTag: ae-tag-init
 description: AE-DIR slapd provider {{ service_fqdn }} running on {{ host }}
 homeDirectory: /home/ae-dir-slapd_{{ service_hostname }}
 cn: ae-dir-slapd_{{ service_hostname }}
@@ -638,6 +668,7 @@ aeHost: host={{ host }},cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir_suffix }}
 #
 dn: cn=ae-replicas,cn=ae,{{ aedir_suffix }}
 aeStatus: 0
+aeTag: ae-tag-init
 cn: ae-replicas
 description: Members of this group are AE-DIR replicas (providers and consumers)
 gidNumber: {{ gid_number }}
@@ -660,6 +691,7 @@ memberUID: ae-dir-slapd_{{ replica.split('.')[0] }}
 
 dn: cn=ae-providers,cn=ae,{{ aedir_suffix }}
 aeStatus: 0
+aeTag: ae-tag-init
 cn: ae-providers
 description: Members of this group are AE-DIR provider replicas
 gidNumber: {{ gid_number }}
@@ -681,6 +713,7 @@ memberUID: ae-dir-slapd_{{ replica.split('.')[0] }}
 {% for zone_cn, zone_attrs in aedir_init_aezones.iteritems() %}
 dn: cn={{ zone_cn }}-zone-admins,cn={{ zone_cn }},{{ aedir_suffix }}
 aeStatus: 0
+aeTag: ae-tag-init
 cn: {{ zone_cn }}-zone-admins
 description: Group members are zone admins who can manage zone '{{ zone_cn }}'
 aeTicketId: {{ zone_attrs['ticket_id'] }}
@@ -694,6 +727,7 @@ objectClass: aeGroup
 
 dn: cn={{ zone_cn }}-zone-auditors,cn={{ zone_cn }},{{ aedir_suffix }}
 aeStatus: 0
+aeTag: ae-tag-init
 cn: {{ zone_cn }}-zone-auditors
 description: Group members are zone auditors who can read zone '{{ zone_cn }}'
 aeTicketId: {{ zone_attrs['ticket_id'] }}
