@@ -17,8 +17,7 @@ NEW_KEY_FILE="{{ openldap_conf_prefix }}/tls/{{ openldap_service_fqdn }}.key-${T
   -new \
   -nodes \
   -out "${NEW_CSR_FILE}" \
-  -keyout "${NEW_KEY_FILE}" \
-  -reqexts "csr_extensions"
+  -keyout "${NEW_KEY_FILE}"
 
 # Display new CSR file
 /usr/bin/openssl req \
