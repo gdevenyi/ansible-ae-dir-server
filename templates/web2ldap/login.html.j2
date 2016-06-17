@@ -1,0 +1,60 @@
+  <fieldset>
+
+    <legend>&AElig;-DIR login</legend>
+
+    <table>
+      <tr>
+        <td>User's bind DN:</td>
+        <td>
+          <input name="who"
+                 id="login_who"
+                 title="Complete Bind-DN of &AElig;-DIR account entry"
+                 maxlength="300"
+                 size="40"
+                 value="{value_ldap_who}">
+        </td>
+      </tr>
+      <tr>
+        <td>Password:</td>
+        <td>
+          <input type="password"
+                       title="Password to be used for login"
+                       name="cred"
+                       id="login_cred"
+                       maxlength="200"
+                       size="40"
+                       value="">
+        </td>
+      </tr>
+    </table>
+
+    <input type="hidden" name="login_filterstr" value="">
+
+    <p>
+      <input type="submit" id="login_submit" value="{value_submit}">
+    </p>
+
+  </fieldset>
+
+  <ul>
+    <li>
+      You have to enter at least the short bind DN like this:
+      <em>uid=<strong>your-username</strong>,{{ aedir_suffix }}</em>
+    </li>
+    <li>
+      If you have Javascript enabled entering only your username
+      will also work. The short bind DN will be auto-completed.
+    </li>
+    <li>
+      Take care that you enter the password only while nobody is
+      watching your keyboard.
+    </li>
+    <li>
+      In case of errors see the
+      <a href="https://wiki.example.com/web2ldap">web2ldap how-to</a>.
+    </li>
+    <li>
+      If you forgot your password you can <a href="/pwd/requestpw">
+      request a temporary reset password</a>.
+    </li>
+  </ul>

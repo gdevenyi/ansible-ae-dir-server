@@ -1,0 +1,62 @@
+<h1>&AElig;-DIR service/host group <em>%(cn)s</em></h1>
+
+<p class="EntryDN">%(entryDN)s</p>
+
+  <h2>General</h2>
+
+  <table>
+    <tr>
+      <td>Name of service/host group:</td>
+      <td>%(cn)s</td>
+    </tr>
+    <tr>
+      <td>Status:</td>
+      <td>%(aeStatus)s</td>
+    </tr>
+    <tr>
+      <td>Purpose of use:</td>
+      <td>%(description)s</td>
+    </tr>
+    <tr>
+      <td>Ticket no. last change:</td>
+      <td>%(aeTicketId)s</td>
+    </tr>
+    <tr>
+      <td>Retention period for logs:</td>
+      <td>%(aeLogRetentionPeriod)s</td>
+    </tr>
+    <tr>
+      <td>Used as SSH proxy for:</td>
+      <td>%(aeProxyFor)s</td>
+    </tr>
+  </table>
+
+  <h2>Groups with special rights</h2>
+
+  <table>
+    <tr>
+      <td>Group(s) with deploy right:</td>
+      <td>%(aeSetupGroups)s</td>
+    </tr>
+    <tr>
+      <td>Group(s) with log view right:</td>
+      <td>%(aeLogStoreGroups)s</td>
+    </tr>
+    <tr>
+      <td>Group(s) allowed to log in:</td>
+      <td>%(aeLoginGroups)s</td>
+    </tr>
+  </table>
+
+  <h2>Visible objects</h2>
+
+  <table>
+    <tr>
+      <td>Other visible group(s):</td>
+      <td>%(aeVisibleGroups)s</td>
+    </tr>
+    <tr>
+      <td>Visible sudo rule(s):</td>
+      <td>%(aeVisibleSudoers)s</td>
+    </tr>
+  </table>

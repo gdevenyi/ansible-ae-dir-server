@@ -1,0 +1,50 @@
+<h1>Server/host <em>%(host)s</em></h1>
+
+<p class="EntryDN">%(entryDN)s</p>
+
+<h2>Required input</h2>
+<table>
+  <tr>
+    <td>ZEUS name of server:<br>(must match first label of FQDN)</td>
+    <td>%(cn)s</td>
+  </tr>
+  <tr>
+    <td>FQDN of server<br>(output of <em>hostname -f</em>, checked against DNS):</td>
+    <td>%(host)s</td>
+  </tr>
+  <tr>
+    <td>Status:</td>
+    <td>%(aeStatus)s</td>
+  </tr>
+</table>
+
+<h2>Optional input</h2>
+<table>
+  <tr>
+    <td>Purpose of use:</td>
+    <td>%(description)s</td>
+  </tr>
+  <tr>
+    <td>User ID<br>(e.g. needed for Samba domains):</td>
+    <td>%(uid)s</td>
+  </tr>
+  <tr>
+    <td>Inventory number (aeStockId):</td>
+    <td>%(aeStockId)s</td>
+  </tr>
+  <tr>
+    <td>Hardware serial number (aeHwSerialNumber):</td>
+    <td>%(aeHwSerialNumber)s</td>
+  </tr>
+  <tr>
+    <td>Validity period:</td>
+    <td>
+      <dl>
+        <dt>from</dt>
+        <dd>%(aeNotBefore)s</dd>
+        <dt>until</dt>
+        <dd>%(aeNotAfter)s</dd>
+      </dl>
+    </td>
+  </tr>
+</table>

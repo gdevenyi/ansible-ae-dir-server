@@ -1,0 +1,163 @@
+<h1>Person entry (aePerson)</h1>
+
+<p>
+  Wiki documentation:
+  <a href="https://www.ae-dir.org/docs.html#schema-aePerson">Schema</a> /
+  <a href="https://www.ae-dir.org/user.html#web2ldap-add-aePerson">How-To</a>
+</p>
+
+<fieldset>
+  <legend>Individual information</legend>
+  <table>
+    <tr>
+      <td>Unique Identifier:</td>
+      <td>%(uniqueIdentifier)s</td>
+    </tr>
+    <tr>
+      <td>Employee number:</td>
+      <td>%(employeeNumber)s</td>
+    </tr>
+    <tr>
+      <td>Common Name:</td>
+      <td>%(cn)s</td>
+    </tr>
+    <tr>
+      <td>Surname:</td>
+      <td>%(sn)s</td>
+    </tr>
+    <tr>
+      <td>Given Name:</td>
+      <td>%(givenName)s</td>
+    </tr>
+    <tr>
+      <td>Title:</td>
+      <td>%(title)s</td>
+    </tr>
+    <tr>
+      <td>e-mail:</td>
+      <td>%(mail)s</td>
+    </tr>
+    <tr>
+      <td>User-ID:</td>
+      <td>%(uid)s</td>
+    </tr>
+    <tr>
+      <td>Photo:</td>
+      <td>
+        %(jpegPhoto)s
+      </td>
+    </tr>
+  </table>
+</fieldset>
+
+<fieldset>
+  <legend>Meta</legend>
+  <table>
+    <tr>
+      <td>Status (aeStatus):</td>
+      <td>%(aeStatus)s</td>
+    </tr>
+    <tr>
+      <td>Intended purpose (description):</td>
+      <td>%(description)s</td>
+    </tr>
+    <tr>
+      <td>Ticket no. last change (aeTicketId):</td>
+      <td>%(aeTicketId)s</td>
+    </tr>
+    <tr>
+      <td>Validity period (aeNotBefore..aeNotAfter):</td>
+      <td>from %(aeNotBefore)s until %(aeNotAfter)s</td>
+    </tr>
+  </table>
+</fieldset>
+
+<fieldset>
+  <legend>Phone Numbers</legend>
+  <table summary="aePerson: Phone Numbers">
+    <tr>
+      <td>Telephone:</td>
+      <td>%(telephoneNumber)s</td>
+    </tr>
+    <tr>
+      <td>Home Phone:</td>
+      <td>%(homePhone)s</td>
+    </tr>
+    <tr>
+      <td>Mobile Phone:</td>
+      <td>%(mobile)s</td>
+    </tr>
+    <tr>
+      <td>FAX:</td>
+      <td>%(facsimileTelephoneNumber)s</td>
+    </tr>
+  </table>
+</fieldset>
+
+<fieldset>
+  <legend>Address</legend>
+  <table summary="aePerson: Addresses">
+    <tr>
+      <td>Street:</td>
+      <td>%(streetAddress)s</td>
+    </tr>
+    <tr>
+      <td>Postal Code:</td>
+      <td>%(postalCode)s</td>
+    </tr>
+    <tr>
+      <td>Location:</td>
+      <td>%(l)s</td>
+    </tr>
+    <tr>
+      <td>State:</td>
+      <td>%(st)s</td>
+    </tr>
+    <tr>
+      <td>Postal Address:</td>
+      <td>%(postalAddress)s</td>
+    </tr>
+    <tr>
+      <td>Country:</td>
+      <td>%(c)s</td>
+    </tr>
+  </table>
+</fieldset>
+
+<fieldset>
+  <legend>Organizational information</legend>
+  <table>
+    <tr>
+      <td>Manager:</td>
+      <td>%(manager)s</td>
+    </tr>
+    <tr>
+      <td>Room number:</td>
+      <td>%(roomNumber)s</td>
+    </tr>
+    <tr>
+      <td>Organization:</td>
+      <td>%(o)s</td>
+    </tr>
+    <tr>
+      <td>Organizational unit:</td>
+      <td>%(ou)s</td>
+    </tr>
+    <tr>
+      <td>Department No.:</td>
+      <td>%(departmentNumber)s</td>
+    </tr>
+    <tr>
+      <td>Business category:</td>
+      <td>%(businessCategory)s</td>
+    </tr>
+    <tr>
+      <td>web page(s):</td>
+      <td>%(labeledURI)s</td>
+    </tr>
+  </table>
+</fieldset>
+
+<p class="ScrollLink">
+  <a href="#web2ldap_top">&uarr; TOP</a>
+</p>

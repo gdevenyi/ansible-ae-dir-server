@@ -26,6 +26,7 @@ aedir_username_gen_trials: 15
 # Some paths for tools
 aedir_prefix: "/opt/ae-dir"
 aedir_bin: "/opt/ae-dir/bin"
+aedir_etc: "/opt/ae-dir/etc"
 aedir_rundir: "/opt/ae-dir/run"
 
 # regex patterns for enforcing naming conventions (substring match!)
@@ -92,7 +93,7 @@ aedir_ldapi_services:
 aedir_init_aezones:
   people:
     ticket_id: "{{ aedir_init_ticket_id }}"
-    description: "People and orga entries"
+    description: "Zone for people and orga entries"
   office:
     ticket_id: "{{ aedir_init_ticket_id }}"
     description: "Zone for primary office users and groups"

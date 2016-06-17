@@ -1,0 +1,12 @@
+dn: uid=,cn=ae,{{ aedir_suffix }}
+objectClass: account
+objectClass: aeObject
+objectClass: aeService
+objectClass: pkiUser
+uid: ae-dir-slapd_
+host: .ae-dir.example.com
+description: System user for OpenLDAP replica on .ae-dir.example.com
+seeAlso: cn=.ae-dir.example.com,ou=ITS,o=stroeder.com,l=Karlsruhe,st=Ba-Wue,c=DE
+aeStatus: 0
+pwdPolicySubentry: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
+
