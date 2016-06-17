@@ -347,32 +347,15 @@ syntax_registry.registerAttrType(
 )
 
 
-class AETag(DynamicDNSelectList):
+class AETag(DynamicValueSelectList):
   oid = 'AETag-oid'
-  desc = 'AE-DIR: DN of referenced aeTag entry'
-  ldap_url = 'ldap:///_?cn?sub?(&(objectClass=aeTag)(aeStatus=0))'
+  desc = 'AE-DIR: cn of referenced aeTag entry'
+  ldap_url = 'ldap:///_?cn,cn?sub?(&(objectClass=aeTag)(aeStatus=0))'
 
 syntax_registry.registerAttrType(
   AETag.oid,[
     AE_OID_PREFIX+'.4.24',  # aeTag
   ]
-)
-
-
-class AEEntryDNAETag(DistinguishedName):
-  oid = 'AEEntryDNAETag-oid'
-  desc = 'AE-DIR: entryDN of aeTag entry'
-  ref_attrs = (
-    ('aeTag',u'Tagged',None,u'Search all entries tagged with this tag'),
-  )
-
-syntax_registry.registerAttrType(
-  AEEntryDNAETag.oid,[
-    '1.3.6.1.1.20', # entryDN
-  ],
-  structural_oc_oids=[
-    AE_TAG_OID, # aeTag
-  ],
 )
 
 
@@ -927,6 +910,9 @@ syntax_registry.registerAttrType(
 
 class AECommonNameAETag(AEZonePrefixCommonName):
   oid = 'AECommonNameAETag-oid'
+  ref_attrs = (
+    ('aeTag',u'Tagged','cn',u'Search all entries tagged with this tag'),
+  )
 
 syntax_registry.registerAttrType(
   AECommonNameAETag.oid,[

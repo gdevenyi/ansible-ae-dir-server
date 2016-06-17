@@ -83,8 +83,8 @@ attributetype ( ae-dir-at:8
 attributetype ( ae-dir-at:24
   NAME 'aeTag'
   X-ORIGIN 'AE-DIR'
-  DESC 'AE-DIR: DN of referenced aeTag entry'
-  SUP distinguishedName )
+  DESC 'AE-DIR: cn of referenced aeTag entry'
+  SUP name )
 
 objectclass ( ae-dir-oc:24
   NAME 'aeTag'
