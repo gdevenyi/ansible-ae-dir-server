@@ -395,7 +395,7 @@ access to
   dn.subtree="{{ aedir_suffix }}"
   attrs=authTimestamp,pwdFailureTime,pwdHistory,oathSecret,msPwdResetAdminPw
     by group/aeGroup/member="cn=ae-providers,cn=ae,{{ aedir_suffix }}" read
-    by group/aeGroup/member="cn=ae-replicas,cn=ae,{{ aedir_suffix }}" read
+    by group/aeGroup/member="cn=ae-replicas,cn=ae,{{ aedir_suffix }}" none
     by * break
 
 # All replicas can read everything else
@@ -489,7 +489,7 @@ access to
   filter="(&(objectClass=oathToken)(aeStatus=0))"
   attrs=oathSecret
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =sw
-    by group/aeGroup/member="cn=otp-admins,cn=otp,{{ aedir_suffix }}" =z
+    by group/aeGroup/member="cn=otp-zone-admins,cn=otp,{{ aedir_suffix }}" =z
     by self =w
     by * none
 
@@ -528,7 +528,17 @@ access to
 # Person entries
 #------------------------------------------------------------------
 
-# Give read access to referencing personal user accounts and zone admins
+# Give read access to confidential employeeNumber only to
+# personal user accounts referencing the person entry
+access to
+  dn.onelevel="cn=people,{{ aedir_suffix }}"
+  attrs=employeeNumber,aeNotBefore,aeNotAfter
+    by set="user/aePerson & this/entryDN" read
+    by * none
+
+# Give read access to other attributes to:
+# - personal user accounts referencing the person entry
+# - all zone admins
 access to
   dn.onelevel="cn=people,{{ aedir_suffix }}"
     by set="user/aePerson & this/entryDN" read
@@ -570,7 +580,7 @@ access to
   filter="(objectClass=oathToken)"
   attrs=oathLastLogin,oathFailureCount,oathLastFailure
     by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" write
-    by group/aeGroup/member="cn=otp-admins,cn=otp,{{ aedir_suffix }}" write
+    by group/aeGroup/member="cn=otp-zone-admins,cn=otp,{{ aedir_suffix }}" write
     by * break
 
 # oathHOTPCounter in token entries may be
@@ -595,7 +605,7 @@ access to
   filter="(&(objectClass=oathToken)(aeStatus=0))"
   attrs=oathHOTPCounter
     by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" write
-    by group/aeGroup/member="cn=otp-admins,cn=otp,{{ aedir_suffix }}" =rz
+    by group/aeGroup/member="cn=otp-zone-admins,cn=otp,{{ aedir_suffix }}" =rz
     by set="user/oathHOTPToken & this/entryDN" read
     by self =rz
     by * none
@@ -610,8 +620,8 @@ access to
   dn.onelevel="cn=otp,{{ aedir_suffix }}"
   filter="(objectClass=oathToken)"
     by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" read
-    by group/aeGroup/member="cn=otp-admins,cn=otp,{{ aedir_suffix }}" write
-    by group/aeGroup/member="cn=otp-auditors,cn=otp,{{ aedir_suffix }}" read
+    by group/aeGroup/member="cn=otp-zone-admins,cn=otp,{{ aedir_suffix }}" write
+    by group/aeGroup/member="cn=otp-zone-auditors,cn=otp,{{ aedir_suffix }}" read
     by set="user/oathHOTPToken & this/entryDN" read
     by set="user/entryDN & ([ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(member=] + user/entryDN + [))])/member" read
     by * none

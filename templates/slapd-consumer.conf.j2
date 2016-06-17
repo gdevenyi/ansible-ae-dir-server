@@ -425,10 +425,20 @@ access to
   attrs=entry,children,objectClass,entryUUID,modifyTimestamp,cn,description,@posixGroup,@sudoRole
     by users read
 
-# HR entries
+# Person entries
 #------------------------------------------------------------------
 
-# Give read access to referencing personal user accounts and zone admins
+# Give read access to confidential employeeNumber only to
+# personal user accounts referencing the person entry
+access to
+  dn.onelevel="cn=people,{{ aedir_suffix }}"
+  attrs=employeeNumber,aeNotBefore,aeNotAfter
+    by set="user/aePerson & this/entryDN" read
+    by * none
+
+# Give read access to other attributes to:
+# - personal user accounts referencing the person entry
+# - all zone admins
 access to
   dn.onelevel="cn=people,{{ aedir_suffix }}"
     by set="user/aePerson & this/entryDN" read
