@@ -453,7 +453,7 @@ objectclass ( ae-dir-oc:8
 
 ditcontentrule ( ae-dir-oc:8
   NAME 'aePerson-dcr'
-  AUX ( ldapPublicKey $ msPerson $ pkiUser )
+  AUX ( msPerson )
   NOT ( audio $ carLicense $ destinationIndicator $ homePostalAddress $
         host $ initials $ internationaliSDNNumber $ pager $ photo $
         preferredDeliveryMethod $ registeredAddress $ secretary $
