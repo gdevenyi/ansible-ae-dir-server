@@ -270,19 +270,19 @@ attributetype ( ae-dir-at:4
   NAME 'aeLoginGroups'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: DN of groups of users allowed to do SSH login'
-  SUP aeOwnerGroup )
+  SUP distinguishedName )
 
 attributetype ( ae-dir-at:6
   NAME 'aeSetupGroups'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: DN of groups of users allowed to deploy machine'
-  SUP aeOwnerGroup )
+  SUP distinguishedName )
 
 attributetype ( ae-dir-at:7
   NAME 'aeLogStoreGroups'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: DN of groups of users allowed to deploy machine'
-  SUP aeOwnerGroup )
+  SUP distinguishedName )
 
 attributetype ( ae-dir-at:15
   NAME 'aeLogStorePeriod'
