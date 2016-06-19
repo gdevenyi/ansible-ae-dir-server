@@ -37,7 +37,7 @@ attributetype ( ae-dir-at:16
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: DN of referenced person entry'
   SINGLE-VALUE
-  SUP seeAlso )
+  SUP distinguishedName )
 
 attributetype ( ae-dir-at:20
   NAME 'aeVisibleGroups'
@@ -172,9 +172,7 @@ objectclass ( ae-dir-oc:22
   NAME 'aeRoot'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: Top-level search root entry'
-  SUP ( organizationalUnit )
-  MUST ( aeStatus )
-  MAY ( description $ aeNotBefore $ aeNotAfter $ aeTicketId ) )
+  SUP ( organizationalUnit $ aeObject ) )
 
 ditcontentrule ( ae-dir-oc:22
   NAME 'aeRoot-dcr'
