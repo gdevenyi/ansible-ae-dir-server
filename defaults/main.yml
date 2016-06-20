@@ -26,6 +26,7 @@ aedir_username_gen_trials: 15
 # Some paths for tools
 aedir_prefix: "/opt/ae-dir"
 aedir_bin: "/opt/ae-dir/bin"
+aedir_sbin: "/opt/ae-dir/sbin"
 aedir_etc: "/opt/ae-dir/etc"
 aedir_rundir: "/opt/ae-dir/run"
 

@@ -12,6 +12,7 @@
     - "{{ aedir_prefix }}"
     - "{{ aedir_prefix }}/etc"
     - "{{ aedir_bin }}"
+    - "{{ aedir_sbin }}"
     - "{{ aedir_rundir }}"
 
 - name: "Create ae-dir-base.ldif"
@@ -20,7 +21,7 @@
     dest: "{{ aedir_etc }}/ae-dir-base.ldif"
     owner: root
     group: ldap
-    mode: 0640
+    mode: 0644
   when: openldap_role == 'provider'
 
 - name: Install tool scripts
@@ -29,11 +30,39 @@
     dest: "{{ aedir_bin }}/{{ item }}"
     owner: root
     group: root
+    mode: 0755
+  with_items:
+    - ae-add-zone.py
+    - ae-passwd.py
+
+- name: Install CRON scripts from templates
+  template:
+    src: "scripts/{{ item }}.j2"
+    dest: "{{ aedir_sbin }}/{{ item }}"
+    owner: root
+    group: root
     mode: 0750
   with_items:
     - aeperson2aeuser.py
-    - ae-add-zone.py
-    - ae-passwd.py
+
+- name: Install CRON scripts from files
+  copy:
+    src: "{{ item }}"
+    dest: "{{ aedir_sbin }}/{{ item }}"
+    owner: root
+    group: root
+    mode: 0750
+  with_items:
+    - update_memberurl_groups.py
+
+- name: Run update_memberurl_groups.py as CRON job
+  cron:
+    name: "update_memberurl_groups"
+    state: present
+    user: root
+    cron_file: update_memberurl_groups
+    minute: "*/3"
+    job: "{{ aedir_sbin }}/update_memberurl_groups.py"
 
 - name: Run aeperson2aeuser.py as CRON job
   cron:
@@ -42,7 +71,7 @@
     user: root
     cron_file: aeperson2aeuser
     minute: "*/5"
-    job: "{{ aedir_bin }}/aeperson2aeuser.py"
+    job: "{{ aedir_sbin }}/aeperson2aeuser.py"
 
 - name: Reset aeperson2aeuser.py as CRON job
   cron:
