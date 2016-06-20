@@ -910,9 +910,25 @@ syntax_registry.registerAttrType(
 
 class AECommonNameAETag(AEZonePrefixCommonName):
   oid = 'AECommonNameAETag-oid'
-  ref_attrs = (
-    ('aeTag',u'Tagged','cn',u'Search all entries tagged with this tag'),
-  )
+
+  def displayValue(self,valueindex=0,commandbutton=0):
+    display_value = AEZonePrefixCommonName.displayValue(self,valueindex,commandbutton)
+    if commandbutton:
+      search_anchor = self._form.applAnchor(
+        'searchform','&raquo;',self._sid,
+        [
+          ('dn',self._dn),
+          ('search_root',self._ls.currentSearchRoot),
+          ('searchform_mode',u'adv'),
+          ('search_attr',u'aeTag'),
+          ('search_option',w2lapp.searchform.SEARCH_OPT_IS_EQUAL),
+          ('search_string',self._ls.uc_decode(self.attrValue)[0]),
+        ],
+        title=u'Search all entries tagged with this tag',
+      )
+    else:
+      search_anchor = ''
+    return ''.join((display_value,search_anchor))
 
 syntax_registry.registerAttrType(
   AECommonNameAETag.oid,[
