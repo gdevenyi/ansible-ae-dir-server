@@ -501,7 +501,7 @@ cn: ae-all-zone-admins
 description: This group is updated to contain all zone admins
 gidNumber: {{ gid_number }}
 {% set gid_number = gid_number+1 -%}
-memberURL: ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins))
+memberURL: ldap:///{{ aedir_suffix }}?member,memberUID?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins))
 objectClass: top
 objectClass: groupOfEntries
 objectClass: groupOfURLs
@@ -516,7 +516,7 @@ cn: ae-all-zone-auditors
 description: This group is updated to contain all zone auditors
 gidNumber: {{ gid_number }}
 {% set gid_number = gid_number+1 -%}
-memberURL: ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-auditors))
+memberURL: ldap:///{{ aedir_suffix }}?member,memberUID?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-auditors))
 objectClass: top
 objectClass: groupOfEntries
 objectClass: groupOfURLs
