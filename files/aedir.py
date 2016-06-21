@@ -46,6 +46,7 @@ AE_SERVICE_OID = AE_OID_PREFIX+'.6.4'
 AE_ZONE_OID = AE_OID_PREFIX+'.6.20'
 AE_PERSON_OID = AE_OID_PREFIX+'.6.8'
 AE_TAG_OID = AE_OID_PREFIX+'.6.24'
+AE_DEPT_OID = AE_OID_PREFIX+'.6.29'
 
 # gidNumber value assigned to all user and service accounts
 GLOBAL_AE_GID = '10000'
@@ -595,12 +596,29 @@ syntax_registry.registerAttrType(
 )
 
 
+class AEEntryDNAEDept(DistinguishedName):
+  oid = 'AEEntryDNAEDept-oid'
+  desc = 'AE-DIR: entryDN of aePerson entry'
+  ref_attrs = (
+    ('aeDept',u'Dept. members',None,u'Search all persons assigned to this department.'),
+  )
+
+syntax_registry.registerAttrType(
+  AEEntryDNAEDept.oid,[
+    '1.3.6.1.1.20', # entryDN
+  ],
+  structural_oc_oids=[
+    AE_DEPT_OID, # aeDept
+  ],
+)
+
+
 class AEDept(DynamicDNSelectList):
   oid = 'AEDept-oid'
   desc = 'AE-DIR: DN of department entry'
   ldap_url = 'ldap:///_?ou?sub?(&(objectClass=aeDept)(aeStatus=0))'
   ref_attrs = (
-    (None,u'All persons',None,u'Search all personal AE-DIR persons associated with this department.'),
+    (None,u'Dept. members',None,u'Search all persons assigned to this department.'),
   )
 
 syntax_registry.registerAttrType(
