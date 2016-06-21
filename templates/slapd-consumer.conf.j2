@@ -272,10 +272,11 @@ index mailRoutingAddress eq
 index entryCSN eq
 index entryUUID eq
 
-# for network management
+# for host and network management
 index macAddress eq
 index ipHostNumber eq
 index host sub,eq
+index aeFqdn sub,eq
 
 # for aeUser
 index aeRemoteHost pres,eq
@@ -295,6 +296,9 @@ index aeVisibleGroups eq
 index aeVisibleSudoers eq
 index aeProxyFor pres,eq
 index aeSSHProxyCommand pres,eq,sub
+
+# service attributes
+index aeHost eq
 
 # login-related attributes
 index authTimestamp pres,eq
