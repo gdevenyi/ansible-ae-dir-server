@@ -1059,11 +1059,6 @@ constraint_attribute
   uid
   regex "^{{ aedir_aeservice_uid_regex }}$"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeService)"
-# Optionally needed for Samba host entries
-constraint_attribute
-  uid
-  regex "^[a-z0-9._$-]+$"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(|(objectClass=aeService)(objectClass=aeHost))"
 constraint_attribute
   uid
   count 1
