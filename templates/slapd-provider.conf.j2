@@ -1100,7 +1100,7 @@ constraint_attribute
 constraint_attribute
   cn
   count 1
-  restrict="ldap:///{{ aedir_suffix }}??sub?(|(objectClass=aeZone)(objectClass=aeUser)(objectClass=aeService)(objectClass=aeSrvGroup)(objectClass=aeHost))"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeObject)"
 
 # naming convention for 'cn' in 'aeSrvGroup' entries
 constraint_attribute
