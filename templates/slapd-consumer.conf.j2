@@ -631,8 +631,8 @@ logdb "cn=accesslog-ae-dir"
 logops writes
 logold "(objectClass=*)"
 logoldattr entryUUID objectClass cn uid
-# keep for 21 days (3 weeks) and scan twice per day
-logpurge 21+00:00 12:00
+# keep for 42 days (6 weeks) and scan twice per day
+logpurge 42+00:00 12:00
 
 # for back-links to group entries in member entries
 overlay memberof
