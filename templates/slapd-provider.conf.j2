@@ -1062,7 +1062,7 @@ constraint_attribute
 constraint_attribute
   uid
   count 1
-  restrict="ldap:///{{ aedir_suffix }}??sub?(|(objectClass=aeUser)(objectClass=aeService)(objectClass=aeHost))"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeObject)"
 
 # Regex constraint on 'cn' in zone entries
 constraint_attribute
