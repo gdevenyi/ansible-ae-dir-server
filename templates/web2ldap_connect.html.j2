@@ -48,29 +48,20 @@ You reached web2ldap service <strong>{{ openldap_service_fqdn }}</strong> (runni
 <table>
 
   <tr>
-    <th>name</th>
-    <th>value</th>
-    <th>purpose</th>
-  </tr>
-  <tr>
-    <td>aedir_suffix</td>
+    <td>base DN / search root:</td>
     <td>{{ aedir_suffix }}</td>
-    <td>base DN / search root for AE-DIR entries</td>
   </tr>
   <tr>
-    <td>POSIX-UID range</td>
+    <td>POSIX-UID number range:</td>
     <td>{{ aedir_min_uid }}..{{ aedir_max_uid }}</td>
-    <td>POSIX-UID number range served</td>
   </tr>
   <tr>
-    <td>POSIX-GID range</td>
+    <td>POSIX-GID number range:</td>
     <td>{{ aedir_min_gid }}..{{ aedir_max_gid }}</td>
-    <td>POSIX-GID number range served</td>
   </tr>
   <tr>
-    <td>aedir_global_gid</td>
+    <td>fixed primary POSIX-GID for user accounts:</td>
     <td>{{ aedir_global_gid }}</td>
-    <td>fixed primary POSIX-GID in all user accounts</td>
   </tr>
 
 </table>
