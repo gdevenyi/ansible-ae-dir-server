@@ -217,7 +217,6 @@ index objectClass eq
 
 access
   to dn.subtree="cn=accesslog-ae-dir"
-    by group/aeGroup/member="cn=ae-replicas,cn=ae,{{ aedir_suffix }}" read
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" read
     by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
     by dn.exact="cn=root,{{ aedir_suffix }}" read
