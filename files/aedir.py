@@ -775,6 +775,7 @@ syntax_registry.registerAttrType(
 class AECommonNameAEHost(DirectoryString):
   oid = 'AECommonNameAEHost-oid'
   desc = 'Canonical hostname'
+  maxValues = 1
   derive_from_host = True
 
   def transmute(self,attrValues):
@@ -826,6 +827,7 @@ syntax_registry.registerAttrType(
 
 class AECommonNameAEZone(DirectoryString):
   oid = 'AECommonNameAEZone-oid'
+  maxValues = 1
 
 syntax_registry.registerAttrType(
   AECommonNameAEZone.oid,[
@@ -884,6 +886,7 @@ class AEZonePrefixCommonName(DirectoryString):
 
 class AECommonNameAEGroup(AEZonePrefixCommonName):
   oid = 'AECommonNameAEGroup-oid'
+  maxValues = 1
 
 syntax_registry.registerAttrType(
   AECommonNameAEGroup.oid,[
@@ -897,6 +900,7 @@ syntax_registry.registerAttrType(
 
 class AECommonNameAESrvGroup(AEZonePrefixCommonName):
   oid = 'AECommonNameAESrvGroup-oid'
+  maxValues = 1
 
 syntax_registry.registerAttrType(
   AECommonNameAESrvGroup.oid,[
@@ -910,6 +914,7 @@ syntax_registry.registerAttrType(
 
 class AECommonNameAETag(AEZonePrefixCommonName):
   oid = 'AECommonNameAETag-oid'
+  maxValues = 1
 
   def displayValue(self,valueindex=0,commandbutton=0):
     display_value = AEZonePrefixCommonName.displayValue(self,valueindex,commandbutton)
@@ -942,6 +947,7 @@ syntax_registry.registerAttrType(
 
 class AECommonNameAESudoRule(AEZonePrefixCommonName):
   oid = 'AECommonNameAESudoRule-oid'
+  maxValues = 1
 
 syntax_registry.registerAttrType(
   AECommonNameAESudoRule.oid,[
