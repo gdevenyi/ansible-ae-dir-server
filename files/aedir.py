@@ -595,10 +595,25 @@ syntax_registry.registerAttrType(
 )
 
 
+class AEDept(DynamicDNSelectList):
+  oid = 'AEDept-oid'
+  desc = 'AE-DIR: DN of department entry'
+  ldap_url = 'ldap:///_?ou?sub?(&(objectClass=aeDept)(aeStatus=0))'
+  ref_attrs = (
+    (None,u'All persons',None,u'Search all personal AE-DIR persons associated with this department.'),
+  )
+
+syntax_registry.registerAttrType(
+  AEDept.oid,[
+    AE_OID_PREFIX+'.4.29', # aeDept
+  ]
+)
+
+
 class AEPersonDN(DynamicDNSelectList):
   oid = 'AEPersonDN-oid'
   desc = 'AE-DIR: DN of person entry'
-  ldap_url = 'ldap:///_?displayName?one?(&(objectClass=aePerson))'
+  ldap_url = 'ldap:///_?displayName?sub?(objectClass=aePerson)'
   sanitize_filter_tmpl = '(|(cn={av}*)(uniqueIdentifier={av})(employeeNumber={av})(displayName={av})(mail={av}))'
   ref_attrs = (
     (None,u'All users',None,u'Search all personal AE-DIR user accounts associated with this person.'),
