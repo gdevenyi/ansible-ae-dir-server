@@ -55,13 +55,15 @@ aedir_init_ticket_id: "INIT-42"
 # - user names must match aedir_aeservice_uid_regex pattern defined above
 # - do not remove items after initializing a AE-DIR deployment
 # - special care needed for usernames used in OpenLDAP ACLs
+
 aedir_ldapi_services:
-  # system user which must match UID/GID slapd is running as
-  - uid: ldap
-    cn: OpenLDAP slapd demon user
-    uid_number: 108
-    gid_number: 113
-    description: The system user for running OpenLDAP server process (slapd)
+#
+#  # system user which must match UID/GID slapd is running as
+#  - uid: ldap
+#    cn: OpenLDAP slapd demon user
+#    uid_number: 108
+#    gid_number: 113
+#    description: The system user for running OpenLDAP server process (slapd)
   # system user for password self-service web application
   # uid is referenced in OpenLDAP ACLs!
   - uid: ae-dir-pwd
@@ -149,16 +151,16 @@ openldap_service_fqdn: "{{ inventory_hostname }}"
 os_openldap_paths:
   Debian:
     # LTB-based installation
-    openldap_prefix: "/usr/local/openldap"
-    openldap_conf_prefix: "/usr/local/openldap/etc/openldap"
-    openldap_data: "/usr/local/openldap/var/openldap-data"
-    openldap_rundir: "/usr/local/openldap/var/run"
+    openldap_prefix: /usr/local/openldap
+    openldap_conf_prefix: /usr/local/openldap/etc/openldap
+    openldap_data: /usr/local/openldap/var/openldap-data
+    openldap_rundir: /usr/local/openldap/var/run
   Suse:
     # openSUSE packages
-    openldap_prefix: "/usr"
-    openldap_conf_prefix: "/etc/openldap"
-    openldap_data: "/var/lib/ldap"
-    openldap_rundir: "/var/run/slapd"
+    openldap_prefix: /usr
+    openldap_conf_prefix: /etc/openldap
+    openldap_data: /var/lib/ldap
+    openldap_rundir: /var/run/slapd
 
 # Some paths
 openldap_prefix: "{{ os_openldap_paths[ansible_os_family].openldap_prefix }}"
@@ -172,10 +174,6 @@ openldap_data: "{{ os_openldap_paths[ansible_os_family].openldap_data }}"
 openldap_conf_file: "{{ openldap_conf_prefix }}/slapd.conf"
 openldap_ldapi_socket: "{{ openldap_rundir }}/ldapi"
 openldap_ldapi_uri: "ldapi://{{ openldap_ldapi_socket|urlencode|replace('/','%2F') }}"
-
-# Directories with dynamically loadable modules
-openldap_module_paths:
-  - "{{ openldap_prefix }}/libexec/openldap"
 
 # All additional schema files needed
 openldap_schema_files:
