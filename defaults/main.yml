@@ -103,6 +103,9 @@ aedir_init_aezones:
   otp:
     ticket_id: "{{ aedir_init_ticket_id }}"
     description: "Zone for OTP tokens (OATH-LDAP)"
+  test:
+    ticket_id: "{{ aedir_init_ticket_id }}"
+    description: "Playground zone for weird tests"
 
 # template file used for generating gen_csr.cnf
 aedir_gen_csr_cnf: "gen_csr.cnf.j2"
