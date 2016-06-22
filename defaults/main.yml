@@ -134,22 +134,41 @@ aedir_hosts:
 # replica role, must be either 'provider' or 'consumer'
 openldap_role: "consumer"
 
-# which Debian repo to use for LTB OpenLDAP builds
-ltb_openldap_repo_source: "deb http://ltb-project.org/debian/{{ ansible_distribution_release }} {{ ansible_distribution_release }} main"
-ltb_openldap_repo_key: "http://ltb-project.org/wiki/lib/RPM-GPG-KEY-LTB-project"
+# which repo to use for LTB OpenLDAP builds (Debian and RHEL/CentOS)
+ltb_openldap_repo:
+  Debian:
+    source: "deb http://ltb-project.org/debian/{{ ansible_distribution_release }} {{ ansible_distribution_release }} main"
+    key: "http://ltb-project.org/wiki/lib/RPM-GPG-KEY-LTB-project"
+ltb_openldap_repo_source: "{{ ltb_openldap_repo[ansible_os_family].source }}"
+ltb_openldap_repo_key: "{{ ltb_openldap_repo[ansible_os_family].key }}"
 
 # default FQDN in LDAP service URL
 openldap_service_fqdn: "{{ inventory_hostname }}"
 
+# OS-specific maps
+os_openldap_paths:
+  Debian:
+    # LTB-based installation
+    openldap_prefix: "/usr/local/openldap"
+    openldap_conf_prefix: "/usr/local/openldap/etc/openldap"
+    openldap_data: "/usr/local/openldap/var/openldap-data"
+    openldap_rundir: "/usr/local/openldap/var/run"
+  Suse:
+    # openSUSE packages
+    openldap_prefix: "/usr"
+    openldap_conf_prefix: "/etc/openldap"
+    openldap_data: "/var/lib/ldap"
+    openldap_rundir: "/var/run/slapd"
+
 # Some paths
-openldap_prefix: "/usr/local/openldap"
+openldap_prefix: "{{ os_openldap_paths[ansible_os_family].openldap_prefix }}"
 openldap_bin: "{{ openldap_prefix }}/bin"
-openldap_conf_prefix: "{{ openldap_prefix }}/etc/openldap"
-openldap_schema_prefix: "{{ openldap_prefix }}/etc/openldap/schema"
+openldap_conf_prefix: "{{ os_openldap_paths[ansible_os_family].openldap_conf_prefix }}"
+openldap_schema_prefix: "{{ openldap_conf_prefix }}/schema"
 openldap_sbin: "{{ openldap_prefix }}/sbin"
 openldap_defaults: "/etc/default/slapd"
-openldap_rundir: "{{ openldap_prefix }}/var/run"
-openldap_data: "{{ openldap_prefix }}/var/openldap-data"
+openldap_rundir: "{{ os_openldap_paths[ansible_os_family].openldap_rundir }}"
+openldap_data: "{{ os_openldap_paths[ansible_os_family].openldap_data }}"
 openldap_conf_file: "{{ openldap_conf_prefix }}/slapd.conf"
 openldap_ldapi_socket: "{{ openldap_rundir }}/ldapi"
 openldap_ldapi_uri: "ldapi://{{ openldap_ldapi_socket|urlencode|replace('/','%2F') }}"
