@@ -1,0 +1,12 @@
+---
+# tasks file for roles/ae-dir-server
+
+- name: "Install base OS packages"
+  zypper:
+    name: "{{ item }}"
+    state: present
+    disable_recommends: yes
+    type: package
+  with_items:
+    - iptables
+    - joe

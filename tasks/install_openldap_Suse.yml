@@ -1,0 +1,17 @@
+---
+# install OpenLDAP packages
+
+- name: Install OpenLDAP packages and dependencies
+  zypper:
+    name: "{{ item }}"
+    state: present
+    disable_recommends: yes
+    type: package
+  notify:
+    - restart slapd
+  with_items:
+    - openldap2
+    - openldap2-back-sock
+    - openldap2-client
+    - openldap2-contrib
+    - openldap2-ppolicy-check-password
