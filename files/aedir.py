@@ -903,7 +903,7 @@ class AEZonePrefixCommonName(DirectoryString):
     result = DirectoryString._validate(self,attrValue)
     if result and attrValue:
       zone_cn = self._get_zone_name()
-      result = zone_cn and attrValue.startswith(zone_cn+u'-')
+      result = zone_cn and (zone_cn=='pub' or attrValue.startswith(zone_cn+u'-'))
     return result
 
   def formValue(self):
