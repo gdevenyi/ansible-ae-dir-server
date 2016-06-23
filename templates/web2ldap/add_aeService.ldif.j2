@@ -6,7 +6,7 @@ objectClass: posixAccount
 objectClass: ldapPublicKey
 aeStatus: 0
 uid: system_
-gidNumber: 10000
+gidNumber: {{ aedir_global_gid }}
 loginShell: /bin/true
 pwdPolicySubentry: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
 
