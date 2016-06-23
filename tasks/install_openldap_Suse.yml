@@ -15,3 +15,13 @@
     - openldap2-client
     - openldap2-contrib
     - openldap2-ppolicy-check-password
+
+- name: Create /etc/sysconfig/openldap
+  template:
+    src: "{{ ansible_os_family }}/sysconfig_openldap.j2"
+    dest: "/etc/sysconfig/openldap"
+    owner: root
+    group: ldap
+    mode: 0644
+  notify:
+  - restart slapd

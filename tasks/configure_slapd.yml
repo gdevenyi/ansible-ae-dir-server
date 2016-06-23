@@ -97,15 +97,5 @@
 # service defaults and service
 #-----------------------------------------------------------------------
 
-- name: Create /etc/default/slapd
-  template:
-    src: "default_slapd.j2"
-    dest: "/etc/default/slapd"
-    owner: root
-    group: ldap
-    mode: 0644
-  notify:
-  - restart slapd
-
 - name: ensure slapd is running (and enable it at boot)
   service: name=slapd state=started enabled=yes

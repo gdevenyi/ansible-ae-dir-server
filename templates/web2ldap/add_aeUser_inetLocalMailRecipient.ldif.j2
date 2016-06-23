@@ -1,0 +1,15 @@
+dn: uid=
+objectClass: account
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+objectClass: aeObject
+objectClass: aeUser
+objectClass: posixAccount
+objectClass: ldapPublicKey
+objectClass: inetLocalMailRecipient
+aeStatus: 0
+gidNumber: {{ aedir_global_gid }}
+loginShell: /bin/bash
+pwdPolicySubentry: cn=ppolicy-users,cn=ae,ou=ae-dir
+
