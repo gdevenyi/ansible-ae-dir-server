@@ -11,6 +11,16 @@
   notify:
     - restart web2ldap
 
+- name: Create web2ldapcnf/hosts.py for AE-DIR
+  template:
+    src: "{{ aedir_web2ldap_cnf_hosts }}"
+    dest: "{{ web2ldap_cnfdir }}/hosts.py"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart web2ldap
+
 - name: "Create connect AE-DIR landing page for web2ldap"
   template:
     src: "{{ aedir_web2ldap_connect_template }}"
