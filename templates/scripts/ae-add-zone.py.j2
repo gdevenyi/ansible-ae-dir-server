@@ -47,7 +47,7 @@ try:
         'cn={zone_cn},{AEDIR_SEARCHBASE}'.format(**vars()),
         ldap.SCOPE_BASE,
         '(objectClass=*)',
-        attrlist=['*','+'],
+        attrlist=['*', '+'],
     )
 except ldap.NO_SUCH_OBJECT:
     pass
@@ -55,54 +55,80 @@ else:
     sys.stderr.write('Zone {} already exists\n'.format(zone_cn))
     sys.exit(9)
 
+zone_dn = 'cn={zone_cn},{AEDIR_SEARCHBASE}'.format(**vars())
+
+# add zone entry
 ldap_conn.add_s(
-    'cn={zone_cn},{AEDIR_SEARCHBASE}'.format(**vars()),
+    zone_dn,
     [
-      ('objectClass', ['namedObject', 'aeObject', 'aeZone']),
-      ('aeStatus', ['0']),
-      ('cn', [zone_cn]),
-      ('aeTicketId', [ticket_id]),
-      ('description', [zone_desc]),
+        ('objectClass', ['namedObject', 'aeObject', 'aeZone']),
+        ('aeStatus', ['0']),
+        ('cn', [zone_cn]),
+        ('aeTicketId', [ticket_id]),
+        ('description', [zone_desc]),
     ]
 )
 
+# add init tag entry
 ldap_conn.add_s(
-    'cn={zone_cn}-zone-admins,cn={zone_cn},{AEDIR_SEARCHBASE}'.format(**vars()),
+    'cn={zone_cn}-init,{zone_dn}'.format(**vars()),
     [
-      (
-          'objectClass',
-          [
-              'aeObject',
-              'groupOfEntries',
-              'posixGroup',
-              'aeGroup'
-          ]
-      ),
-      ('aeStatus', ['0']),
-      ('cn', [zone_cn+'-zone-admins']),
-      ('aeTicketId', [ticket_id]),
-      ('description', ["Group members are zone admins who can manage zone '{zone_cn}'".format(**vars())]),
-      ('gidNumber', [str(random.randint(30000, 59999))]),
+        ('objectClass', ['namedObject', 'aeTag']),
+        ('aeStatus', ['0']),
+        ('cn', [zone_cn+'-init']),
+        ('description', ['Initialization of "{zone_desc}"'.format(**vars())]),
     ]
 )
 
+# add init tag to zone entry
+ldap_conn.modify_s(
+    zone_dn,
+    [(ldap.MOD_ADD, 'aeTag', [zone_cn+'-init'])]
+)
+
+# add zone admins group entry
 ldap_conn.add_s(
-    'cn={zone_cn}-zone-auditors,cn={zone_cn},{AEDIR_SEARCHBASE}'.format(**vars()),
+    'cn={zone_cn}-zone-admins,{zone_dn}'.format(**vars()),
     [
-      (
-          'objectClass',
-          [
-              'aeObject',
-              'groupOfEntries',
-              'posixGroup',
-              'aeGroup'
-          ]
-      ),
-      ('aeStatus', ['0']),
-      ('cn', [zone_cn+'-zone-auditors']),
-      ('aeTicketId', [ticket_id]),
-      ('description', ["Group members are zone auditors who can read zone '{zone_cn}'".format(**vars())]),
-      ('gidNumber', [str(random.randint(30000, 59999))]),
+        (
+            'objectClass',
+            [
+                'aeObject',
+                'groupOfEntries',
+                'posixGroup',
+                'aeGroup'
+            ]
+        ),
+        ('aeStatus', ['0']),
+        ('aeTag', [zone_cn+'-init']),
+        ('cn', [zone_cn+'-zone-admins']),
+        ('aeTicketId', [ticket_id]),
+        ('description', [
+            "Group members are zone admins who can manage zone '{zone_cn}'".format(**vars())
+        ]),
+        ('gidNumber', [str(random.randint(30000, 59999))]),
+    ]
+)
+
+# add zone auditors group entry
+ldap_conn.add_s(
+    'cn={zone_cn}-zone-auditors,{zone_dn}'.format(**vars()),
+    [
+        (
+            'objectClass',
+            [
+                'aeObject',
+                'groupOfEntries',
+                'posixGroup',
+                'aeGroup'
+            ]
+        ),
+        ('aeStatus', ['0']),
+        ('aeTag', [zone_cn+'-init']),
+        ('cn', [zone_cn+'-zone-auditors']),
+        ('aeTicketId', [ticket_id]),
+        ('description', ["Group members are zone auditors who can read zone '{zone_cn}'".format(**vars())]),
+        ('gidNumber', [str(random.randint(30000, 59999))]),
     ]
 )
 
