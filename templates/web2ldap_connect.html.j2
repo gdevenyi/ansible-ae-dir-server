@@ -43,10 +43,13 @@ You reached web2ldap service <strong>{{ openldap_service_fqdn }}</strong> (runni
 
 {% endfor %}
 
+<h2>&AElig;-DIR documentation</h2>
+<ul>
+  <li><a href="https://ae-dir.com/user.html">User Guide</a></li>
+</ul>
+
 <h2>&AElig;-DIR configuration</h2>
-
 <table>
-
   <tr>
     <td>base DN / search root:</td>
     <td>{{ aedir_suffix }}</td>
@@ -63,5 +66,4 @@ You reached web2ldap service <strong>{{ openldap_service_fqdn }}</strong> (runni
     <td>fixed primary POSIX-GID for user accounts:</td>
     <td>{{ aedir_global_gid }}</td>
   </tr>
-
 </table>
