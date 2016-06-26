@@ -327,7 +327,7 @@ syntax_registry.registerAttrType(
 class AESrvGroup(DynamicDNSelectList):
   oid = 'AESrvGroup-oid'
   desc = 'AE-DIR: DN of referenced aeSrvGroup entry'
-  ldap_url = 'ldap:///..?cn?sub?(&(objectClass=aeSrvGroup)(aeStatus=0))'
+  ldap_url = 'ldap:///_?cn?sub?(&(objectClass=aeSrvGroup)(aeStatus=0))'
 
 syntax_registry.registerAttrType(
   AESrvGroup.oid,[
