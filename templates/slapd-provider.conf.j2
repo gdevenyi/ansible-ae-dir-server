@@ -1172,7 +1172,7 @@ constraint_attribute
   uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeSrvGroup)(aeStatus=0))"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeSrvGroup)"
 constraint_attribute aeSrvGroup,entryDN set
-  "this/aeSrvGroup/-1/entryDN & this/entryDN/-1/entryDN"
+  "this/aeSrvGroup/-1/entryDN & this/entryDN/-1/-1/entryDN"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeHost)"
 
 # restrict aeHost in aeService entry to reference solely active aeHost entry
