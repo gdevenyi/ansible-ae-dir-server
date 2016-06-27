@@ -1,0 +1,95 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+"""
+Generates a report of active aeUser entries and their aePerson attributes
+"""
+
+__version__ = '0.0.1'
+
+import sys, csv, pprint
+
+import ldap, ldap.resiter
+from ldap.controls.deref import DereferenceControl
+
+AEDIR_LDAPI_URI = '{{ openldap_ldapi_uri }}'
+AEDIR_SEARCHBASE = '{{ aedir_suffix }}'
+
+PYLDAP_TRACE_LEVEL = 0
+
+USER_ATTRS = ['uid','uidNumber','entryUUID','aeTicketId','description']
+
+DEREF_PERSON_ATTRS = [
+    'sn',
+    'givenName',
+    'cn',
+    'mail',
+    'employeeNumber',
+    'telephoneNumber',
+    'mobile',
+    'aeDept',
+    'ou',
+    'departmentNumber',
+    'o',
+    'street',
+    'l',
+    'c',
+]
+
+DEREF_CONTROL = DereferenceControl(
+  True,
+  {
+    'aePerson': DEREF_PERSON_ATTRS,
+  }
+)
+
+
+class MyLDAPObject(ldap.ldapobject.LDAPObject,ldap.resiter.ResultProcessor):
+  pass
+
+#---------------------------------------------------------------------------
+# main()
+#---------------------------------------------------------------------------
+
+ldap._trace_level = PYLDAP_TRACE_LEVEL
+
+ldap_conn = MyLDAPObject(AEDIR_LDAPI_URI, trace_level=PYLDAP_TRACE_LEVEL)
+ldap_conn.sasl_interactive_bind_s('', ldap.sasl.sasl({}, 'EXTERNAL'))
+
+
+msg_id = ldap_conn.search_ext(
+    AEDIR_SEARCHBASE,
+    ldap.SCOPE_SUBTREE,
+    '(&(objectClass=aeUser)(aeStatus=0))',
+    attrlist=USER_ATTRS,
+    serverctrls = [DEREF_CONTROL],
+)
+
+person_dict = {}
+
+for res_type, res_data, res_msgid, res_controls in ldap_conn.allresults(
+    msg_id,
+    add_ctrls=1
+):
+    for dn,entry,deref_control in res_data:
+        # process dn and entry
+#        pprint.pprint((dn, entry))
+        if deref_control:
+#            pprint.pprint(deref_control[0].derefRes)
+            deref_dn, deref_entry = deref_control[0].derefRes['aePerson'][0]
+            person_dict[deref_dn.lower()] = dict([
+                (at,av[0])
+                for at,av in deref_entry.items()
+            ])
+
+csv_writer = csv.DictWriter(
+    sys.stdout,
+    DEREF_PERSON_ATTRS,
+    dialect='excel'
+)
+csv_writer.writerow(
+    dict([
+        (at,at)
+        for at in DEREF_PERSON_ATTRS
+    ])
+)
+csv_writer.writerows(person_dict.values())
