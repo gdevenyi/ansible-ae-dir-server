@@ -693,6 +693,7 @@ access to
   attrs=children
     by group/aeGroup/member.expand="cn=${d2}-zone-admins,cn=${d2},{{ aedir_suffix }}" write
     by set="user/entryDN & this/aeSetupGroups/member" write
+    by set="user/entryDN & this/aeSrvGroup/aeSetupGroups/member" write
     by group/aeGroup/member.expand="cn=${d2}-zone-auditors,cn=${d2},{{ aedir_suffix }}" read
     by * break
 access to
@@ -701,6 +702,7 @@ access to
     by group/aeGroup/member.expand="cn=${d2}-zone-admins,cn=${d2},{{ aedir_suffix }}" write
     by group/aeGroup/member.expand="cn=${d2}-zone-auditors,cn=${d2},{{ aedir_suffix }}" read
     by set="user/entryDN & this/aeSetupGroups/member" read
+    by set="user/entryDN & this/aeSrvGroup/aeSetupGroups/member" read
     by * break
 # aeHost entries have to be subordinate entries of aeSrvGroup entries
 access to
