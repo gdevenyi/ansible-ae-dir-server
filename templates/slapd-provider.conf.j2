@@ -1126,7 +1126,7 @@ constraint_attribute
   regex "(^|.* )ssh-(rsa|dss|ecdsa-sha2-nistp256) .+$"
 
 # restrict values of aeLoginGroups and aeVisibleGroups to DNs of active aeGroup entries
-# Excluded:
+# Excluded are special role groups:
 # - ae-admins, ae-auditors and ae-login-proxies
 # - zone-admins and zone-auditors
 # - pub-*
@@ -1181,14 +1181,11 @@ constraint_attribute
   uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeHost)(aeStatus=0))"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeService)"
 
-# restrict references from user groups to have only personal and system user accounts as members
+# restrict references from user groups to have only active personal
+# and system user accounts as members
 constraint_attribute
   member
   uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(|(objectClass=aeUser)(objectClass=aeService))(aeStatus=0))"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(&(objectClass=groupOfEntries)(|(cn=*-zone-admins)(cn=*-zone-auditors)))"
-constraint_attribute
-  member
-  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=account)(aeStatus=0))"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=groupOfEntries)"
 
 # 'mail' the same in personal user accounts and referenced person entries
