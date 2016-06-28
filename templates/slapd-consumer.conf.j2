@@ -521,6 +521,16 @@ access to
 # Read access to server groups filtered by (objectClass=aeSrvGroup)
 #------------------------------------------------------------------
 
+# Read access to aeSetupGroups in aeSrvGroup entries for proxies
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(objectClass=aeSrvGroup)"
+  attrs=aeSetupGroups
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
+    by set="user/-1/aeProxyFor & this/entryDN" read
+    by set="user/aeSrvGroup/aeProxyFor & this/entryDN" read
+    by * break
+
 # Read access to some attrs of aeSrvGroup entries
 # 1. for subordinate aeHost entries
 # 2. for SSH proxy aeSrvGroup/aeHost entries
@@ -528,6 +538,7 @@ access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=aeSrvGroup)"
   attrs=entry,objectClass,aeVisibleGroups,aeVisibleSudoers,aeLogStorePeriod,aeLoginGroups,aeLogStoreGroups
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by self.level{1} read
     by set="user/-1/aeProxyFor & this/entryDN" read
     by set="user/aeSrvGroup/aeProxyFor & this/entryDN" read
