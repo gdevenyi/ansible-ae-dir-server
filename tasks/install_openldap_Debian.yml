@@ -3,7 +3,7 @@
 
 - name: "Add LTB OpenLDAP repository key from {{ ltb_openldap_repo_key }}"
   apt_key:
-    url: "{{ ltb_openldap_repo_key }}"
+    data: "{{ lookup('file', 'RPM-GPG-KEY-LTB-project') }}"
     state: present
 
 - name: "Add LTB OpenLDAP Debian repository {{ ltb_openldap_repo_source }}"
@@ -16,7 +16,7 @@
   apt:
     name: "{{ item }}"
     state: installed
-    update_cache: no
+    update_cache: yes
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
   notify:
