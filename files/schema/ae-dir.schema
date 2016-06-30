@@ -447,7 +447,7 @@ objectclass ( ae-dir-oc:29
   STRUCTURAL
   SUP ( organizationalUnit $ aeObject )
   MUST ( departmentNumber )
-  MAY ( manager ) )
+  MAY ( manager $ aeSourceUri ) )
 
 ditcontentrule ( ae-dir-oc:29
   NAME 'aeDept-dcr'
