@@ -77,6 +77,12 @@ attributetype ( ae-dir-at:8
   SUBSTR caseIgnoreSubstringsMatch
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
 
+attributetype ( ae-dir-at:9
+  NAME 'aeSourceUri'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: URI of data source for synced person entry'
+  SUP labeledURI )
+
 # Tagging
 #-----------------------------------------------------------------------
 
@@ -459,12 +465,6 @@ ditcontentrule ( ae-dir-oc:29
 
 # Person entries
 #-----------------------------------------------------------------------
-
-attributetype ( ae-dir-at:9
-  NAME 'aeSourceUri'
-  X-ORIGIN 'AE-DIR'
-  DESC 'AE-DIR: URI of data source for synced person entry'
-  SUP labeledURI )
 
 objectclass ( ae-dir-oc:8
   NAME 'aePerson'
