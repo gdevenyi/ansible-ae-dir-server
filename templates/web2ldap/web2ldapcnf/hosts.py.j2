@@ -26,34 +26,7 @@ class Web2LDAPConfig:
 # with the host set as default.
 ########################################################################
 
-ldap_uri_list = [
-  'ldap://localhost',
-  (
-    'ldap://localhost:1390',
-    u'Local OpenLDAP 2.x server'
-  ),
-  (
-    'ldapi://%2Ftmp%2Fopenldap-socket',
-    u'Local OpenLDAP 2.x server (Unix domain socket)'
-  ),
-  ('ldap://ldap.uninett.no/dc=uninett,dc=no????x-starttls=2','UNINETT'),
-  ('ldap://magnesio.rediris.es:1389/dc%3Drediris%2Cdc%3Des??one?%28objectClass%3D%2A%29','Red.es/RedIRIS'),
-  ('ldap://ipa.demo1.freeipa.org/dc=demo1,dc=freeipa,dc=org??one??bindname=uid%3Dadmin%2Ccn%3Dusers%2Ccn%3Daccounts%2Cdc%3Ddemo1%2Cdc%3Dfreeipa%2Cdc%3Dorg,X-BINDPW=Secret123','freeIPA demo as admin'),
-  ('ldap://db.debian.org/dc=debian,dc=org??one',u'debian.org Developers LDAP Search'),
-  ('ldap://x500.bund.de/o=Bund,c=DE??one',u'X.500 Directory Informationsverbund Berlin-Bonn'),
-  ('ldap://keyserver.pgp.com',u"PGP Global Directory"),
-  ('ldap://pks-ldap.telesec.de/c=DE',u'T-TeleSec PKS'),
-  ('ldap://ldap.nrca-ds.de/dc=ldap,dc=nrca-ds,dc=de??one',u"Qualified certificates of german BNetzA"),
-  ('ldap://ldap.globaltrustpoint.com/dc%3Dzertificon%2Cdc%3Dcom',u"Z1 Global TrustPoint (www.globaltrustpoint.com)"),
-  'ldap://ldap.itd.umich.edu',
-  ('ldap://ldap.swissdigicert.ch/dc%3Dswissdigicert%2Cdc%3Dch??one?',u'SwissDigiCert'),
-  ('ldap://ldap.a-trust.at/c=AT??one?',u'A-Trust PKI Verzeichnisdienst'),
-  ('ldap://directory.s-trust.de',u'S-Trust'),
-  ('ldap://ldap1.pca.dfn.de/ou%3DDFN-PKI%2Co%3DDFN-Verein%2Cc%3Dde??one',u'DFN-PKI'),
-  ('ldap://ldap.sbca.telesec.de/c=de??one',u'T-Systems Shared Business'),
-  ('ldap://ldap.crl.esecure.datev.de/??one',u'Datev'),
-  ('ldap://directory.swisssign.net/o=SwissSign,c=CH??one',u'SwissSign AG'),
-]
+ldap_uri_list = []
 
 # Set to True (or 1) if LDAP access should be restricted to the LDAP servers
 # defined in ldap_uri_list (default if absent is 0 - restriction disabled)
@@ -63,32 +36,6 @@ restricted_ldap_uri_list = 0
 # Init some re-usable preset configuration instances
 # which are registered in ldap_def below
 ########################################################################
-
-#---------------------------------------------------------------------------
-# Presets for MS Active Directory
-#---------------------------------------------------------------------------
-
-msad_config = Web2LDAPConfig(
-  description=u'MS Active Directory',
-  searchform_template= {
-    u'_':os.path.join(web2ldapcnf.templates_dir,'searchform_msad.html'),
-  },
-  requested_attrs=[
-    'structuralObjectClass','subschemaSubentry',
-    # counters
-    'hasSubordinates',
-    # Dynamic Entries (see RFC 2589)
-    'entryTTL',
-    # MS Active Directory
-    'nTSecurityDescriptor',
-    'tokenGroups','tokenGroupsGlobalAndUniversal','tokenGroupsNoGCAcceptable',
-    'mS-DS-CreatorSID','primaryGroupToken','canonicalName','fromEntry',
-    'sDRightsEffective','msDS-Approx-Immed-Subordinates','msDS-KeyVersionNumber',
-    'msDS-ReplAttributeMetaData',
-    'lastLogonTimestamp','lockoutTime',
-    'allowedAttributes','allowedAttributesEffective','allowedChildClasses','allowedChildClassesEffective',
-  ],
-)
 
 #---------------------------------------------------------------------------
 # Presets for OpenLDAP's accesslog DB
@@ -127,27 +74,6 @@ openldap_accesslog_config = Web2LDAPConfig(
     'auditModify':os.path.join(web2ldapcnf.templates_dir,'openldap','read_auditAdd.html'),
     'auditModRDN':os.path.join(web2ldapcnf.templates_dir,'openldap','read_auditModRDN.html'),
     'auditDelete':os.path.join(web2ldapcnf.templates_dir,'openldap','read_auditDelete.html'),
-  },
-)
-
-#---------------------------------------------------------------------------
-# Presets for changelog database
-#---------------------------------------------------------------------------
-
-changelog_config = Web2LDAPConfig(
-  description=u'changelog',
-  search_tdtemplate= {
-    'changelogentry':r'No. %(changenumber)s at %(changetime)s<br>%(changetype)s %(targetdn)s (%(targetentryuuid)s)<br>by %(changeInitiatorsName)s',
-  },
-  searchform_template= {
-    u'_':os.path.join(web2ldapcnf.templates_dir,'searchform_changelog.html'),
-  },
-  search_attrs=[
-    'changeType','targetDN','targetEntryUUID','changeTime',
-    'changeLogCookie','replicaIdentifier','replicationCSN','changeInitiatorsName',
-  ],
-  read_template={
-    'changeLogEntry':os.path.join(web2ldapcnf.templates_dir,'read_changeLogEntry.html'),
   },
 )
 
@@ -539,7 +465,7 @@ ldap_def = {
       # Directory containing all the trusted root CA certs (symbolic hash links required!)
 #      LDAP_OPT_X_TLS_CACERTDIR = os.path.sep.join([web2ldapcnf.etc_dir,'web2ldap', 'ssl', 'crt']),
       # File containing all the trusted root CA certs
-      ldap.OPT_X_TLS_CACERTFILE:os.path.join(web2ldapcnf.etc_dir,'web2ldap','ssl','crt','trusted-certs.crt'),
+      ldap.OPT_X_TLS_CACERTFILE:'{{ openldap_cacert_pathname }}',
 #      ldap.OPT_X_TLS_CIPHER_SUITE:'ECDHE-RSA-AES256-SHA:DHE-RSA-AES256-SHA',
       ldap.OPT_X_TLS_PROTOCOL_MIN:3,
 #      ldap.OPT_X_TLS_CRLCHECK:ldap.OPT_X_TLS_CRL_PEER,
@@ -552,7 +478,7 @@ ldap_def = {
     sec_reqlevel=0,
 
     # Send session track control
-    session_track_control=0,
+    session_track_control=1,
 
     # Attributes explicitly requested while doing read
     # and modify operations
@@ -864,74 +790,8 @@ ldap_def = {
 
   ),
 
-  'ldap://localhost': Web2LDAPConfig(
-    description=u'My poorly configured LDAP host',
-  ),
-
-  'ldap://localhost:7389': Web2LDAPConfig(
-    description=u'Sun/Oracle DSEE',
-    # broken schema shipped with Sun/Oracle/389 DS
-    schema_strictcheck=False,
-  ),
-
-  'ldap://ipa.demo1.freeipa.org': Web2LDAPConfig(
-    description=u'freeIPA demo host',
-    # work around 389-DS bug here
-    schema_strictcheck=False,
-  ),
-
-  # This meant as an more complex example section
-  # Adjust the settings to reflect your local LDAP installation
-  'ldapi://%2Ftmp%2Fopenldap-socket/dc=stroeder,dc=de': Web2LDAPConfig(
-    description=u'My Address Book',
-    ssl_valid_dn=r'^/S=Stroeder/G=Michael/CN=Michael Stroeder/Email=michael@stroeder.com$',
-    ssl_valid_idn=r'^/C=ZA/ST=Western Cape/L=Durbanville/O=Thawte/OU=Certificate Services/CN=Personal Freemail RSA 1999\.9\.16$',
-    session_track_control=1,
-    # LDIF file used to extended the server's schema
-#    schema_supplement=os.path.join(web2ldapcnf.etc_dir,'web2ldap','stroeder-dit-structure.ldif'),
-    searchform_search_root_url=u'ldap:///dc=stroeder,dc=de??sub?(&(|(ou=Private)(ou:dn:=Bizness)(ou:dn:=Kultur))(|(objectClass=msOrganization)(objectClass=organizationalUnit))(hasSubordinates=TRUE)(|(organizationalStatus=0)(!(organizationalStatus=*))))',
-    search_attrs=[
-      'authTimestamp','createTimestamp','creatorsName','modifiersName','modifyTimestamp',
-      'cn','mail','sn','givenName','personalTitle','businessTitle','gender',
-      'o','ou','departmentNumber','employeeNumber',
-      'telephoneNumber','homePhone','mobile',
-      'c','st','l','streetAddress','roomNumber','postalCode',
-      'uid','uidNumber','description',
-      'objectClass','organizationalStatus',
-      'entryDN','entryUUID',
-      # DNS
-      'dc','associatedDomain','mXRecord','aRecord','aAAARecord','pTRRecord','nSRecord','sOARecord',
-      # groups
-      'member','memberOf',
-      # DHCP
-      'dhcpHWAddress','dhcpOption','dhcpStatements',
-    ],
-    addform_entry_templates={
-      u'stroeder.com Person':os.path.join(web2ldapcnf.templates_dir,'add_msperson.ldif'),
-      u'stroeder.com Organization':os.path.join(web2ldapcnf.templates_dir,'add_msorganization.ldif'),
-      u'User':os.path.join(web2ldapcnf.templates_dir,'add_user.ldif'),
-      u'Organizational unit (OU)':os.path.join(web2ldapcnf.templates_dir,'add_orgunit.ldif'),
-      u'Group':os.path.join(web2ldapcnf.templates_dir,'add_group.ldif'),
-      u'Posix user account':os.path.join(web2ldapcnf.templates_dir,'add_user.ldif'),
-      u'DNS sub-domain':os.path.join(web2ldapcnf.templates_dir,'add_dnsdomain2.ldif'),
-      u'DNS zone (SOA)':os.path.join(web2ldapcnf.templates_dir,'add_dnsdomain2_soa.ldif'),
-      u'DHCP host':os.path.join(web2ldapcnf.templates_dir,'dhcp','add_dhcpHost.ldif'),
-      u'DHCP server':os.path.join(web2ldapcnf.templates_dir,'dhcp','add_dhcpServer.ldif'),
-      u'DHCP service':os.path.join(web2ldapcnf.templates_dir,'dhcp','add_dhcpService.ldif'),
-      u'DHCP subnet':os.path.join(web2ldapcnf.templates_dir,'dhcp','add_dhcpSubnet.ldif'),
-      u'X.509 CA':os.path.join(web2ldapcnf.templates_dir,'add_pkica.ldif'),
-    },
-#    login_default_mech='EXTERNAL',
-#    passwd_hashtypes=['ssha',''],
-#    schema_uri='ldapi://%2Ftmp%2Fopenldap-socket/cn=Subschema',
-#    schema_uri='file:'+os.path.join(web2ldapcnf.etc_dir,os.path.join('web2ldap','localschema.ldif')),
-  ),
-
   # Example for OpenLDAP's accesslog database
   'ldap:///cn=accesslog': openldap_accesslog_config,
-
-  # Example for changelog database
-  'ldap:///cn=changelog': changelog_config,
 
   # Example for cn=Monitor covering various server implementations
   'ldap:///cn=Monitor': openldap_monitor_config,
