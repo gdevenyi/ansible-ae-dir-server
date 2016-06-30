@@ -37,7 +37,7 @@
     group: root
     mode: 0644
   with_fileglob:
-    "../templates/web2ldap/*.*.j2"
+    "../templates/web2ldap/templates/ae-dir/*.*.j2"
 
 - name: install AE-DIR plugin module for web2ldap
   copy:
