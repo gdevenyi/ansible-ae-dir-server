@@ -47,12 +47,6 @@ w2lapp.schema.plugins.aedir.AEHostname.html_tmpl = """{av}
      href="http://monitoring.example.com/network/check_mk/index.py?start_url=%2Fnetwork%2Fcheck_mk%2Fview.py%3Fview_name%3Dhost%26host%3D{av}">check_mk</a>
 """
 
-w2lapp.schema.plugins.aedir.AEDisplayNamePerson.compose_templates = (
-  '{givenName} {sn}/{uniqueIdentifier}/{departmentNumber}',
-  '{givenName} {sn}/{uniqueIdentifier})',
-  '{givenName} {sn}',
-)
-
 # Require the browser to at least connect via HTTPS with strong cipher
 #web2ldapcnf.hosts.ldap_def['_'].ssl_minlevel = 1
 
