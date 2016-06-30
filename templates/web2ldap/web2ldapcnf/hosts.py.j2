@@ -240,15 +240,13 @@ ae_dir_config = Web2LDAPConfig(
     'aeDept':r"""
     <div class="aestatus_%(aeStatus)s">
       <var>%(entryDN)s</var><br>
-      %(ou)s
-      (%(departmentNumber)s)
+      %(ou)s (%(departmentNumber)s)
     </div>
     """,
     'aePerson':r"""
     <div class="aestatus_%(aeStatus)s">
       <var>%(entryDN)s</var><br>
-      %(cn)s
-      (%(employeeNumber)s) &lt;%(mail)s&gt;
+      %(displayName)s &lt;%(mail)s&gt;
     </div>
     """,
     'aeGroup':r"""
