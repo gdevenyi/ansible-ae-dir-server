@@ -1039,7 +1039,7 @@ class AEManager(DynamicDNSelectList):
 
 syntax_registry.registerAttrType(
   AEManager.oid,[
-    '0.9.2342.19200300.100.1.10', manager
+    '0.9.2342.19200300.100.1.10', # manager
   ],
   structural_oc_oids=[
     AE_PERSON_OID, # aePerson
