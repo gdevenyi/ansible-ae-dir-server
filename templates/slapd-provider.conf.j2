@@ -992,13 +992,6 @@ access to
 # Give read access to associated personal user accounts and zone admins
 access to
   dn.onelevel="cn=people,{{ aedir_suffix }}"
-  attrs=userCertificate
-    by group/aeGroup/member="cn=pki-email-cert-publishers,cn=pki,{{ aedir_suffix }}" write
-    by * break
-
-# Give read access to associated personal user accounts and zone admins
-access to
-  dn.onelevel="cn=people,{{ aedir_suffix }}"
     by set="user/aePerson & this/entryDN" read
     by set="user/entryDN & ([ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-admins)(member=] + user/entryDN + [))])/member" read
     by group/aeGroup/member="cn=pki-email-cert-publishers,cn=pki,{{ aedir_suffix }}" read
