@@ -246,6 +246,6 @@ openldap_syncrepl_providers: "{{ aedir_hosts['provider']|map('extract', hostvars
 #---------------------------------------------------------------------------
 
 # Jinja template names used
-aedir_web2ldap_cnf_local: "web2ldapcnf_local.py.j2"
-aedir_web2ldap_cnf_hosts: "web2ldapcnf_hosts.py.j2"
+aedir_web2ldap_cnf_local: "web2ldap/web2ldapcnf/local.py.j2"
+aedir_web2ldap_cnf_hosts: "web2ldap/web2ldapcnf/hosts.py.j2"
 aedir_web2ldap_connect_template: "web2ldap_connect.html.j2"
