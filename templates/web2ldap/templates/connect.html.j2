@@ -1,0 +1,69 @@
+<h1>{text_heading}</h1>
+
+You reached web2ldap service <strong>{{ openldap_service_fqdn }}</strong> (running on <em>{{ ansible_fqdn }}</em>)
+
+{text_error}
+
+<h2>Normal use</h2>
+<p>
+  <a class="CommandLink" href="/web2ldap/searchform?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}????bindname=">Local &AElig;-DIR via LDAPI</a>
+  (if in doubt, click this!)
+</p>
+
+{% for role in ['provider', 'consumer'] %}
+<h2>&AElig;-DIR {{ role }}(s)</h2>
+<table>
+  <tr>
+    <th>Service</th>
+    <th>Host</th>
+    <th>Id</th>
+  </tr>
+{% for host in aedir_hosts[role] %}
+{% set replica = hostvars[host].get('openldap_service_fqdn',host) -%}
+{% set server_id = hostvars[host].get('openldap_server_id','') -%}
+  <tr>
+    <td>
+      <a class="CommandLink" href="/web2ldap/searchform?ldaps://{{ replica }}/{{ aedir_suffix }}????bindname=">{{ replica }}</a>
+    </td>
+{% if replica!=host %}
+    <td>
+      {{ host }}
+    </td>
+{% else %}
+    <td>
+      -
+    </td>
+{% endif %}
+    <td>
+      {{ server_id }}
+    </td>
+  </tr>
+{% endfor %}
+</table>
+
+{% endfor %}
+
+<h2>&AElig;-DIR documentation</h2>
+<ul>
+  <li><a href="https://ae-dir.com/web2ldap.html">User Guide</a></li>
+</ul>
+
+<h2>&AElig;-DIR configuration</h2>
+<table>
+  <tr>
+    <td>base DN / search root:</td>
+    <td>{{ aedir_suffix }}</td>
+  </tr>
+  <tr>
+    <td>POSIX-UID number range:</td>
+    <td>{{ aedir_min_uid }}..{{ aedir_max_uid }}</td>
+  </tr>
+  <tr>
+    <td>POSIX-GID number range:</td>
+    <td>{{ aedir_min_gid }}..{{ aedir_max_gid }}</td>
+  </tr>
+  <tr>
+    <td>fixed primary POSIX-GID for user accounts:</td>
+    <td>{{ aedir_global_gid }}</td>
+  </tr>
+</table>
