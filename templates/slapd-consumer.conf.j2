@@ -433,7 +433,7 @@ access to
 # Give read access to confidential employeeNumber only to
 # personal user accounts referencing the person entry
 access to
-  dn.onelevel="cn=people,{{ aedir_suffix }}"
+  filter="(objectClass=aePerson)"
   attrs=employeeNumber,aeNotBefore,aeNotAfter
     by set="user/aePerson & this/entryDN" read
     by * none
@@ -442,7 +442,7 @@ access to
 # - personal user accounts referencing the person entry
 # - all zone admins
 access to
-  dn.onelevel="cn=people,{{ aedir_suffix }}"
+  filter="(objectClass=aePerson)"
     by set="user/aePerson & this/entryDN" read
     by set="user/entryDN & ([ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(member=] + user/entryDN + [))])/member" read
     by * none

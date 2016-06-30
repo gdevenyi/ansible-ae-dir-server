@@ -522,26 +522,6 @@ access to
   attrs=entry,children,objectClass,entryUUID,modifyTimestamp,cn,description,@posixGroup,@sudoRole
     by users read
 
-# Person entries
-#------------------------------------------------------------------
-
-# Give read access to confidential employeeNumber only to
-# personal user accounts referencing the person entry
-access to
-  dn.onelevel="cn=people,{{ aedir_suffix }}"
-  attrs=employeeNumber,aeNotBefore,aeNotAfter
-    by set="user/aePerson & this/entryDN" read
-    by * none
-
-# Give read access to other attributes to:
-# - personal user accounts referencing the person entry
-# - all zone admins
-access to
-  dn.onelevel="cn=people,{{ aedir_suffix }}"
-    by set="user/aePerson & this/entryDN" read
-    by set="user/entryDN & ([ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(member=] + user/entryDN + [))])/member" read
-    by * none
-
 # for OATH-LDAP
 #------------------------------------------------------------------
 
@@ -723,6 +703,21 @@ access to
     by set="user/entryDN & this/aeSrvGroup/aeSetupGroups/member" write
     by group/aeGroup/member.expand="cn=${d3}-zone-auditors,cn=${d3},{{ aedir_suffix }}" read
     by * break
+
+# aePerson and aeDept entries solely beneath cn=people,ou=ae-dir
+access to
+  dn.regex="^uniqueIdentifier=([a-zA-Z0-9_.-]+),cn=people,ou=ae-dir$"
+  filter="(objectClass=aePerson)"
+    by group/aeGroup/member.expand="cn=people-zone-admins,cn=people,ou=ae-dir" write
+    by group/aeGroup/member.expand="cn=people-zone-auditors,cn=people,ou=ae-dir" read
+    by * break
+access to
+  dn.regex="^departmentNumber=([a-zA-Z0-9_.-]+),cn=people,ou=ae-dir$"
+  filter="(objectClass=aeDept)"
+    by group/aeGroup/member.expand="cn=people-zone-admins,cn=people,ou=ae-dir" write
+    by group/aeGroup/member.expand="cn=people-zone-auditors,cn=people,ou=ae-dir" read
+    by * break
+
 
 # After this ACL all inactive entries are only visible for all zone admins
 #---------------------------------------------------------------------------
@@ -985,17 +980,24 @@ access to
     by set="user/entryDN & ([ldap:///] + user/entryDN + [?entryDN?base?(&(objectClass=aeUser)(aeStatus=0))])/entryDN" read
     by * auth
 
-
 # Person entries
 #------------------------------------------------------------------
 
-# Give read access to associated personal user accounts and zone admins
+# Give read access to confidential employeeNumber only to
+# personal user accounts referencing the person entry
 access to
-  dn.onelevel="cn=people,{{ aedir_suffix }}"
+  filter="(objectClass=aePerson)"
+  attrs=employeeNumber,aeNotBefore,aeNotAfter
     by set="user/aePerson & this/entryDN" read
-    by set="user/entryDN & ([ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-admins)(member=] + user/entryDN + [))])/member" read
-    by group/aeGroup/member="cn=pki-email-cert-publishers,cn=pki,{{ aedir_suffix }}" read
-    by users search
+    by * none
+
+# Give read access to other attributes to:
+# - personal user accounts referencing the person entry
+# - all zone admins
+access to
+  filter="(objectClass=aePerson)"
+    by set="user/aePerson & this/entryDN" read
+    by set="user/entryDN & ([ldap:///ou=ae-dir?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(member=] + user/entryDN + [))])/member" read
     by * none
 
 # Last catch ACLs
