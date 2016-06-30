@@ -628,14 +628,18 @@ syntax_registry.registerAttrType(
 )
 
 
-class AEPersonDN(DynamicDNSelectList):
-  oid = 'AEPersonDN-oid'
+class AEPerson(DynamicDNSelectList):
+  oid = 'AEPerson-oid'
   desc = 'AE-DIR: DN of person entry'
   ldap_url = 'ldap:///_?displayName?sub?(objectClass=aePerson)'
-  sanitize_filter_tmpl = '(|(cn={av}*)(uniqueIdentifier={av})(employeeNumber={av})(displayName={av})(mail={av}))'
   ref_attrs = (
     (None,u'All users',None,u'Search all personal AE-DIR user accounts associated with this person.'),
   )
+
+
+class AEPerson2(AEPerson):
+  oid = 'AEPerson2-oid'
+  sanitize_filter_tmpl = '(|(cn={av}*)(uniqueIdentifier={av})(employeeNumber={av})(displayName={av})(mail={av}))'
 
   def formValue(self):
     form_value = DistinguishedName.formValue(self)
@@ -678,7 +682,7 @@ class AEPersonDN(DynamicDNSelectList):
         return attrValues
 
 syntax_registry.registerAttrType(
-  AEPersonDN.oid,[
+  AEPerson.oid,[
     AE_OID_PREFIX+'.4.16', # aePerson
   ]
 )
