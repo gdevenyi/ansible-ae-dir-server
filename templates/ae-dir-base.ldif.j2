@@ -426,6 +426,7 @@ objectClass: aeObject
 aeStatus: 0
 aeTag: ae-tag-init
 cn: {{ person_attrs.given_name }} {{ person_attrs.sur_name }}
+displayName: {{ person_attrs.given_name }} {{ person_attrs.sur_name }} ({{ unique_identifier }})
 sn: {{ person_attrs.sur_name }}
 givenName: {{ person_attrs.given_name }}
 mail: {{ person_attrs.mail }}
