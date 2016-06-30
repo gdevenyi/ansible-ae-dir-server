@@ -72,15 +72,6 @@ web2ldapcnf.hosts.ldap_uri_list = [
   ),
 ]
 
-w2lapp.schema.syntaxes.syntax_registry.registerAttrType(
-  w2lapp.schema.plugins.aedir.AEPersonManager.oid,[
-    '0.9.2342.19200300.100.1.10', # manager
-  ],
-  structural_oc_oids=[
-    w2lapp.schema.plugins.aedir.AE_PERSON_OID, # aePerson
-  ],
-)
-
 # gidNumber value assigned to all user and service accounts
 w2lapp.schema.plugins.aedir.GLOBAL_AE_GID = '{{ aedir_min_uid }}'
 
