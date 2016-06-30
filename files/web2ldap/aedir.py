@@ -845,10 +845,15 @@ syntax_registry.registerAttrType(
   structural_oc_oids=[AE_USER_OID], # aeUser
 )
 
-
 class AEDisplayNamePerson(DisplayNameInetOrgPerson):
   oid = 'AEDisplayNamePerson-oid'
   desc = 'Attribute displayName in object class aePerson'
+  # do not stuff confidential employeeNumber herein!
+  compose_templates = (
+    '{givenName} {sn} ({uniqueIdentifier}) / {departmentNumber}',
+    '{givenName} {sn} ({uniqueIdentifier})',
+    '{givenName} {sn}',
+  )
 
 syntax_registry.registerAttrType(
   AEDisplayNamePerson.oid,[
