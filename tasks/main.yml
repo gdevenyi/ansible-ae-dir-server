@@ -16,11 +16,5 @@
 - name: "Configure OpenLDAP slapd for AE-DIR"
   include: system_accounts.yml
 
-- name: "Install various AE-DIR tools"
-  include: aedir_tools.yml
-  when: openldap_role == 'provider'
-
-- name: "Configure web2ldap for AE-DIR"
-  include: configure_web2ldap.yml
-  when: openldap_role == 'provider'
-
+- name: "Specific tasks on OpenLDAP {{ openldap_role }}"
+  include: "{{ openldap_role }}.yml"
