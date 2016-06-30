@@ -1032,11 +1032,20 @@ syntax_registry.registerAttrType(
 )
 
 
-class AEPersonManager(DynamicDNSelectList):
-  oid = 'AEPersonManager-oid'
-  desc = 'AE-DIR: Manager responsible for a person'
+class AEManager(DynamicDNSelectList):
+  oid = 'AEManager-oid'
+  desc = 'AE-DIR: Manager responsible for a person/department'
   ldap_url = 'ldap:///cn=people,_?displayName?one?(&(objectClass=aePerson)(aeStatus=0))'
 
+syntax_registry.registerAttrType(
+  AEManager.oid,[
+    '0.9.2342.19200300.100.1.10', manager
+  ],
+  structural_oc_oids=[
+    AE_PERSON_OID, # aePerson
+    AE_DEPT_OID, # aeDept
+  ]
+)
 
 
 syntax_registry.registerAttrType(

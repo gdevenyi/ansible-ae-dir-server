@@ -41,7 +41,7 @@
 
 - name: install AE-DIR plugin module for web2ldap
   copy:
-    src: "aedir.py"
+    src: "web2ldap/aedir.py"
     dest: "{{ web2ldap_pylib }}/w2lapp/schema/plugins/aedir.py"
     owner: root
     group: root
@@ -49,3 +49,10 @@
   notify:
     - restart web2ldap
 
+- name: Create supplemental schema file for AE-DIR (ae-suppl-schema.ldif)
+  copy:
+    src: "web2ldap/ae-suppl-schema.ldif"
+    dest: "{{ web2ldap_etc }}/ae-suppl-schema.ldif"
+    owner: root
+    group: root
+    mode: 0644
