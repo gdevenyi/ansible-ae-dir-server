@@ -863,6 +863,21 @@ syntax_registry.registerAttrType(
 )
 
 
+class AEDepartmentNumber(DirectoryString):
+  oid = 'AEDepartmentNumber-oid'
+  maxValues = 1
+
+syntax_registry.registerAttrType(
+  AEDepartmentNumber.oid,[
+    '2.16.840.1.113730.3.1.2', # departmentNumber
+  ],
+  structural_oc_oids=[
+    AE_PERSON_OID, # aePerson
+    AE_DEPT_OID,   # aeDept
+  ]
+)
+
+
 class AECommonNameAEZone(DirectoryString):
   oid = 'AECommonNameAEZone-oid'
   maxValues = 1
@@ -872,7 +887,7 @@ syntax_registry.registerAttrType(
     '2.5.4.3', # cn alias commonName
   ],
   structural_oc_oids=[
-    AE_ZONE_OID,    # aeZone
+    AE_ZONE_OID, # aeZone
   ]
 )
 

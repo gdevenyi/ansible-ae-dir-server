@@ -704,15 +704,18 @@ access to
     by group/aeGroup/member.expand="cn=${d3}-zone-auditors,cn=${d3},{{ aedir_suffix }}" read
     by * break
 
+# Security zone cn=people
+#------------------------------------------------------------------
+
 # aePerson and aeDept entries solely beneath cn=people,ou=ae-dir
 access to
-  dn.regex="^uniqueIdentifier=([a-zA-Z0-9_.-]+),cn=people,ou=ae-dir$"
+  dn.regex="^uniqueIdentifier=({{ aedir_aeperson_uniqueid_regex }}),cn=people,ou=ae-dir$"
   filter="(objectClass=aePerson)"
     by group/aeGroup/member.expand="cn=people-zone-admins,cn=people,ou=ae-dir" write
     by group/aeGroup/member.expand="cn=people-zone-auditors,cn=people,ou=ae-dir" read
     by * break
 access to
-  dn.regex="^departmentNumber=([a-zA-Z0-9_.-]+),cn=people,ou=ae-dir$"
+  dn.regex="^departmentNumber=({{ aedir_aedept_deptnumber_regex }}),cn=people,ou=ae-dir$"
   filter="(objectClass=aeDept)"
     by group/aeGroup/member.expand="cn=people-zone-admins,cn=people,ou=ae-dir" write
     by group/aeGroup/member.expand="cn=people-zone-auditors,cn=people,ou=ae-dir" read
@@ -1054,6 +1057,16 @@ unique_uri "ldap:///{{ aedir_suffix }}?gidNumber?sub?(!(objectClass=posixAccount
 constraint_attribute
   host
   regex "^[a-zA-Z0-9.-]+$"
+
+constraint_attribute
+  uniqueIdentifier
+  regex "^{{ aedir_aeperson_uniqueid_regex }}$"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aePerson)"
+
+constraint_attribute
+  departmentNumber
+  regex "^{{ aedir_aedept_deptnumber_regex }}$"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeDept)"
 
 constraint_attribute
   uid
