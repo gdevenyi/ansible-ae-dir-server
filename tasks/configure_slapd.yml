@@ -91,7 +91,7 @@
     user: root
     cron_file: backup_slapd_database
     hour: "*/12"
-    job: "umask 077 ; {{ openldap_bin }}/ldapsearch -LLL -b 'cn=config' -s one olcSuffix '(olcSuffix=*)' olcSuffix|grep olcSuffix|cut -d' ' -f2 |xargs -n1 -isuffix {{ openldap_sbin }}/slapcat -b 'suffix' -l \"{{ openldap_data }}/suffix-$(date +%Y%m%d%H%M%S).ldif\" ; xz -9 {{ openldap_data }}/*.ldif"
+    job: "{{ openldap_backup_script }}"
   when: openldap_role == 'provider'
 
 # service defaults and service

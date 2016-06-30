@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# current timestamp
+DATETIME="$(date +%Y%m%d%H%M%S)"
+
+# strict permissions
+umask 077
+
+# slapcat all real database backends found
+{{ openldap_bin }}/ldapsearch \
+  -LLL \
+  -b 'cn=config' \
+  -s one olcSuffix '(olcSuffix=*)' \
+  olcSuffix | \
+  grep olcSuffix| \
+  cut -d' ' -f2 | \
+  xargs -n1 -isuffix \
+    {{ openldap_sbin }}/slapcat \
+      -b 'suffix' \
+      -l "{{ openldap_data }}/suffix-${DATETIME}.ldif"
+
+# compress all uncompressed LDIF files
+xz -9 {{ openldap_data }}/*.ldif

@@ -45,6 +45,7 @@
     mode: 0750
   with_items:
     - aeperson2aeuser.py
+    - ae-dir-slapcat.sh
 
 - name: Install CRON scripts from files
   copy:
