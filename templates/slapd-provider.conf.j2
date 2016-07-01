@@ -1169,7 +1169,7 @@ constraint_attribute
 # restrict references from personal user accounts to their person entries
 constraint_attribute
   aePerson
-  uri "ldap:///cn=people,{{ aedir_suffix }}?entryDN?one?(objectClass=aePerson)"
+  uri "ldap:///cn=people,{{ aedir_suffix }}?entryDN?sub?(objectClass=aePerson)"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeUser)"
 
 # restrict tag references
@@ -1212,7 +1212,7 @@ constraint_attribute
 # 'mail' the same in personal user accounts and referenced person entries
 constraint_attribute aePerson,mail set
   "this/aePerson/mail & this/mail"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeUser)"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(&(objectClass=aeUser)(!(objectClass=inetLocalMailRecipient)))"
 
 # 'givenName' the same in personal user accounts and referenced person entries
 constraint_attribute aePerson,givenName set
@@ -1234,20 +1234,15 @@ constraint_attribute uid,homeDirectory
   set "([/home/] + this/uid) & this/homeDirectory"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeUser)"
 
-# cn in personal user account must be composed based on "<givenName> <sn>"
-constraint_attribute cn,sn,givenName
-  set "(this/givenName + [ ] + this/sn) & this/cn"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeUser)"
-
 # displayName in personal user account must be composed based on "<cn> (<uid>/<uidNumber>)"
 constraint_attribute displayName,cn,uid,uidNumber
   set "(this/cn + [ (] + this/uid + [/] + this/uidNumber + [)]) & this/displayName"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeUser)"
 
-# cn in aePerson entry must be composed based on "<givenName> <sn>"
+# cn in aeUser or aePerson entry must be composed based on "<givenName> <sn>"
 constraint_attribute cn,sn,givenName
   set "(this/givenName + [ ] + this/sn) & this/cn"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aePerson)"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(|(objectClass=aePerson)(objectClass=aeUser))"
 
 # restrict memberUID to be consistent with group membership defined in member
 constraint_attribute memberUID,member
