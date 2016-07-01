@@ -354,6 +354,7 @@ class AEEntryDNAEPerson(DistinguishedName):
   desc = 'AE-DIR: entryDN of aePerson entry'
   ref_attrs = (
     ('aePerson',u'Users',None,u'Search all personal AE-DIR user accounts (aeUser entries) of this person'),
+    ('manager',u'Manages',None,u'Search all entries managed by this person'),
   )
 
 syntax_registry.registerAttrType(
@@ -868,13 +869,14 @@ syntax_registry.registerAttrType(
   structural_oc_oids=[AE_USER_OID], # aeUser
 )
 
+
 class AEDisplayNamePerson(DisplayNameInetOrgPerson):
   oid = 'AEDisplayNamePerson-oid'
   desc = 'Attribute displayName in object class aePerson'
   # do not stuff confidential employeeNumber herein!
   compose_templates = (
-    '{givenName} {sn} ({uniqueIdentifier}) / {ou}',
-    '{givenName} {sn} ({uniqueIdentifier}) / {departmentNumber}',
+    '{givenName} {sn} / {ou}',
+    '{givenName} {sn} / #{departmentNumber}',
     '{givenName} {sn} ({uniqueIdentifier})',
     '{givenName} {sn}',
   )
@@ -884,6 +886,37 @@ syntax_registry.registerAttrType(
     '2.16.840.1.113730.3.1.241', # displayName
   ],
   structural_oc_oids=[AE_PERSON_OID], # aePerson
+)
+
+
+class AEUniqueIdentifier(DirectoryString):
+  oid = 'AEUniqueIdentifier-oid'
+  maxValues = 1
+  gen_template = 'web2ldap-{timestamp}'
+
+  def transmute(self,attrValues):
+    if not attrValues or not attrValues[0].strip():
+      return [self.gen_template.format(timestamp=time.time())]
+    else:
+      return attrValues
+
+  def formField(self):
+    input_field = pyweblib.forms.HiddenInput(
+      self.attrType,
+      ': '.join([self.attrType,self.desc]),
+      self.maxLen,self.maxValues,None,
+      default=self.formValue()
+    )
+    input_field.charset = self._form.accept_charset
+    return input_field
+
+syntax_registry.registerAttrType(
+  AEUniqueIdentifier.oid,[
+    '0.9.2342.19200300.100.1.44', # uniqueIdentifier
+  ],
+  structural_oc_oids=[
+    AE_PERSON_OID, # aePerson
+  ]
 )
 
 
