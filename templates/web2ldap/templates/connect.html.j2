@@ -5,10 +5,15 @@ You reached web2ldap service <strong>{{ openldap_service_fqdn }}</strong> (runni
 {text_error}
 
 <h2>Normal use</h2>
-<p>
-  <a class="CommandLink" href="/web2ldap/searchform?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}????bindname=">Local &AElig;-DIR via LDAPI</a>
-  (if in doubt, click this!)
-</p>
+<ul>
+  <li>
+    <a class="CommandLink" href="/web2ldap/searchform?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}????bindname=">General administration</a>
+    on local &AElig;-DIR via LDAPI (if in doubt, click this!)
+  </li>
+  <li>
+    <a class="CommandLink" href="/web2ldap/passwd?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}????bindname=">Change own password</a>
+  </li>
+</ul>
 
 {% for role in ['provider', 'consumer'] %}
 <h2>&AElig;-DIR {{ role }}(s)</h2>
