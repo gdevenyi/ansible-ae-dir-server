@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-Generates a report of active aeUser entries and their aePerson attributes
+Generates a report of aePerson entries referenced by active aeUser entries
 """
 
 __version__ = '0.0.1'
@@ -71,34 +71,30 @@ msg_id = ldap_conn.search_ext(
     serverctrls = [DEREF_CONTROL],
 )
 
-user_dict = {}
+person_dict = {}
 
 for res_type, res_data, res_msgid, res_controls in ldap_conn.allresults(
     msg_id,
     add_ctrls=1
 ):
     for dn, entry, deref_control in res_data:
-        user_dict[dn] = dict([
-            (at,av[0])
-            for at,av in entry.items()
-        ])
         # process dn and entry
         if deref_control:
             deref_dn, deref_entry = deref_control[0].derefRes['aePerson'][0]
-            user_dict[dn].update(dict([
+            person_dict[deref_dn.lower()] = dict([
                 (at,av[0])
                 for at,av in deref_entry.items()
-            ]))
+            ])
 
 csv_writer = csv.DictWriter(
     sys.stdout,
-    USER_ATTRS+DEREF_PERSON_ATTRS,
+    DEREF_PERSON_ATTRS,
     dialect='excel'
 )
 csv_writer.writerow(
     dict([
         (at, at)
-        for at in USER_ATTRS+DEREF_PERSON_ATTRS
+        for at in DEREF_PERSON_ATTRS
     ])
 )
-csv_writer.writerows(user_dict.values())
+csv_writer.writerows(person_dict.values())
