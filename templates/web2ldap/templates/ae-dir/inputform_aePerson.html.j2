@@ -25,20 +25,6 @@
       <td>Given Name:</td>
       <td>%(givenName)s</td>
     </tr>
-    <tr>
-      <td>Title:</td>
-      <td>%(title)s</td>
-    </tr>
-    <tr>
-      <td>e-mail:</td>
-      <td>%(mail)s</td>
-    </tr>
-    <tr>
-      <td>Photo:</td>
-      <td>
-        %(jpegPhoto)s
-      </td>
-    </tr>
   </table>
 </fieldset>
 
@@ -91,7 +77,7 @@
 </fieldset>
 
 <fieldset>
-  <legend>Address</legend>
+  <legend>Address/location information</legend>
   <table summary="aePerson: Addresses">
     <tr>
       <td>Street:</td>
@@ -117,6 +103,10 @@
       <td>Country:</td>
       <td>%(c)s</td>
     </tr>
+    <tr>
+      <td>Room number:</td>
+      <td>%(roomNumber)s</td>
+    </tr>
   </table>
 </fieldset>
 
@@ -132,10 +122,6 @@
       <td>%(manager)s</td>
     </tr>
     <tr>
-      <td>Room number:</td>
-      <td>%(roomNumber)s</td>
-    </tr>
-    <tr>
       <td>Organization:</td>
       <td>%(o)s</td>
     </tr>
@@ -147,13 +133,31 @@
       <td>Department No.:</td>
       <td>%(departmentNumber)s</td>
     </tr>
+  </table>
+</fieldset>
+
+<fieldset>
+  <legend>Misc.</legend>
+  <table>
     <tr>
-      <td>Business category:</td>
-      <td>%(businessCategory)s</td>
+      <td>e-mail:</td>
+      <td>%(mail)s</td>
     </tr>
     <tr>
       <td>web page(s):</td>
       <td>%(labeledURI)s</td>
+    </tr>
+    <tr>
+      <td>Photo:</td>
+      <td>
+        %(jpegPhoto)s
+      </td>
+    </tr>
+    <tr>
+      <td>S/MIME certificate:</td>
+      <td>
+        %(userCertificate)s
+      </td>
     </tr>
   </table>
 </fieldset>
