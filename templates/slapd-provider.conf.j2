@@ -707,18 +707,18 @@ access to
 # Security zone cn=people
 #------------------------------------------------------------------
 
-# aePerson and aeDept entries solely beneath cn=people,ou=ae-dir
+# aePerson and aeDept entries solely beneath aeZone cn=people
 access to
-  dn.regex="^uniqueIdentifier=({{ aedir_aeperson_uniqueid_regex }}),cn=people,ou=ae-dir$"
+  dn.regex="^uniqueIdentifier=({{ aedir_aeperson_uniqueid_regex }}),cn=people,{{ aedir_suffix }}$"
   filter="(objectClass=aePerson)"
-    by group/aeGroup/member.expand="cn=people-zone-admins,cn=people,ou=ae-dir" write
-    by group/aeGroup/member.expand="cn=people-zone-auditors,cn=people,ou=ae-dir" read
+    by group/aeGroup/member.expand="cn=people-zone-admins,cn=people,{{ aedir_suffix }}" write
+    by group/aeGroup/member.expand="cn=people-zone-auditors,cn=people,{{ aedir_suffix }}" read
     by * break
 access to
-  dn.regex="^departmentNumber=({{ aedir_aedept_deptnumber_regex }}),cn=people,ou=ae-dir$"
+  dn.regex="^departmentNumber=({{ aedir_aedept_deptnumber_regex }}),cn=people,{{ aedir_suffix }}$"
   filter="(objectClass=aeDept)"
-    by group/aeGroup/member.expand="cn=people-zone-admins,cn=people,ou=ae-dir" write
-    by group/aeGroup/member.expand="cn=people-zone-auditors,cn=people,ou=ae-dir" read
+    by group/aeGroup/member.expand="cn=people-zone-admins,cn=people,{{ aedir_suffix }}" write
+    by group/aeGroup/member.expand="cn=people-zone-auditors,cn=people,{{ aedir_suffix }}" read
     by * break
 
 
@@ -1000,7 +1000,7 @@ access to
 access to
   filter="(objectClass=aePerson)"
     by set="user/aePerson & this/entryDN" read
-    by set="user/entryDN & ([ldap:///ou=ae-dir?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(member=] + user/entryDN + [))])/member" read
+    by set="user/entryDN & ([ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(member=] + user/entryDN + [))])/member" read
     by * none
 
 # Last catch ACLs
@@ -1049,7 +1049,9 @@ unique_uri "ldap:///{{ aedir_suffix }}?uid,uidNumber,homeDirectory?sub?(objectCl
 unique_uri "ldap:///{{ aedir_suffix }}?mailLocalAddress?sub?(objectClass=*)"
 unique_uri "ldap:///{{ aedir_suffix }}?seeAlso?sub?(objectClass=*)"
 unique_uri "ldap:///{{ aedir_suffix }}?ipHostNumber,host,aeFqdn?sub?(objectClass=*)"
-unique_uri "ldap:///ou=people,{{ aedir_suffix }}?employeeNumber,uniqueIdentifier,displayName?sub"
+unique_uri "ldap:///cn=people,{{ aedir_suffix }}?employeeNumber,uniqueIdentifier,displayName?sub"
+# only one primary aeUser entry per aePerson
+unique_uri "ldap:///cn={{ aedir_primary_user_zone }},{{ aedir_suffix }}?aePerson?sub"
 # these two constraints are only possible with a negation filter
 unique_uri "ldap:///{{ aedir_suffix }}?cn?sub?(!(|(objectClass=aePerson)(objectClass=aeUser)(objectClass=aeNwDevice)))"
 unique_uri "ldap:///{{ aedir_suffix }}?gidNumber?sub?(!(objectClass=posixAccount))"
