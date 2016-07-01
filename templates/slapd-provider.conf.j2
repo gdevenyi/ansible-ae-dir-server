@@ -1300,7 +1300,7 @@ constraint_attribute pwdPolicySubentry
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeUser)"
 constraint_attribute pwdPolicySubentry
   regex "^cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}$"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(|(objectClass=aeServer)(objectClass=aeService))"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(|(objectClass=aeHost)(objectClass=aeService))"
 constraint_attribute pwdPolicySubentry
   regex "^cn=ppolicy-otptokens,cn=ae,{{ aedir_suffix }}$"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=oathToken)"
