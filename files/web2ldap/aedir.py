@@ -188,17 +188,6 @@ syntax_registry.registerAttrType(
 )
 
 
-class AEUser(DynamicDNSelectList):
-  oid = 'AEUser-oid'
-  desc = 'AE-DIR: User'
-  ldap_url = 'ldap:///_?displayName?sub?(&(objectClass=aeUser)(aeStatus=0))'
-
-syntax_registry.registerAttrType(
-  AEUser.oid,[
-  ]
-)
-
-
 class AEHost(DynamicDNSelectList):
   oid = 'AEHost-oid'
   desc = 'AE-DIR: Host'
@@ -688,16 +677,22 @@ syntax_registry.registerAttrType(
 )
 
 
-class AEPersonAttribute(DirectoryString):
-  oid = 'AEPersonAttribute-oid'
+class AEDerefAttribute(DirectoryString):
+  oid = 'AEDerefAttribute-oid'
   maxValues = 1
+  deref_object_class = None
+  deref_attribute_type = None
+  deref_filter_tmpl = '(&(objectClass={deref_object_class})(aeStatus=0)({attribute_type}=*))'
 
   def _readPersonAttribute(self):
     try:
       ldap_result = self._ls.readEntry(
-        self._entry['aePerson'][0].decode(self._ls.charset),
+        self._entry[self.deref_attribute_type][0].decode(self._ls.charset),
         attrtype_list=[self.attrType],
-        search_filter='(&(objectClass=aePerson)(aeStatus=0)(%s=*))' % (self.attrType),
+        search_filter=self.deref_filter_tmpl.format(
+          deref_object_class=self.deref_object_class,
+          attribute_type=self.attrType,
+        ),
       )
     except ldap.LDAPError:
       result = None
@@ -710,7 +705,7 @@ class AEPersonAttribute(DirectoryString):
     return result
 
   def transmute(self,attrValues):
-    if 'aePerson' in self._entry:
+    if self.deref_attribute_type in self._entry:
       ae_person_attribute = self._readPersonAttribute()
       if ae_person_attribute!=None:
         result = [ae_person_attribute.encode(self._ls.charset)]
@@ -732,6 +727,13 @@ class AEPersonAttribute(DirectoryString):
     input_field.charset = self._form.accept_charset
     input_field.setDefault(self.formValue())
     return input_field
+
+
+class AEPersonAttribute(AEDerefAttribute):
+  oid = 'AEPersonAttribute-oid'
+  maxValues = 1
+  deref_object_class = 'aePerson'
+  deref_attribute_type = 'aePerson'
 
 
 class AEUserNames(AEPersonAttribute,DirectoryString):
@@ -758,6 +760,23 @@ syntax_registry.registerAttrType(
   ],
   structural_oc_oids=[
     AE_USER_OID, # aeUser
+  ],
+)
+
+
+class AEDeptAttribute(AEDerefAttribute,DirectoryString):
+  oid = 'AEDeptAttribute-oid'
+  maxValues = 1
+  deref_object_class = 'aeDept'
+  deref_attribute_type = 'aeDept'
+
+syntax_registry.registerAttrType(
+  AEDeptAttribute.oid,[
+    '2.16.840.1.113730.3.1.2', # departmentNumber
+    '2.5.4.11',                # ou, organizationalUnitName
+  ],
+  structural_oc_oids=[
+    AE_PERSON_OID, # aePerson
   ],
 )
 
@@ -854,6 +873,7 @@ class AEDisplayNamePerson(DisplayNameInetOrgPerson):
   desc = 'Attribute displayName in object class aePerson'
   # do not stuff confidential employeeNumber herein!
   compose_templates = (
+    '{givenName} {sn} ({uniqueIdentifier}) / {ou}',
     '{givenName} {sn} ({uniqueIdentifier}) / {departmentNumber}',
     '{givenName} {sn} ({uniqueIdentifier})',
     '{givenName} {sn}',
@@ -876,7 +896,6 @@ syntax_registry.registerAttrType(
     '2.16.840.1.113730.3.1.2', # departmentNumber
   ],
   structural_oc_oids=[
-    AE_PERSON_OID, # aePerson
     AE_DEPT_OID,   # aeDept
   ]
 )
