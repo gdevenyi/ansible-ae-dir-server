@@ -1,10 +1,11 @@
 <h1>{text_heading}</h1>
 
-You reached web2ldap service <strong>{{ openldap_service_fqdn }}</strong> (running on <em>{{ ansible_fqdn }}</em>)
-
 {text_error}
 
 <h2>Normal use</h2>
+<p>
+  You reached web2ldap service <strong>{{ openldap_service_fqdn }}</strong> (running on <em>{{ ansible_fqdn }}</em>)
+</p>
 <ul>
   <li>
     <a class="CommandLink" href="/web2ldap/searchform?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}????bindname=">General administration</a>
