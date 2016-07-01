@@ -90,6 +90,7 @@
     state: present
     user: root
     cron_file: backup_slapd_database
+    minute: "23"
     hour: "*/12"
     job: "{{ openldap_backup_script }}"
   when: openldap_role == 'provider'
