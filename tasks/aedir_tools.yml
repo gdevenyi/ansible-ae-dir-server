@@ -1,5 +1,5 @@
 ---
-# Install some AE-DIR tools
+# Install some AE-DIR script tools and documentation files
 
 - name: "Create directories for AE-DIR tools"
   file:
@@ -7,13 +7,25 @@
     state: directory
     owner: root
     group: root
-    mode: 0755
+    mode: u=rwx,g=rx,o=rx
   with_items:
     - "{{ aedir_prefix }}"
     - "{{ aedir_prefix }}/etc"
+    - "{{ aedir_prefix }}/htdocs"
+    - "{{ aedir_prefix }}/htdocs/reporting"
     - "{{ aedir_bin }}"
     - "{{ aedir_sbin }}"
     - "{{ aedir_rundir }}"
+
+- name: "copy AE-DIR HTML docs to {{ aedir_prefix }}/htdocs/"
+  copy:
+    src: "ae-dir-htdocs/"
+    dest: "{{ aedir_prefix }}/htdocs/"
+    follow: no
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+    directory_mode: u=rwx,g=rx,o=rx
 
 - name: "Create ae-dir-base.ldif"
   template:

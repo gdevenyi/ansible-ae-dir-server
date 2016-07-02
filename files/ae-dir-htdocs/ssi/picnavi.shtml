@@ -1,0 +1,9 @@
+<div id="picnavi">
+  <p>
+    <a href="<!--#echo encoding="none" var="picnavi_prev" -->">&laquo;</a>
+    |
+    <a href="<!--#echo encoding="none" var="picnavi_next" -->">&raquo;</a>
+    &nbsp;&nbsp;
+    <!--#echo encoding="none" var="head_title" -->
+  </p>
+</div>

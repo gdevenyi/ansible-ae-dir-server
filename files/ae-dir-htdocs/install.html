@@ -1,0 +1,91 @@
+<!--#set var="head_title" value="Installation" -->
+<!--#set var="head_pagedescription" value="Installation" -->
+<!--#set var="base_path" value="" -->
+<!--#include file="ssi/head.shtml" -->
+
+<h1 id="prerequisites">&AElig;-DIR server</h1>
+<ol>
+  <li>
+    Make yourself familiar with the
+    <a href="docs.html#sys-arch">system architecture</a>.
+  </li>
+  <li>
+    Install &AElig;-DIR servers with one of the supported operating
+    systems. Currently the ansible playbooks support fully automated
+    installation/configuration on&hellip;
+    <ul>
+      <li>
+        <a href="https://en.opensuse.org/openSUSE:Tumbleweed_installation">
+        openSUSE Tumbleweed</a>
+      </li>
+      <li>
+        <a href="https://www.debian.org/releases/jessie/">
+          Debian Jessie</a>
+        with OpenLDAP packages from
+        <a href="https://ltb-project.org/wiki/documentation/openldap-deb#apt_repository">
+          Debian APT repository of LTB project
+        </a>
+      </li>
+      <li>
+        Soon coming:
+        <a href="https://www.centos.org/">CentOS 7</a>
+        with OpenLDAP packages from
+        <a href="http://ltb-project.org/wiki/documentation/openldap-rpm#yum_repository">
+          YUM repository of LTB project
+        </a>
+      </li>
+    </ul>
+    If you want to tweak the ansible roles to install on another OS make
+    sure a recent <a href="http://www.openldap.org">OpenLDAP 2.4.44+</a>
+    build is available for your OS platform. Older releases are explicitly
+    not recommended!
+  </li>
+  <li>
+    Install on your admin workstation:
+    <ul>
+      <li>
+        <a href="http://docs.ansible.com/ansible/intro_installation.html">ansible 2.1.0.0+</a>
+      </li>
+      <li>
+        <a href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git">git</a>
+      </li>
+      <li>
+        <a href="http://www.dnspython.org">dnspython</a>
+      </li>
+    </ul>
+  </li>
+  <li>
+    Create DNS entries for all your &AElig;-DIR servers including correct
+    reverse DNS entries (PTR RRs)
+  </li>
+  <li>
+    Prepare to have SSH access to all &AElig;-DIR servers as user
+    <em>root</em> (via <code>su</code> or <code>sudo</code>) and make
+    yourself familiar with using
+    <a href="http://docs.ansible.com/ansible/become.html">ansible become</a>.
+  </li>
+  <li>
+    Issue X.509 TLS server certificates with appropriate <var>CN</var> and
+    <var>subjectAltName</var> values for all replicas with your existing
+    PKI's certificate authority
+  </li>
+  <li>
+    Get the ansible playbooks:
+    <pre>git clone https://ae-dir.com/git/ae-dir.git</pre>
+  </li>
+  <li>
+    Read and understand <code>ansible/README.md</code>.
+  </li>
+  <li>
+    Read comments in file
+    <code>ansible/roles/ae-dir-server/defaults/main.yml</code> and adjust
+    ansible group and host vars to match your environment.
+  </li>
+  <li>
+    Invoke ansible play in sub-directory <code>ansible/</code>
+    (here using command <code>su</code>):
+    <pre>ANSIBLE_HOSTS=hosts ansible-playbook ae-dir-servers.yml --become -K --become-method=su</pre>
+  </li>
+</ol>
+
+<!--#include file="ssi/footer.shtml" -->

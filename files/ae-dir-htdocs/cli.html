@@ -1,0 +1,57 @@
+<!--#set var="head_title" value="User Guide" -->
+<!--#set var="head_pagedescription" value="User guide for command-line tools" -->
+<!--#set var="base_path" value="" -->
+<!--#include file="ssi/head.shtml" -->
+
+<p>
+  Various command-line tools are installed on the provider systems
+  into directory <code>/opt/ae-dir/bin/</code>:
+</p>
+<dl>
+  <dt>ae-passwd.py</dt>
+  <dd>
+    Sets password of <em>aeUser</em>, <em>aeService</em> or <em>aeHost</em>
+  </dd>
+  <dt>ae-add-zone.py</dt>
+  <dd>
+    Adds new <em>aeZone</em> with the two standard <em>aeGroup</em> entries
+    for the zone admins and zone auditors.
+  </dd>
+</dl>
+
+<h1 id="ae-passwd">ae-passwd.py</h1>
+
+<p>Roles:</p>
+<ul>
+  <li><a href="docs.html#role-ae-admin">&AElig; Admin</a></li>
+</ul>
+
+<p>
+  Especially this tool is used when boot-strapping a new &AElig;-DIR
+  installation to set the password of the first
+  <a href="docs.html#role-ae-admin">&AElig; admin</a>.
+</p>
+<p>
+  Example usage setting password for user account:
+</p>
+<pre class="cli-ae-passwd-example">
+root@ae-dir-deb-p1:~# /opt/ae-dir/bin/ae-passwd.py bart
+new password for uid=bart,cn=ae,ou=ae-dir:
+repeat password:
+</pre>
+
+<h1 id="ae-add-zone">ae-add-zone.py</h1>
+
+<p>Roles:</p>
+<ul>
+  <li><a href="docs.html#role-ae-admin">&AElig; Admin</a></li>
+</ul>
+
+<p>
+  Example usage:
+</p>
+<pre class="cli-ae-add-zone-example">
+root@ae-dir-deb-p1:~# /opt/ae-dir/bin/ae-add-zone.py mike FOO-45 "Michael's testing playground"
+</pre>
+
+<!--#include file="ssi/footer.shtml" -->

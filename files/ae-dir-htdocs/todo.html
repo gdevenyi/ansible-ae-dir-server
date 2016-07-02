@@ -1,0 +1,162 @@
+<!--#set var="head_title" value="Next steps" -->
+<!--#set var="head_pagedescription" value="To-do items, ideas, next steps" -->
+<!--#set var="base_path" value="" -->
+<!--#include file="ssi/head.shtml" -->
+
+<p>
+  In no particular order:
+</p>
+
+<dl>
+
+  <dt id="monitoring">Monitoring</dt>
+  <dd>
+    <ul>
+      <li>
+        monitor whether PAM/NSS client still has valid configuration
+      </li>
+    </ul>
+  </dd>
+
+  <dt id="mfa-authc">Multi-factor authc</dt>
+  <dd>
+    <ul>
+      <li>
+        integrate <a href="http://ldapcon.org/2015/?page_id=185">OATH-LDAP</a>
+      </li>
+    </ul>
+  </dd>
+
+  <dt id="pxe">PXE/DHCP/TFTP integration</dt>
+  <dd>
+    <ul>
+      <li>
+        Extend Python demon implementations to look up correct boot config
+        in &AElig;-DIR (e.g. <a href="https://github.com/mpetazzoni/ptftpd">ptftpd</a>)
+      </li>
+      <li>
+        make use of <a href="docs.html#schema-oc-aeNwDevice">aeNwDevice</a>
+      </li>
+    </ul>
+  </dd>
+
+  <dt id="nac">Network Access Control</dt>
+  <dd>
+    <ul>
+      <li>
+        <a href="http://freeradius.org/">direct FreeRADIUS integration</a>
+      </li>
+      <li>
+        make use of <a href="docs.html#schema-oc-aeNwDevice">aeNwDevice</a>
+      </li>
+    </ul>
+  </dd>
+
+  <dt id="sso">WebSSO / SAML</dt>
+  <dd>
+    <ul>
+      <li>
+        WebSSO with CAS protocol
+      </li>
+      <li>
+        SAML 2.0 support (based on
+        <a href="https://pypi.python.org/pypi/pysaml2">pysaml2</a> or
+        <a href="https://shibboleth.net/">Shibboleth</a>)
+      </li>
+    </ul>
+  </dd>
+
+  <dt id="pki">X.509 PKI</dt>
+  <dd>
+    <ul>
+      <li>
+        Issue server certs to
+        <a href="docs.html#schema-oc-aeHost">aeHost</var>,
+        <a href="docs.html#schema-oc-aeService">aeService</a> or
+        <a href="docs.html#schema-oc-aeSrvGroup">aeSrvGroup</a>
+        based on authorization of role
+        <a href="docs.html#role-setup-admins">Setup Admins</a>
+      </li>
+      <li>
+        direct ansible integration for server cert enrollment
+      </li>
+      <li>
+        X.509 cert enrollment for <a href="docs.html#schema-oc-aeUser">aeUser</a>
+        with <a href="#mfa-authc">multi-factor authc</a>
+      </li>
+      <li>
+        use X.509 certs as SSH authorized keys instead of attribute
+        <var>sshPublicKey</var>
+      </li>
+    </ul>
+  </dd>
+
+  <dt id="ansible">ansible</dt>
+  <dd>
+    <ul>
+      <li>
+        Automated authentication configuration (set <var>userPassword</var>) for
+        <a href="docs.html#schema-oc-aeHost">aeHost</a> and
+        <a href="docs.html#schema-oc-aeService">aeService</a>
+      </li>
+      <li>
+        <a
+        href="http://docs.ansible.com/ansible/developing_inventory.html">
+        Dynamic inventory</a> module for accessing attributes in
+        &AElig;-DIR entries
+      </li>
+    </ul>
+  </dd>
+
+  <dt id="ae-dir-demon">PAM/NSS caching demon</dt>
+  <dd>
+    <ul>
+      <li>
+        <dl>
+          <dt>Improve Performance</dt>
+          <dd>
+            &AElig;-DIR-specific caching demon knows the data can search
+            more efficiently without a-priori configuration
+          </dd>
+          <dt>Automation / Recovery on error</dt>
+          <dd>
+            special system user for
+            <a href="docs.html#schema-oc-aeHost">aeHost</a> with host
+            password allowed to set system password in local configuration
+          </dd>
+        </dl>
+      </li>
+      <li>
+        use PAM/NSS frontend modules of
+        <a href="https://arthurdejong.org/nss-pam-ldapd/">nss-pam-ldapd</a>
+      </li>
+      <li>
+        eventually fix and extend Arthur's
+        <a href="https://arthurdejong.org/nss-pam-ldapd/pynslcd.8">pynslcd(8)</a>
+      </li>
+      <li>
+        Use X.509 TLS client certs for authc with LDAP SASL bind
+        with <var>EXTERNAL</var> mech
+      </li>
+    </ul>
+  </dd>
+
+  <dt id="ui">User Interface</dt>
+  <dd>
+    <ul>
+      <li>
+        specific web application for administrative use-cases
+      </li>
+      <li>
+        Python / flask / WTForms&hellip;
+      </li>
+    </ul>
+  </dd>
+
+</dl>
+
+<p>
+  This list is already pretty long&hellip;
+</p>
+
+<!--#include file="ssi/footer.shtml" -->

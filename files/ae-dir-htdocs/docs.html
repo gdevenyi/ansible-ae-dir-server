@@ -1,0 +1,1073 @@
+<!--#set var="head_title" value="Documentation" -->
+<!--#set var="head_pagedescription" value="Documentation" -->
+<!--#set var="base_path" value="" -->
+<!--#include file="ssi/head.shtml" -->
+
+<ol>
+  <li><a href="#sys-arch">System architecture</a></li>
+  <li><a href="#roles">Roles and Access Rights</a></li>
+  <li><a href="#dit">Directory Information Tree (DIT)</a></li>
+  <li><a href="#eer">Entity Relationship</a></li>
+  <li><a href="#schema">Schema</a></li>
+  <li><a href="#slapd.access">Access control</a></li>
+  <li><a href="#slapd.conf">OpenLDAP configuration (slapd.conf)</a></li>
+</ol>
+
+<h1 id="sys-arch">System architecture</h1>
+
+<p>
+  <img
+    class="svg_image"
+    src="img/arch.svg"
+    title="&AElig;-DIR overall system architecture"
+  >
+</p>
+
+<h2 id="sys-provider">&AElig;-DIR provider</h2>
+<p>
+  <img
+    class="svg_image"
+    src="img/slapd-provider.svg"
+    title="&AElig;-DIR overall system architecture"
+  >
+</p>
+
+<h2 id="sys-consumer">&AElig;-DIR consumer</h2>
+<p>
+</p>
+
+<h1 id="roles">Roles and Access Rights</h1>
+<p>
+  This chapter gives a high-level overview over the different roles and
+  their access rights in &AElig;-DIR. See chapter
+  <a href="#slapd.access">Access control</a> for details.
+</p>
+
+<h2 id="role-ae-admin">&AElig; Admin</h2>
+<p>
+  <em>&AElig; admins</em> (role assigned by membership in group
+  <em>ae-admins</em>) directly manage all &AElig;-DIR systems and therefore
+  have full write access (including <var>manage</var> privilege) to all LDAP
+  entries. Furthermore this role has full read access to the audit
+  database.
+</p>
+<p>
+  Typically the &AElig; admins are not expected to know the systems
+  attached to &AElig;-DIR or the users in detail. Therefore &AElig; admins are
+  adviced not to perform daily maintenance tasks except those directly
+  related to &AElig;-DIR systems (e.g. adding new zones).
+</p>
+
+<h2 id="role-ae-auditor">&AElig; Auditor</h2>
+<p>
+  <em>&AElig; auditors</em> (role assigned by membership in group
+  <em>ae-auditors</em>) have full read access to all LDAP entries including
+  the audit database. Even when added to another user group members of
+  group <em>ae-auditors</em> will not gain any write access.
+</p>
+
+<h2 id="role-zone-admin">Zone Admin</h2>
+<p>
+  <em>Zone admins</em> have full write access (but no <var>manage</var>
+  privilege) to all entries within a zone. The role is assigned to a user
+  account by adding it to the group <var>[zone name]-zone-admins</var>).
+  Typically zone admins perform the daily maintenance tasks, e.g.
+  adding/modifying personal and system user accounts, adding/modifying user
+  and service groups, help users with password reset procedure.
+</p>
+
+<h2 id="role-zone-auditor">Zone Auditor</h2>
+<p>
+  <em>Zone auditors</em> have full read access to all entries within a zone.
+  The role is assigned to a user account by adding it to the group
+  <var>[zone name]-zone-auditors</var>).
+</p>
+
+<h2 id="role-setup-admin">Setup Admin</h2>
+<p>
+  <em>Setup admins</em> can maintain (add/modify/delete) member
+  hosts/services of a service group typically while setting up a
+  hosts/services instances. They can read but not write the service group
+  entry. Especially the setup admins set passwords for hosts/services.
+  The role is assigned by adding a user to a user group referenced in
+  attribute <var>aeSetupGroups</var> in the service group.
+</p>
+
+<h2 id="role-ae-user">&AElig; User</h2>
+<p>
+  Normal <em>&AElig; users</em> can read their own person and user entries
+  and all user entries which are in at least one common user group.
+  Users can set their own password but not read it.
+</p>
+
+<h2 id="role-ae-replica">&AElig; Replica</h2>
+<p>
+  The system role <em>&AElig; replicas</em> (role assigned by membership in
+  group <em>ae-replicas</em>) can read all entries including
+  <var>userPassword</var> except some sensitive attributes only used on
+  &AElig; providers.
+</p>
+
+<h2 id="role-ae-provider">&AElig; Provider</h2>
+<p>
+  The system role <em>&AElig; providers</em> (role assigned by membership
+  in group <em>ae-providers</em>). Additionally to the rights assigned to
+  role <em>&AElig; replicas</em> this role has read access also to some
+  more credential attributes.
+</p>
+
+<h1 id="dit">Directory Information Tree (DIT)</h1>
+<p>
+  The following diagram illustrates the directory information tree (DIT)
+  structure of Æ-DIR. The nodes contain the <em>relative distinguished
+  name</em> (RDN) and the <a href="#schema-soc">structural object class</a>
+  used for that entry.
+  The tree structure is also formally specified (within web2ldap's
+  configuration) with DIT structure rules and name forms.
+</p>
+<p>
+  <img
+    class="svg_image"
+    src="img/dit.svg"
+    title="graph of &AElig;-DIR tree structure"
+  >
+</p>
+
+<h2 id="dit-zone-ae">cn=ae,ou=ae-dir</h2>
+<p>
+  Zone <em>ae</em> is used for administration of &AElig;-DIR itself.
+</p>
+<p>
+  <img
+    class="svg_image"
+    src="img/dit-zone-ae.svg"
+    title="sub-tree structure of zone ae"
+  >
+</p>
+
+<h2 id="dit-zone-people">cn=people,ou=ae-dir</h2>
+<p>
+  Zone <em>people</em> is used for maintaining <var>aePerson</var> entries
+  synced with a HR system or similar.
+</p>
+
+<h2 id="dit-zone-pub">cn=pub,ou=ae-dir</h2>
+<p>
+  Zone <em>pub</em> contains entries which are globally readable by all
+  clients.
+</p>
+
+<h1 id="eer">Entity Relationship</h1>
+<p>
+  <img
+    class="svg_image"
+    src="img/eer.svg"
+    title="entity relationship diagram"
+  >
+</p>
+
+<h1 id="schema">Schema</h1>
+
+<h2 id="schema-soc">Structural Object Classes</h2>
+
+<p>
+  For each entity in &AElig;-DIR there is a distinct
+  <em>structural object class</em>. All are derived from multiple abstract
+  and structural object classes defined in various other standards.
+</p>
+
+<p>
+  <img
+    class="svg_image"
+    src="img/object_classes_graph.svg"
+    title="graph of AE-DIR's structural object classes"
+  >
+</p>
+
+<p>
+  The structural object classes are also referenced in the accompanying&hellip;
+</p>
+<ul>
+  <li>
+    DIT content rules using <var>NOT</var> and <var>AUX</var>
+    (see <a href="https://tools.ietf.org/html/rfc4512#section-4.1.6">RFC 4512 section 4.1.6</a>)
+  </li>
+  <li>
+    DIT structure rules and name forms for enforcing the <a href="#dit">DIT</a>
+    (see <a href="https://tools.ietf.org/html/rfc4512#section-4.1.7">RFC 4512 section 4.1.7</a>)
+  </li>
+  <li>
+    constraints enforcing the entity relationship
+    (see <a href="#eer">EER</a>)
+  </li>
+</ul>
+
+<table id="schema-soc-table">
+  <tr>
+    <th>NAME</th>
+    <th>RDN</th>
+    <th>DESC</th>
+    <th>SUP</th>
+    <th>AUX</th>
+  </tr>
+  <tr>
+    <th><a href="#schema-oc-aeRoot">aeRoot</a></th>
+    <td>ou</td>
+    <td>root entry of &AElig;-DIR tree</td>
+    <td>
+      <ul>
+        <li>organizationalUnit</li>
+        <li><a href="#schema-oc-aeObject">aeObject</a></li>
+      </ul>
+    </td>
+    <td>aePosixIdRanges</td>
+  </tr>
+  <tr>
+    <th><a href="#schema-oc-aeDept">aeDept</a></th>
+    <td>departmentNumber</td>
+    <td>department</td>
+    <td>
+      <ul>
+        <li>organizationalUnit</li>
+        <li><a href="#schema-oc-aeObject">aeObject</a></li>
+      </ul>
+    </td>
+    <td>labeledURIObject</td>
+  </tr>
+  <tr>
+    <th><a href="#schema-oc-aeObject">aeObject</a></th>
+    <td>-/-</td>
+    <td>abstract meta class</td>
+    <td></td>
+    <td>-/-</td>
+  </tr>
+  <tr>
+    <th><a href="#schema-oc-aeTag">aeTag</a></th>
+    <td>cn</td>
+    <td>tag name-description mapping</td>
+    <td>namedObject</td>
+    <td>-/-</td>
+  </tr>
+  <tr>
+    <th><a href="#schema-oc-aeZone">aeZone</a></th>
+    <td>cn</td>
+    <td>zone (delegation container)</td>
+    <td>
+      <ul>
+        <li><a href="#schema-oc-aeObject">aeObject</a></li>
+        <li>namedObject</li>
+      </ul>
+    </td>
+    <td>aePosixIdRanges</td>
+  </tr>
+  <tr>
+    <th><a href="#schema-oc-aePerson">aePerson</a></th>
+    <td>uniqueIdentifier</td>
+    <td>personal information</td>
+    <td>
+      <ul>
+        <li><a href="#schema-oc-aeObject">aeObject</a></li>
+        <li>inetOrgPerson</li>
+      </ul>
+    </td>
+    <td>msPerson</td>
+  </tr>
+  <tr>
+    <th><a href="#schema-oc-aeUser">aeUser</a></th>
+    <td>uid</td>
+    <td>personal user account</td>
+    <td>
+      <ul>
+        <li><a href="#schema-oc-aeObject">aeObject</a></li>
+        <li>account</li>
+        <li>inetOrgPerson</li>
+      </ul>
+    </td>
+    <td>
+      <ul>
+        <li><a href="#schema-oc-posixAccount">posixAccount</a></li>
+        <li><a href="#schema-oc-inetLocalMailRecipient">inetLocalMailRecipient</a></li>
+        <li><a href="#schema-oc-pkiUser">pkiUser</a></li>
+        <li>ldapPublicKey</li>
+        <li>msPwdResetObject</li>
+        <li>oathHOTPUser</li>
+        <li>oathTOTPUser</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <th><a href="#schema-oc-aeGroup">aeGroup</a></th>
+    <td>cn</td>
+    <td>user group</td>
+    <td>
+      <ul>
+        <li><a href="#schema-oc-aeObject">aeObject</a></li>
+        <li>groupOfEntries</li>
+        <li>groupOfURLs</li>
+        <li><a href="#schema-oc-posixGroup">posixGroup</a></li>
+      </ul>
+    </td>
+    <td>-/-</td>
+  </tr>
+  <tr>
+    <th><a href="#schema-oc-aeSrvGroup">aeSrvGroup</a></th>
+    <td>cn</td>
+    <td>host/service group</td>
+    <td>
+      <ul>
+        <li>namedObject</li>
+        <li><a href="#schema-oc-aeObject">aeObject</a></li>
+      </ul>
+    </td>
+    <td>-/-</td>
+  </tr>
+  <tr>
+    <th><a href="#schema-oc-aeService">aeService</a></th>
+    <td>uid</td>
+    <td>service user account</td>
+    <td>
+      <ul>
+        <li><a href="#schema-oc-aeObject">aeObject</a></li>
+        <li>account</li>
+      </ul>
+    </td>
+    <td>
+      <ul>
+        <li><a href="#schema-oc-posixAccount">posixAccount</a></li>
+        <li><a href="#schema-oc-inetLocalMailRecipient">inetLocalMailRecipient</a></li>
+        <li><a href="#schema-oc-pkiUser">pkiUser</a></li>
+        <li>ldapPublicKey</li>
+        <li>oathHOTPUser</li>
+        <li>oathTOTPUser</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <th><a href="#schema-oc-aeHost">aeHost</a></th>
+    <td>host</td>
+    <td>host information and for host authentication</td>
+    <td>aeDevice</td>
+    <td>
+      <ul>
+        <li><a href="#schema-oc-posixAccount">posixAccount</a></li>
+        <li>ldapPublicKey</li>
+        <li><a href="#schema-oc-pkiUser">pkiUser</a></li>
+        <li>ipHost</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <th><a href="#schema-oc-aeNwDevice">aeNwDevice</a></th>
+    <td>cn</td>
+    <td>Network device information</td>
+    <td>aeDevice</td>
+    <td>
+      <ul>
+        <li>ipHost</li>
+        <li>ieee802Device</li>
+        <li>bootableDevice</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <th><a href="#schema-oc-aeSudoRule">aeSudoRule</a></th>
+    <td>cn</td>
+    <td>sudoers entry</td>
+    <td>sudoRole</td>
+    <td>-/-</td>
+  </tr>
+</table>
+
+<h3 id="schema-oc-aeObject">aeObject</h3>
+<p>
+  <var>aeObject</var> is an <em>abstract object class</em>, which only
+  contains some common meta data attributes, to be available in all
+  entries as described in the following list:
+</p>
+<dl id="schema-oc-aeObject-attributes">
+  <dt>
+    description
+  </dt>
+  <dd>
+    Must / should contain short description of the purpose / reason /
+    usage of an entry. Especially this attribute is very often displayed
+    as pop-up title in <a href="user.html#web2ldap">web2ldap</a>.
+  </dd>
+  <dt>
+    aeStatus
+  </dt>
+  <dd>
+    The current status of an entry:
+    <table>
+      <tr>
+        <th>Value</th>
+        <th>Meaning</th>
+        <th>Usage</th>
+      </tr>
+      <tr>
+        <th>-1</th>
+        <td>requested</td>
+        <td>
+          Especially useful for adding an entry without making it
+          directly usable, e.g. in case a confirmation is needed.
+        </td>
+      </tr>
+      <tr>
+        <th>0</th>
+        <td>active</td>
+        <td>
+          In this state an entry is visible depending on the normal ACLs.
+        </td>
+      </tr>
+      <tr>
+        <th>1</th>
+        <td>deactivated</td>
+        <td>
+          In this state an entry is still visible for zone
+          admins/auditors but is not usable on systems/services. The
+          entry can be set to <var>active</var> by zone admins if no
+          other constraint disallows it.
+        </td>
+      </tr>
+      <tr>
+        <th>2</th>
+        <td>archived</td>
+        <td>
+          In this state an entry is invisible even for zone
+          admins/auditors and some attributes might already been stripped
+          off due to privacy regulations.
+        </td>
+      </tr>
+    </table>
+    <img
+      src="img/aeStatus-graph.svg"
+      title="finite state machine of attribute <em>aeStatus</em>"
+    >
+  </dd>
+  <dt>
+    aeTicketId
+  </dt>
+  <dd>
+    This attribute is used to record the bug/issue tracker ID of the last
+    change applied to an entry.
+  </dd>
+  <dt>
+    notBefore
+  </dt>
+  <dd>
+    The entry must not be actively used before this timestamp.
+  </dd>
+  <dt>
+    notAfter
+  </dt>
+  <dd>
+    The entry must not be actively used after this timestamp.
+  </dd>
+  <dt>
+    aeTag
+  </dt>
+  <dd>
+    This attribute contains names (attribute <var>cn</var>) of
+    <var>aeTag</var> entries useful for marking various entries across
+    zones or other boundaries. This eases searching for entries which are
+    used together to provide a certain service.
+  </dd>
+</dl>
+
+<h3 id="schema-oc-aeRoot">aeRoot</h3>
+<p>
+  The object class <var>aeRoot</var> is solely used for locating an
+  &AElig;-DIR tree within another tree of other entries. Especially it also
+  serves as start point to &AElig;-DIR's specific DIT structure rules and
+  name forms.
+</p>
+<dl id="schema-oc-aeRoot-attributes">
+  <dt>
+    description
+  </dt>
+  <dd>
+    set to &quot;&AElig;-DIR - Authorized Entities Directory&quot;
+  </dd>
+  <dt>ou</dt>
+  <dd>
+    set to &quot;ae-dir&quot;
+  </dd>
+  <dt>meta attributes</dt>
+  <dd>see <a href="#schema-oc-aeObject-attributes">aeObject</a></dd>
+</dl>
+
+<h3 id="schema-oc-aeDept">aeDept</h3>
+<p>
+  The object class <var>aeDept</var> is used for department entries.
+</p>
+<dl id="schema-oc-aeDept-attributes">
+  <dt>
+    departmentNumber
+  </dt>
+  <dt>
+    ou
+  </dt>
+  <dd>
+    Name of department / organizational unit
+  </dd>
+  <dd>
+    Unique identifier for department / organizational unit
+  </dd>
+  <dt>organizationalUnit attributes</dt>
+  <dd>see <a href="https://tools.ietf.org/html/rfc4519#section-3.11">RFC 4519: organizationalUnit</a></dd>
+  <dt>meta attributes</dt>
+  <dd>see <a href="#schema-oc-aeObject-attributes">aeObject</a></dd>
+</dl>
+
+<h3 id="schema-oc-aeTag">aeTag</h3>
+<p>
+  The structural object class <var>aeTag</var> is used to create tagging
+  entries mapping an arbitrary name (RFN attribute <var>cn</var>) to a
+  meaningful usage definition in attribute <var>description</var>.
+</p>
+<dl id="schema-oc-aeTag-attributes">
+  <dt>
+    description
+  </dt>
+  <dd>
+    Must contain short description of the purpose / meaning of a tag.
+  </dd>
+  <dt>cn</dt>
+  <dd>
+    Name of the tag.
+  </dd>
+  <dt>meta attributes</dt>
+  <dd>see <a href="#schema-oc-aeObject-attributes">aeObject</a></dd>
+</dl>
+
+<h3 id="schema-oc-aeZone">aeZone</h3>
+<p>
+  Entries of object class <var>aeZone</var> are simply used as container for delegated administration.
+  Besides the meta attributes and the zone name in attribute <var>cn</var> for forming the
+  RDN there are no other attributes therein.
+</p>
+<dl id="schema-oc-aeZone-attributes">
+  <dt>cn</dt>
+  <dd>
+    Name of the zone.
+    For the sake of clarity the value in <var>cn</var> must also be used as
+    prefix of attribute <var>cn</var> in these subordinate entries:
+    <ul>
+      <li>aeGroup</li>
+      <li>aeSrvGroup</li>
+      <li>aeSudoRule</li>
+      <li>aeTag</li>
+    </ul>
+  </dd>
+  <dt>meta attributes</dt>
+  <dd>see <a href="#schema-oc-aeObject-attributes">aeObject</a></dd>
+</dl>
+
+<h3 id="schema-oc-aePerson">aePerson</h3>
+<p>
+  Person entries are added using object class <var>aePerson</var>.
+  Note that such an entry is not a user account and thus cannot
+  authenticate to a the directory.
+  Typically <var>aePerson</var> are synchronized from a human resource (HR)
+  or a customer relationship management (CRM) database or similar.
+</p>
+<dl id="schema-oc-aePerson-attributes">
+  <dt>uniqueIdentifier</dt>
+  <dd>
+    Unique primary key possibly used for synchronisation.
+    This attribute is readable to various roles.
+  </dd>
+  <dt>employeeNumber</dt>
+  <dd>
+    Another unique primary key possibly used for synchronisation but
+    subject to stricter access control due to privacy regulations for HR
+    databases.
+  </dd>
+  <dt>inetOrgPerson attributes</dt>
+  <dd>
+    A limited subset of the widely used attributes defined in
+    <a href="https://tools.ietf.org/html/rfc2798">RFC 2798</a>.
+  </dd>
+  <dt>meta attributes</dt>
+  <dd>see <a href="#schema-oc-aeObject-attributes">aeObject</a></dd>
+</dl>
+
+<h3 id="schema-oc-aeUser">aeUser</h3>
+<p>
+  Accounts for persons are created by using object class <var>aeUser</var>.
+  For compability reasons with existing software <var>aeUser</var> is
+  derived from the superior object classes <var>account</var> and
+  <var>inetOrgPerson</var>.
+  This object class <strong>should not</strong> be used when creating
+  system/service/tool accounts.
+</p>
+<dl id="schema-oc-aeUser-attributes">
+  <dt>uid</dt>
+  <dd>
+    unique username / user-ID of the personal account
+  </dd>
+  <dt>aePerson</dt>
+  <dd>
+    DN of the associated <var>aePerson</var> entry
+  </dd>
+  <dt>aePerson attributes</dt>
+  <dd>
+    The following name attributes values are copied from the accompanying
+    <var>aePerson</var> name attributes:
+    <ul>
+      <li>sn</li>
+      <li>givenName</li>
+      <li>cn</li>
+      <li>mail</li>
+    </ul>
+  </dd>
+  <dt>meta attributes</dt>
+  <dd>see <a href="#schema-oc-aeObject-attributes">aeObject</a></dd>
+</dl>
+
+<h3 id="schema-oc-aeGroup">aeGroup</h3>
+<p>
+  User groups are created using object class <var>aeGroup</var>. This
+  hybrid group object class is derived from two structural group object
+  classes:
+</p>
+<dl>
+  <dt>groupOfEntries</dt>
+  <dd>
+    replacement for <var>groupOfNames</var> which permits empty groups
+    (see <a href="https://tools.ietf.org/html/draft-findlay-ldap-groupofentries">draft-findlay-ldap-groupofentries</a>)
+  </dd>
+  <dt>posixGroup</dt>
+  <dd>
+    multiple attributes required for POSIX groups used for Unixoid operating systems
+    (see <a href="https://tools.ietf.org/html/rfc2307">RFC 2307</a>)
+  </dd>
+</dl>
+<p>
+  The following attributes are used in <var>aeGroup</var> entries:
+</p>
+<dl id="schema-oc-aeGroup-attributes">
+  <dt>cn</dt>
+  <dd>
+    unique group name
+  </dd>
+  <dt>gidNumber</dt>
+  <dd>
+    unique numerical POSIX GID for the group
+  </dd>
+  <dt>member</dt>
+  <dd>
+    Distinguished names of all member entries
+  </dd>
+  <dt>memberUID</dt>
+  <dd>
+    <var>uid</var> values of all member entries
+  </dd>
+  <dt>meta attributes</dt>
+  <dd>see <a href="#schema-oc-aeObject-attributes">aeObject</a></dd>
+</dl>
+
+<h3 id="schema-oc-aeSrvGroup">aeSrvGroup</h3>
+<p>
+  All hosts and systems providing a login service must be member of a
+  service group for which entries are created with object class
+  <var>aeSrvGroup</var> and contain the following attributes:
+</p>
+<dl id="schema-oc-aeSrvGroup-attributes">
+  <dt>cn</dt>
+  <dd>
+    unique service group name
+  </dd>
+  <dt>aeLoginGroups</dt>
+  <dd>
+    Distinguished names of all <var>aeGroup</var> entries which's members
+    have the right to login to the members of the service group
+  </dd>
+  <dt>aeLogStoreGroups</dt>
+  <dd>
+    Distinguished names of all <var>aeGroup</var> entries which's members
+    have the right to access the centrally stored logs of the members of
+    the service group
+  </dd>
+  <dt>aeLogStorePeriod</dt>
+  <dd>
+  </dd>
+  <dt>aeProxyFor</dt>
+  <dd>
+    Distinguished names of all <var>aeSrvGroup</var> for which this service
+    group acts as proxy (must be within same zone)
+  </dd>
+  <dt>aeSetupGroups</dt>
+  <dd>
+    Distinguished names of all <var>aeGroup</var> entries which's members
+    have the right to setup the members of the service group
+  </dd>
+  <dt>aeVisibleGroups</dt>
+  <dd>
+    Distinguished names of all <var>aeGroup</var> entries visible with
+    their member accounts on all members of the service group
+  </dd>
+  <dt>aeVisibleSudoers</dt>
+  <dd>
+    Distinguished names of all <var>aeSudoRule</var> entries visible
+    on all members of the service group
+  </dd>
+  <dt>meta attributes</dt>
+  <dd>see <a href="#schema-oc-aeObject-attributes">aeObject</a></dd>
+</dl>
+
+<h3 id="schema-oc-aeSudoRule">aeSudoRule</h3>
+
+<p>
+  <em>sudoers</em> rules are stored in entries of object class
+  <var>aeSudoRule</var>. The attributes are compatible to those defined for
+  <em>sudo-ldap</em> plus the meta information of <var>aeObject</var> and
+  some constraints.
+</p>
+<dl id="schema-oc-aeSudoRule-attributes">
+  <dt>cn</dt>
+  <dd>
+    unique rule name
+  </dd>
+  <dt>sudo-ldap attributes</dt>
+  <dd>
+    See <em>sudo-ldap</em> documentation:
+    <ul>
+      <li>
+        <a href="https://www.sudo.ws/readme_ldap.html">Sudo README.LDAP File</a>
+      </li>
+      <li>
+        <a href="https://www.sudo.ws/man/sudoers.ldap.man.html">SUDOERS.LDAP(5)</a>
+      </li>
+    </ul>
+    The attribute <var>sudoUser</var> must only contain the name
+    of a group (<var>cn</var> of an <var>aeGroup</var> entry) prefixed with '%'.<br>
+  </dd>
+  <dt>meta attributes</dt>
+  <dd>see <a href="#schema-oc-aeObject-attributes">aeObject</a></dd>
+</dl>
+
+
+<h3 id="schema-oc-aeService">aeService</h3>
+<p>
+  Object class <var>aeService</var> is used for creating accounts for
+  services (sometimes called tool accounts or similar).
+  The service must authenticate by using bind-DN/password or TLS client cert.
+  So Those entries may
+  have a password to authenticate to &AElig;-DIR. X.509 client certificate(s)
+  may be associated by using AUX object class <var>pkiUser</var> and
+  setting the attribute <var>seeAlso</var> to the client certs subject-DN.
+</p>
+<p>
+  Two possible usage types (roles):
+</p>
+<ul>
+  <li>
+    Member of <var>aeGroup</var> to access other resources as client
+    (similar to <var>aeUser</var> for humans).
+  </li>
+  <li>
+    Member of <var>aeSrvGroup</var> to access user/group information when
+    providing a service to users.
+  </li>
+</ul>
+<dl id="schema-oc-aeService-attributes">
+  <dt>uid</dt>
+  <dd>
+    unique username / user-ID of the system account
+  </dd>
+  <dt>cn</dt>
+  <dd>
+    unique service name
+  </dd>
+  <dt>aeSrvGroup</dt>
+  <dd>
+    distinguished names of <var>aeSrvGroup</var> entries this service is also
+    member of
+  </dd>
+  <dt>aeHost</dt>
+  <dd>
+    distinguished name of <var>aeHost</var> entry for the system this
+    service is running on
+  </dd>
+  <dt>meta attributes</dt>
+  <dd>see <a href="#schema-oc-aeObject-attributes">aeObject</a></dd>
+</dl>
+
+<h3 id="schema-oc-aeHost">aeHost</h3>
+<p>
+  Object class <var>aeHost</var> for host systems with login service for
+  the operating system on this host.
+</p>
+<ul>
+  <li>
+    Hosts are at least member of the superior <var>aeSrvGroup</var> entry.
+  </li>
+  <li>
+    Hosts can be member of other <var>aeSrvGroup</var> entries by adding
+    those to the <var>aeSrvGroup</var> attribute.
+  </li>
+  <li>
+    Hosts must not be a member of <var>aeGroup</var> entry.
+  </li>
+  <li>
+    The host must authenticate by using bind-DN/password or TLS client cert.
+  </li>
+  <li>
+    Entries may have a password to authenticate to &AElig;-DIR.
+  </li>
+  <li>
+    X.509 client certificate(s) may be associated by using AUX object class
+    <var>pkiUser</var> and setting the attribute <var>seeAlso</var> to the
+    client certs subject-DN.
+  </li>
+  <li>
+    SSH host keys may be associated by using AUX object class
+    <var>ldapPublicKey</var> and setting the attribute <var>sshPublicKey</var>.
+  </li>
+</ul>
+<dl id="schema-oc-aeHost-attributes">
+  <dt>host</dt>
+  <dd>
+    unique canonical hostname (FQDN)
+  </dd>
+  <dt>aeSrvGroup</dt>
+  <dd>
+    distinguished names of <var>aeSrvGroup</var> entries this host is also
+    member of
+  </dd>
+  <dt>meta attributes</dt>
+  <dd>see <a href="#schema-oc-aeObject-attributes">aeObject</a></dd>
+</dl>
+
+<h3 id="schema-oc-aeNwDevice">aeNwDevice</h3>
+<p>
+  Object class <var>aeNwDevice</var> is used to add entries subordinate to
+  <var>aeHost</var> entries for network devices available on that
+  particular host system.
+</p>
+<dl id="schema-oc-aeNwDevice-attributes">
+  <dt>cn</dt>
+  <dd>
+    OS-assigned device name of network device
+  </dd>
+  <dt>aeFqdn</dt>
+  <dd>
+    fully qualified domain name (FQDN) of IP address(es) assigned to this
+    device
+  </dd>
+  <dt>meta attributes</dt>
+  <dd>see <a href="#schema-oc-aeObject-attributes">aeObject</a></dd>
+</dl>
+
+<h2 id="schema-aux-oc">Auxiliary Object Classes</h2>
+
+<p>
+  Various <em>auxiliary object classes</em> are used to provide
+  supplemental attributes. The DIT content rules defined for structural
+  object classes restrict which auxiliary object classes can be added to an
+  entry
+  (see also <a href="#schema-soc-table">table of structural object classes</a>).
+</p>
+
+<h3 id="schema-oc-posixAccount">posixAccount</h3>
+<p>
+  The auxiliary object class <var>posixAccount</var> contains multiple
+  attributes required for POSIX login to Unixoid operating systems
+  (see <a href="https://tools.ietf.org/html/rfc2307">RFC 2307</a>).
+</p>
+<p>
+  The following <var>posixAccount</var> attributes are always added to
+  <var>aeUser</var> and <var>aeService</var> entries:
+</p>
+<ul>
+  <li>uidNumber</li>
+  <li>gidNumber</li>
+  <li>homeDirectory</li>
+  <li>loginShell</li>
+</ul>
+
+<h3 id="schema-oc-inetLocalMailRecipient">inetLocalMailRecipient</h3>
+<p>
+  The auxiliary object class <var>inetLocalMailRecipient</var> contains multiple
+  attributes used for SMTP e-mail routing
+  (see <a href="https://tools.ietf.org/html/draft-lachman-laser-ldap-mail-routing">draft-lachman-laser-ldap-mail-routing</a>).
+</p>
+<p>
+  The following <var>inetLocalMailRecipient</var> attributes are optionally
+  added to <var>aeUser</var> and <var>aeService</var> entries to turn these
+  entries into a mailbox account:
+</p>
+<ul>
+  <li>mailLocalAddress</li>
+</ul>
+
+<h3 id="schema-oc-pkiUser">pkiUser</h3>
+<p>
+  The auxiliary object class <var>pkiUser</var> is used ...
+  (see <a href="https://tools.ietf.org/html/rfc4523">RFC 4523</a>).
+</p>
+<p>
+  The following <var>pkiUser</var> attribute is optionally added to
+  <var>aeUser</var>, <var>aeService</var> or <var>aeHost</var> entries:
+</p>
+<ul>
+  <li>userCertificate</li>
+</ul>
+
+<h3 id="schema-oc-ldapPublicKey">ldapPublicKey</h3>
+<p>
+  The auxiliary object class <var>ldapPublicKey</var> is used to store SSH public keys in
+  (see <a href="https://github.com/AndriiGrytsenko/openssh-ldap-publickey">openssh-ldap-publickey</a>).
+</p>
+<p>
+  The following <var>ldapPublicKey</var> attribute is optionally
+  added to <var>aeUser</var> and <var>aeService</var> entries:
+</p>
+<ul>
+  <li>sshPublicKey</li>
+</ul>
+
+
+<h1 id="slapd.access">Access control</h1>
+
+<p>
+  Security policies are enforced by different types of OpenLDAP ACLs:
+</p>
+<dl>
+  <dt>group</dt>
+  <dd>
+    Access rights are granted based on simple group membership.
+  </dd>
+  <dt>regex</dt>
+  <dd>
+    Access rights are granted based on <a href="#dit">DIT</a> with
+    distinguished names matching certain regex patterns.
+  </dd>
+  <dt>sets</dt>
+  <dd>
+    Access rights are granted based on (indirect)
+    <a href="#eer">entity relationship</a> by following the references from
+    entries to other entries.
+  </dd>
+</dl>
+
+<p>
+  If you want to understand the ACLs in detail you should consult various
+  on-line documentation:
+</p>
+<ul>
+  <li>
+    <a href="http://www.openldap.org/software/man.cgi?query=slapd.access">slapd.access(5)</a>
+  </li>
+  <li>
+    <a href="http://www.openldap.org/faq/data/cache/189.html">FAQ-O-MATIC: Access Control</a>
+  </li>
+  <li>
+    <a href="http://www.openldap.org/faq/data/cache/1133.html">FAQ-O-MATIC: Sets in Access Control</a>
+  </li>
+</ul>
+
+<h1 id="slapd.conf">OpenLDAP configuration (slapd.conf)</h1>
+
+<h2 id="slapd-roles">slapd replica roles</h2>
+
+<h3 id="slapd-role-provider">slapd provider</h3>
+<p>
+</p>
+
+<dl>
+  <dt>web2ldap</dt>
+  <dd>
+    <a href="https://web2ldap.de/">web2ldap</a> is used as interactive
+    management user interface. Check out the
+    <a href="https://www.web2ldap.de/docs.html">documentation</a>
+    to find out about fine-tuning, customizing etc.
+  </dd>
+</dl>
+
+<h3 id="slapd-role-consumer">slapd consumer</h3>
+<p>
+</p>
+
+<h2 id="backends">Backends</h2>
+
+<p>
+  Backends used are:
+</p>
+<dl>
+  <dt id="slapd-mdb">slapd-mdb</dt>
+  <dd>
+    <a href="http://www.openldap.org/software/man.cgi?query=slapd-mdb">slapd-mdb(5)</a>
+  </dd>
+  <dt id="slapd-sock">slapd-sock</dt>
+  <dd>
+    only for multi-factor authentication used as overlay
+    <a href="http://www.openldap.org/software/man.cgi?query=slapd-sock">slapd-sock(5)</a>
+  </dd>
+</dl>
+
+<h2 id="overlays">Overlays</h2>
+
+<p>
+  Various overlays are configured on all replicas:
+</p>
+<dl>
+  <dt id="slapo-memberof">slapo-memberof</dt>
+  <dd>
+    <a href="http://www.openldap.org/software/man.cgi?query=slapo-memberof">slapo-memberof(5)</a>
+  </dd>
+  <dt id="slapo-accesslog">slapo-accesslog</dt>
+  <dd>
+    <a href="http://www.openldap.org/software/man.cgi?query=slapo-accesslog">slapo-accesslog(5)</a>
+  </dd>
+  <dt id="slapo-rwm">slapo-rwm</dt>
+  <dd>
+    <a href="http://www.openldap.org/software/man.cgi?query=slapo-rwm">slapo-rwm(5)</a>
+  </dd>
+  <dt id="slapo-syncprov">slapo-syncprov</dt>
+  <dd>
+    <a href="http://www.openldap.org/software/man.cgi?query=slapo-syncprov">slapo-syncprov(5)</a>
+  </dd>
+  <dt id="slapo-lastbind">slapo-lastbind</dt>
+  <dd>
+    <a href="http://www.openldap.org/software/man.cgi?query=slapo-lastbind">slapo-lastbind(5)</a>
+  </dd>
+  <dt id="slapo-ppolicy">slapo-ppolicy</dt>
+  <dd>
+    <a href="http://www.openldap.org/software/man.cgi?query=slapo-ppolicy">slapo-ppolicy(5)</a>
+  </dd>
+  <dt id="slapo-noopsrch">slapo-noopsrch</dt>
+  <dd>
+    <a href="http://www.openldap.org/software/man.cgi?query=slapo-noopsrch">slapo-noopsrch(5)</a>
+  </dd>
+  <dt id="slapo-deref">slapo-deref</dt>
+  <dd>
+    <a href="http://www.openldap.org/software/man.cgi?query=slapo-deref">slapo-deref(5)</a>
+  </dd>
+</dl>
+
+<p>
+  Several constraints are enforced by overlays configured on the
+  <a href="#slapd-role-provider">slap provider</a> to ensure data
+  consistency and some more security policies:
+</p>
+<dl>
+  <dt id="slapo-unique">slapo-unique</dt>
+  <dd>
+    Uniqueness constraints
+    <a href="http://www.openldap.org/software/man.cgi?query=slapo-unique">slapo-unique(5)</a>
+  </dd>
+  <dt id="slapo-constraint">slapo-constraint</dt>
+  <dd>
+    Attribute value constraints
+    <a href="http://www.openldap.org/software/man.cgi?query=slapo-constraint">slapo-constraint(5)</a>
+  </dd>
+  <dt id="slapo-refint">slapo-refint</dt>
+  <dd>
+    Referential integrity
+    <a href="http://www.openldap.org/software/man.cgi?query=slapo-refint">slapo-refint(5)</a>
+  </dd>
+</dl>
+
+<!--#include file="ssi/footer.shtml" -->

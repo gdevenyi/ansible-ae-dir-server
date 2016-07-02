@@ -1,0 +1,9 @@
+Options -Indexes +Includes
+
+DirectoryIndex ae-dir.html
+
+AddType text/html .html .shtml
+AddOutputFilter INCLUDES .html .shtml
+AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript image/svg+xml
+
+AddType text/plain .txt .log .py .schema
