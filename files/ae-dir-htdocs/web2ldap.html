@@ -53,7 +53,7 @@
   common errors, etc.
 </p>
 
-<h2>Layout of user interface</h2>
+<h2 id="general-layout">Layout</h2>
 
 <p>
   At top of the displayed web page always the fixed status area is displayed
@@ -65,7 +65,8 @@
     LDAP URI of LDAP server you are connected to
   </li>
   <li>
-    identity bound to the LDAP server as friendly name with description if set
+    Identity bound to the LDAP server as friendly name with description if set
+    in the identity's entry
   </li>
   <li>
     distinguished name of current position in the tree as clickable link
@@ -79,13 +80,13 @@
 <dl>
   <dt id="main-menu">Main menu</dt>
   <dd>
-     The main menu is displayed on the left and always shows the same menu
-     items for choosing the main use-cases.
+     The main menu on the left always shows the same menu items for
+     choosing the main use-cases.
   </dd>
   <dt id="context-menu">Context menu</dt>
   <dd>
      The context menu on the right depends on content displayed in the
-     middle area for a particular use-case.
+     middle area for starting a related use-case.
   </dd>
 </dl>
 
@@ -100,6 +101,7 @@
   <li>various input forms for adding/modifying entries</li>
 </ul>
 
+<h2 id="general-link-types">Links</h2>
 <p>
   Different link types have different colors:
 </p>
@@ -127,6 +129,23 @@
   next step by hitting a <button class="web2ldap-submit-button">submit</button>
   button in the middle area.
 </p>
+
+<h2 id="general-messages">Messages</h2>
+<p>
+  Different message types have different border colors:
+</p>
+<ul>
+  <li>
+    <span class="web2ldap-msg-warning">Warning messages</span>
+    with grey border indicate that some functionality is not available but 
+    you can probably proceed with your action but with limited features.
+  </li>
+  <li>
+    <span class="web2ldap-msg-warning">Error messages</span>
+    with red border indicate that something failed to work and action was 
+    aborted/canceled.
+  </li>
+</ul>
 
 <h2>Multi-valued attributes</h2>
 <p>
