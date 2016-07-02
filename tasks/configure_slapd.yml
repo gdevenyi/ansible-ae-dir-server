@@ -86,10 +86,10 @@
 
 - name: Backup slapd databases in CRON job
   cron:
-    name: "backup_slapd_database"
+    name: "ae_dir_slapcat"
     state: present
     user: root
-    cron_file: backup_slapd_database
+    cron_file: ae_dir_slapcat
     minute: "23"
     hour: "*/12"
     job: "{{ openldap_backup_script }}"
