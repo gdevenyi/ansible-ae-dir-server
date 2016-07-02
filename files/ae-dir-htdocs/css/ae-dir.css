@@ -256,3 +256,21 @@ button.web2ldap-submit-button {
   border-top-color:#eeeeee;
   border-left-color:#eeeeee;
 }
+
+span.web2ldap-msg-success {
+  font-weight:normal;
+  padding:0.1em;
+  border: 1px solid #e0e0e0;
+}
+
+span.web2ldap-msg-warning {
+  font-weight:bold;
+  padding:0.1em;
+  border: 3px solid #a0a0a0;
+}
+
+span.web2ldap-msg-error {
+  font-weight:bold;
+  padding:0.1em;
+  border: 3px solid #c81f2a;
+}
