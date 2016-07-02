@@ -8,7 +8,8 @@
         <td>
           <input name="who"
                  id="login_who"
-                 title="Complete Bind-DN of &AElig;-DIR account entry"
+                 title="User name or bind-DN of &AElig;-DIR entry"
+                 placeholder="User name or bind-DN"
                  maxlength="300"
                  size="40"
                  value="{value_ldap_who}">
@@ -18,12 +19,13 @@
         <td>Password:</td>
         <td>
           <input type="password"
-                       title="Password to be used for login"
-                       name="cred"
-                       id="login_cred"
-                       maxlength="200"
-                       size="40"
-                       value="">
+                 title="Password to be used for login"
+                 placeholder="your secret password"
+                 name="cred"
+                 id="login_cred"
+                 maxlength="200"
+                 size="40"
+                 value="">
         </td>
       </tr>
     </table>
@@ -36,30 +38,21 @@
 
   </fieldset>
 
-  <p>
-    see also
-    <a href="/web2ldap.html#connect-and-bind">User Guide</a>
-  </p>
-
   <ul>
     <li>
-      You have to enter at least the short bind DN like this:
-      <em>uid=<strong>your-username</strong>,{{ aedir_suffix }}</em>
-    </li>
-    <li>
-      If you have Javascript enabled entering only your username
-      will also work. The short bind DN will be auto-completed.
+      See <a href="/web2ldap.html#connect-and-bind">user guide</a>
+      for more information.
     </li>
     <li>
       Take care that you enter the password only while nobody is
       watching your keyboard.
     </li>
     <li>
-      In case of errors see the
-      <a href="https://wiki.example.com/web2ldap">web2ldap how-to</a>.
+      In case of errors see the user guide section
+      <a href="/web2ldap.html#connect-common-errors">common errors</a>.
     </li>
-    <li>
+    <!--li>
       If you forgot your password you can <a href="/pwd/requestpw">
       request a temporary reset password</a>.
-    </li>
+    </li-->
   </ul>
