@@ -117,6 +117,16 @@
     <span class="web2ldap-external-link">Blue links</span>
     point to external resources (URLs).
   </li>
+  <li>
+    DIT navigation links are displayed in the top section:
+    <br>
+    <span class="web2ldap-dit-navigation">cn=example,ou=ae-dir</span>
+    <br>
+    Each DN component is a separate link to directly navigate to 
+    the entry. E.g. clicking on the single link
+    <span class="web2ldap-dit-navigation">cn=example</span>
+    would directly jump to entry <em>cn=example,ou=ae-dir</em>.
+  </li>
 </ul>
 <p>
   Clicking on an <span class="web2ldap-menu-button">item</span> in the main
@@ -142,7 +152,7 @@
     with light grey border indicate that some action was completed successfully.
   </dd>
   <dt><span class="web2ldap-msg-warning">Warning messages</span></dt>
-  <dd>    
+  <dd>
     with dark grey border indicate that some functionality is not available but
     you can probably proceed with your action but with limited features.
   </dd>
@@ -295,6 +305,9 @@
 
 <h1 id="search">Search</h1>
 <p>
+  Various search use-cases are described in the following sections.
+</p>
+<p>
   When searching bear in mind that you might not see entries due to access
   control restrictions. The LDAP server does not distinguish whether you're
   not allowed to read an entry or whether it does not exist or wasn't found
@@ -309,8 +322,9 @@
 <h2 id="choose-zone">Choose zone</h2>
 <ol>
   <li>
-    Navigate to top-level LDAP entry <em>ou=ae-dir</em> by clicking the
-    link in the navigation bar at the top.
+    Navigate to top-level LDAP entry by clicking the link
+    <span class="web2ldap-dit-navigation">ou=ae-dir</span>
+    in the navigation bar at the top.
   </li>
   <li>
     Select link <span class="web2ldap-menu-button">Down</span>
@@ -335,7 +349,7 @@
     &rarr; The basic search form is displayed in the middle area.
   </li>
   <li>
-    Enter the user's ID in the field "&AElig;-DIR user name" and
+    Enter the user's ID in the field "&AElig;-DIR user name".
   </li>
   <li>
     Press <span class="keyb-return">&#9166;</span> in the input form or klick the
@@ -399,13 +413,13 @@
   <li>
     Select link <span class="web2ldap-menu-button">Edit filter</span>
     from the context menu on the right to define the
-    attribute columns to be exported
+    attribute columns to be exported.
   </li>
   <li>
     Fill in the attributes to be exported as columns in the field
     "Attributes to be read" as comma-separated list like
-    this:
-    "cn,host,aeStatus,description,aeTicketId"
+    this:<br>
+    <kbd>cn,host,aeStatus,description,aeTicketId</kbd>
   </li>
   <li>
     Press <span class="keyb-return">&#9166;</span> in the input form or klick the
