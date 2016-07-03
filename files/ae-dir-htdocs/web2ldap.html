@@ -122,7 +122,7 @@
     <br>
     <span class="web2ldap-dit-navigation">cn=example,ou=ae-dir</span>
     <br>
-    Each DN component is a separate link to directly navigate to 
+    Each DN component is a separate link to directly navigate to
     the entry. E.g. clicking on the single link
     <span class="web2ldap-dit-navigation">cn=example</span>
     would directly jump to entry <em>cn=example,ou=ae-dir</em>.
@@ -523,7 +523,7 @@
 <h2 id="oc-aePerson">&AElig;-DIR person (aePerson)</h2>
 
 <p>
-  Schema description: <a href="docs.html#schema-oc-aeUser">aeUser</a>
+  Schema description: <a href="docs.html#schema-oc-aePerson">aePerson</a>
 </p>
 
 <p>Roles:</p>
@@ -566,9 +566,6 @@
     Fill in the input values:
     <ol>
       <li>
-        Leave the suggested value in input field <em>RDN</em> as is.
-      </li>
-      <li>
         Enter names and optionally the e-mail address if already known.
       </li>
       <li>
@@ -586,6 +583,88 @@
       <li>
         You might want to fill in the fields "Intended purpose" and "Jira
         ticket for last change".
+      </li>
+    </ol>
+  </li>
+  <li>
+    Press
+    <kbd class="return">&#9166;</kbd>
+    anywhere in the input form or click on the
+    <button class="web2ldap-submit-button">Add</button> button
+    at top of the middle area to add the new entry.
+  </li>
+  <li>
+    &rarr; Confirmation of added data is shown in the middle area.
+  </li>
+  <li>
+    Click link <span class="web2ldap-internal-link">Read added entry</span>
+    in the middle area to display the new entry.
+  </li>
+</ol>
+
+<h2 id="oc-aeDept">&AElig;-DIR department (aeDept)</h2>
+
+<p>
+  Schema description: <a href="docs.html#schema-oc-aeDept">aeDept</a>
+</p>
+
+<p>Roles:</p>
+<ul>
+  <li><a href="docs.html#role-people-admin">People Admin</a> (zone admin for in zone <em>people</em>)</li>
+  <li><a href="docs.html#role-ae-admin">&AElig; Admin</a></li>
+</ul>
+
+<h3>Add new &AElig;-DIR person</h3>
+
+<p>Prerequisites:</p>
+<ol>
+  <li>
+    Organizational information is available.
+  </li>
+</ol>
+
+<p>Steps:</p>
+<ol>
+  <li>
+    <a href="#connect-and-bind">Connect and bind</a>
+  </li>
+  <li>
+    Select link <span class="web2ldap-menu-button">New entry</span>
+    from the main menu on the left.
+  </li>
+  <li>
+    In the middle area select <span class="web2ldap-internal-link">&AElig;-DIR department</span>.
+  </li>
+  <li>
+    &rarr; Input form is displayed in the middle area.
+    (This template already automatically chooses zone <em>people</em>.)
+  </li>
+  <li>
+    Make sure <em>web2ldap</em> displays this above the submit buttons to
+    ensure you're adding the new entry directly beneath a zone:<br>
+    "Superior entry: &AElig;-DIR zone <em>people</em>"
+  </li>
+  <li>
+    Fill in the input values:
+    <ol>
+      <li>
+        Enter at least "Organizational unit name" and "Department number".
+      </li>
+      <li>
+        Select person for "Manager" if appropriate &AElig;-DIR person
+        already exists.
+      </li>
+      <li>
+        Set "Status:" to&hellip;
+        <ul>
+          <li>
+            "requested" if you're waiting for some more confirmation before
+            activating the person
+          </li>
+          <li>
+          "active" otherwise
+          </li>
+        </ul>
       </li>
     </ol>
   </li>
@@ -652,9 +731,6 @@
   <li>
     Fill in the input values:
     <ol>
-      <li>
-        Leave the suggested value in input field <em>RDN</em> as is.
-      </li>
       <li>
         In the field "Base person:" enter an person name or e-mail address.
       </li>
@@ -817,9 +893,6 @@
     Fill in the input values:
     <ol>
       <li>
-        Leave the suggested value in input field <em>RDN</em> as is.
-      </li>
-      <li>
         Don't muck up the suggested "Posix GID" unless you're really know
         what you're doing.
       </li>
@@ -891,9 +964,6 @@
     Fill in the input values:
     <ol>
       <li>
-        Leave the suggested value in input field <em>RDN</em> as is.
-      </li>
-      <li>
         The service group name has to use the zone name and a dash
         as prefix. This should be pre-filled in input field "Name of
         group".
@@ -960,9 +1030,6 @@
   <li>
     Fill in the input values:
     <ol>
-      <li>
-        Leave the suggested value in input field <em>RDN</em> as is.
-      </li>
       <li>
         Make sure <em>web2ldap</em> displays this to ensure you're adding
         the server entry beneath a service group above the submit
@@ -1049,9 +1116,6 @@
   <li>
     Fill in the input values:
     <ol>
-      <li>
-        Leave the suggested value in input field <em>RDN</em> as is.
-      </li>
       <li>
         The rule name has to use the zone name and a dash as prefix.
         This should be pre-filled.
@@ -1230,9 +1294,6 @@
   </li>
   <li>Fill in the input values:
     <ol>
-      <li>
-        Leave the suggested value in input field <em>RDN</em> as is.
-      </li>
       <li>
         The zone name has to be confirmed by the team leads!
       </li>
