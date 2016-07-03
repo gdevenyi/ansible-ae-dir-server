@@ -26,8 +26,7 @@
 
 <h1 id="access">Access</h1>
 <p>
-  Directly connect to &AElig;-DIR provider for maintaining data:<br>
-  <a href="/web2ldap/searchform?ldapi:///ou%3Dae-dir????bindname=">Connect to local web2ldap installation</a>
+  <a href="/web2ldap">Connect to local web2ldap installation</a>
 </p>
 
 <p>Notes:</p>
@@ -216,7 +215,7 @@
 <p>Prerequisites:</p>
 <ol>
   <li>
-    Active <a href="#aeUser">aeUser</a> entry has been added for user and
+    Active <a href="#oc-aeUser">aeUser</a> entry has been added for user and
     he/she knows username and password.
   </li>
 </ol>
@@ -224,7 +223,10 @@
 <p>Steps:</p>
 <ol>
   <li>
-    Choose one of the <a href="#Access">web2ldap instances</a>
+    <a href="/web2ldap">Connect to local web2ldap</a>
+  </li>
+  <li>
+    Choose link <span class="web2ldap-internal-link">General administration</span>.
   </li>
   <li>
     Enter your user name or bind-DN.
@@ -257,33 +259,33 @@
   Common errors and their possible causes:
 </p>
 <dl>
-  <dt>Invalid credentials:</dt>
+  <dt><span class="web2ldap-msg-error">Invalid credentials:</span></dt>
   <dd>
     Either you've entered a wrong password or there is no &AElig;-DIR account
     entry for the bind DN used.
   </dd>
-  <dt>Invalid DN syntax:</dt>
+  <dt><span class="web2ldap-msg-error">Invalid DN syntax:</span></dt>
   <dd>
     You've used an syntactically invalid / incomplete bind DN.
   </dd>
-  <dt>
+  <dt><span class="web2ldap-msg-error">
     Inappropriate authentication / anonymous bind disallowed:
-  </dt>
+  </span></dt>
   <dd>
     You've probably did not enter a bind DN at all or an empty password
     resulting in anonymous simple bind which is not allowed.
   </dd>
-  <dt>Strong(er) authentication required:</dt>
+  <dt><span class="web2ldap-msg-error">Strong(er) authentication required:</span></dt>
   <dd>
     Anonymous access is not allowed at all. But you tried to send a LDAP
     request while still not bound with your &AElig;-DIR account.
   </dd>
-  <dt>Session hijacking detected by wrong cookie. Access denied!</dt>
+  <dt><span class="web2ldap-msg-error">Session hijacking detected by wrong cookie. Access denied!</span></dt>
   <dd>
     In most cases this is caused by Cookies being disabled/blocked in your browser.
     Make sure your browser accepts Cookies for &AElig;-DIR's web2ldap sites.
   </dd>
-  <dt>Session hijacking detected. Access denied!</dt>
+  <dt><span class="web2ldap-msg-error">Session hijacking detected. Access denied!</span></dt>
   <dd>
     In very rare cases this is due to some of the
     <a href="https://www.web2ldap.de/web2ldapcnf_misc.html#session_checkvars">
