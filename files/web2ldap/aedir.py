@@ -47,9 +47,6 @@ AE_PERSON_OID = AE_OID_PREFIX+'.6.8'
 AE_TAG_OID = AE_OID_PREFIX+'.6.24'
 AE_DEPT_OID = AE_OID_PREFIX+'.6.29'
 
-# gidNumber value assigned to all user and service accounts
-GLOBAL_AE_GID = '10000'
-
 
 syntax_registry.registerAttrType(
   NotBefore.oid,[
@@ -835,6 +832,14 @@ syntax_registry.registerAttrType(
 class AEUserMailaddress(AEPersonAttribute,RFC822Address):
   oid = 'AEUserMailaddress-oid'
   html_tmpl = RFC822Address.html_tmpl
+  maxValues = 1
+
+  def transmute(self,attrValues):
+    try:
+      attrValues = [self._entry['mailLocalAddress'][0]]
+    except KeyError:
+      attrValues = AEPersonAttribute.transmute(self,attrValues)
+    return attrValues
 
 syntax_registry.registerAttrType(
   AEUserMailaddress.oid,[
@@ -842,6 +847,53 @@ syntax_registry.registerAttrType(
   ],
   structural_oc_oids=[
     AE_USER_OID, # aeUser
+  ],
+)
+
+
+class AEPersonMailaddress(RFC822Address):
+  oid = 'AEPersonMailaddress-oid'
+  maxValues = 1
+
+  def _search_base_user_mail(self):
+    result = None
+    try:
+      ldap_result = self._ls.l.search_ext_s(
+        self._ls.currentSearchRoot,
+        ldap.SCOPE_SUBTREE,
+        '(&'
+          '(objectClass=aeUser)'
+          '(objectClass=inetLocalMailRecipient)'
+          '(aeStatus=0)'
+          '(aePerson=%s)'
+          '(mailLocalAddress=*)'
+        ')' % (self._dn),
+        attrlist=[
+          'mailLocalAddress',
+        ],
+        sizelimit=2,
+      )
+    except ldap.LDAPError:
+      pass
+    else:
+      if ldap_result and len(ldap_result)==1:
+        result = ldap_result[0][1]['mailLocalAddress'][0]
+    return result
+
+  def transmute(self,attrValues):
+    mail_local_address = self._search_base_user_mail()
+    if mail_local_address:
+      attrValues = [mail_local_address]
+    else:
+      attrValues = RFC822Address.transmute(self,attrValues)
+    return attrValues
+
+syntax_registry.registerAttrType(
+  AEPersonMailaddress.oid,[
+    '0.9.2342.19200300.100.1.3', # mail
+  ],
+  structural_oc_oids=[
+    AE_PERSON_OID, # aePerson
   ],
 )
 
