@@ -703,6 +703,24 @@ class AEPerson(DynamicDNSelectList):
   ref_attrs = (
     (None,u'All users',None,u'Search all personal AE-DIR user accounts associated with this person.'),
   )
+  ae_status_map = {
+    -1:(0,),
+    0:(0,),
+    1:(0,1,2),
+    2:(0,1,2),
+  }
+
+  def _determineFilter(self):
+    ae_status = int(self._entry.get('aeStatus',['0'])[0])
+    aeperson_aestatus_filters = [
+      '(aeStatus={0})'.format(st)
+      for st in map(str,self.ae_status_map[ae_status])
+    ]
+    filter_str = '(&{0}(|{1}))'.format(
+      DynamicDNSelectList._determineFilter(self),
+      ''.join(aeperson_aestatus_filters),
+    )
+    return filter_str
 
 
 class AEPerson2(AEPerson):
