@@ -8,7 +8,6 @@
 #
 # {{ ansible_managed }}
 #---------------------------------------------------------------------------
-{% set uid_number = aedir_min_uid -%}
 {% set gid_number = aedir_min_gid -%}
 version: 1
 
@@ -72,31 +71,14 @@ objectClass: namedObject
 objectClass: aeObject
 objectClass: aeZone
 
-dn: cn=ae-users,cn=pub,{{ aedir_suffix }}
-aeStatus: 0
-aeTag: ae-tag-init
-cn: ae-users
-description: Primary POSIX group for all aeUser and aeSystem entries
-gidNumber: {{ gid_number }}
-{% set gid_number = gid_number+1 -%}
-objectClass: top
-objectClass: groupOfEntries
-objectClass: posixGroup
-objectClass: aeObject
-objectClass: aeGroup
-
 dn: cn=sudo-defaults,cn=pub,{{ aedir_suffix }}
 objectClass: top
-objectClass: aeObject
 objectClass: sudoRole
-objectClass: aeSudoRule
 cn: sudo-defaults
-sudoHost: ALL
 description: SUDO global defaults
 sudoOption: env_reset
-aeStatus: 0
-aeTag: ae-tag-init
-sudoUser: %ae-users
+sudoHost: ALL
+sudoUser: ALL
 
 #---------------------------------------------------------------------------
 # black-list entries
@@ -435,8 +417,8 @@ mail: {{ person_attrs.mail }}
 {% for ae_user in aedir_init_aeadmins %}
 dn: uid={{ ae_user.uid }},cn=ae,{{ aedir_suffix }}
 uid: {{ ae_user.uid }}
-uidNumber: {{ uid_number + loop.index }}
-gidNumber: {{ aedir_global_gid }}
+uidNumber: {{ gid_number + loop.index }}
+gidNumber: {{ gid_number + loop.index }}
 objectClass: account
 objectClass: person
 objectClass: organizationalPerson
@@ -455,13 +437,13 @@ pwdPolicySubentry: cn=ppolicy-users,cn=ae,ou=ae-dir
 cn: {{ aedir_init_aepersons[ae_user.unique_identifier].given_name }} {{ aedir_init_aepersons[ae_user.unique_identifier].sur_name }}
 displayName: {{ aedir_init_aepersons[ae_user.unique_identifier].given_name }}
   {{ aedir_init_aepersons[ae_user.unique_identifier].sur_name }}
-  ({{ ae_user.uid }}/{{ uid_number + loop.index }})
+  ({{ ae_user.uid }}/{{ gid_number + loop.index }})
 sn: {{ aedir_init_aepersons[ae_user.unique_identifier].sur_name }}
 givenName: {{ aedir_init_aepersons[ae_user.unique_identifier].given_name }}
 mail: {{ aedir_init_aepersons[ae_user.unique_identifier].mail }}
 
 {% endfor %}
-{% set uid_number = uid_number + aedir_init_aeadmins|length -%}
+{% set gid_number = gid_number + aedir_init_aeadmins|length + 1 -%}
 
 #---------------------------------------------------------------------------
 # AE groups
@@ -654,14 +636,15 @@ aeTag: ae-tag-init
 description: AE-DIR slapd provider {{ service_fqdn }} running on {{ host }}
 homeDirectory: /home/ae-dir-slapd_{{ service_hostname }}
 cn: ae-dir-slapd_{{ service_hostname }}
-uidNumber: {{ uid_number + loop.index }}
-gidNumber: {{ aedir_global_gid }}
+uidNumber: {{ gid_number + loop.index }}
+gidNumber: {{ gid_number + loop.index }}
 seeAlso: cn={{ service_fqdn }},{{ openldap_tls_cert_suffix }}
 aeHost: host={{ host }},cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir_suffix }}
 
 {% endfor %}
-{% set uid_number = uid_number + aedir_hosts[role]|length -%}
+{% set gid_number = gid_number + aedir_hosts[role]|length -%}
 {% endfor %}
+{% set gid_number = gid_number + aedir_hosts['provider']|length + aedir_hosts['consumer']|length + 1 -%}
 #
 #---------------------------------------------------------------------------
 # AE-DIR slapd replica groups

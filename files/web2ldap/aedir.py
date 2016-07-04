@@ -25,8 +25,7 @@ from w2lapp.schema.syntaxes import \
   DynamicDNSelectList,RFC822Address,IntegerRange,ComposedAttribute, \
   NotBefore,NotAfter,syntax_registry
 
-from w2lapp.schema.plugins.quirks import UserPassword as quirks_UserPassword
-from w2lapp.schema.plugins.nis import UidNumber,MemberUID
+from w2lapp.schema.plugins.nis import UidNumber,GidNumber,MemberUID
 from w2lapp.schema.plugins.ppolicy import PwdExpireWarning,PwdMaxAge
 from w2lapp.schema.plugins.inetorgperson import DisplayNameInetOrgPerson
 from w2lapp.schema.plugins.groups import GroupEntryDN
@@ -94,25 +93,105 @@ syntax_registry.registerAttrType(
 )
 
 
-class AEGIDNumberAEUser(AutogenGIDNumber):
-  oid = 'AEGIDNumberAEUser-oid'
-  desc = 'numeric Unix-GID'
-  object_class = 'posixGroup'
-
-  def transmute(self,attrValues):
-    return [GLOBAL_AE_GID]
+class AEUIDNumber(UidNumber):
+  oid = 'AEUIDNumber-oid'
+  desc = 'numeric Unix-UID'
+  object_classes = set(['posixAccount','posixGroup'])
 
   def formValue(self):
-    return unicode(GLOBAL_AE_GID)
+    try:
+      form_value = self._entry['gidNumber'][0].decode(self._ls.charset)
+    except KeyError:
+      form_value = UidNumber.formValue(self)
+    return form_value
+
+  def transmute(self,attrValues):
+    try:
+      attrValues = self._entry['gidNumber']
+    except KeyError:
+      attrValues = []
+    return attrValues
+
+syntax_registry.registerAttrType(
+  AEUIDNumber.oid,[
+    '1.3.6.1.1.1.1.0', # uidNumber
+  ],
+  structural_oc_oids=[
+    AE_USER_OID, # aeUser
+  ],
+)
+
+
+class AEGIDNumber(GidNumber):
+  oid = 'AEGIDNumber-oid'
+  desc = 'numeric Unix-GID'
+  minNewValue = 30000L
+  maxNewValue = 49999L
+
+  def formValue(self):
+    form_value = GidNumber.formValue(self)
+    if form_value:
+      return form_value
+    try:
+      ldap_result = self._ls.l.search_s(
+        self._ls.getSearchRoot(self._dn),
+        ldap.SCOPE_SUBTREE,
+        (
+          '(&'
+            '(|(objectClass=posixAccount)(objectClass=posixGroup))'
+            '(|'
+              '(uidNumber>={0})(uidNumber<={1})'
+              '(gidNumber>={0})(gidNumber<={1})'
+            ')'
+          ')'
+        ).format(
+          self.__class__.minNewValue,
+          self.__class__.maxNewValue
+        ),
+        attrlist=['uidNumber','gidNumber'],
+      )
+    except (
+      ldap.NO_SUCH_OBJECT,
+      ldap.SIZELIMIT_EXCEEDED,
+      ldap.TIMELIMIT_EXCEEDED,
+    ):
+      # search failed => no value suggested
+      return u''
+    idnumber_set = set()
+    for ldap_dn,ldap_entry in ldap_result:
+      if ldap_dn!=None:
+        ldap_dn = ldap_dn.decode(self._ls.charset)
+        if ldap_dn==self._dn:
+          return ldap_entry[self.attrType][0].decode(self._ls.charset)
+        else:
+          for attr_type in ('uidNumber','gidNumber'):
+            try:
+              idnumber_set.add(int(ldap_entry[attr_type][0]))
+            except KeyError:
+              pass
+    for idnumber in xrange(self.__class__.minNewValue,self.maxNewValue+1):
+      if idnumber in idnumber_set:
+        self.__class__.minNewValue = idnumber
+      else:
+        break
+    if idnumber>self.maxNewValue:
+      # end of valid range reached => no value suggested
+      form_value = u''
+    else:
+      form_value = unicode(idnumber)
+    return form_value # formValue()
 
   def formField(self):
     return IntegerRange.formField(self)
 
 syntax_registry.registerAttrType(
-  AEGIDNumberAEUser.oid,[
+  AEGIDNumber.oid,[
     '1.3.6.1.1.1.1.1', # gidNumber
   ],
-  structural_oc_oids=[AE_USER_OID,AE_SERVICE_OID], # aeUser and aeService
+  structural_oc_oids=[
+    AE_USER_OID,  # aeUser
+    AE_GROUP_OID, # aeGroup
+  ],
 )
 
 
@@ -123,7 +202,7 @@ class AEUserId(IA5String):
   oid = 'AEUserId-oid'
   desc = 'AE-DIR: User name'
   maxValues = 1
-  maxLen = 5
+  maxLen = 4
   maxCollisionChecks = 15
   UID_LETTERS = 'abcdefghijklmnopqrstuvwxyz'
   reobj = re.compile('^%s$' % (UID_LETTERS))
@@ -173,7 +252,9 @@ syntax_registry.registerAttrType(
   AEUserId.oid,[
     '0.9.2342.19200300.100.1.1', # uid
   ],
-  structural_oc_oids=[AE_USER_OID],
+  structural_oc_oids=[
+    AE_USER_OID, # aeUser
+  ],
 )
 
 
