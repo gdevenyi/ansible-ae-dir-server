@@ -384,12 +384,34 @@ pwdCheckQuality: 2
 pwdExpireWarning: 864000
 pwdFailureCountInterval: 1800
 pwdGraceAuthNLimit: 0
-pwdInHistory: 20
+pwdInHistory: 30
 pwdLockout: TRUE
 pwdLockoutDuration: 20
 pwdMaxAge: 7776000
 pwdMaxFailure: 6
-pwdMinAge: 7200
+pwdMinAge: 900
+pwdMinLength: 12
+pwdMustChange: FALSE
+pwdSafeModify: FALSE
+
+# policy for primary aeUser entries
+dn: cn=ppolicy-base-users,cn=ae,{{ aedir_suffix }}
+cn: ppolicy-base-users
+description: Password policy for primary personal user accounts (aeUser) in zone base
+objectClass: namedPolicy
+objectClass: pwdPolicy
+pwdAllowUserChange: TRUE
+pwdAttribute: userPassword
+pwdCheckQuality: 2
+pwdExpireWarning: 864000
+pwdFailureCountInterval: 1800
+pwdGraceAuthNLimit: 0
+pwdInHistory: 30
+pwdLockout: TRUE
+pwdLockoutDuration: 20
+pwdMaxAge: 7776000
+pwdMaxFailure: 6
+pwdMinAge: 900
 pwdMinLength: 10
 pwdMustChange: FALSE
 pwdSafeModify: FALSE
