@@ -62,6 +62,7 @@ objectClass: aeZone
 # cn=pub,{{ aedir_suffix }}
 #---------------------------------------------------------------------------
 #
+# tag for initial loading of this LDIF file
 dn: cn=pub,{{ aedir_suffix }}
 aeStatus: 0
 aeTag: ae-tag-init
@@ -71,6 +72,7 @@ objectClass: namedObject
 objectClass: aeObject
 objectClass: aeZone
 
+# sudoers defaults
 dn: cn=sudo-defaults,cn=pub,{{ aedir_suffix }}
 objectClass: top
 objectClass: sudoRole
@@ -79,6 +81,27 @@ description: SUDO global defaults
 sudoOption: env_reset
 sudoHost: ALL
 sudoUser: ALL
+
+# DUA configuration profile for Solaris, HP-UX etc.
+dn: cn=dua-profile,cn=pub,{{ aedir_suffix }}
+cn: dua-profile
+objectClass: top
+objectClass: DUAConfigProfile
+profileTTL: 864000
+serviceAuthenticationMethod: pam_ldap:tls:simple
+defaultServerList: {{ openldap_rootdse_alt_servers|join(' ') }}
+defaultSearchBase: {{ aedir_suffix }}
+defaultSearchScope: sub
+followReferrals: FALSE
+bindTimeLimit: 10
+searchTimeLimit: 10
+credentialLevel: proxy
+authenticationMethod: tls:simple;SASL/EXTERNAL
+serviceSearchDescriptor: passwd:{{ aedir_suffix }}?sub
+serviceSearchDescriptor: shadow:{{ aedir_suffix }}?sub
+serviceSearchDescriptor: user_attr:{{ aedir_suffix }}?sub
+serviceSearchDescriptor: audit_user:{{ aedir_suffix }}?sub
+serviceSearchDescriptor: group:{{ aedir_suffix }}?sub
 
 #---------------------------------------------------------------------------
 # black-list entries
