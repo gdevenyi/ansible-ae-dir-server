@@ -1371,6 +1371,7 @@ syncprov-checkpoint 1000 2
 syncprov-reloadhint TRUE
 
 {% for provider_replica in openldap_syncrepl_providers %}
+{% if provider_replica!=openldap_service_fqdn %}
 syncrepl rid=0{{ loop.index }}
   provider=ldaps://{{ provider_replica }}
   type=refreshAndPersist
@@ -1386,6 +1387,7 @@ syncrepl rid=0{{ loop.index }}
   tls_cert={{ openldap_cert_pathname }}
   tls_key={{ openldap_key_pathname }}
 
+{% endif %}
 {% endfor %}
 
 mirrormode true
