@@ -408,6 +408,10 @@ class AEProxyFor(AESrvGroup):
   desc = 'AE-DIR: DN of referenced aeSrvGroup entry this is proxy for'
   ldap_url = 'ldap:///..?cn?sub?(&(objectClass=aeSrvGroup)(aeStatus=0)(!(aeProxyFor=*)))'
 
+  def _determineSearchDN(self,current_dn,ldap_url_dn):
+    dn_list = ldap.dn.explode_dn(self._dn.encode(self._ls.charset))
+    return  ','.join(dn_list[-2:])
+
 syntax_registry.registerAttrType(
   AEProxyFor.oid,[
     AE_OID_PREFIX+'.4.25',  # aeProxyFor
@@ -433,6 +437,7 @@ class AEEntryDNAEPerson(DistinguishedName):
   ref_attrs = (
     ('aePerson',u'Users',None,u'Search all personal AE-DIR user accounts (aeUser entries) of this person'),
     ('manager',u'Manages',None,u'Search all entries managed by this person'),
+#    ('aePerson',u'Devices',None,u'Search all AE-DIR devices (aeDevice entries) of this person'),
   )
 
 syntax_registry.registerAttrType(
@@ -701,7 +706,8 @@ class AEPerson(DynamicDNSelectList):
   desc = 'AE-DIR: DN of person entry'
   ldap_url = 'ldap:///_?displayName?sub?(objectClass=aePerson)'
   ref_attrs = (
-    (None,u'All users',None,u'Search all personal AE-DIR user accounts associated with this person.'),
+    (None,u'Users','aeUser',u'Search all personal AE-DIR user accounts associated with this person.'),
+#    (None,u'Devices','aeDevice',u'Search all personal AE-DIR user accounts associated with this person.'),
   )
   ae_status_map = {
     -1:(0,),
