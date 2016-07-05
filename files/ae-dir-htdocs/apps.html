@@ -3,7 +3,44 @@
 <!--#set var="base_path" value="" -->
 <!--#include file="ssi/head.shtml" -->
 
-<h1 id="linux-client">Linux Client Components</h1>
+<h1>PAM/NSS services</h1>
+
+<h2 id="pam-nss-simple">Simple PAM/NSS clients</h2>
+
+<h2 id="pam-nss-smart">Smart PAM/NSS clients</h2>
+<p>Smart clients optimized for &AElig;-DIR should do the following:</p>
+<ul>
+  <li>
+    Bind to &AElig;-DIR either with
+    <ul>
+      <li><em>simple bind</em> (short-DN form)</li>
+      <li><em>SASL/EXTERNAL</em> bind when using TLS client certs</li>
+    </ul>
+  </li>
+  <li>
+    Send <em>LDAP Who Am I?</em> extended operation
+    (see <a href="https://tools.ietf.org/html/rfc4532">RFC 4352</a>)
+    to find the real DN of their own
+    <a href="docs.html#schema-oc-aeHost">aeHost</a> entry.
+  </li>
+  <li>
+    Search all relevant
+    <a href="docs.html#schema-oc-aeSrvGroup">aeSrvGroup</a>
+    entries.
+  </li>
+  <li>
+    Construct the search filters for searching user, group and sudoers
+    entries based on the attributes found in <em>aeSrvGroup</em> entries
+    searched before:
+    <ul>
+      <li>aeLoginGroups</li>
+      <li>aeVisibleGroups</li>
+      <li>aeVisibleSudoers</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="pam-nss-linux">Linux integration</h2>
 <p>
   <img
     class="svg_image"
