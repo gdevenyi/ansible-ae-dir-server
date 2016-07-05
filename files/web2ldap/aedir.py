@@ -391,10 +391,29 @@ syntax_registry.registerAttrType(
 )
 
 
-class AESrvGroup(DynamicDNSelectList):
+class AESameZoneObject(DynamicDNSelectList):
+  oid = 'AESameZoneObject-oid'
+  desc = 'AE-DIR: DN of referenced aeSrvGroup entry this is proxy for'
+  ldap_url = 'ldap:///_?cn?sub?(&(objectClass=aeObject)(aeStatus=0))'
+
+  def _determineSearchDN(self,current_dn,ldap_url_dn):
+    dn_list = ldap.dn.explode_dn(self._dn.encode(self._ls.charset))
+    return  ','.join(dn_list[-2:])
+
+
+class AESrvGroup(AESameZoneObject):
   oid = 'AESrvGroup-oid'
   desc = 'AE-DIR: DN of referenced aeSrvGroup entry'
   ldap_url = 'ldap:///_?cn?sub?(&(objectClass=aeSrvGroup)(aeStatus=0))'
+
+  def _determineFilter(self):
+    filter_str = self.lu_obj.filterstr or '(objectClass=*)'
+    dn_u = self._dn.decode(self._ls.charset)
+    parent_dn = ldaputil.base.ParentDN(dn_u)
+    return '(&%s(!(entryDN=%s)))' % (
+      filter_str,
+      parent_dn.encode(self._ls.charset),
+    )
 
 syntax_registry.registerAttrType(
   AESrvGroup.oid,[
@@ -403,14 +422,17 @@ syntax_registry.registerAttrType(
 )
 
 
-class AEProxyFor(AESrvGroup):
+class AEProxyFor(AESameZoneObject):
   oid = 'AEProxyFor-oid'
   desc = 'AE-DIR: DN of referenced aeSrvGroup entry this is proxy for'
-  ldap_url = 'ldap:///..?cn?sub?(&(objectClass=aeSrvGroup)(aeStatus=0)(!(aeProxyFor=*)))'
+  ldap_url = 'ldap:///_?cn?sub?(&(objectClass=aeSrvGroup)(aeStatus=0)(!(aeProxyFor=*)))'
 
-  def _determineSearchDN(self,current_dn,ldap_url_dn):
-    dn_list = ldap.dn.explode_dn(self._dn.encode(self._ls.charset))
-    return  ','.join(dn_list[-2:])
+  def _determineFilter(self):
+    filter_str = self.lu_obj.filterstr or '(objectClass=*)'
+    return '(&%s(!(entryDN=%s)))' % (
+      filter_str,
+      self._dn,
+    )
 
 syntax_registry.registerAttrType(
   AEProxyFor.oid,[
