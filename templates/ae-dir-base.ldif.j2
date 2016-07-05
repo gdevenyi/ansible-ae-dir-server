@@ -655,7 +655,7 @@ description: AE-DIR provider replica host for {{ service_fqdn }}
 dn: cn={{ interface }},host={{ host }},cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir_suffix }}
 aeStatus: 0
 aeTag: ae-tag-init
-aeTicketId: IAM-44
+aeTicketId: {{ aedir_init_ticket_id }}
 cn: {{ interface }}
 ipHostNumber: {{ interface_ipv4 }}
 macAddress: {{ hostvars[host][interface_fact]["macaddress"] }}
