@@ -728,7 +728,7 @@ class AEPerson(DynamicDNSelectList):
   desc = 'AE-DIR: DN of person entry'
   ldap_url = 'ldap:///_?displayName?sub?(objectClass=aePerson)'
   ref_attrs = (
-    (None,u'Users','aeUser',u'Search all personal AE-DIR user accounts associated with this person.'),
+    (None,u'Users',None,u'Search all personal AE-DIR user accounts associated with this person.'),
 #    (None,u'Devices','aeDevice',u'Search all personal AE-DIR user accounts associated with this person.'),
   )
   ae_status_map = {
