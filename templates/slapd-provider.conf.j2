@@ -1291,16 +1291,20 @@ constraint_attribute
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=oathHOTPToken)"
 
 
-# Constraints on applicable password policy for certain object classes
+# Constraints on applicable password policy for certain object classes in certain zone
 constraint_attribute pwdPolicySubentry
-  regex "^cn=ppolicy-users,cn=ae,{{ aedir_suffix }}$"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeUser)"
+  uri "ldap:///cn=ppolicy-users,cn=ae,{{ aedir_suffix }}?entryDN?base?(objectClass=pwdPolicy)"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(&(objectClass=aeUser)(!(entryDN:dnSubtreeMatch:=cn=base,ou=ae-dir)))"
 constraint_attribute pwdPolicySubentry
-  regex "^cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}$"
+  uri "ldap:///cn=ppolicy-base-users,cn=ae,{{ aedir_suffix }}?entryDN?base?(objectClass=pwdPolicy)"
+  restrict="ldap:///cn=base,{{ aedir_suffix }}??sub?(objectClass=aeUser)"
+constraint_attribute pwdPolicySubentry
+  uri "ldap:///cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}?entryDN?base?(objectClass=pwdPolicy)"
   restrict="ldap:///{{ aedir_suffix }}??sub?(|(objectClass=aeHost)(objectClass=aeService))"
 constraint_attribute pwdPolicySubentry
-  regex "^cn=ppolicy-otptokens,cn=ae,{{ aedir_suffix }}$"
+  uri "ldap:///cn=ppolicy-otptokens,cn=ae,{{ aedir_suffix }}?entryDN?base?(objectClass=pwdPolicy)"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=oathToken)"
+
 
 # restrict memberUID to be consistent with group membership defined in member
 constraint_attribute memberUID
