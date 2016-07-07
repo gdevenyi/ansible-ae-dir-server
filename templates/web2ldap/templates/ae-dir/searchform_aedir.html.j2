@@ -4,13 +4,14 @@
 
 <datalist id="zonenames">
   <option value="ae" title="&AElig;-DIR itself">&AElig;-DIR</option>
-  <option value="people" title="Person data">People</option>
+  <option value="{{ aedir_org_zone }}" title="Person data">People</option>
+  <option value="{{ aedir_base_zone }}" title="Primary/base accounts">Base</option>
   <option value="pub" title="Public data">Public</option>
 </datalist>
 
 <datalist id="zonedn">
   <option value="cn=ae,{{ aedir_suffix }}" title="&AElig;-DIR itself">&AElig;-DIR</option>
-  <option value="cn=people,{{ aedir_suffix }}" title="Person data">People</option>
+  <option value="cn={{ aedir_org_zone }},{{ aedir_suffix }}" title="Personal and department entries">People/Orga</option>
   <option value="cn=pub,{{ aedir_suffix }}" title="Public data">Public</option>
 </datalist>
 

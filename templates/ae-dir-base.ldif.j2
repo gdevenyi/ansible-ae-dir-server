@@ -443,7 +443,7 @@ pwdSafeModify: FALSE
 #---------------------------------------------------------------------------
 #
 {% for unique_identifier, person_attrs in aedir_init_aepersons.iteritems() %}
-dn: uniqueIdentifier={{ unique_identifier }},cn=people,{{ aedir_suffix }}
+dn: uniqueIdentifier={{ unique_identifier }},cn={{ aedir_org_zone }},{{ aedir_suffix }}
 uniqueIdentifier: {{ unique_identifier }}
 objectClass: person
 objectClass: organizationalPerson
@@ -474,7 +474,7 @@ objectClass: posixAccount
 objectClass: ldapPublicKey
 aeStatus: 0
 aeTag: ae-tag-init
-aePerson: uniqueIdentifier={{ ae_user.unique_identifier }},cn=people,{{ aedir_suffix }}
+aePerson: uniqueIdentifier={{ ae_user.unique_identifier }},cn={{ aedir_org_zone }},{{ aedir_suffix }}
 description: {{ ae_user.description }}
 homeDirectory: /home/{{ ae_user.uid }}
 loginShell: /bin/bash

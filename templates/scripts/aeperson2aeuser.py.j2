@@ -27,7 +27,7 @@ from ldap.ldapobject import ReconnectLDAPObject
 # Constants (configuration)
 #-----------------------------------------------------------------------
 
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 
 # Trace level for python-ldap logs
 PYLDAP_TRACELEVEL = 0
@@ -41,7 +41,7 @@ LDAP_RETRYDELAY = 10.0
 
 AEDIR_LDAPI_URI = '{{ openldap_ldapi_uri }}'
 AEDIR_SEARCHBASE = '{{ aedir_suffix }}'
-AEDIR_PERSON_BASE = 'cn=people,'+AEDIR_SEARCHBASE
+AEDIR_PERSON_BASE = AEDIR_SEARCHBASE
 
 # Filter to be used to search for aePerson entries
 AEDIR_AEPERSON_FILTERSTR = '(objectClass=aePerson)'
@@ -287,7 +287,7 @@ class SyncProcess(object):
         )
         msg_id = self.ldap_conn.search(
             AEDIR_PERSON_BASE,
-            ldap.SCOPE_ONELEVEL,
+            ldap.SCOPE_SUBTREE,
             aeperson_filterstr,
             attrlist=AEDIR_AEPERSON_ATTRS,
         )
