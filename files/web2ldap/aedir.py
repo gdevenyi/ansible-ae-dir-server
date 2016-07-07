@@ -766,7 +766,7 @@ class AEPerson(DynamicDNSelectList,AEObjectUtil):
       filter_components.append('(|{})'.format(''.join(aeperson_aestatus_filters)))
     elif len(aeperson_aestatus_filters)==1:
       filter_components.append(''.join(aeperson_aestatus_filters))
-    if not self._get_zone_name() in self.mail_zones:
+    if self.mail_zones is None or not self._get_zone_name() in self.mail_zones:
       filter_components.append('(mail=*)')
     filter_str = '(&{})'.format(''.join(filter_components))
     return filter_str
@@ -819,6 +819,22 @@ class AEPerson2(AEPerson):
 syntax_registry.registerAttrType(
   AEPerson.oid,[
     AE_OID_PREFIX+'.4.16', # aePerson
+  ]
+)
+
+
+class AEManager(AEPerson):
+  oid = 'AEManager-oid'
+  desc = 'AE-DIR: Manager responsible for a person/department'
+  mail_zones = None
+
+syntax_registry.registerAttrType(
+  AEManager.oid,[
+    '0.9.2342.19200300.100.1.10', # manager
+  ],
+  structural_oc_oids=[
+    AE_PERSON_OID, # aePerson
+    AE_DEPT_OID, # aeDept
   ]
 )
 
@@ -1294,22 +1310,6 @@ class AEStatus(SelectList,IntegerRange):
 syntax_registry.registerAttrType(
   AEStatus.oid,[
     AE_OID_PREFIX+'.4.5', # aeStatus
-  ]
-)
-
-
-class AEManager(DynamicDNSelectList):
-  oid = 'AEManager-oid'
-  desc = 'AE-DIR: Manager responsible for a person/department'
-  ldap_url = 'ldap:///cn=people,_?displayName?one?(&(objectClass=aePerson)(aeStatus=0))'
-
-syntax_registry.registerAttrType(
-  AEManager.oid,[
-    '0.9.2342.19200300.100.1.10', # manager
-  ],
-  structural_oc_oids=[
-    AE_PERSON_OID, # aePerson
-    AE_DEPT_OID, # aeDept
   ]
 )
 
