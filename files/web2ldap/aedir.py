@@ -69,6 +69,22 @@ syntax_registry.registerAttrType(
 )
 
 
+class AEObjectUtil:
+
+  def _get_zone_name(self):
+    dn_list = ldap.dn.str2dn(self._dn.encode(self._ls.charset))
+    try:
+      zone_cn = dict([
+        (at,av)
+        for at,av,flags in dn_list[-2]
+      ])['cn'].decode(self._ls.charset)
+    except (KeyError,IndexError):
+      result = None
+    else:
+      result = zone_cn
+    return result # _get_zone_name()
+
+
 class AEHomeDirectory(HomeDirectory):
   oid = 'AEHomeDirectory-oid'
 
@@ -723,7 +739,7 @@ syntax_registry.registerAttrType(
 )
 
 
-class AEPerson(DynamicDNSelectList):
+class AEPerson(DynamicDNSelectList,AEObjectUtil):
   oid = 'AEPerson-oid'
   desc = 'AE-DIR: DN of person entry'
   ldap_url = 'ldap:///_?displayName?sub?(objectClass=aePerson)'
@@ -731,6 +747,7 @@ class AEPerson(DynamicDNSelectList):
     (None,u'Users',None,u'Search all personal AE-DIR user accounts associated with this person.'),
 #    (None,u'Devices','aeDevice',u'Search all personal AE-DIR user accounts associated with this person.'),
   )
+  mail_zones = set(('base',))
   ae_status_map = {
     -1:(0,),
     0:(0,),
@@ -739,15 +756,19 @@ class AEPerson(DynamicDNSelectList):
   }
 
   def _determineFilter(self):
+    filter_components = [DynamicDNSelectList._determineFilter(self)]
     ae_status = int(self._entry.get('aeStatus',['0'])[0])
     aeperson_aestatus_filters = [
       '(aeStatus={0})'.format(st)
       for st in map(str,self.ae_status_map[ae_status])
     ]
-    filter_str = '(&{0}(|{1}))'.format(
-      DynamicDNSelectList._determineFilter(self),
-      ''.join(aeperson_aestatus_filters),
-    )
+    if len(aeperson_aestatus_filters)>1:
+      filter_components.append('(|{})'.format(''.join(aeperson_aestatus_filters)))
+    elif len(aeperson_aestatus_filters)==1:
+      filter_components.append(''.join(aeperson_aestatus_filters))
+    if not self._get_zone_name() in self.mail_zones:
+      filter_components.append('(mail=*)')
+    filter_str = '(&{})'.format(''.join(filter_components))
     return filter_str
 
 
@@ -1117,6 +1138,9 @@ class AECommonNameAEZone(DirectoryString):
   oid = 'AECommonNameAEZone-oid'
   maxValues = 1
 
+  def sanitizeInput(self,attrValue):
+    return attrValue.strip()
+
 syntax_registry.registerAttrType(
   AECommonNameAEZone.oid,[
     '2.5.4.3', # cn alias commonName
@@ -1127,7 +1151,7 @@ syntax_registry.registerAttrType(
 )
 
 
-class AEZonePrefixCommonName(DirectoryString):
+class AEZonePrefixCommonName(DirectoryString,AEObjectUtil):
   oid = 'AEZonePrefixCommonName-oid'
   desc = 'AE-DIR: Attribute values have to be prefixed with zone name'
   maxValues = 1
@@ -1136,19 +1160,6 @@ class AEZonePrefixCommonName(DirectoryString):
 
   def sanitizeInput(self,attrValue):
     return attrValue.strip()
-
-  def _get_zone_name(self):
-    dn_list = ldap.dn.str2dn(self._dn.encode(self._ls.charset))
-    try:
-      zone_cn = dict([
-        (at,av)
-        for at,av,flags in dn_list[-2]
-      ])['cn'].decode(self._ls.charset)
-    except (KeyError,IndexError):
-      result = None
-    else:
-      result = zone_cn
-    return result # _get_zone_name()
 
   def transmute(self,attrValues):
     attrValues = [attrValues[0].lower()]
