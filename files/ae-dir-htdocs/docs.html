@@ -451,17 +451,66 @@
     This attribute is used to record the bug/issue tracker ID of the last
     change applied to an entry.
   </dd>
-  <dt id="schema-at-aeNotBefore">
-    aeNotBefore
+  <dt id="schema-validity-period">
+    Validity period
   </dt>
   <dd>
-    The entry must not be actively used before this timestamp.
-  </dd>
-  <dt id="schema-at-aeNotAfter">
-    aeNotAfter
-  </dt>
-  <dd>
-    The entry must not be actively used after this timestamp.
+    Two attributes define the time period in which an entry can be used:
+    <dl>
+      <dt id="schema-at-aeNotBefore">
+        aeNotBefore
+      </dt>
+      <dd>
+        The entry must not be actively used before this timestamp.
+      </dd>
+      <dt id="schema-at-aeNotAfter">
+        aeNotAfter
+      </dt>
+      <dd>
+        The entry must not be actively used after this timestamp.
+      </dd>
+    </dl>
+    The validity period affects which
+    <a href="#schema-at-aeStatus">aeStatus</a>
+    values are valid at current time:
+    <table>
+      <tr>
+        <th>
+          Validity period
+        </th>
+        <th>
+          aeStatus
+        </th>
+      </tr>
+      <tr>
+        <td>
+          aeNotBefore &lt;= [current time] &lt;= aeNotAfter
+        </td>
+        <td>
+          requested (-1)<br>
+          active (0)<br>
+          deactivated (1)<br>
+          archived (2)
+        </td>
+      </tr>
+      <tr>
+        <td>
+          [current time] &gt; aeNotAfter (expired)
+        </td>
+        <td>
+          deactivated (1)<br>
+          archived (2)
+        </td>
+      </tr>
+      <tr>
+        <td>
+          [current time] &lt; aeNotBefore
+        </td>
+        <td>
+          requested (-1)<br>
+        </td>
+      </tr>
+    </table>
   </dd>
   <dt id="schema-at-aeTag">
     aeTag
