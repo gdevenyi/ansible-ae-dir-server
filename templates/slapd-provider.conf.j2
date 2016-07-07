@@ -385,7 +385,7 @@ access to
 # The replica ACLs MUST be before secret attributes' ACLs
 #---------------------------------------------------------------------------
 
-# Access control for attributes only visible on provider replicas
+# Access control for entries/attributes only visible on provider replicas
 #---------------------------------------------------------------------------
 
 access to
@@ -393,13 +393,19 @@ access to
   attrs=authTimestamp,pwdFailureTime,pwdHistory,oathSecret,msPwdResetAdminPw
     by group/aeGroup/member="cn=ae-providers,cn=ae,{{ aedir_suffix }}" read
     by group/aeGroup/member="cn=ae-replicas,cn=ae,{{ aedir_suffix }}" none
-    by * break
+    by * none break
+
+access to
+  dn.subtree="cn=people,{{ aedir_suffix }}"
+    by group/aeGroup/member="cn=ae-providers,cn=ae,{{ aedir_suffix }}" read
+    by group/aeGroup/member="cn=ae-replicas,cn=ae,{{ aedir_suffix }}" none
+    by * none break
 
 # All replicas can read everything else
 access to
   dn.subtree="{{ aedir_suffix }}"
     by group/aeGroup/member="cn=ae-replicas,cn=ae,{{ aedir_suffix }}" read
-    by * break
+    by * none break
 
 # Access control for various password attributes
 #---------------------------------------------------------------------------
@@ -479,7 +485,7 @@ access to
   filter="(&(objectClass=oathToken)(aeStatus=0)(oathHOTPCounter>=0))"
   attrs=oathSecret
     by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" read
-    by * break
+    by * none break
 
 access to
   dn.subtree="{{ aedir_suffix }}"
@@ -506,7 +512,7 @@ access to
   dn.subtree="{{ aedir_suffix }}"
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" manage
     by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
-    by * break
+    by * none break
 
 # Block access to archived entries from here no matter what
 access to
@@ -541,7 +547,7 @@ access to
   filter="(objectClass=oathUser)"
   attrs=authTimestamp,pwdFailureTime
     by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" manage
-    by * break
+    by * none break
 
 # read access to password policy DN for OTP validator
 access to
@@ -549,7 +555,7 @@ access to
   filter="(objectClass=oathUser)"
   attrs=pwdPolicySubentry
     by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" read
-    by * break
+    by * none break
 
 # write access to special status attributes for OTP validator
 access to
@@ -558,7 +564,7 @@ access to
   attrs=oathLastLogin,oathFailureCount,oathLastFailure
     by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" write
     by group/aeGroup/member="cn=otp-zone-admins,cn=otp,{{ aedir_suffix }}" write
-    by * break
+    by * none break
 
 # oathHOTPCounter in token entries may be
 #---------------------------------------------------------------------------
@@ -575,7 +581,7 @@ access to
   attrs=oathHOTPCounter
   val/integerMatch="0"
     by self =ra
-    by * break
+    by * none break
 
 access to
   dn.onelevel="cn=otp,{{ aedir_suffix }}"
@@ -613,21 +619,21 @@ access to
     by group/aeGroup/member.expand="cn=${d1}-zone-admins,cn=${d1},{{ aedir_suffix }}" write
     by group/aeGroup/member.expand="cn=${d1}-zone-auditors,cn=${d1},{{ aedir_suffix }}" read
     by set="user/-1/entryDN & this/entryDN" search
-    by * break
+    by * none break
 access to
   dn.regex="^cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
     by group/aeGroup/member.expand="cn=${d1}-zone-admins,cn=${d1},{{ aedir_suffix }}" read
     by group/aeGroup/member.expand="cn=${d1}-zone-auditors,cn=${d1},{{ aedir_suffix }}" read
     by set="user/-1/entryDN & this/entryDN" read
     by users search
-    by * break
+    by * none break
 # aeSudoRule entries
 access to
   dn.regex="^cn=({{ aedir_aesudorule_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
   filter="(objectClass=aeSudoRule)"
     by group/aeGroup/member.expand="cn=${d2}-zone-admins,cn=${d2},{{ aedir_suffix }}" write
     by group/aeGroup/member.expand="cn=${d2}-zone-auditors,cn=${d2},{{ aedir_suffix }}" read
-    by * break
+    by * none break
 # aeGroup entries add-only attributes
 access to
   dn.regex="^cn=({{ aedir_aegroup_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
@@ -635,14 +641,14 @@ access to
   attrs=objectClass,entry,cn,gidNumber
     by group/aeGroup/member.expand="cn=${d2}-zone-admins,cn=${d2},{{ aedir_suffix }}" =arscxd
     by group/aeGroup/member.expand="cn=${d2}-zone-auditors,cn=${d2},{{ aedir_suffix }}" read
-    by * break
+    by * none break
 # aeGroup entries
 access to
   dn.regex="^cn=({{ aedir_aegroup_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
   filter="(objectClass=aeGroup)"
     by group/aeGroup/member.expand="cn=${d2}-zone-admins,cn=${d2},{{ aedir_suffix }}" write
     by group/aeGroup/member.expand="cn=${d2}-zone-auditors,cn=${d2},{{ aedir_suffix }}" read
-    by * break
+    by * none break
 # aeUser entries add-only attributes
 access to
   dn.regex="^uid=({{ aedir_aeuser_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
@@ -650,7 +656,7 @@ access to
   attrs=objectClass,entry,uid,uidNumber,aePerson
     by group/aeGroup/member.expand="cn=${d2}-zone-admins,cn=${d2},{{ aedir_suffix }}" =arscxd
     by group/aeGroup/member.expand="cn=${d2}-zone-auditors,cn=${d2},{{ aedir_suffix }}" read
-    by * break
+    by * none break
 # aeUser entries not archived
 access to
   dn.regex="^uid=({{ aedir_aeuser_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
@@ -658,14 +664,14 @@ access to
   attrs=!msPwdResetObject
     by group/aeGroup/member.expand="cn=${d2}-zone-admins,cn=${d2},{{ aedir_suffix }}" write
     by group/aeGroup/member.expand="cn=${d2}-zone-auditors,cn=${d2},{{ aedir_suffix }}" read
-    by * break
+    by * none break
 # aeService entries
 access to
   dn.regex="^uid=({{ aedir_aeservice_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
   filter="(objectClass=aeService)"
     by group/aeGroup/member.expand="cn=${d2}-zone-admins,cn=${d2},{{ aedir_suffix }}" write
     by group/aeGroup/member.expand="cn=${d2}-zone-auditors,cn=${d2},{{ aedir_suffix }}" read
-    by * break
+    by * none break
 # aeSrvGroup entries
 access to
   dn.regex="^cn=({{ aedir_aesrvgroup_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
@@ -675,7 +681,7 @@ access to
     by set="user/entryDN & this/aeSetupGroups/member" write
     by set="user/entryDN & this/aeSrvGroup/aeSetupGroups/member" write
     by group/aeGroup/member.expand="cn=${d2}-zone-auditors,cn=${d2},{{ aedir_suffix }}" read
-    by * break
+    by * none break
 access to
   dn.regex="^cn=({{ aedir_aesrvgroup_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
   filter="(objectClass=aeSrvGroup)"
@@ -683,7 +689,7 @@ access to
     by group/aeGroup/member.expand="cn=${d2}-zone-auditors,cn=${d2},{{ aedir_suffix }}" read
     by set="user/entryDN & this/aeSetupGroups/member" read
     by set="user/entryDN & this/aeSrvGroup/aeSetupGroups/member" read
-    by * break
+    by * none break
 # aeHost entries have to be subordinate entries of aeSrvGroup entries
 access to
   dn.regex="^host=([a-z]?[a-z0-9.-]+),cn=({{ aedir_aesrvgroup_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
@@ -692,7 +698,7 @@ access to
     by set="user/entryDN & this/-1/aeSetupGroups/member" write
     by set="user/entryDN & this/aeSrvGroup/aeSetupGroups/member" write
     by group/aeGroup/member.expand="cn=${d3}-zone-auditors,cn=${d3},{{ aedir_suffix }}" read
-    by * break
+    by * none break
 # aeService entries can also be subordinate entries of aeSrvGroup
 # entries if the need read access to aeUser and aeGroup entries
 access to
@@ -702,25 +708,25 @@ access to
     by set="user/entryDN & this/-1/aeSetupGroups/member" write
     by set="user/entryDN & this/aeSrvGroup/aeSetupGroups/member" write
     by group/aeGroup/member.expand="cn=${d3}-zone-auditors,cn=${d3},{{ aedir_suffix }}" read
-    by * break
+    by * none break
 
-# Security zone cn=people
+# Zone cn=people
 #------------------------------------------------------------------
 
-# aePerson and aeDept entries solely beneath aeZone cn=people
+# administration of aePerson entries beneath zone cn=people
 access to
   dn.regex="^uniqueIdentifier=({{ aedir_aeperson_uniqueid_regex }}),cn=people,{{ aedir_suffix }}$"
   filter="(objectClass=aePerson)"
     by group/aeGroup/member.expand="cn=people-zone-admins,cn=people,{{ aedir_suffix }}" write
     by group/aeGroup/member.expand="cn=people-zone-auditors,cn=people,{{ aedir_suffix }}" read
-    by * break
+    by * none break
+# administration of aeDept entries beneath aeZone cn=people
 access to
   dn.regex="^departmentNumber=({{ aedir_aedept_deptnumber_regex }}),cn=people,{{ aedir_suffix }}$"
   filter="(objectClass=aeDept)"
     by group/aeGroup/member.expand="cn=people-zone-admins,cn=people,{{ aedir_suffix }}" write
     by group/aeGroup/member.expand="cn=people-zone-auditors,cn=people,{{ aedir_suffix }}" read
-    by * break
-
+    by * none break
 
 # After this ACL all inactive entries are only visible for all zone admins
 #---------------------------------------------------------------------------
@@ -775,7 +781,7 @@ access to
   filter="(objectClass=aeUser)"
   attrs=entry,uid,aeStatus,objectClass,mail,pwdPolicySubentry
     by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" read
-    by * break
+    by * none break
 
 # Allow search access to memberOf for special services
 access to
@@ -783,7 +789,7 @@ access to
   attrs=memberOf
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" search
     by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" search
-    by * break
+    by * none break
 
 # Acess to user, group and sudoers entries
 #------------------------------------------------------------------
@@ -800,7 +806,7 @@ access to
     by set="user/aeSrvGroup/aeLoginGroups & this/entryDN" read
     by set="user/aeSrvGroup/aeVisibleGroups & this/entryDN" read
     by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups & this/entryDN" read
-    by * break
+    by * none break
 
 # Give read access to SUDO rules to servers
 access to
@@ -822,7 +828,7 @@ access to
     by set="user/-1/aeProxyFor/aeLoginGroups/member & this/entryDN" read
     by set="user/aeSrvGroup/aeLoginGroups/member & this/entryDN" read
     by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups/member & this/entryDN" read
-    by * break
+    by * none break
 
 # Give read access to loginShell to servers which
 # shall allow login for the user's groups
@@ -835,7 +841,7 @@ access to
     by set="user/-1/aeProxyFor/aeLoginGroups/member & this/entryDN" read
     by set="user/aeSrvGroup/aeLoginGroups/member & this/entryDN" read
     by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups/member & this/entryDN" read
-    by * break
+    by * none break
 
 # Read access to server groups filtered by (objectClass=aeSrvGroup)
 #------------------------------------------------------------------
@@ -848,7 +854,7 @@ access to
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeProxyFor & this/entryDN" read
     by set="user/aeSrvGroup/aeProxyFor & this/entryDN" read
-    by * break
+    by * none break
 
 # Read access to some attrs of aeSrvGroup entries
 # 1. for subordinate aeHost entries
@@ -861,7 +867,7 @@ access to
     by self.level{1} read
     by set="user/-1/aeProxyFor & this/entryDN" read
     by set="user/aeSrvGroup/aeProxyFor & this/entryDN" read
-    by * break
+    by * none break
 
 # Read access to server entries filtered by (objectClass=aeHost)
 #------------------------------------------------------------------
@@ -873,7 +879,7 @@ access to
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeProxyFor & this/-1/entryDN" read
     by set="user/aeSrvGroup/aeProxyFor & this/-1/entryDN" read
-    by * break
+    by * none break
 
 # Personal user accounts filtered by (objectClass=aeUser)
 #------------------------------------------------------------------
@@ -884,7 +890,7 @@ access to
   filter="(objectClass=aeUser)"
   attrs=description
     by self write
-    by * break
+    by * none break
 
 # Give read access to POSIX accounts to servers
 access to
@@ -898,7 +904,7 @@ access to
     by set="user/aeSrvGroup/aeLoginGroups/member & this/entryDN" read
     by set="user/aeSrvGroup/aeVisibleGroups/member & this/entryDN" read
     by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups/member & this/entryDN" read
-    by * break
+    by * none break
 
 # Access to pwdChangedTime for SSH key sync
 access to
@@ -910,7 +916,7 @@ access to
     by set="user/-1/aeProxyFor/aeLoginGroups/member & this/entryDN" search
     by set="user/aeSrvGroup/aeLoginGroups/member & this/entryDN" search
     by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups/member & this/entryDN" search
-    by * break
+    by * none break
 
 # Only on providers
 access to
@@ -922,7 +928,7 @@ access to
     by set="user/-1/aeProxyFor/aeLoginGroups/member & this/entryDN" search
     by set="user/aeSrvGroup/aeLoginGroups/member & this/entryDN" search
     by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups/member & this/entryDN" search
-    by * break
+    by * none break
 
 # Read access to specific memberOf *values* to all aeHost entries
 # where aeSrvGroup references this particular group DN
@@ -933,7 +939,7 @@ access to
   val.regex="^(.+)$"
     by set.expand="user/-1/entryDN & [ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeSrvGroup)(aeStatus=0)(|(aeLoginGroups=${v1})(aeVisibleGroups=${v1})))]/entryDN" read
     by set.expand="user/aeSrvGroup/entryDN & [ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeSrvGroup)(aeStatus=0)(|(aeLoginGroups=${v1})(aeVisibleGroups=${v1})))]/entryDN" read
-    by * break
+    by * none break
 
 # Terminating ACLs for aeZone, aeUser and aeGroup entries
 #------------------------------------------------------------------
@@ -983,12 +989,13 @@ access to
     by set="user/entryDN & ([ldap:///] + user/entryDN + [?entryDN?base?(&(objectClass=aeUser)(aeStatus=0))])/entryDN" read
     by * auth
 
-# Person entries
-#------------------------------------------------------------------
+# Read-only (but no administrative) access to active aePerson entries
+#---------------------------------------------------------------------------
 
-# Give read access to confidential employeeNumber only to
+# Give read access to confidential HR attributes only to
 # personal user accounts referencing the person entry
 access to
+  dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=aePerson)"
   attrs=employeeNumber,aeNotBefore,aeNotAfter
     by set="user/aePerson & this/entryDN" read
@@ -998,9 +1005,18 @@ access to
 # - personal user accounts referencing the person entry
 # - all zone admins
 access to
+  dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=aePerson)"
     by set="user/aePerson & this/entryDN" read
     by set="user/entryDN & ([ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(member=] + user/entryDN + [))])/member" read
+    by * none break
+
+# restricted addressbook usage of zone cn=people for normal users
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(objectClass=aePerson)"
+  attrs=entry,cn,sn,givenName,mail,userCertificate
+    by dn.onelevel="cn=base,{{ aedir_suffix }}" read
     by * none
 
 # Last catch ACLs
@@ -1374,8 +1390,7 @@ overlay syncprov
 syncprov-checkpoint 1000 2
 syncprov-reloadhint TRUE
 
-{% for provider_replica in openldap_syncrepl_providers %}
-{% if provider_replica!=openldap_service_fqdn %}
+{% for provider_replica in openldap_syncrepl_providers if provider_replica!=openldap_service_fqdn %}
 syncrepl rid=0{{ loop.index }}
   provider=ldaps://{{ provider_replica }}
   type=refreshAndPersist
@@ -1391,7 +1406,6 @@ syncrepl rid=0{{ loop.index }}
   tls_cert={{ openldap_cert_pathname }}
   tls_key={{ openldap_key_pathname }}
 
-{% endif %}
 {% endfor %}
 
 mirrormode true
