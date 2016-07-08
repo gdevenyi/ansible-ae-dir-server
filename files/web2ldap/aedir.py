@@ -1338,15 +1338,15 @@ class AEStatus(SelectList,IntegerRange):
     if not SelectList._validate(self,attrValue):
       return False
     ae_status = int(attrValue)
+    current_time = time.gmtime(time.time())
     try:
       ae_not_before = time.strptime(self._entry['aeNotBefore'][0],r'%Y%m%d%H%M%SZ')
     except (KeyError, ValueError):
-      ae_not_before = None
+      ae_not_before = time.strptime('19700101000000Z',r'%Y%m%d%H%M%SZ')
     try:
       ae_not_after = time.strptime(self._entry['aeNotAfter'][0],r'%Y%m%d%H%M%SZ')
     except (KeyError, ValueError):
-      ae_not_after = None
-    current_time = time.gmtime(time.time())
+      ae_not_after = current_time
     # see https://www.ae-dir.com/docs.html#schema-validity-period
     result = ae_not_before <= current_time <= ae_not_after
     if current_time > ae_not_after:
