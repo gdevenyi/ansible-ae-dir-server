@@ -49,13 +49,6 @@ AE_DEPT_OID = AE_OID_PREFIX+'.6.29'
 
 
 syntax_registry.registerAttrType(
-  NotBefore.oid,[
-    AE_OID_PREFIX+'.4.22', # aeNotBefore
-  ]
-)
-
-
-syntax_registry.registerAttrType(
   NotAfter.oid,[
     AE_OID_PREFIX+'.4.23', # aeNotAfter
   ]
@@ -1297,6 +1290,40 @@ syntax_registry.registerAttrType(
 )
 
 
+class AENotBefore(NotBefore):
+  oid = 'AENotBefore-oid'
+  desc = 'AE-DIR: begin of validity period'
+
+syntax_registry.registerAttrType(
+  AENotBefore.oid,[
+    AE_OID_PREFIX+'.4.22', # aeNotBefore
+  ]
+)
+
+
+class AENotAfter(NotAfter):
+  oid = 'AENotAfter-oid'
+  desc = 'AE-DIR: begin of validity period'
+
+  def _validate(self,attrValue):
+    result = NotAfter._validate(self,attrValue)
+    if result:
+      ae_not_after = time.strptime(attrValue,r'%Y%m%d%H%M%SZ')
+      try:
+        ae_not_before = time.strptime(self._entry['aeNotBefore'][0],r'%Y%m%d%H%M%SZ')
+      except (KeyError,ValueError):
+        result = True
+      else:
+        result = (ae_not_before<=ae_not_after)
+    return result
+
+syntax_registry.registerAttrType(
+  AENotAfter.oid,[
+    AE_OID_PREFIX+'.4.23', # aeNotAfter
+  ]
+)
+
+
 class AEStatus(SelectList,IntegerRange):
   oid = 'AEStatus-oid'
   desc = 'AE-DIR: Status of object'
@@ -1306,6 +1333,46 @@ class AEStatus(SelectList,IntegerRange):
     u'1':u'deactivated',
     u'2':u'archived',
   }
+
+  def _validate(self,attrValue):
+    if not SelectList._validate(self,attrValue):
+      return False
+    ae_status = int(attrValue)
+    try:
+      ae_not_before = time.strptime(self._entry['aeNotBefore'][0],r'%Y%m%d%H%M%SZ')
+    except (KeyError, ValueError):
+      ae_not_before = None
+    try:
+      ae_not_after = time.strptime(self._entry['aeNotAfter'][0],r'%Y%m%d%H%M%SZ')
+    except (KeyError, ValueError):
+      ae_not_after = None
+    current_time = time.gmtime(time.time())
+    # see https://www.ae-dir.com/docs.html#schema-validity-period
+    result = ae_not_before <= current_time <= ae_not_after
+    if current_time > ae_not_after:
+      result = ae_status>=1
+    elif current_time < ae_not_before:
+      result = ae_status==-1
+    return result
+
+  def transmute(self,attrValues):
+    ae_status = int(attrValues[0])
+    current_time = time.gmtime(time.time())
+    try:
+      ae_not_before = time.strptime(self._entry['aeNotBefore'][0],r'%Y%m%d%H%M%SZ')
+    except (KeyError, ValueError):
+      pass
+    else:
+      if ae_status==0 and current_time < ae_not_before:
+        ae_status = -1
+    try:
+      ae_not_after = time.strptime(self._entry['aeNotAfter'][0],r'%Y%m%d%H%M%SZ')
+    except (KeyError, ValueError):
+      pass
+    else:
+      if ae_status<=0 and current_time > ae_not_after:
+        ae_status = 1
+    return [str(ae_status)]
 
 syntax_registry.registerAttrType(
   AEStatus.oid,[
