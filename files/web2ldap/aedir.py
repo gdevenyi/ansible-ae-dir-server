@@ -5,15 +5,16 @@ web2ldap plugin classes for
 Æ-DIR -- Yet another LDAP user and systems management
 """
 
-
 # Python's standard lib
 import re,time,calendar,socket
 
-# python-ldap
+# from python-ldap
 import ldap,ldap.filter
 
-import pyweblib.forms
+# from pyweblib
+from pyweblib.forms import HiddenInput
 
+# from internal base modules
 import ldaputil.base
 
 # web2ldap's internal application modules
@@ -82,7 +83,7 @@ class AEHomeDirectory(HomeDirectory):
   oid = 'AEHomeDirectory-oid'
 
   def formField(self):
-    input_field = pyweblib.forms.HiddenInput(
+    input_field = HiddenInput(
       self.attrType,
       ': '.join([self.attrType,self.desc]),
       self.maxLen,self.maxValues,None,
@@ -244,7 +245,7 @@ class AEUserId(IA5String):
     return form_value
 
   def formField(self):
-    return pyweblib.forms.HiddenInput(
+    return HiddenInput(
       self.attrType,
       ': '.join([self.attrType,self.desc]),
       self.maxLen,self.maxValues,None,
@@ -335,7 +336,7 @@ class AEMemberUid(MemberUID):
     return u''
 
   def formField(self):
-    input_field = pyweblib.forms.HiddenInput(
+    input_field = HiddenInput(
       self.attrType,
       ': '.join([self.attrType,self.desc]),
       self.maxLen,self.maxValues,None,
@@ -889,7 +890,7 @@ class AEDerefAttribute(DirectoryString):
     return u''
 
   def formField(self):
-    input_field = pyweblib.forms.HiddenInput(
+    input_field = HiddenInput(
       self.attrType,
       ': '.join([self.attrType,self.desc]),
       self.maxLen,self.maxValues,None,
@@ -1125,7 +1126,7 @@ class AEUniqueIdentifier(DirectoryString):
       return attrValues
 
   def formField(self):
-    input_field = pyweblib.forms.HiddenInput(
+    input_field = HiddenInput(
       self.attrType,
       ': '.join([self.attrType,self.desc]),
       self.maxLen,self.maxValues,None,
@@ -1446,4 +1447,3 @@ class AEDirLDAPSession(LDAPSessionOrig):
       return self.binddn_tmpl.format(
         username=username,searchroot=searchroot
       )
-
