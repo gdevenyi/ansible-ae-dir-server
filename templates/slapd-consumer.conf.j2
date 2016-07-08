@@ -253,10 +253,8 @@ envflags writemap
 
 index objectClass eq
 index uid eq
-index departmentNumber eq
 index uidNumber eq
 index gidNumber eq
-index homeDirectory eq
 index member eq
 index memberUID eq
 index memberOf eq
@@ -280,12 +278,7 @@ index aeRemoteHost pres,eq
 
 # sub and eq indexes
 index cn sub,eq
-index displayName sub,eq
-index sn sub,eq
-index givenName sub,eq
 index mail sub,eq
-index o sub,eq
-index ou sub,eq
 
 # server groups
 index aeLoginGroups eq
@@ -303,8 +296,6 @@ index pwdChangedTime pres,eq
 index pwdFailureTime pres,eq
 
 # for person/employee references
-index uniqueIdentifier eq
-index employeeNumber eq
 index aePerson eq
 
 # Meta data
