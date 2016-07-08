@@ -383,7 +383,22 @@ syntax_registry.registerAttrType(
 class AESrvGroupRightsGroupDN(DynamicDNSelectList):
   oid = 'AESrvGroupRightsGroupDN-oid'
   desc = 'AE-DIR: DN of user group entry'
-  ldap_url = 'ldap:///_?cn?sub?(&(objectClass=aeGroup)(aeStatus=0)(!(|(cn=ae-admins)(cn=ae-auditors)(cn=ae-login-proxies)(cn=*-zone-admins)(cn=*-zone-auditors)(cn=global-*))))'
+  ldap_url = (
+    'ldap:///_?cn?sub?'
+    '(&'
+      '(objectClass=aeGroup)'
+      '(aeStatus=0)'
+      '(!(|'
+        '(cn=ae-admins)'
+        '(cn=ae-auditors)'
+        '(cn=ae-providers)'
+        '(cn=ae-replicas)'
+        '(cn=ae-login-proxies)'
+        '(cn=*-zone-admins)'
+        '(cn=*-zone-auditors)'
+      '))'
+    ')'
+  )
 
   ref_attrs = (
     ('memberOf',u'Members',None,u'Search all member entries of this user group'),
@@ -1381,8 +1396,28 @@ syntax_registry.registerAttrType(
 )
 
 
+class AESudoUser(w2lapp.schema.plugins.sudoers.SudoUserGroup):
+  oid = 'AESudoUser-oid'
+  desc = 'AE-DIR: sudoUser'
+  ldap_url = (
+    'ldap:///_?cn,cn?sub?'
+    '(&'
+      '(objectClass=aeGroup)'
+      '(aeStatus=0)'
+      '(!(|'
+        '(cn=ae-admins)'
+        '(cn=ae-auditors)'
+        '(cn=ae-providers)'
+        '(cn=ae-replicas)'
+        '(cn=ae-login-proxies)'
+        '(cn=*-zone-admins)'
+        '(cn=*-zone-auditors)'
+      '))'
+    ')'
+  )
+
 syntax_registry.registerAttrType(
-  w2lapp.schema.plugins.sudoers.SudoUserGroup.oid,[
+  AESudoUser.oid,[
     '1.3.6.1.4.1.15953.9.1.1', # sudoUser
   ],
   structural_oc_oids=[
