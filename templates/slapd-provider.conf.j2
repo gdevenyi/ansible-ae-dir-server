@@ -266,7 +266,6 @@ index uid eq
 index departmentNumber eq
 index uidNumber eq
 index gidNumber eq
-index homeDirectory eq
 index member eq
 index memberUID eq
 index memberOf eq
@@ -1061,7 +1060,7 @@ overlay unique
 overlay constraint
 
 # Check sub-tree wide uniqueness of certain attributes
-unique_uri "ldap:///{{ aedir_suffix }}?uid,uidNumber,homeDirectory?sub?(objectClass=*)"
+unique_uri "ldap:///{{ aedir_suffix }}?uid,uidNumber?sub?(objectClass=*)"
 unique_uri "ldap:///{{ aedir_suffix }}?mailLocalAddress?sub?(objectClass=*)"
 unique_uri "ldap:///{{ aedir_suffix }}?seeAlso?sub?(objectClass=*)"
 unique_uri "ldap:///{{ aedir_suffix }}?ipHostNumber,host,aeFqdn?sub?(objectClass=*)"
@@ -1241,7 +1240,7 @@ constraint_attribute aePerson,sn
 
 # 'sudoUser' only may contain a reference to 'cn' of an active group
 constraint_attribute sudoUser
-  set "([%] + [ldap:///{{ aedir_suffix }}??sub?(&(objectClass=aeGroup)(aeStatus=0))]/cn) & this/sudoUser"
+  set "([%] + [ldap:///{{ aedir_suffix }}??sub?(&(objectClass=aeGroup)(aeStatus=0)(!(|(cn=ae-admins)(cn=ae-auditors)(cn=ae-provider)(cn=ae-replicas)(cn=ae-login-proxies)(cn=*-zone-admins)(cn=*-zone-auditors))))]/cn) & this/sudoUser"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeSudoRule)"
 
 # 'homeDirectory' must be composed as /home/<uid> for 'aeUser' entries
