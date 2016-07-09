@@ -1167,11 +1167,11 @@ constraint_attribute
 # - pub-*
 constraint_attribute
   aeLoginGroups
-  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeGroup)(aeStatus=0)(!(|(cn=ae-admins)(cn=ae-auditors)(cn=ae-login-proxies)(cn=*-zone-admins)(cn=*-zone-auditors)(cn=pub-*))))"
+  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeGroup)(aeStatus=0)(!(|(cn=ae-admins)(cn=ae-auditors)(cn=ae-provider)(cn=ae-replicas)(cn=ae-login-proxies)(cn=*-zone-admins)(cn=*-zone-auditors))))"
   restrict="ldap:///{{ aedir_suffix }}??sub"
 constraint_attribute
   aeVisibleGroups
-  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeGroup)(aeStatus=0)(!(|(cn=ae-admins)(cn=ae-auditors)(cn=ae-login-proxies)(cn=*-zone-admins)(cn=*-zone-auditors)(cn=pub-*))))"
+  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeGroup)(aeStatus=0)(!(|(cn=ae-admins)(cn=ae-auditors)(cn=ae-provider)(cn=ae-replicas)(cn=ae-login-proxies)(cn=*-zone-admins)(cn=*-zone-auditors))))"
   restrict="ldap:///{{ aedir_suffix }}??sub"
 
 # restrict values of aeVisibleSudoers to DNs of active aeSudoRule entries
@@ -1389,6 +1389,7 @@ overlay syncprov
 syncprov-checkpoint 1000 2
 syncprov-reloadhint TRUE
 
+{% if openldap_syncrepl_providers %}
 {% for provider_replica in openldap_syncrepl_providers if provider_replica!=openldap_service_fqdn %}
 syncrepl rid=0{{ loop.index }}
   provider=ldaps://{{ provider_replica }}
@@ -1408,6 +1409,7 @@ syncrepl rid=0{{ loop.index }}
 {% endfor %}
 
 mirrormode true
+{% endif %}
 
 #######################################################################
 # Monitoring backend cn=Monitor
