@@ -166,18 +166,18 @@ access to
     by * none
 
 #######################################################################
-# Audit database cn=accesslog-ae-dir
+# Audit database {{ aedir_accesslog_suffix }}
 #######################################################################
 
 database mdb
 
-suffix "cn=accesslog-ae-dir"
+suffix "{{ aedir_accesslog_suffix }}"
 directory {{ openldap_data }}/accesslog
 
 require strong
 
 # Always set rootdn since needed by internally writing overlays
-rootdn "cn=root,cn=accesslog-ae-dir"
+rootdn "cn=root,{{ aedir_accesslog_suffix }}"
 # rootpw not needed in production!
 #rootpw donotenable!!!
 
@@ -201,18 +201,18 @@ index reqEntryUUID eq
 index objectClass eq
 
 #---------------------------------------------------------------------------
-# Access rights cn=accesslog-ae-dir
+# Access rights {{ aedir_accesslog_suffix }}
 #---------------------------------------------------------------------------
 
 access
-  to dn.subtree="cn=accesslog-ae-dir"
+  to dn.subtree="{{ aedir_accesslog_suffix }}"
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" read
     by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
     by dn.exact="cn=root,{{ aedir_suffix }}" read
     by * none
 
 #---------------------------------------------------------------------------
-# overlays used within cn=accesslog-ae-dir
+# overlays used within {{ aedir_accesslog_suffix }}
 #---------------------------------------------------------------------------
 
 # for counting search results without retrieving them
@@ -626,7 +626,7 @@ overlay deref
 
 # Where to log LDAP write operations (for auditing)
 overlay accesslog
-logdb "cn=accesslog-ae-dir"
+logdb "{{ aedir_accesslog_suffix }}"
 logops writes
 logold "(objectClass=*)"
 logoldattr entryUUID objectClass cn uid

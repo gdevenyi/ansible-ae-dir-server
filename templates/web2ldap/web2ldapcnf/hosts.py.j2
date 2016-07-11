@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """
+{{ ansible_managed }}
+
 web2ldapcnf/hosts.py - Host-related options
 (c) by Michael Stroeder <michael@stroeder.com>
 """
@@ -801,6 +803,6 @@ ldap_def = {
   'ldap:///{{ aedir_suffix }}': ae_dir_config,
 
   # Æ-DIR's accesslog
-  'ldap:///cn=accesslog-ae-dir': openldap_accesslog_config,
+  'ldap:///{{ aedir_accesslog_suffix }}': openldap_accesslog_config,
 
 }
