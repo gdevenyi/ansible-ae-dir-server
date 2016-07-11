@@ -2,19 +2,46 @@
 
 {text_error}
 
-<h2>Normal use</h2>
 <p>
   You reached web2ldap service <strong>{{ openldap_service_fqdn }}</strong> (running on <em>{{ ansible_fqdn }}</em>)
 </p>
+<p>
+  <a href="/web2ldap.html">User Guide</a>
+</p>
 <ul>
   <li>
-    <a class="CommandLink" href="/web2ldap/searchform?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}????bindname=">General administration</a>
-    on local &AElig;-DIR via LDAPI (if in doubt, click this!)
+    <a class="CommandLink" href="/web2ldap/searchform?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}????bindname=">Local &AElig;-DIR</a>
+    (if in doubt, click this!)
   </li>
   <li>
     <a class="CommandLink" href="/web2ldap/passwd?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}????bindname=">Change own password</a>
   </li>
 </ul>
+
+<h2>Special</h2>
+<p>Roles: &AElig; admins and &AElig; auditors<p>
+<ul>
+  <li>
+    <a class="CommandLink" href="/web2ldap/searchform?{{ openldap_ldapi_uri }}/{{ aedir_accesslog_suffix }}????bindname=">Search access log</a>
+    (only &AElig; admins)
+  </li>
+</ul>
+
+<h2>&AElig;-DIR configuration</h2>
+<table>
+  <tr>
+    <td>base DN / search root:</td>
+    <td>{{ aedir_suffix }}</td>
+  </tr>
+  <tr>
+    <td>POSIX-UID number range:</td>
+    <td>{{ aedir_min_uid }}..{{ aedir_max_uid }}</td>
+  </tr>
+  <tr>
+    <td>POSIX-GID number range:</td>
+    <td>{{ aedir_min_gid }}..{{ aedir_max_gid }}</td>
+  </tr>
+</table>
 
 {% for role in ['provider', 'consumer'] %}
 <h2>&AElig;-DIR {{ role }}(s)</h2>
@@ -48,24 +75,3 @@
 </table>
 
 {% endfor %}
-
-<h2>&AElig;-DIR documentation</h2>
-<ul>
-  <li><a href="/web2ldap.html">User Guide</a></li>
-</ul>
-
-<h2>&AElig;-DIR configuration</h2>
-<table>
-  <tr>
-    <td>base DN / search root:</td>
-    <td>{{ aedir_suffix }}</td>
-  </tr>
-  <tr>
-    <td>POSIX-UID number range:</td>
-    <td>{{ aedir_min_uid }}..{{ aedir_max_uid }}</td>
-  </tr>
-  <tr>
-    <td>POSIX-GID number range:</td>
-    <td>{{ aedir_min_gid }}..{{ aedir_max_gid }}</td>
-  </tr>
-</table>
