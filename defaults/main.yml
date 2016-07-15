@@ -25,10 +25,15 @@ aedir_username_gen_trials: 15
 
 # Some paths for tools
 aedir_prefix: "/opt/ae-dir"
-aedir_bin: "/opt/ae-dir/bin"
-aedir_sbin: "/opt/ae-dir/sbin"
-aedir_etc: "/opt/ae-dir/etc"
-aedir_rundir: "/opt/ae-dir/run"
+aedir_bin: "{{ aedir_prefix }}/bin"
+aedir_sbin: "{{ aedir_prefix }}/sbin"
+aedir_etc: "{{ aedir_prefix }}/etc"
+aedir_rundir: "{{ aedir_prefix }}/run"
+
+aedir_platform_python:
+  Debian: "{{ aedir_bin }}/python"
+  Suse: "/usr/bin/python"
+aedir_python: "{{ aedir_platform_python[ansible_os_family] }}"
 
 # regex patterns for enforcing naming conventions (substring match!)
 # Important notes:

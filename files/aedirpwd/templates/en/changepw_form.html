@@ -1,0 +1,71 @@
+$def with (username,message)
+$var title: Change password
+
+<div id="content">
+
+  <h1>Change password</h1>
+
+  $if message:
+    <p class="message">$message</p>
+
+  <form method="POST" action="changepw" enctype="application/x-www-form-urlencoded" accept-charset="utf-8">
+
+    <fieldset title="Authentication">
+      <legend>User name and old password for authentication</legend>
+      <table summary="Input fields for user name and old password">
+        <tr>
+          <th>
+            User name:
+          </th>
+          <td>
+            <input name="username" value="$username" size="25">
+          </td>
+        </tr>
+        <tr>
+          <th>
+            Old password:
+          </th>
+          <td>
+            <input type="password" name="oldpassword" value="" size="20">
+          </td>
+        </tr>
+      </table>
+    </fieldset>
+
+    <fieldset title="New password">
+      <legend>Input new password twice</legend>
+      <table summary="Input fields for new password">
+        <tr>
+          <th>
+            New password:
+          </th>
+          <td>
+            <input type="password" name="newpassword1" value="" size="20"><br>
+          </td>
+        </tr>
+        <tr>
+          <th>
+            New password (repeat):
+          </th>
+          <td>
+            <input type="password" name="newpassword2" value="" size="20">
+          </td>
+        </tr>
+      </table>
+    </fieldset>
+
+    <input type="submit" class="submit" name="submit" value="Set new password" />
+
+  </form>
+
+  <ul class="tip">
+    <li>Minimum <strong>ten</strong> characters!</li>
+    <li>Password with capital and lower-case chars, numbers, and special chars.</li>
+    <li><strong>Password must not be used before!</strong></li>
+    <li>
+      Forgot old password? &rarr;
+      <a href="requestpw?username=$username">Request password reset</a>.
+    </li>
+  </ul>
+
+</div>

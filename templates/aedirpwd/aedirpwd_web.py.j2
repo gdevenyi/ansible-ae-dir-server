@@ -1,0 +1,962 @@
+#!{{ aedir_python }}
+# -*- coding: utf-8 -*-
+"""
+Web-interface for resetting/changing user passwords in a LDAP server
+
+Author: Michael Ströder <michael@stroeder.com>
+
+Tested with:
+Python 2.7+ (see http://www.python.org/)
+web.py 0.37+ (see http://webpy.org/)
+python-ldap 2.4.25+ (see http://www.python-ldap.org/)
+"""
+
+__version__ = '0.1.0'
+
+# from Python's standard lib
+import string
+import re
+import sys
+import os
+import time
+import socket
+import smtplib
+import hashlib
+import random
+
+from calendar import timegm
+from urllib import quote_plus as url_quote_plus
+
+import email.utils
+
+# web.py
+import web
+
+# from python-ldap
+import ldap
+import ldap.dn
+import ldap.filter
+import ldap.sasl
+import ldapurl
+from ldap.filter import escape_filter_chars
+from ldap.controls.ppolicy import PasswordPolicyControl
+from ldap.controls.sessiontrack import SessionTrackingControl
+from ldap.controls.sessiontrack import SESSION_TRACKING_FORMAT_OID_USERNAME
+
+# mail utility module
+import mailutil
+
+# Import constants from configuration module
+sys.path.extend([
+  '{{ aedir_etc }}/aedirpwd',
+])
+from aedirpwd_cnf import *
+
+#-----------------------------------------------------------------------
+# utility functions
+#-----------------------------------------------------------------------
+
+def read_template_file(filename):
+    """
+    return UTF-8 encoded text file as decoded Unicode string
+    """
+    file_obj = open(filename, 'rb')
+    file_content = file_obj.read().decode('utf-8')
+    file_obj.close()
+    return file_content
+
+#-----------------------------------------------------------------------
+# Some custom exception classes for password policy handling
+#-----------------------------------------------------------------------
+
+
+class PasswordPolicyException(ldap.LDAPError):
+    """
+    Base class for raising password policy related exceptions
+    """
+
+    def __init__(self, who=None, desc=None):
+        self.who = who
+        self.desc = desc
+
+    def __str__(self):
+        return self.desc
+
+
+class PasswordPolicyChangeAfterReset(PasswordPolicyException):
+    """
+    Exception class for password change after reset warning
+    """
+    pass
+
+
+class PasswordPolicyExpirationWarning(PasswordPolicyException):
+    """
+    Exception class for password expiry warning
+    """
+
+    def __init__(self, who=None, desc=None, timeBeforeExpiration=None):
+        PasswordPolicyException.__init__(self, who, desc)
+        self.timeBeforeExpiration = timeBeforeExpiration
+
+
+class PasswordPolicyExpiredError(PasswordPolicyException):
+    """
+    Exception class for password expired error
+    """
+
+    def __init__(self, who=None, desc=None, graceAuthNsRemaining=None):
+        PasswordPolicyException.__init__(self, who, desc)
+        self.graceAuthNsRemaining = graceAuthNsRemaining
+
+
+#-----------------------------------------------------------------------
+# The web application
+#-----------------------------------------------------------------------
+
+RENDER = web.template.render(TEMPLATES_DIRNAME, base=LAYOUT)
+
+# Safety check for URL chars
+if PWD_TMP_CHARS != url_quote_plus(PWD_TMP_CHARS):
+    raise ValueError('URL special chars in PWD_TMP_CHARS: %r' % (PWD_TMP_CHARS))
+
+# Set some webpy configuration vars
+if WEB_CONFIG_DEBUG == False:
+    web.config.debug = False
+
+# Declaration for text input field for 'username'
+USERNAME_FIELD = web.form.Textbox(
+    'username',
+    web.form.notnull,
+    web.form.regexp('^[a-zA-Z0-9._-]+$', u'Invalid user name.'),
+    description=u'User name:'
+)
+
+# Declaration for text input field for 'email'
+EMAIL_FIELD = web.form.Textbox(
+    'email',
+    web.form.notnull,
+    web.form.regexp(
+        r'^[a-zA-Z0-9@.+=/_ -]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*$',
+        u'Invalid e-mail address.'
+    ),
+    description=u'E-mail address:'
+)
+
+# Declaration for text input field for old password
+USERPASSWORD_FIELD = web.form.Password(
+    'oldpassword',
+    web.form.notnull,
+    web.form.regexp(r'^.*$', u''),
+    description=u'Old password'
+)
+
+TEMP1PASSWORD_FIELD = web.form.Password(
+    'temppassword1',
+    web.form.notnull,
+    web.form.regexp(
+      ur'^[%s]+$' % re.escape(PWD_TMP_CHARS),
+      u'Invalid input format.'
+    ),
+    description=u'Temporary password part #1'
+)
+
+TEMP2PASSWORD_FIELD = web.form.Password(
+    'temppassword2',
+#    web.form.notnull,
+    web.form.regexp(
+      ur'^[%s]*$' % re.escape(PWD_TMP_CHARS),
+      u'Invalid input format.'
+    ),
+    description=u'Temporary password part #2'
+)
+
+# Declarations for new password fields
+
+valid_newpassword_regexp = web.form.regexp(r'^.+$', u'Passwort rules violated!')
+
+NEWPASSWORD1_FIELD = web.form.Password(
+    'newpassword1',
+    web.form.notnull,
+    valid_newpassword_regexp,
+    description=u'New password'
+)
+
+NEWPASSWORD2_FIELD = web.form.Password(
+    'newpassword2',
+    web.form.notnull,
+    valid_newpassword_regexp,
+    description=u'New password (repeat)'
+)
+
+NEWPASSWORD_VALIDATOR = web.form.Validator(
+    u'New password input does not match',
+    lambda i: i.newpassword1 == i.newpassword2
+)
+
+
+class Default(object):
+    """
+    Handle default index request
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.remote_ip = web.ctx.env.get(
+            'FORWARDED_FOR',
+            web.ctx.env.get('HTTP_X_FORWARDED_FOR', web.ctx.ip)
+        )
+        # Set additional headers in response
+        self._add_headers()
+
+    def _add_headers(self):
+        """
+        add custom response headers, mainly content security policy
+        """
+        csp_value = ';'.join((
+            "default-src 'self'",
+            "script-src 'none'",
+        ))
+        for header, value in (
+            ('Cache-Control', 'no-store,no-cache,max-age=0,must-revalidate'),
+            ('X-XSS-Protection', '1; mode=block'),
+            ('X-DNS-Prefetch-Control', 'off'),
+            ('X-Content-Type-Options', 'nosniff'),
+            ('X-Frame-Options', 'deny'),
+            ('Server', 'unknown'),
+            ('Content-Security-Policy', csp_value),
+            ('X-Webkit-CSP', csp_value),
+            ('X-Content-Security-Policy', csp_value),
+        ):
+            web.header(header, value)
+        return # end of _add_headers()
+
+    def GET(self):
+        """
+        handle GET request by returning default entry page
+        """
+        return RENDER.default()
+
+
+class BaseApp(Default):
+    """
+    Request handler base class which is not used directly
+    """
+
+    get_form = web.form.Form(
+      USERNAME_FIELD,
+    )
+
+    def _sess_track_ctrl(self, username='anon'):
+        """
+        return LDAPv3 session tracking control representing current user
+        """
+        if type(username) == type(u''):
+            username = username.encode('utf-8')
+        return SessionTrackingControl(
+            self.remote_ip,
+            web.ctx.homedomain,
+            SESSION_TRACKING_FORMAT_OID_USERNAME,
+            username,
+        )
+
+    def _connect_and_bind(self, ldap_url):
+        """
+        Connect and bind to the LDAP directory
+        """
+
+        class PwdLDAPUrl(ldapurl.LDAPUrl):
+            """
+            Special class for handling additional LDAP URL extensions
+            """
+            attr2extype = {
+              'who':'bindname',
+              'cred':'X-BINDPW',
+              'start_tls':'startTLS',
+              'trace_level':'trace',
+            }
+
+        ldap_url_obj = PwdLDAPUrl(ldap_url)
+        trace_level = int(ldap_url_obj.trace_level or '0')
+        start_tls = int(ldap_url_obj.start_tls or '1')
+        ldap_conn = ldap.initialize(
+            ldap_url_obj.initializeUrl(),
+            trace_level=0,
+            trace_file=sys.stderr
+        )
+        ldap_conn._trace_level = trace_level
+        if ldap_url_obj.urlscheme.lower() == 'ldapi' and not ldap_url_obj.who:
+            ldap_conn.sasl_interactive_bind_s('', ldap.sasl.external())
+        else:
+            if ldap_url_obj.urlscheme.lower() == 'ldap' and start_tls:
+                ldap_conn.start_tls_s()
+            # turn off trace for LDAP Simple Bind Request
+            ldap_conn._trace_level = 0
+            ldap_conn.simple_bind_s(ldap_url_obj.who or '', ldap_url_obj.cred or '')
+            ldap_conn._trace_level = trace_level
+        return ldap_conn, ldap_url_obj
+
+    def search_user_entry(self, inputs):
+        """
+        Search a user entry for the user specified by username
+        """
+        filterstr_inputs_dict = dict([
+            (i.name, escape_filter_chars(i.get_value()))
+            for i in inputs
+        ])
+        filterstr_inputs_dict['currenttime'] = escape_filter_chars(
+            time.strftime(
+                '%Y%m%d%H%M%SZ',
+                time.gmtime(time.time())
+            )
+        )
+        ldap_results = self.ldap_conn.search_ext_s(
+            self.ldap_url.dn,
+            self.ldap_url.scope,
+            filterstr=(
+                self.filterstr_template % filterstr_inputs_dict
+            ).encode('utf-8'),
+            attrlist=[
+                'objectClass',
+                'uid',
+                'cn',
+                'mail',
+                'pwdChangedTime',
+                'pwdPolicySubentry'
+            ],
+            sizelimit=2
+        )
+        if len(ldap_results) > 1:
+            # Should never happen if correctly configured
+            raise ValueError(u'More than one user entry found.')
+        elif not ldap_results:
+            raise ValueError(u'No user entry found.')
+        else:
+            return ldap_results[0]
+
+    def POST(self):
+        """
+        handle POST request processing input form
+
+        mainly this opens and binds LDAP connection for user
+        """
+        self.form = self.post_form()
+        if not self.form.validates():
+            return self.GET(message=u'Invalid input!')
+        # Make connection to LDAP server
+        try:
+            self.ldap_conn, self.ldap_url = self._connect_and_bind(PWD_LDAP_URL)
+        except ldap.SERVER_DOWN:
+            res = self.GET(message=u'LDAP server not reachable!')
+        except ldap.LDAPError:
+            res = self.GET(message=u'Internal LDAP error!')
+        else:
+            # Call specific handler for LDAP user
+            try:
+                user_dn, user_entry = self.search_user_entry(self.form.inputs)
+            except ValueError:
+                res = self.GET(message=u'Error searching user entry!')
+            except ldap.LDAPError:
+                res = self.GET(message=u'Internal LDAP error!')
+            else:
+                res = self.handle_user_request(user_dn, user_entry)
+        # Anyway we should try to close the LDAP connection
+        try:
+            self.ldap_conn.unbind_s()
+        except (AttributeError, ldap.LDAPError):
+            pass
+        else:
+            self.ldap_conn._trace_file.flush()
+        return res
+
+
+class CheckPassword(BaseApp):
+    """
+    Handler for checking user's password
+    """
+
+    filterstr_template = FILTERSTR_CHANGEPW
+
+    post_form = web.form.Form(
+        USERNAME_FIELD,
+        USERPASSWORD_FIELD,
+        web.form.Button('submit', type='submit', description=u'Check password'),
+    )
+
+    def GET(self, message=u''):
+        """
+        handle GET request by returning input form
+        with username pre-filled
+        """
+        try:
+            get_input = web.input(username=u'')
+        except UnicodeError:
+            return RENDER.checkpw_form(u'', u'Invalid input')
+        else:
+            return RENDER.checkpw_form(get_input.username, message)
+
+    def _ldap_user_operations(self, user_dn, old_password_ldap):
+        """
+        - bind as user
+        - check password policy response control
+        """
+        # Prepare LDAPv3 extended request controls
+        ppolicy_control = PasswordPolicyControl()
+        session_tracking_control = self._sess_track_ctrl()
+        # Do the password check itself by sending LDAP simple bind
+        _, _, _, bind_srv_ctrls = self.ldap_conn.simple_bind_s(
+            user_dn,
+            old_password_ldap,
+            serverctrls=[
+                ppolicy_control,
+                session_tracking_control,
+            ]
+        )
+        # Extract the password policy response control and raise appropriate
+        # warning exceptions
+        if bind_srv_ctrls:
+            ppolicy_ctrls = [
+                c
+                for c in bind_srv_ctrls
+                if c.controlType == PasswordPolicyControl.controlType
+            ]
+            if ppolicy_ctrls and len(ppolicy_ctrls) == 1:
+                ppolicy_ctrl = ppolicy_ctrls[0]
+                if ppolicy_ctrl.error == 2:
+                    raise PasswordPolicyChangeAfterReset(
+                        who=user_dn,
+                        desc='Password change is needed after reset!',
+                    )
+                elif ppolicy_ctrl.timeBeforeExpiration != None:
+                    raise PasswordPolicyExpirationWarning(
+                        who=user_dn,
+                        desc='Password will expire in %d seconds!' % (
+                            ppolicy_ctrl.timeBeforeExpiration
+                        ),
+                        timeBeforeExpiration=ppolicy_ctrl.timeBeforeExpiration,
+                    )
+                elif ppolicy_ctrl.graceAuthNsRemaining != None:
+                    raise PasswordPolicyExpiredError(
+                        who=user_dn,
+                        desc='Password expired! %d grace logins left.' % (
+                            ppolicy_ctrl.graceAuthNsRemaining
+                        ),
+                        graceAuthNsRemaining=ppolicy_ctrl.graceAuthNsRemaining,
+                    )
+        return
+
+    def handle_user_request(self, user_dn, user_entry):
+        current_time = time.time()
+        old_password_ldap = self.form.d.oldpassword.encode('utf-8')
+        try:
+            self._ldap_user_operations(user_dn, old_password_ldap)
+        except ldap.INVALID_CREDENTIALS:
+            return self.GET(message=u'Wrong password!')
+        except PasswordPolicyExpirationWarning, ppolicy_error:
+            expire_time_str = unicode(time.strftime(
+                TIME_DISPLAY_FORMAT,
+                time.localtime(current_time+ppolicy_error.timeBeforeExpiration)
+            ))
+            return RENDER.changepw_form(
+              self.form.d.username,
+              u'Password will expire soon at %s !' % (expire_time_str)
+            )
+        except PasswordPolicyException, ppolicy_error:
+            return RENDER.changepw_form(
+                self.form.d.username,
+                unicode(str(ppolicy_error))
+            )
+        except ldap.LDAPError:
+            return self.GET(message=u'Internal error!')
+        # Try to display until when password is still valid
+        user_entry_self = {}
+        valid_until = u'unknown'
+        if not 'pwdChangedTime' in user_entry or \
+           not 'pwdPolicySubentry' in user_entry:
+            # Try to read the user entry again while being bound as the user
+            try:
+                _, user_entry_self = self.ldap_conn.search_s(
+                  user_dn,
+                  ldap.SCOPE_BASE,
+                  '(objectClass=*)',
+                  attrlist=['pwdChangedTime', 'pwdPolicySubentry']
+                )[0]
+            except (ldap.LDAPError, IndexError):
+                pass
+        try:
+            pwd_changed_time = (
+                user_entry.get('pwdChangedTime', None) or
+                user_entry_self['pwdChangedTime']
+            )[0]
+            pwd_policy_subentry_dn = (
+                user_entry.get('pwdPolicySubentry', None) or
+                user_entry_self['pwdPolicySubentry']
+            )[0]
+        except KeyError, key_error:
+            valid_until = unicode(str(key_error))
+        else:
+            pwd_changed_timestamp = timegm(
+                time.strptime(pwd_changed_time, '%Y%m%d%H%M%SZ')
+            )
+            try:
+                _, pwd_policy_subentry = self.ldap_conn.search_s(
+                  pwd_policy_subentry_dn,
+                  ldap.SCOPE_BASE,
+                  '(objectClass=pwdPolicy)',
+                  attrlist=[
+                      'pwdMaxAge',
+                      'pwdExpireWarning'
+                  ],
+                )[0]
+            except (ldap.LDAPError, IndexError):
+                pass
+            else:
+                try:
+                    pwd_max_age = int(pwd_policy_subentry['pwdMaxAge'][0])
+                except (ValueError, KeyError):
+                    pass
+                else:
+                    current_time = time.time()
+                    expire_timestamp = pwd_changed_timestamp+pwd_max_age
+                    valid_until = unicode(
+                        time.strftime(
+                            TIME_DISPLAY_FORMAT,
+                            time.localtime(expire_timestamp)
+                        )
+                    )
+        # Finally render output page with success message
+        return RENDER.checkpw_action(
+            self.form.d.username,
+            user_dn,
+            valid_until
+        )
+
+
+class ChangePassword(BaseApp):
+    """
+    Handler for changing user's own password
+    """
+
+    filterstr_template = FILTERSTR_CHANGEPW
+
+    post_form = web.form.Form(
+        USERNAME_FIELD,
+        USERPASSWORD_FIELD,
+        NEWPASSWORD1_FIELD,
+        NEWPASSWORD2_FIELD,
+        web.form.Button(
+            'submit',
+            type='submit',
+            description=u'Change password'
+        ),
+        validators=[NEWPASSWORD_VALIDATOR],
+    )
+
+    def GET(self, message=u''):
+        """
+        handle GET request by returning input form
+        with username pre-filled
+        """
+        try:
+            get_input = web.input(username=u'')
+        except UnicodeError:
+            return RENDER.changepw_form(u'', u'Invalid input')
+        else:
+            return RENDER.changepw_form(get_input.username, message)
+
+    def _ldap_user_operations(
+            self,
+            user_dn,
+            old_password_ldap,
+            new_password_ldap
+        ):
+        self.ldap_conn.simple_bind_s(
+            user_dn,
+            old_password_ldap,
+            serverctrls=[self._sess_track_ctrl()],
+        )
+        self.ldap_conn.passwd_s(
+            user_dn,
+            None,
+            new_password_ldap,
+            serverctrls=[self._sess_track_ctrl(user_dn)],
+        )
+        return
+
+    def handle_user_request(self, user_dn, user_entry):
+        old_password_ldap = self.form.d.oldpassword.encode('utf-8')
+        new_password_ldap = self.form.d.newpassword1.encode('utf-8')
+        try:
+            self._ldap_user_operations(
+                user_dn,
+                old_password_ldap,
+                new_password_ldap
+            )
+        except ldap.INVALID_CREDENTIALS:
+            res = self.GET(message=u'Old password wrong!')
+        except ldap.CONSTRAINT_VIOLATION:
+            res = self.GET(
+                message=(
+                    u'Constraint violation! '
+                    u'Probably password rules violated. '
+                    u'Try again with stronger password.'
+                )
+            )
+        except ldap.LDAPError:
+            res = self.GET(message=u'Internal error!')
+        else:
+            res = RENDER.changepw_action(self.form.d.username, user_dn)
+        return res
+
+
+class RequestPasswordReset(BaseApp):
+    """
+    Handler for starting password reset procedure
+    """
+
+    filterstr_template = FILTERSTR_REQUESTPW
+
+    # Declaration for the change password input form
+    post_form = web.form.Form(
+      USERNAME_FIELD,
+      EMAIL_FIELD,
+      web.form.Button('submit', type='submit', description=u'Set new password'),
+    )
+
+    def GET(self, message=u''):
+        """
+        handle GET request by returning input form
+        with username pre-filled
+        """
+        try:
+            get_input = web.input(username=u'')
+        except UnicodeError:
+            return RENDER.requestpw_form(u'', u'Invalid input')
+        else:
+            return RENDER.requestpw_form(get_input.username, message)
+
+    def _generate_pwd(self):
+        sys_rand = random.SystemRandom()
+        pwd_tmp_chars_len = len(PWD_TMP_CHARS)
+        temp_pwd_clear = ''.join([
+            PWD_TMP_CHARS[sys_rand.randint(0, pwd_tmp_chars_len-1)]
+            for _ in range(PWD_LENGTH)
+        ]).decode('ascii')
+        temp_pwd_hash = hashlib.new(
+            PWD_TMP_HASH_ALGO,
+            temp_pwd_clear
+        ).hexdigest()
+        return temp_pwd_clear, temp_pwd_hash
+
+    def _get_admin_mailaddrs(self, user_dn=None):
+        if not user_dn:
+            return PWD_ADMIN_MAILTO
+        try:
+            zone_name = ldap.dn.explode_dn(user_dn)[-2][3:]
+        except (ldap.LDAPError, IndexError):
+            return [PWD_ADMIN_MAILTO]
+        zone_admin_groupdn = 'cn={0}-zone-admins,cn={0},{1}'.format(
+            ldap.dn.escape_dn_chars(zone_name),
+            self.ldap_url.dn,
+        )
+        admin_addrs = set()
+        try:
+            ldap_results = self.ldap_conn.search_s(
+                self.ldap_url.dn,
+                ldap.SCOPE_SUBTREE,
+                filterstr='(&(objectClass=aeUser)(aeStatus=0)(memberOf=%s))' % (
+                    escape_filter_chars(zone_admin_groupdn),
+                ),
+                attrlist=['mail'],
+            )
+        except ldap.LDAPError:
+            pass
+        else:
+            admin_addrs.update([
+                ldap_entry['mail'][0]
+                for _, ldap_entry in ldap_results or []
+                if 'mail' in ldap_entry
+            ])
+        return list(admin_addrs) or PWD_ADMIN_MAILTO
+
+    def _send_pw(self, username, user_dn, user_entry, temp_pwd_clear):
+        """
+        send e-mails to user and zone-admins
+        """
+        smtp_conn = mailutil.smtp_connection(
+            SMTP_URL,
+            local_hostname=SMTP_LOCALHOSTNAME,
+            tls_args=SMTP_TLSARGS,
+            debug_level=SMTP_DEBUGLEVEL
+        )
+        to_addr = user_entry['mail'][0].decode('utf-8')
+        default_headers = (
+            ('From', SMTP_FROM),
+            ('Date', email.utils.formatdate(time.time(), True)),
+        )
+        #-----------------------------------------------------------------------
+        # First send notification to admin if PWD_ADMIN_LEN is non-zero
+        #-----------------------------------------------------------------------
+        if PWD_ADMIN_LEN:
+            smtp_message_tmpl = read_template_file(EMAIL_TEMPLATE_ADMIN)
+            user_data_admin = {
+                'username':username,
+                'temppassword2':temp_pwd_clear[
+                    len(temp_pwd_clear)-PWD_ADMIN_LEN:
+                ],
+                'remote_ip':self.remote_ip,
+                'fromaddr':SMTP_FROM,
+                'userdn':user_dn.decode('utf-8'),
+                'web_ctx_host':web.ctx.host,
+                'app_path_prefix':APP_PATH_PREFIX,
+                'ldap_uri':self.ldap_url.initializeUrl(),
+            }
+            smtp_message = smtp_message_tmpl % user_data_admin
+            smtp_subject = EMAIL_SUBJECT_ADMIN % user_data_admin
+            admin_addrs = self._get_admin_mailaddrs(user_dn=user_dn)
+            smtp_conn.send_simple_message(
+                SMTP_FROM,
+                admin_addrs,
+                'utf-8',
+                default_headers+(
+                  ('Subject', smtp_subject),
+                  ('To', ','.join(admin_addrs)),
+                ),
+                smtp_message,
+            )
+        #-----------------------------------------------------------------------
+        # Now send (rest of) clear-text password to user
+        #-----------------------------------------------------------------------
+
+        smtp_message_tmpl = read_template_file(EMAIL_TEMPLATE_PERSONAL)
+        user_data_user = {
+            'username':username,
+            'temppassword1':temp_pwd_clear[:len(temp_pwd_clear)-PWD_ADMIN_LEN],
+            'remote_ip':self.remote_ip,
+            'fromaddr':SMTP_FROM,
+            'userdn':user_dn.decode('utf-8'),
+            'web_ctx_host':web.ctx.host,
+            'app_path_prefix':APP_PATH_PREFIX,
+            'ldap_uri':self.ldap_url.initializeUrl(),
+        }
+        smtp_message = smtp_message_tmpl % user_data_user
+        smtp_subject = EMAIL_SUBJECT_PERSONAL % user_data_user
+        smtp_conn.send_simple_message(
+            SMTP_FROM,
+            [to_addr.encode('utf-8')],
+            'utf-8',
+            default_headers+(
+                ('Subject', smtp_subject),
+                ('To', to_addr),
+            ),
+            smtp_message,
+        )
+        smtp_conn.quit()
+        return # _send_pw()
+
+    def handle_user_request(self, user_dn, user_entry):
+        """
+        add password reset object class and attributes
+        to user's entry and send e-mails
+        """
+        current_time = time.time()
+        temp_pwd_clear, temp_pwd_hash = self._generate_pwd()
+        ldap_mod_list = [
+            (
+                ldap.MOD_REPLACE,
+                'msPwdResetPasswordHash',
+                [temp_pwd_hash],
+            ),
+            (
+                ldap.MOD_REPLACE,
+                'msPwdResetTimestamp',
+                [
+                    time.strftime(
+                        '%Y%m%d%H%M%SZ',
+                        time.gmtime(current_time)
+                    )
+                ]
+            ),
+            (
+                ldap.MOD_REPLACE,
+                'msPwdResetExpirationTime',
+                [
+                    time.strftime(
+                        '%Y%m%d%H%M%SZ',
+                        time.gmtime(current_time+PWD_EXPIRETIMESPAN)
+                    )
+                ]
+            ),
+            (
+                ldap.MOD_REPLACE,
+                'msPwdResetEnabled',
+                [PWD_RESET_ENABLED]
+            ),
+        ]
+        old_objectclasses = [
+            oc.lower()
+            for oc in user_entry['objectClass']
+        ]
+        if not 'mspwdresetobject' in old_objectclasses:
+            ldap_mod_list.append(
+                (ldap.MOD_ADD, 'objectClass', ['msPwdResetObject'])
+            )
+        if PWD_ADMIN_LEN:
+            ldap_mod_list.append(
+                (
+                    ldap.MOD_REPLACE,
+                    'msPwdResetAdminPw',
+                    [temp_pwd_clear[-PWD_ADMIN_LEN:].encode('utf-8')]
+                ),
+            )
+        try:
+            self.ldap_conn.modify_ext_s(
+                user_dn,
+                ldap_mod_list,
+                serverctrls=[self._sess_track_ctrl()],
+            )
+        except ldap.LDAPError:
+            res = self.GET(message=u'Internal error!')
+        else:
+            try:
+                self._send_pw(
+                    self.form.d.username,
+                    user_dn,
+                    user_entry,
+                    temp_pwd_clear,
+                )
+            except (socket.error, smtplib.SMTPException):
+                res = self.GET(message=u'Error sending e-mail via SMTP!')
+            else:
+                res = RENDER.requestpw_action(
+                    self.form.d.username,
+                    self.form.d.email,
+                    user_dn
+                )
+        return res
+
+
+class FinishPasswordReset(BaseApp):
+    """
+    Handler for finishing password reset procedure
+    """
+
+    filterstr_template = '(&(msPwdResetEnabled=TRUE)%s)' % (FILTERSTR_RESETPW)
+
+    get_form = web.form.Form(
+        USERNAME_FIELD,
+        TEMP1PASSWORD_FIELD,
+    )
+
+    post_form = web.form.Form(
+        USERNAME_FIELD,
+        TEMP1PASSWORD_FIELD,
+        TEMP2PASSWORD_FIELD,
+        NEWPASSWORD1_FIELD,
+        NEWPASSWORD2_FIELD,
+        web.form.Button(
+            'submit',
+            type='submit',
+            description=u'Change password'
+        ),
+        validators=[NEWPASSWORD_VALIDATOR],
+    )
+
+    def GET(self, message=u''):
+        """
+        handle GET request by returning input form with username and
+        1st temporary password part pre-filled
+        """
+        try:
+            get_input = web.input(username=u'', temppassword1=u'')
+        except UnicodeError:
+            return RENDER.resetpw_form(u'', u'', u'Invalid input')
+        else:
+            return RENDER.resetpw_form(
+                get_input.username,
+                PWD_LENGTH-PWD_ADMIN_LEN,
+                PWD_ADMIN_LEN,
+                get_input.temppassword1,
+                message
+            )
+
+    def _ldap_user_operations(self, user_dn, temp_pwd_hash, new_password_ldap):
+        ldap_mod_list = [
+            (ldap.MOD_DELETE, attr_type, attr_values)
+            for attr_type, attr_values in (
+                ('objectClass', ['msPwdResetObject']),
+                ('msPwdResetPasswordHash', [temp_pwd_hash]),
+                ('msPwdResetTimestamp', None),
+                ('msPwdResetExpirationTime', None),
+                ('msPwdResetEnabled', None),
+            )
+        ]
+        if PWD_ADMIN_LEN:
+            ldap_mod_list.append(
+                (ldap.MOD_DELETE, 'msPwdResetAdminPw', None)
+            )
+        self.ldap_conn.modify_ext_s(
+            user_dn,
+            ldap_mod_list,
+            serverctrls=[self._sess_track_ctrl(user_dn)],
+        )
+        self.ldap_conn.passwd_s(
+            user_dn,
+            None,
+            new_password_ldap,
+            serverctrls=[self._sess_track_ctrl(user_dn)],
+        )
+        return
+
+    def handle_user_request(self, user_dn, user_entry):
+        temppassword1 = self.form.d.temppassword1
+        temppassword2 = self.form.d.temppassword2
+        if len(temppassword1)+len(temppassword2) != PWD_LENGTH:
+            return self.GET(message=u'Temporary password parts wrong!')
+        temp_pwd_hash = hashlib.new(
+            PWD_TMP_HASH_ALGO,
+            ''.join((
+                self.form.d.temppassword1,
+                self.form.d.temppassword2
+            )),
+        ).hexdigest()
+        new_password_ldap = self.form.d.newpassword1.encode('utf-8')
+        try:
+            self._ldap_user_operations(
+                user_dn,
+                temp_pwd_hash,
+                new_password_ldap
+            )
+        except ldap.NO_SUCH_ATTRIBUTE:
+            res = self.GET(message=u'Temporary password wrong!')
+        except ldap.CONSTRAINT_VIOLATION:
+            res = self.GET(
+                message=(
+                    u'Constraint violation! '
+                    u'Probably password rules violated. '
+                    u'You have to request new temporary password.'
+                )
+            )
+        except ldap.LDAPError:
+            res = self.GET(message=u'Internal error!')
+        else:
+            res = RENDER.resetpw_action(self.form.d.username, user_dn)
+        return res
+
+
+def run():
+    """
+    run the web application
+    """
+    # Initialize web application
+    app = web.application(URL2CLASS_MAPPING, globals())
+    # Change to directory where the script is located
+    os.chdir(os.path.dirname(sys.argv[0]))
+    # Set error handling
+    if WEB_ERROR == False:
+        app.internalerror = False
+    # Start the internal web server
+    app.run()
+
+
+if __name__ == '__main__':
+    run()

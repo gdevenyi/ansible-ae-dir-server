@@ -1,0 +1,46 @@
+$def with (username,message)
+$var title: Request password reset
+
+<div id="content">
+
+  <h1>Request password reset</h1>
+
+  $if message:
+    <p class="message">$message</p>
+
+  <form method="POST" action="requestpw" enctype="application/x-www-form-urlencoded" accept-charset="utf-8">
+
+    <fieldset>
+      <legend>User data</legend>
+      <table summary="Input fields user data">
+        <tr>
+          <th>
+            User name:
+          </th>
+          <td>
+            <input name="username" value="$username" size="25">
+          </td>
+        </tr>
+        <tr>
+          <th>
+            E-mail address:<br>
+            (must match username)
+          </th>
+          <td>
+            <input name="email" value="" size="25">
+          </td>
+        </tr>
+      </table>
+    </fieldset>
+
+    <input type="submit" class="submit" name="submit" value="Request">
+
+  </form>
+
+  <p class="tip">
+    Later you will need a second part of the temporary password generated here.<br>
+    It will be told you by an admin of your particular zone (see welcome e-mail).<br>
+    Therefore you should contact him/her <em>now</em> before requesting the temporary password.
+  </p>
+
+</div>

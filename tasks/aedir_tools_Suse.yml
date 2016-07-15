@@ -1,0 +1,20 @@
+---
+
+- name: "Install additional base packages on {{ ansible_os_family }}"
+  zypper:
+    name: "{{ item }}"
+    state: present
+    disable_recommends: yes
+    type: package
+  notify:
+    - "restart {{ web_server }}"
+    - restart web2ldap
+  with_items:
+    - python
+    - python-aedir
+    - python-paramiko
+    - python-ldap
+    - python-mailutil
+    - python-pyasn1
+    - python-pyasn1-modules
+    - python-web.py

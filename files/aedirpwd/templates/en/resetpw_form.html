@@ -1,0 +1,86 @@
+$def with (username,temppassword1_len,temppassword2_len,temppassword1,message)
+$var title: Finish password reset
+
+<div id="content">
+
+  <h1>Finish password reset</h1>
+
+  $if message:
+    <p class="message">$message</p>
+
+  <form method="POST" action="resetpw" enctype="application/x-www-form-urlencoded" accept-charset="utf-8">
+
+    <fieldset>
+      <legend>User name and temporary password</legend>
+      <table summary="Input fields for user name and temporary password">
+        <tr>
+          <th>
+            User name:
+          </th>
+          <td>
+            <input name="username" value="$username" size="25">
+          </td>
+        </tr>
+        <tr>
+          <th>
+            Temporary password part #1:
+          </th>
+          <td>
+            <input name="temppassword1" value="$temppassword1" size="25" maxlen="$temppassword1_len">
+          </td>
+        </tr>
+      $if temppassword2_len>0:
+        <tr>
+          <th>
+            Temporary password part #2:
+          </th>
+          <td>
+            <input name="temppassword2" value="" size="$temppassword2_len">
+          </td>
+        </tr>
+      $else:
+        <input type="hidden" name="temppassword2" value="">
+      </table>
+    </fieldset>
+
+    <fieldset title="New password">
+      <legend>Input new password twice</legend>
+      <table summary="Input fields for new password">
+        <tr>
+          <th>
+            New password:
+          </th>
+          <td>
+            <input type="password" name="newpassword1" value="" size="20">
+          </td>
+        </tr>
+        <tr>
+          <th>
+            New password (repeat):
+          </th>
+          <td>
+            <input type="password" name="newpassword2" value="" size="20">
+          </td>
+        </tr>
+      </table>
+    </fieldset>
+
+    <input type="submit" class="submit" name="submit" value="Set new password">
+
+  </form>
+
+  <ul class="tip">
+    <li>
+      Temporary password part #2 will be told you by an admin of 
+      your particular zone (see welcome e-mail).
+    </li>
+    <li>Minimum <strong>twelve</strong> characters!</li>
+    <li>Password with capital and lower-case chars, numbers, and special chars.</li>
+    <li><strong>Password must not be used before!</strong></li>
+    <li>
+      Forgot input values or the temporary password is already expired? &rarr;
+      <a href="requestpw?username=$username">Request password reset again</a>.
+    </li>
+  </ul>
+
+</div>

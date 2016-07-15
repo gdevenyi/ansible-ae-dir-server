@@ -1,0 +1,83 @@
+---
+# Install AE-DIR password service (aedirpwd)
+
+- name: "Create directories for aedirpwd"
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: u=rwx,g=rx,o=rx
+  with_items:
+    - "{{ aedir_etc }}/aedirpwd"
+    - "{{ aedir_etc }}/aedirpwd/templates"
+    - "{{ aedir_etc }}/aedirpwd/templates/en"
+
+- name: Create Apache configuration include snippets
+  template:
+    src: "apache2/{{ item }}.j2"
+    dest: "{{ web2ldap_prefix }}/etc/{{ web_server }}/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - global/mod_proxy.conf
+    - vhost/aedirpwd.conf
+  notify:
+    - "restart {{ web_server }}"
+
+- name: "copy aedirpwd HTML templates to {{ aedir_etc }}/aedirpwd/templates"
+  copy:
+    src: "aedirpwd/templates/"
+    dest: "{{ aedir_etc }}/aedirpwd/templates"
+    follow: no
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+    directory_mode: u=rwx,g=rx,o=rx
+
+- name: "copy aedirpwd static files {{ aedir_prefix }}/htdocs/"
+  copy:
+    src: "aedirpwd/static/"
+    dest: "{{ aedir_prefix }}/htdocs/aedirpwd-static"
+    follow: no
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+    directory_mode: u=rwx,g=rx,o=rx
+
+- name: "Create aedirpwd_cnf.py"
+  template:
+    src: "aedirpwd/aedirpwd_cnf.py.j2"
+    dest: "{{ aedir_etc }}/aedirpwd/aedirpwd_cnf.py"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: "Install password service scripts from templates"
+  template:
+    src: "aedirpwd/{{ item }}.j2"
+    dest: "{{ aedir_sbin }}/{{ item }}"
+    owner: root
+    group: root
+    mode: 0750
+  with_items:
+    - aedirpwd_web.py
+    - aedirpwd_cron.py
+
+- name: Install systemd files from templates
+  template:
+    src: "aedirpwd/aedirpwd.service.j2"
+    dest: "{{ web2ldap_systemd_dir[ansible_os_family] }}/aedirpwd.service"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart aedirpwd
+  when: ansible_service_mgr=="systemd"
+
+- name: "ensure aedirpwd is running"
+  service:
+    name: "aedirpwd"
+    state: started
+    enabled: yes

@@ -1,0 +1,110 @@
+# -*- coding: utf-8 -*-
+"""
+Configuration module for aepwd_web and aepwd_cron
+"""
+
+# LDAP-URL describing the connection parameters and bind information
+PWD_LDAP_URL = r'{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub??trace=0'
+
+# Filter string templates for the various use-cases
+# String-keyed dictionary with input field names used
+FILTERSTR_CHANGEPW = ur'(&(objectClass=aeUser)(aeStatus=0)(uid=%(username)s))'
+FILTERSTR_REQUESTPW = ur'(&(objectClass=aeUser)(aeStatus=0)(uid=%(username)s)(mail=%(email)s))'
+FILTERSTR_RESETPW = ur'(&(objectClass=aeUser)(aeStatus=0)(uid=%(username)s)(objectClass=msPwdResetObject)(msPwdResetTimestamp<=%(currenttime)s)(msPwdResetExpirationTime>=%(currenttime)s))'
+
+# Filter string template for finding an active user entry
+# mainly used to inform about who did something and send e-mail to
+FILTERSTR_USER = ur'(&(objectClass=aeUser)(aeStatus=0)(displayName=*)(mail=*))'
+
+# Initial value for Boolean attribute 'msPwdResetEnabled'
+# Setting this to 'FALSE' enables you to let an admin set this manually
+# before the user can set a new password
+PWD_RESET_ENABLED = 'TRUE'
+
+# Name of directory containing all the template files
+TEMPLATES_DIRNAME = '{{ aedir_etc }}/aedirpwd/templates/en/'
+
+# Name of layout template (without the file suffix .html)
+LAYOUT = 'layout'
+
+# This constants specifies whether send exceptions to the browser or not
+WEB_CONFIG_DEBUG = True
+WEB_ERROR = None
+
+# Format string for displaying date and time
+TIME_DISPLAY_FORMAT = '%d.%m.%Y %H:%M:%S'
+
+# Length of generated temporary passwords
+PWD_LENGTH = 64
+
+# Number of chars of generated temporary passwords to be store
+# in attribute 'msPwdResetAdminPw'
+PWD_ADMIN_LEN = 8
+
+# Where to send admin notification if PWD_ADMIN_LEN is non-zero
+# and responsible zone admins cannot be determined
+PWD_ADMIN_MAILTO = [
+  u'ae-dir-admins@example.com',
+]
+
+# Number of seconds a temporary password is valid
+PWD_EXPIRETIMESPAN = 600
+
+# Hash algorithm used for the temporary passwords
+PWD_TMP_HASH_ALGO = 'sha512'
+
+# Characters used for the temporary passwords
+PWD_TMP_CHARS = u'abcdefghijkmnopqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ23456789'
+
+# Filename of template for sending e-mail message to user
+EMAIL_SUBJECT_PERSONAL = u'Your temporary reset password for %(username)s'
+EMAIL_TEMPLATE_PERSONAL = TEMPLATES_DIRNAME+'requestpw_user.txt'
+
+# Filename of template for sending e-mail message to admin
+# with second portion of clear-text password
+EMAIL_SUBJECT_ADMIN = u'Password reset for %(username)s needs help'
+EMAIL_TEMPLATE_ADMIN = TEMPLATES_DIRNAME+'requestpw_admin.txt'
+
+# SMTP server used as smart host (SMTP relay)
+# query string of URL may contain two more parameters:
+# STARTTLS: Send STARTTLS (see also config parameter SMTP_TLSARGS)
+# VIA: Use this hostname or IP address for connection
+#SMTP_URL = 'smtp://user:password@mail-relay.example.com/?STARTTLS&VIA=mail-relay-othername.example.com'
+#SMTP_URL = 'smtp://127.0.0.1'
+SMTP_URL = 'smtp://smtp.example.com:587/?STARTTLS'
+
+# Debug level for SMTP messages sent to stderr
+SMTP_DEBUGLEVEL = 0
+
+# Hostname to be sent in EHLO request, set to None for autmatically using the local hostname
+SMTP_LOCALHOSTNAME = '{{ ansible_fqdn }}'
+
+# Dictionary for key-word arguments to be used for function ssl.wrap_socket()
+# See http://docs.python.org/2/library/ssl.html#ssl.wrap_socket
+import ssl
+SMTP_TLSARGS = {
+#  'keyfile':None,
+#  'certfile':None,
+  'cert_reqs':ssl.CERT_REQUIRED,
+  'ssl_version':ssl.PROTOCOL_TLSv1,
+  'ca_certs':'/opt/ae-dir/etc/smtp-cacerts.pem',
+  'expected_fingerprints':None,
+  # ciphers only supported with Python 2.7+
+  'ciphers': "TLSv1.2:HIGH:!aNULL:!eNULL",
+}
+
+# From address in sent e-mail
+SMTP_FROM = 'ae-dir-pwd@example.com'
+
+# URL path prefix used when generating URLs in e-mails
+# handy for reverse proxy setups
+APP_PATH_PREFIX = '/pwd'
+
+# Mapping of request URL path to Python handler class
+URL2CLASS_MAPPING = (
+  '/','Default',
+  '/checkpw', 'CheckPassword',
+  '/changepw', 'ChangePassword',
+  '/requestpw', 'RequestPasswordReset',
+  '/resetpw', 'FinishPasswordReset',
+)

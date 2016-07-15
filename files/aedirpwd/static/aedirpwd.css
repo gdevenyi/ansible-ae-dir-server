@@ -1,0 +1,55 @@
+h1:before {
+  content: "";
+}
+
+h2:before {
+  content: "";
+}
+
+fieldset {
+  border:1px solid #a0a0a0;
+  margin-bottom:1.0em;
+  padding:1em;
+}
+
+input {
+  background-color:#f8f8f8;
+  border:2px solid #cccccc;
+  border-bottom-color:#eeeeee;
+  border-right-color:#eeeeee;
+}
+
+input.submit {
+  display:block;
+  padding:3px;
+  padding-left:10px;
+  padding-right:10px;
+  background-color:#D8D8D8;
+  border:2px solid #cccccc;
+  border-top-color:#eeeeee;
+  border-left-color:#eeeeee;
+}
+
+form table td {
+  width:70%;
+  border:none;
+}
+
+form table th {
+  text-align:right;
+  font-weight:normal;
+  border:none;
+  background-color:transparent;
+}
+
+/* Footnotes */
+.tip {
+  padding:0.7em;
+  font-size:1.0em;
+  background-color:#f0f0f0;
+}
+
+.userDN {
+  padding-left:2.0em;
+  font-weight:bold;
+}

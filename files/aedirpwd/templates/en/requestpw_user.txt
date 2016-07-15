@@ -1,0 +1,37 @@
+Dear user,
+
+a password reset for your user entry was requested.
+
+If you did that yourself you should immediately set a new password by 
+entering the following link in your web browser. This is possible only 
+for a couple of minutes.
+
+https://%(web_ctx_host)s%(app_path_prefix)s/resetpw?username=%(username)s&temppassword1=%(temppassword1)s
+
+You will need a 2nd part of your temporary password. This will be 
+given to you by the admin mentioned in the welcome e-mail.
+
+If you react too late to this e-mail and above link does not work you can 
+simply request the password reset again with this link:
+
+https://%(web_ctx_host)s%(app_path_prefix)s/requestpw?username=%(username)s
+
+If someone else falsely invoked the password request you can simply 
+ignore this message or inform the administrator reachable through 
+%(fromaddr)s.
+
+Have fun!
+
+Your LDAP admins.
+
+User name:
+%(username)s
+
+Temporary password:
+%(temppassword1)s
+
+Distinguished name of user entry:
+%(userdn)s
+
+IP address from which password reset was invoked:
+%(remote_ip)s

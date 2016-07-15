@@ -1,0 +1,62 @@
+---
+
+- name: "Install base packages on {{ ansible_os_family }}"
+  apt:
+    name: "{{ item }}"
+    state: installed
+    update_cache: yes
+    install_recommends: no
+    dpkg_options: 'force-confold,force-confdef'
+  with_items:
+    - python
+    - python-paramiko
+    - python-webpy
+
+- name: "PIP installation packages on {{ ansible_os_family }}"
+  apt:
+    name: "{{ item }}"
+    state: installed
+    update_cache: yes
+    install_recommends: no
+    dpkg_options: 'force-confold,force-confdef'
+  when: ansible_os_family == 'Debian'
+  notify:
+    - "restart {{ web_server }}"
+  with_items:
+    - tar
+    - gzip
+    - gcc
+    - libsasl2-dev
+    - libldap-dev
+    - python-dev
+    - libpython-dev
+    - python-setuptools
+    - virtualenv
+    - python-virtualenv
+    - python-pip
+
+- name: "Additional PIP packages in virtualenv {{ aedir_prefix }}"
+  pip:
+    name: "{{ item }}"
+    state: latest
+    virtualenv: "{{ aedir_prefix }}"
+    virtualenv_site_packages: yes
+    extra_args: "--upgrade"
+  with_items:
+    - aedir
+    - mailutil
+    - python-ldap
+    - pyasn1
+    - pyasn1_modules
+
+#- name: "Grab list of python scripts installed in {{ aedir_bin }}/ and {{ aedir_sbin }}/"
+#  shell: "ls -1 {{ aedir_bin }}/*.py {{ aedir_sbin }}/*.py"
+#  register: aedir_python_scripts
+
+#- name: "Set Python interpreter in start scripts"
+#  replace:
+#    dest: "{{ item }}"
+#    regexp: '/usr/bin/python'
+#    replace: '{{ aedir_python }}'
+#    backup: no
+#  with_items: "{{ aedir_python_scripts.stdout_lines }}"

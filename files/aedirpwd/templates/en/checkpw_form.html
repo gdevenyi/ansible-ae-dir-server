@@ -1,0 +1,44 @@
+$def with (username,message)
+$var title: Check password
+
+<div id="content">
+
+  <h1>Check password</h1>
+
+  $if message:
+    <p class="message">$message</p>
+
+  <form method="POST" action="checkpw" enctype="application/x-www-form-urlencoded" accept-charset="utf-8">
+
+    <fieldset title="Authentication">
+      <legend>User name and password for authentication</legend>
+      <table summary="Input fields for user name and old password">
+        <tr>
+          <th>
+            User name:
+          </th>
+          <td>
+            <input name="username" value="$username" size="25">
+          </td>
+        </tr>
+        <tr>
+          <th>
+            Current password:
+          </th>
+          <td>
+            <input type="password" name="oldpassword" value="" size="20">
+          </td>
+        </tr>
+      </table>
+    </fieldset>
+
+    <input type="submit" class="submit" name="submit" value="Check password" />
+
+  </form>
+
+  <p class="tip">
+    Forgot password? &rarr;
+    <a href="requestpw?username=$username">Request password reset</a>.
+  </p>
+
+</div>

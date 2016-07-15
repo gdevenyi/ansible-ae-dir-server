@@ -4,3 +4,5 @@
 - name: restart slapd
   service: name=slapd state=restarted
 
+- name: restart aedirpwd
+  service: name=aedirpwd state=restarted

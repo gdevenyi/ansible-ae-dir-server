@@ -10,7 +10,7 @@
     mode: u=rwx,g=rx,o=rx
   with_items:
     - "{{ aedir_prefix }}"
-    - "{{ aedir_prefix }}/etc"
+    - "{{ aedir_etc }}"
     - "{{ aedir_prefix }}/htdocs"
     - "{{ aedir_prefix }}/htdocs/reporting"
     - "{{ aedir_bin }}"
@@ -34,9 +34,11 @@
     owner: root
     group: ldap
     mode: 0644
-  when: openldap_role == 'provider'
 
-- name: Install tool scripts
+- name: "Specific installation for {{ ansible_os_family }}"
+  include: "aedir_tools_{{ ansible_os_family }}.yml"
+
+- name: "Install tool scripts"
   template:
     src: "scripts/{{ item }}.j2"
     dest: "{{ aedir_bin }}/{{ item }}"
@@ -49,26 +51,8 @@
     - ae-person-report.py
     - ae-user-report.py
 
-- name: Install CRON scripts from templates
-  template:
-    src: "scripts/{{ item }}.j2"
-    dest: "{{ aedir_sbin }}/{{ item }}"
-    owner: root
-    group: root
-    mode: 0750
-  with_items:
-    - aeperson2aeuser.py
-    - ae-dir-slapcat.sh
-
-- name: Install CRON scripts from files
-  copy:
-    src: "{{ item }}"
-    dest: "{{ aedir_sbin }}/{{ item }}"
-    owner: root
-    group: root
-    mode: 0750
-  with_items:
-    - update_memberurl_groups.py
+- name: "Install AE-DIR password service (aedirpwd)"
+  include: "aedirpwd.yml"
 
 - name: Run update_memberurl_groups.py as CRON job
   cron:
@@ -78,6 +62,18 @@
     cron_file: update_memberurl_groups
     minute: "*/3"
     job: "{{ aedir_sbin }}/update_memberurl_groups.py"
+
+- name: "Install CRON/demon scripts from templates"
+  template:
+    src: "scripts/{{ item }}.j2"
+    dest: "{{ aedir_sbin }}/{{ item }}"
+    owner: root
+    group: root
+    mode: 0750
+  with_items:
+    - aeperson2aeuser.py
+    - ae-dir-slapcat.sh
+    - update_memberurl_groups.py
 
 - name: Run aeperson2aeuser.py as CRON job
   cron:

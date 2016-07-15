@@ -1,0 +1,332 @@
+#!{{ aedir_python }}
+# -*- coding: utf-8 -*-
+"""
+This CRON script performs two tasks:
+1. Remove expired msPwdResetObject attributes
+2. Send welcome e-mail to new users which have not set a password yet
+
+Author: Michael Ströder <michael@stroeder.com>
+"""
+
+__version__ = '0.0.1'
+
+import os
+import logging
+
+#-----------------------------------------------------------------------
+# Configuration constants
+#-----------------------------------------------------------------------
+
+# Import constants from configuration module
+sys.path.extend([
+  '{{ aedir_etc }}/aedirpwd',
+])
+from aedirpwd_cnf import *
+
+# Timeout in seconds when connecting to local and remote LDAP servers
+# used for ldap.OPT_NETWORK_TIMEOUT and ldap.OPT_TIMEOUT
+LDAP_TIMEOUT = 10.0
+
+# Number of times connecting to LDAP is tried
+LDAP_MAXRETRYCOUNT = 4
+
+# Logging level
+if os.environ.get('DEBUG','no')=='yes':
+  LOG_LEVEL = logging.DEBUG
+else:
+  LOG_LEVEL = logging.WARN
+
+# Logging format
+LOG_FORMAT = '%(asctime)s %(levelname)s %(message)s'
+
+# If non-zero this specifies to run step 2. only if the host's FQDN
+# is equal to this, else abort
+ENSURE_DNS_CNAME = 'ae-dir-provider.example.com'
+
+# Filter string templates
+FILTERSTR_EXPIRE = ur'(&(objectClass=msPwdResetObject)(!(msPwdResetExpirationTime=%(currenttime)s))(msPwdResetExpirationTime<=%(currenttime)s))'
+FILTERSTR_NOPASSWORD = ur'(&(objectClass=aeUser)(aeStatus=0)(uid=*)(mail=*)(!(|(objectClass=msPwdResetObject)(userPassword=*)(pwdChangedTime=*)))(modifyTimestamp>=%(lasttime)s)(!(modifyTimestamp>=%(currenttime)s)))'
+
+# Maximum timespan to search for password-less entries in the past
+NOTIFY_OLDEST_TIMESPAN = 7200.0
+
+# Where to store the last run timestamp
+NOTIFY_STATE_FILENAME = '{{ aedir_rundir }}/aepwd_cron.state'
+
+# E-Mail subject for notification message
+NOTIFY_EMAIL_SUBJECT = u'New Æ-DIR account "%(user_uid)s" added for %(user_cn)s'
+# E-Mail body template file for notification message
+NOTIFY_EMAIL_TEMPLATE = '{{ aedir_etc }}/aedirpwd/templates/en/notify_user.txt'
+
+#-----------------------------------------------------------------------
+# Imports and pre-filled vars
+#-----------------------------------------------------------------------
+
+# from Python's standard lib
+import sys,os,time,socket,smtplib,logging
+from calendar import timegm
+import email.utils
+from email.header import Header as email_Header
+
+# from python-ldap
+import ldap,ldap.filter,ldap.sasl,ldapurl
+from ldap.ldapobject import ReconnectLDAPObject
+
+# the separate mailutil module
+import mailutil
+
+# Optional use of module SocksiPy
+if SMTP_PROXY!=None:
+  import socks
+  mailutil.smtp_socket = socks.socksocket
+  socks.setdefaultproxy(**SMTP_PROXY)
+else:
+  mailutil.smtp_socket = socket.socket
+
+#-----------------------------------------------------------------------
+# Classes and functions
+#-----------------------------------------------------------------------
+
+
+def generalized_time(t):
+  """
+  Convert seconds since epoch into LDAP syntax GeneralizedTime
+  """
+  return time.strftime(
+    '%Y%m%d%H%M%SZ',
+    time.gmtime(t)
+  )
+
+
+def connect_and_bind(ldap_url):
+  """
+  Connect and bind to the LDAP directory
+  """
+
+  class PwdLDAPUrl(ldapurl.LDAPUrl):
+    """
+    Special class for handling additional LDAP URL extensions
+    """
+    attr2extype = {
+      'who':'bindname',
+      'cred':'X-BINDPW',
+      'start_tls':'startTLS',
+      'trace_level':'trace',
+    }
+
+  lu = PwdLDAPUrl(ldap_url)
+  trace_level = int(lu.trace_level or '0')
+  start_tls = int(lu.start_tls or '1')
+  ldap_conn = ldap.initialize(lu.initializeUrl(),trace_level=0,trace_file=sys.stderr)
+  ldap_conn._trace_level = trace_level
+  if lu.urlscheme.lower()=='ldapi' and not lu.who:
+    ldap_conn.sasl_interactive_bind_s('',ldap.sasl.external())
+  else:
+    if lu.urlscheme.lower()=='ldap' and start_tls:
+      ldap_conn.start_tls_s()
+    # Aus Sicherheitsgruenden wird Trace-Log fuer LDAP Simple Bind Request
+    # mit Passwort ausgeschaltet
+    ldap_conn._trace_level = 0
+    ldap_conn.simple_bind_s(lu.who or '',lu.cred or '')
+    ldap_conn._trace_level = trace_level
+  return ldap_conn,lu
+
+#-----------------------------------------------------------------------
+# Main
+#-----------------------------------------------------------------------
+
+script_name = sys.argv[0]
+my_logger = logging.getLogger(script_name)
+my_stream_formatter = logging.Formatter(fmt=LOG_FORMAT)
+my_stream_handler = logging.StreamHandler()
+my_stream_handler.setFormatter(my_stream_formatter)
+my_logger.addHandler(my_stream_handler)
+my_logger.setLevel(LOG_LEVEL)
+
+host_fqdn = socket.getfqdn()
+
+my_logger.debug('Starting %s %s or %s',script_name,__version__,host_fqdn)
+
+if ENSURE_DNS_CNAME and \
+   socket.gethostbyname(ENSURE_DNS_CNAME)!=socket.gethostbyname(host_fqdn):
+  my_logger.info('%s is not %s => aborting',repr(host_fqdn),repr(ENSURE_DNS_CNAME))
+  sys.exit(0)
+
+# Determine oldest possible last timestamp (sounds strange, yeah!)
+current_time = time.time()
+oldest_last_run_timestr = generalized_time(current_time-NOTIFY_OLDEST_TIMESPAN)
+try:
+  last_run_timestr = open(NOTIFY_STATE_FILENAME,'rb').read().strip()
+except IOError,e:
+  my_logger.warn('Error reading file %s: %s',repr(NOTIFY_STATE_FILENAME),str(e))
+  last_run_timestr = oldest_last_run_timestr
+else:
+  my_logger.debug('Read last run timestamp %s from file %s',repr(last_run_timestr),repr(NOTIFY_STATE_FILENAME))
+  if oldest_last_run_timestr>last_run_timestr:
+    my_logger.warn('Timestamp read from file %s too old => ignoring',repr(NOTIFY_STATE_FILENAME))
+    last_run_timestr = oldest_last_run_timestr
+
+my_logger.debug('oldest_last_run_timestr = %s',repr(oldest_last_run_timestr))
+
+try:
+  ldap_conn,ldap_url = connect_and_bind(PWD_LDAP_URL)
+except ldap.LDAPError,e:
+  my_logger.error('LDAPError during connecting to %s: %s',repr(PWD_LDAP_URL),str(e))
+  sys.exit(1)
+else:
+  my_logger.info('Successfully bound to %s as %s',repr(ldap_conn._uri),repr(ldap_conn.whoami_s()))
+
+current_run_timestr = generalized_time(current_time)
+
+filterstr_inputs_dict = {
+  'currenttime':current_run_timestr,
+  'lasttime':last_run_timestr,
+}
+my_logger.debug('filterstr_inputs_dict = %s',filterstr_inputs_dict)
+
+# 1. Remove expired msPwdResetObject attributes
+#-----------------------------------------------------------------------
+
+expiration_filterstr = (FILTERSTR_EXPIRE % filterstr_inputs_dict).encode('utf-8')
+
+ldap_results = ldap_conn.search_ext_s(
+  ldap_url.dn,
+  ldap_url.scope,
+  filterstr=expiration_filterstr,
+  attrlist=['objectClass','msPwdResetExpirationTime','msPwdResetTimestamp','msPwdResetAdminPw'],
+)
+
+for ldap_dn,ldap_entry in ldap_results:
+
+  my_logger.debug('Found %s: %s',repr(ldap_dn),repr(ldap_entry))
+
+  # Prepare the modification list
+  ldap_mod_list = [
+    # explictly delete by value
+    (ldap.MOD_DELETE,'objectClass',['msPwdResetObject']),
+    (ldap.MOD_DELETE,'msPwdResetTimestamp',[ldap_entry['msPwdResetTimestamp'][0]]),
+    (ldap.MOD_DELETE,'msPwdResetExpirationTime',[ldap_entry['msPwdResetExpirationTime'][0]]),
+    # delete whole value no matter what
+    (ldap.MOD_DELETE,'msPwdResetEnabled',None),
+    (ldap.MOD_DELETE,'msPwdResetPasswordHash',None),
+  ]
+  if PWD_ADMIN_LEN or 'msPwdResetAdminPw' in ldap_entry:
+    ldap_mod_list.append(
+      (ldap.MOD_DELETE,'msPwdResetAdminPw',None),
+    )
+
+  # Actually perform the modify operation
+  try:
+    ldap_conn.modify_s(ldap_dn,ldap_mod_list)
+  except ldap.LDAPError,e:
+    my_logger.warn('LDAPError during removing msPwdResetObject attributes in %s: %s',repr(ldap_dn),str(e))
+  else:
+    my_logger.info('Removed msPwdResetObject attributes from %s',repr(ldap_dn))
+
+
+# 2. Send welcome e-mail to new users which have not set a password yet
+#-----------------------------------------------------------------------
+
+nopassword_filterstr = (FILTERSTR_NOPASSWORD % filterstr_inputs_dict).encode('utf-8')
+
+my_logger.debug('Searching users without password with %s',repr(nopassword_filterstr))
+ldap_results = ldap_conn.search_ext_s(
+  ldap_url.dn,
+  ldap_url.scope,
+  filterstr=nopassword_filterstr,
+  attrlist=['objectClass','uid','cn','displayName','description','mail','creatorsName','modifiersName'],
+)
+
+if ldap_results:
+
+  notification_counter = 0
+
+  my_logger.debug('Open SMTP connection to %s via %s from %s',repr(SMTP_URL),repr(SMTP_PROXY),repr(SMTP_LOCALHOSTNAME))
+  smtp_conn = mailutil.smtp_connection(
+    SMTP_URL,local_hostname=SMTP_LOCALHOSTNAME,
+    tls_args=SMTP_TLSARGS,
+    debug_level=SMTP_DEBUGLEVEL
+  )
+
+  for ldap_dn,ldap_entry in ldap_results:
+
+    to_addr = ldap_entry['mail'][0].decode('utf-8')
+    my_logger.debug('Prepare notification for %s sent to %s',repr(ldap_dn),repr(to_addr))
+    default_headers = (
+      ('From',SMTP_FROM),
+      ('Date',email.utils.formatdate(time.time(),True)),
+    )
+    smtp_message_tmpl = open(NOTIFY_EMAIL_TEMPLATE,'rb').read().decode('utf-8')
+    user_data_user = {
+      'user_uid':ldap_entry['uid'][0].decode('utf-8'),
+      'user_cn':ldap_entry.get('cn',[''])[0].decode('utf-8'),
+      'user_displayname':ldap_entry.get('displayName',[''])[0].decode('utf-8'),
+      'user_description':ldap_entry.get('description',[''])[0].decode('utf-8'),
+      'emailadr':to_addr,
+      'fromaddr':SMTP_FROM,
+      'user_dn':ldap_dn.decode('utf-8'),
+      'web_ctx_host':(ENSURE_DNS_CNAME or host_fqdn).decode('ascii'),
+      'app_path_prefix':APP_PATH_PREFIX,
+    }
+
+    user_data_user['admin_cn'] = u'unknown'
+    user_data_user['admin_mail'] = u'unknown'
+    for admin_dn_attr in ('modifiersName','creatorsName'):
+      try:
+        admin_dn,admin_entry = ldap_conn.search_ext_s(
+          ldap_entry[admin_dn_attr][0],
+          ldap.SCOPE_BASE,
+          filterstr=FILTERSTR_USER.encode('utf-8'),
+          attrlist=['objectClass','uid','cn','mail'],
+        )[0]
+      except ldap.LDAPError,e:
+        my_logger.debug('LDAPError reading %s: %s: %s',repr(admin_dn_attr),repr(ldap_entry[admin_dn_attr][0]),str(e))
+      except IndexError:
+        my_logger.debug('Not real admin referenced in %s: %s',repr(admin_dn_attr),repr(ldap_entry[admin_dn_attr][0]))
+      else:
+        user_data_user['admin_cn'] = admin_entry.get('cn',[''])[0].decode('utf-8')
+        user_data_user['admin_mail'] = admin_entry.get('mail',[''])[0].decode('utf-8')
+        my_logger.debug('Admin displayName read from %s: %s',repr(admin_dn_attr),repr(user_data_user['admin_cn']))
+        break
+
+    smtp_message = smtp_message_tmpl % user_data_user
+    smtp_subject = NOTIFY_EMAIL_SUBJECT % user_data_user
+    my_logger.debug('smtp_subject = %s',repr(smtp_subject))
+    my_logger.debug('smtp_message = %s',repr(smtp_message))
+    try:
+      smtp_conn.send_simple_message(
+        SMTP_FROM,
+        [to_addr.encode('utf-8')],
+        'utf-8',
+        default_headers+(
+          ('Subject',smtp_subject),
+          ('To',to_addr),
+        ),
+        smtp_message,
+      )
+    except smtplib.SMTPRecipientsRefused,e:
+      my_logger.error('Recipient %s rejected: %s',repr(to_addr),str(e))
+      continue
+    else:
+      notification_counter += 1
+
+  my_logger.info('Sent %d notifications',notification_counter)
+  my_logger.debug('Close SMTP connection to %s',repr(SMTP_URL))
+  smtp_conn.quit()
+
+else:
+
+  my_logger.info('No results => no notifications')
+
+# Close LDAP connection
+ldap_conn.unbind_s()
+
+# Write the last run timestamp
+try:
+  open(NOTIFY_STATE_FILENAME,'wb').write(current_run_timestr)
+except Exception,e:
+  my_logger.error('Error writing file %s: %s',repr(NOTIFY_STATE_FILENAME),str(e))
+else:
+  my_logger.debug('Wrote timestamp %s to file %s',repr(current_run_timestr),repr(NOTIFY_STATE_FILENAME))
+
+sys.exit(0)
