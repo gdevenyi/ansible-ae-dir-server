@@ -769,7 +769,7 @@ class AEPerson(DynamicDNSelectList,AEObjectUtil):
     ae_status = int(self._entry.get('aeStatus',['0'])[0])
     aeperson_aestatus_filters = [
       '(aeStatus={0})'.format(st)
-      for st in map(str,self.ae_status_map[ae_status])
+      for st in map(str,self.ae_status_map.get(ae_status,[]))
     ]
     if len(aeperson_aestatus_filters)>1:
       filter_components.append('(|{})'.format(''.join(aeperson_aestatus_filters)))
@@ -1340,7 +1340,7 @@ syntax_registry.registerAttrType(
 )
 
 
-class AEStatus(SelectList,IntegerRange):
+class AEStatus(SelectList):
   oid = 'AEStatus-oid'
   desc = 'AE-DIR: Status of object'
   attr_value_dict = {
@@ -1351,8 +1351,9 @@ class AEStatus(SelectList,IntegerRange):
   }
 
   def _validate(self,attrValue):
-    if not SelectList._validate(self,attrValue):
-      return False
+    result = SelectList._validate(self,attrValue)
+    if not result or not attrValue:
+      return result
     ae_status = int(attrValue)
     current_time = time.gmtime(time.time())
     try:
@@ -1372,6 +1373,8 @@ class AEStatus(SelectList,IntegerRange):
     return result
 
   def transmute(self,attrValues):
+    if not attrValues or not attrValues[0]:
+      return attrValues
     ae_status = int(attrValues[0])
     current_time = time.gmtime(time.time())
     try:
