@@ -5,24 +5,30 @@
 <p>
   You reached web2ldap service <strong>{{ openldap_service_fqdn }}</strong> (running on <em>{{ ansible_fqdn }}</em>)
 </p>
-<p>
-  <a href="/web2ldap.html">User Guide</a>
-</p>
 <ul>
   <li>
-    <a class="CommandLink" href="/web2ldap/searchform?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}????bindname=">Local &AElig;-DIR</a>
+    <a class="CommandLink"
+      href="/web2ldap/searchform?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}????bindname=">
+      Connect to local &AElig;-DIR
+    </a>
     (if in doubt, click this!)
   </li>
   <li>
-    <a class="CommandLink" href="/web2ldap/passwd?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}????bindname=">Change own password</a>
+    <a href="/web2ldap.html">web2ldap user guide</a>
+  </li>
+  <li>
+    <a href="/pwd">Password Self-Service</a>
   </li>
 </ul>
 
-<h2>Special</h2>
-<p>Roles: &AElig; admins and &AElig; auditors<p>
+<h2>For &AElig; admins and &AElig; auditors</h2>
 <ul>
   <li>
     <a class="CommandLink" href="/web2ldap/searchform?{{ openldap_ldapi_uri }}/{{ aedir_accesslog_suffix }}????bindname=">Search access log</a>
+    (only &AElig; admins)
+  </li>
+  <li>
+    <a class="CommandLink" href="/web2ldap/searchform?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}???(objectClass=pwdPolicy)?bindname=">Search password policies</a>
     (only &AElig; admins)
   </li>
 </ul>
@@ -43,8 +49,9 @@
   </tr>
 </table>
 
+<h2>&AElig;-DIR remote servers</h2>
 {% for role in ['provider', 'consumer'] %}
-<h2>&AElig;-DIR {{ role }}(s)</h2>
+<h3>{{ role }}(s)</h3>
 <table>
   <tr>
     <th>Service</th>

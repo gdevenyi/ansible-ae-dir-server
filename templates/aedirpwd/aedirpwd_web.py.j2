@@ -604,7 +604,11 @@ class ChangePassword(BaseApp):
         except ldap.LDAPError:
             res = self.GET(message=u'Internal error!')
         else:
-            res = RENDER.changepw_action(self.form.d.username, user_dn)
+            res = RENDER.changepw_action(
+                self.form.d.username,
+                user_dn,
+                self.ldap_url.initializeUrl()
+            )
         return res
 
 

@@ -1,4 +1,4 @@
-$def with (username,userdn)
+$def with (username,userdn,ldap_uri)
 $var title: Password change for $username
 
 <div id="content">
@@ -20,7 +20,7 @@ $var title: Password change for $username
       Try to <a href="checkpw?username=$username">check password</a> right now.
     </li>
     <li>
-      <a href="/web2ldap/searchform?%(ldap_uri)s/ou%3Dae-dir????bindname=$username">Login to web2ldap as $username</a>.
+      <a href="/web2ldap/searchform?$ldap_uri/ou%3Dae-dir????bindname=$username">Login to web2ldap as $username</a>.
     </li>
   </ul>
 
