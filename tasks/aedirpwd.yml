@@ -48,7 +48,7 @@
 
 - name: "Create aedirpwd_cnf.py"
   template:
-    src: "aedirpwd/aedirpwd_cnf.py.j2"
+    src: "{{ aedirpwd_cnf_template }}"
     dest: "{{ aedir_etc }}/aedirpwd/aedirpwd_cnf.py"
     owner: root
     group: root
