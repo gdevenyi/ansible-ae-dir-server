@@ -18,6 +18,8 @@ After=local-fs.target remote-fs.target network.target
 Type=simple
 #PIDFile=
 ExecStart={{ aedir_sbin }}/aedirpwd_web.py 127.0.0.1:8080
+User={{ aedirpwd_web_user }}
+Group={{ aedirpwd_web_group }}
 
 [Install]
 WantedBy=multi-user.target

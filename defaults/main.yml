@@ -262,7 +262,18 @@ openldap_syncrepl_providers: "{{ aedir_hosts['provider']|map('extract', hostvars
 aedir_web2ldap_cnf_local: "web2ldap/web2ldapcnf/local.py.j2"
 aedir_web2ldap_cnf_hosts: "web2ldap/web2ldapcnf/hosts.py.j2"
 aedir_web2ldap_connect_template: "web2ldap/templates/connect.html.j2"
+
+#---------------------------------------------------------------------------
+# parameters for password services
+#---------------------------------------------------------------------------
+
+# jinja template to use for aedirpwd_cnf.py
 aedirpwd_cnf_template: "aedirpwd/aedirpwd_cnf.py.j2"
+
+# user/group to run password self-service web application
+# must be in {{ aedir_ldapi_services }}
+aedirpwd_web_user: ae-dir-pwd
+aedirpwd_web_group: ae-dir-pwd
 
 #---------------------------------------------------------------------------
 # SMTP parameters

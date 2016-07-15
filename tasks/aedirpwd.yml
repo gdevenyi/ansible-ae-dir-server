@@ -61,7 +61,7 @@
     src: "aedirpwd/{{ item }}.j2"
     dest: "{{ aedir_sbin }}/{{ item }}"
     owner: root
-    group: root
+    group: "{{ aedirpwd_web_group }}"
     mode: 0750
   with_items:
     - aedirpwd_web.py
@@ -73,7 +73,7 @@
     src: "aedirpwd/{{ item }}.j2"
     dest: "{{ aedir_sbin }}/{{ item }}"
     owner: root
-    group: root
+    group: "{{ aedirpwd_web_group }}"
     mode: 0750
   with_items:
     - aedirpwd_cron.py
