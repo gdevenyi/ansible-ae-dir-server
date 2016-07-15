@@ -53,8 +53,10 @@
     owner: root
     group: root
     mode: 0644
+  notify:
+    - "restart aedirpwd"
 
-- name: "Install password service scripts from templates"
+- name: "Install password service web application from template"
   template:
     src: "aedirpwd/{{ item }}.j2"
     dest: "{{ aedir_sbin }}/{{ item }}"
@@ -63,6 +65,17 @@
     mode: 0750
   with_items:
     - aedirpwd_web.py
+  notify:
+    - "restart aedirpwd"
+
+- name: "Install password service CRON scripts from template"
+  template:
+    src: "aedirpwd/{{ item }}.j2"
+    dest: "{{ aedir_sbin }}/{{ item }}"
+    owner: root
+    group: root
+    mode: 0750
+  with_items:
     - aedirpwd_cron.py
 
 - name: Install systemd files from templates
@@ -73,7 +86,7 @@
     group: root
     mode: 0644
   notify:
-    - restart aedirpwd
+    - "restart aedirpwd"
   when: ansible_service_mgr=="systemd"
 
 - name: "ensure aedirpwd is running"

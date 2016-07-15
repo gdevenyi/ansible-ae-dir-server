@@ -87,7 +87,7 @@ SMTP_TLSARGS = {
 #  'certfile':None,
   'cert_reqs':ssl.CERT_REQUIRED,
   'ssl_version':ssl.PROTOCOL_TLSv1,
-  'ca_certs':'/opt/ae-dir/etc/smtp-cacerts.pem',
+  'ca_certs':'{{ smtp_cacert_pathname }}',
   'expected_fingerprints':None,
   # ciphers only supported with Python 2.7+
   'ciphers': "TLSv1.2:HIGH:!aNULL:!eNULL",

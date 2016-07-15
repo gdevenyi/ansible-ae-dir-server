@@ -263,3 +263,13 @@ aedir_web2ldap_cnf_local: "web2ldap/web2ldapcnf/local.py.j2"
 aedir_web2ldap_cnf_hosts: "web2ldap/web2ldapcnf/hosts.py.j2"
 aedir_web2ldap_connect_template: "web2ldap/templates/connect.html.j2"
 aedirpwd_cnf_template: "aedirpwd/aedirpwd_cnf.py.j2"
+
+#---------------------------------------------------------------------------
+# SMTP parameters
+#---------------------------------------------------------------------------
+
+# The CA certificate file bundle for sending e-mail via SMTP/STARTTLS
+smtp_cacert_filename: "smtp-cacerts.pem"
+
+# The CA certificate file for sending e-mail via SMTP/STARTTLS
+smtp_cacert_pathname: "{{ aedir_etc }}/{{ smtp_cacert_filename }}"

@@ -17,6 +17,16 @@
     - "{{ aedir_sbin }}"
     - "{{ aedir_rundir }}"
 
+- name: "install CA cert for SMTP/STARTTLS"
+  copy:
+    src: "{{ smtp_cacert_filename }}"
+    dest: "{{ smtp_cacert_pathname }}"
+    follow: no
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+    directory_mode: u=rwx,g=rx,o=rx
+
 - name: "copy AE-DIR HTML docs to {{ aedir_prefix }}/htdocs/"
   copy:
     src: "ae-dir-htdocs/"
@@ -92,4 +102,3 @@
     cron_file: aeperson2aeuser
     hour: "*/12"
     job: "rm {{ aedir_rundir }}/aeperson2aeuser.state > /dev/null 2>&1 || exit 0"
-
