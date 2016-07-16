@@ -11,7 +11,7 @@ web.py 0.37+ (see http://webpy.org/)
 python-ldap 2.4.25+ (see http://www.python-ldap.org/)
 """
 
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 
 # from Python's standard lib
 import string
@@ -46,15 +46,25 @@ from ldap.controls.sessiontrack import SESSION_TRACKING_FORMAT_OID_USERNAME
 # mail utility module
 import mailutil
 
+import aedir
+
 # Import constants from configuration module
 sys.path.extend([
-  '{{ aedir_etc }}/aedirpwd',
+    '{{ aedir_etc }}/aedirpwd',
 ])
 from aedirpwd_cnf import *
 
 #-----------------------------------------------------------------------
 # utility functions
 #-----------------------------------------------------------------------
+
+
+def pwd_hash(pw_clear):
+    """
+    Generate un-salted hash as hex-digest
+    """
+    return hashlib.new(PWD_TMP_HASH_ALGO, pw_clear).hexdigest()
+
 
 def read_template_file(filename):
     """
@@ -121,7 +131,7 @@ if PWD_TMP_CHARS != url_quote_plus(PWD_TMP_CHARS):
     raise ValueError('URL special chars in PWD_TMP_CHARS: %r' % (PWD_TMP_CHARS))
 
 # Set some webpy configuration vars
-if WEB_CONFIG_DEBUG == False:
+if not WEB_CONFIG_DEBUG:
     web.config.debug = False
 
 # Declaration for text input field for 'username'
@@ -155,18 +165,18 @@ TEMP1PASSWORD_FIELD = web.form.Password(
     'temppassword1',
     web.form.notnull,
     web.form.regexp(
-      ur'^[%s]+$' % re.escape(PWD_TMP_CHARS),
-      u'Invalid input format.'
+        ur'^[%s]+$' % re.escape(PWD_TMP_CHARS),
+        u'Invalid input format.'
     ),
     description=u'Temporary password part #1'
 )
 
 TEMP2PASSWORD_FIELD = web.form.Password(
     'temppassword2',
-#    web.form.notnull,
+    #web.form.notnull,
     web.form.regexp(
-      ur'^[%s]*$' % re.escape(PWD_TMP_CHARS),
-      u'Invalid input format.'
+        ur'^[%s]*$' % re.escape(PWD_TMP_CHARS),
+        u'Invalid input format.'
     ),
     description=u'Temporary password part #2'
 )
@@ -199,6 +209,18 @@ class Default(object):
     """
     Handle default index request
     """
+    ldap_url = aedir.AEDirUrl(PWD_LDAP_URL)
+    http_headers = (
+        ('Cache-Control', 'no-store,no-cache,max-age=0,must-revalidate'),
+        ('X-XSS-Protection', '1; mode=block'),
+        ('X-DNS-Prefetch-Control', 'off'),
+        ('X-Content-Type-Options', 'nosniff'),
+        ('X-Frame-Options', 'deny'),
+        ('Server', 'unknown'),
+        ('Content-Security-Policy', "default-src 'self';script-src 'none'"),
+        ('X-Webkit-CSP', "default-src 'self';script-src 'none'"),
+        ('X-Content-Security-Policy', "default-src 'self';script-src 'none'"),
+    )
 
     def __init__(self, *args, **kwargs):
         self.remote_ip = web.ctx.env.get(
@@ -206,29 +228,9 @@ class Default(object):
             web.ctx.env.get('HTTP_X_FORWARDED_FOR', web.ctx.ip)
         )
         # Set additional headers in response
-        self._add_headers()
-
-    def _add_headers(self):
-        """
-        add custom response headers, mainly content security policy
-        """
-        csp_value = ';'.join((
-            "default-src 'self'",
-            "script-src 'none'",
-        ))
-        for header, value in (
-            ('Cache-Control', 'no-store,no-cache,max-age=0,must-revalidate'),
-            ('X-XSS-Protection', '1; mode=block'),
-            ('X-DNS-Prefetch-Control', 'off'),
-            ('X-Content-Type-Options', 'nosniff'),
-            ('X-Frame-Options', 'deny'),
-            ('Server', 'unknown'),
-            ('Content-Security-Policy', csp_value),
-            ('X-Webkit-CSP', csp_value),
-            ('X-Content-Security-Policy', csp_value),
-        ):
+        for header, value in self.http_headers:
             web.header(header, value)
-        return # end of _add_headers()
+        return # end of __init__()
 
     def GET(self):
         """
@@ -242,58 +244,18 @@ class BaseApp(Default):
     Request handler base class which is not used directly
     """
 
-    get_form = web.form.Form(
-      USERNAME_FIELD,
-    )
+    get_form = web.form.Form(USERNAME_FIELD)
 
-    def _sess_track_ctrl(self, username='anon'):
+    def _sess_track_ctrl(self, username='-/-'):
         """
         return LDAPv3 session tracking control representing current user
         """
-        if type(username) == type(u''):
-            username = username.encode('utf-8')
         return SessionTrackingControl(
             self.remote_ip,
             web.ctx.homedomain,
             SESSION_TRACKING_FORMAT_OID_USERNAME,
             username,
         )
-
-    def _connect_and_bind(self, ldap_url):
-        """
-        Connect and bind to the LDAP directory
-        """
-
-        class PwdLDAPUrl(ldapurl.LDAPUrl):
-            """
-            Special class for handling additional LDAP URL extensions
-            """
-            attr2extype = {
-              'who':'bindname',
-              'cred':'X-BINDPW',
-              'start_tls':'startTLS',
-              'trace_level':'trace',
-            }
-
-        ldap_url_obj = PwdLDAPUrl(ldap_url)
-        trace_level = int(ldap_url_obj.trace_level or '0')
-        start_tls = int(ldap_url_obj.start_tls or '1')
-        ldap_conn = ldap.initialize(
-            ldap_url_obj.initializeUrl(),
-            trace_level=0,
-            trace_file=sys.stderr
-        )
-        ldap_conn._trace_level = trace_level
-        if ldap_url_obj.urlscheme.lower() == 'ldapi' and not ldap_url_obj.who:
-            ldap_conn.sasl_interactive_bind_s('', ldap.sasl.external())
-        else:
-            if ldap_url_obj.urlscheme.lower() == 'ldap' and start_tls:
-                ldap_conn.start_tls_s()
-            # turn off trace for LDAP Simple Bind Request
-            ldap_conn._trace_level = 0
-            ldap_conn.simple_bind_s(ldap_url_obj.who or '', ldap_url_obj.cred or '')
-            ldap_conn._trace_level = trace_level
-        return ldap_conn, ldap_url_obj
 
     def search_user_entry(self, inputs):
         """
@@ -304,14 +266,11 @@ class BaseApp(Default):
             for i in inputs
         ])
         filterstr_inputs_dict['currenttime'] = escape_filter_chars(
-            time.strftime(
-                '%Y%m%d%H%M%SZ',
-                time.gmtime(time.time())
-            )
+            aedir.ldap_strf_secs(time.time())
         )
-        ldap_results = self.ldap_conn.search_ext_s(
-            self.ldap_url.dn,
-            self.ldap_url.scope,
+        return self.ldap_conn.find_unique_entry(
+            self.ldap_conn.ldap_url_obj.dn,
+            ldap.SCOPE_SUBTREE,
             filterstr=(
                 self.filterstr_template % filterstr_inputs_dict
             ).encode('utf-8'),
@@ -321,17 +280,9 @@ class BaseApp(Default):
                 'cn',
                 'mail',
                 'pwdChangedTime',
-                'pwdPolicySubentry'
+                'pwdPolicySubentry',
             ],
-            sizelimit=2
         )
-        if len(ldap_results) > 1:
-            # Should never happen if correctly configured
-            raise ValueError(u'More than one user entry found.')
-        elif not ldap_results:
-            raise ValueError(u'No user entry found.')
-        else:
-            return ldap_results[0]
 
     def POST(self):
         """
@@ -344,7 +295,7 @@ class BaseApp(Default):
             return self.GET(message=u'Invalid input!')
         # Make connection to LDAP server
         try:
-            self.ldap_conn, self.ldap_url = self._connect_and_bind(PWD_LDAP_URL)
+            self.ldap_conn = aedir.AEDirObject(PWD_LDAP_URL)
         except ldap.SERVER_DOWN:
             res = self.GET(message=u'LDAP server not reachable!')
         except ldap.LDAPError:
@@ -364,8 +315,6 @@ class BaseApp(Default):
             self.ldap_conn.unbind_s()
         except (AttributeError, ldap.LDAPError):
             pass
-        else:
-            self.ldap_conn._trace_file.flush()
         return res
 
 
@@ -445,6 +394,9 @@ class CheckPassword(BaseApp):
         return
 
     def handle_user_request(self, user_dn, user_entry):
+        """
+        check the user password and display password expiry information
+        """
         current_time = time.time()
         old_password_ldap = self.form.d.oldpassword.encode('utf-8')
         try:
@@ -457,8 +409,8 @@ class CheckPassword(BaseApp):
                 time.localtime(current_time+ppolicy_error.timeBeforeExpiration)
             ))
             return RENDER.changepw_form(
-              self.form.d.username,
-              u'Password will expire soon at %s !' % (expire_time_str)
+                self.form.d.username,
+                u'Password will expire soon at %s !' % (expire_time_str)
             )
         except PasswordPolicyException, ppolicy_error:
             return RENDER.changepw_form(
@@ -468,61 +420,28 @@ class CheckPassword(BaseApp):
         except ldap.LDAPError:
             return self.GET(message=u'Internal error!')
         # Try to display until when password is still valid
-        user_entry_self = {}
         valid_until = u'unknown'
-        if not 'pwdChangedTime' in user_entry or \
-           not 'pwdPolicySubentry' in user_entry:
-            # Try to read the user entry again while being bound as the user
-            try:
-                _, user_entry_self = self.ldap_conn.search_s(
-                  user_dn,
-                  ldap.SCOPE_BASE,
-                  '(objectClass=*)',
-                  attrlist=['pwdChangedTime', 'pwdPolicySubentry']
-                )[0]
-            except (ldap.LDAPError, IndexError):
-                pass
+        pwd_changed_timestamp = aedir.ldap_strp_secs(user_entry['pwdChangedTime'][0])
+        pwd_policy_subentry_dn = user_entry['pwdPolicySubentry'][0]
+        pwd_policy_subentry = self.ldap_conn.read_s(
+            pwd_policy_subentry_dn,
+            attrlist=[
+                'pwdMaxAge',
+                'pwdExpireWarning'
+            ],
+        )
         try:
-            pwd_changed_time = (
-                user_entry.get('pwdChangedTime', None) or
-                user_entry_self['pwdChangedTime']
-            )[0]
-            pwd_policy_subentry_dn = (
-                user_entry.get('pwdPolicySubentry', None) or
-                user_entry_self['pwdPolicySubentry']
-            )[0]
-        except KeyError, key_error:
-            valid_until = unicode(str(key_error))
+            pwd_max_age = int(pwd_policy_subentry['pwdMaxAge'][0])
+        except (ValueError, KeyError):
+            pass
         else:
-            pwd_changed_timestamp = timegm(
-                time.strptime(pwd_changed_time, '%Y%m%d%H%M%SZ')
+            expire_timestamp = pwd_changed_timestamp+pwd_max_age
+            valid_until = unicode(
+                time.strftime(
+                    TIME_DISPLAY_FORMAT,
+                    time.localtime(expire_timestamp)
+                )
             )
-            try:
-                _, pwd_policy_subentry = self.ldap_conn.search_s(
-                  pwd_policy_subentry_dn,
-                  ldap.SCOPE_BASE,
-                  '(objectClass=pwdPolicy)',
-                  attrlist=[
-                      'pwdMaxAge',
-                      'pwdExpireWarning'
-                  ],
-                )[0]
-            except (ldap.LDAPError, IndexError):
-                pass
-            else:
-                try:
-                    pwd_max_age = int(pwd_policy_subentry['pwdMaxAge'][0])
-                except (ValueError, KeyError):
-                    pass
-                else:
-                    current_time = time.time()
-                    expire_timestamp = pwd_changed_timestamp+pwd_max_age
-                    valid_until = unicode(
-                        time.strftime(
-                            TIME_DISPLAY_FORMAT,
-                            time.localtime(expire_timestamp)
-                        )
-                    )
         # Finally render output page with success message
         return RENDER.checkpw_action(
             self.form.d.username,
@@ -583,6 +502,9 @@ class ChangePassword(BaseApp):
         return
 
     def handle_user_request(self, user_dn, user_entry):
+        """
+        set new password
+        """
         old_password_ldap = self.form.d.oldpassword.encode('utf-8')
         new_password_ldap = self.form.d.newpassword1.encode('utf-8')
         try:
@@ -607,7 +529,7 @@ class ChangePassword(BaseApp):
             res = RENDER.changepw_action(
                 self.form.d.username,
                 user_dn,
-                self.ldap_url.initializeUrl()
+                self.ldap_conn.ldap_url_obj.initializeUrl()
             )
         return res
 
@@ -621,9 +543,13 @@ class RequestPasswordReset(BaseApp):
 
     # Declaration for the change password input form
     post_form = web.form.Form(
-      USERNAME_FIELD,
-      EMAIL_FIELD,
-      web.form.Button('submit', type='submit', description=u'Set new password'),
+        USERNAME_FIELD,
+        EMAIL_FIELD,
+        web.form.Button(
+            'submit',
+            type='submit',
+            description=u'Set new password'
+        ),
     )
 
     def GET(self, message=u''):
@@ -638,49 +564,21 @@ class RequestPasswordReset(BaseApp):
         else:
             return RENDER.requestpw_form(get_input.username, message)
 
-    def _generate_pwd(self):
-        sys_rand = random.SystemRandom()
-        pwd_tmp_chars_len = len(PWD_TMP_CHARS)
-        temp_pwd_clear = ''.join([
-            PWD_TMP_CHARS[sys_rand.randint(0, pwd_tmp_chars_len-1)]
-            for _ in range(PWD_LENGTH)
-        ]).decode('ascii')
-        temp_pwd_hash = hashlib.new(
-            PWD_TMP_HASH_ALGO,
-            temp_pwd_clear
-        ).hexdigest()
-        return temp_pwd_clear, temp_pwd_hash
-
-    def _get_admin_mailaddrs(self, user_dn=None):
-        if not user_dn:
-            return PWD_ADMIN_MAILTO
+    def _get_admin_mailaddrs(self, user_dn):
         try:
-            zone_name = ldap.dn.explode_dn(user_dn)[-2][3:]
-        except (ldap.LDAPError, IndexError):
-            return [PWD_ADMIN_MAILTO]
-        zone_admin_groupdn = 'cn={0}-zone-admins,cn={0},{1}'.format(
-            ldap.dn.escape_dn_chars(zone_name),
-            self.ldap_url.dn,
-        )
-        admin_addrs = set()
-        try:
-            ldap_results = self.ldap_conn.search_s(
-                self.ldap_url.dn,
-                ldap.SCOPE_SUBTREE,
-                filterstr='(&(objectClass=aeUser)(aeStatus=0)(memberOf=%s))' % (
-                    escape_filter_chars(zone_admin_groupdn),
-                ),
+            ldap_results = self.ldap_conn.get_zoneadmins(
+                user_dn,
                 attrlist=['mail'],
+                suppl_filter='(mail=*)',
             )
         except ldap.LDAPError:
-            pass
+            admin_addrs = None
         else:
-            admin_addrs.update([
+            admin_addrs = [
                 ldap_entry['mail'][0]
                 for _, ldap_entry in ldap_results or []
-                if 'mail' in ldap_entry
-            ])
-        return list(admin_addrs) or PWD_ADMIN_MAILTO
+            ]
+        return admin_addrs or PWD_ADMIN_MAILTO
 
     def _send_pw(self, username, user_dn, user_entry, temp_pwd_clear):
         """
@@ -712,18 +610,18 @@ class RequestPasswordReset(BaseApp):
                 'userdn':user_dn.decode('utf-8'),
                 'web_ctx_host':web.ctx.host,
                 'app_path_prefix':APP_PATH_PREFIX,
-                'ldap_uri':self.ldap_url.initializeUrl(),
+                'ldap_uri':self.ldap_conn.ldap_url_obj.initializeUrl(),
             }
             smtp_message = smtp_message_tmpl % user_data_admin
             smtp_subject = EMAIL_SUBJECT_ADMIN % user_data_admin
-            admin_addrs = self._get_admin_mailaddrs(user_dn=user_dn)
+            admin_addrs = self._get_admin_mailaddrs(user_dn)
             smtp_conn.send_simple_message(
                 SMTP_FROM,
                 admin_addrs,
                 'utf-8',
                 default_headers+(
-                  ('Subject', smtp_subject),
-                  ('To', ','.join(admin_addrs)),
+                    ('Subject', smtp_subject),
+                    ('To', ','.join(admin_addrs)),
                 ),
                 smtp_message,
             )
@@ -740,7 +638,7 @@ class RequestPasswordReset(BaseApp):
             'userdn':user_dn.decode('utf-8'),
             'web_ctx_host':web.ctx.host,
             'app_path_prefix':APP_PATH_PREFIX,
-            'ldap_uri':self.ldap_url.initializeUrl(),
+            'ldap_uri':self.ldap_conn.ldap_url_obj.initializeUrl(),
         }
         smtp_message = smtp_message_tmpl % user_data_user
         smtp_subject = EMAIL_SUBJECT_PERSONAL % user_data_user
@@ -763,7 +661,8 @@ class RequestPasswordReset(BaseApp):
         to user's entry and send e-mails
         """
         current_time = time.time()
-        temp_pwd_clear, temp_pwd_hash = self._generate_pwd()
+        temp_pwd_clear = aedir.random_string(PWD_TMP_CHARS, PWD_LENGTH)
+        temp_pwd_hash = pwd_hash(temp_pwd_clear)
         ldap_mod_list = [
             (
                 ldap.MOD_REPLACE,
@@ -773,22 +672,12 @@ class RequestPasswordReset(BaseApp):
             (
                 ldap.MOD_REPLACE,
                 'msPwdResetTimestamp',
-                [
-                    time.strftime(
-                        '%Y%m%d%H%M%SZ',
-                        time.gmtime(current_time)
-                    )
-                ]
+                [aedir.ldap_strf_secs(current_time)]
             ),
             (
                 ldap.MOD_REPLACE,
                 'msPwdResetExpirationTime',
-                [
-                    time.strftime(
-                        '%Y%m%d%H%M%SZ',
-                        time.gmtime(current_time+PWD_EXPIRETIMESPAN)
-                    )
-                ]
+                [aedir.ldap_strf_secs(current_time+PWD_EXPIRETIMESPAN)]
             ),
             (
                 ldap.MOD_REPLACE,
@@ -912,17 +801,19 @@ class FinishPasswordReset(BaseApp):
         return
 
     def handle_user_request(self, user_dn, user_entry):
+        """
+        set new password if temporary reset password matches
+        """
         temppassword1 = self.form.d.temppassword1
         temppassword2 = self.form.d.temppassword2
         if len(temppassword1)+len(temppassword2) != PWD_LENGTH:
             return self.GET(message=u'Temporary password parts wrong!')
-        temp_pwd_hash = hashlib.new(
-            PWD_TMP_HASH_ALGO,
-            ''.join((
+        temp_pwd_hash = pwd_hash(
+            u''.join((
                 self.form.d.temppassword1,
-                self.form.d.temppassword2
-            )),
-        ).hexdigest()
+                self.form.d.temppassword2,
+            )).encode('utf-8')
+        )
         new_password_ldap = self.form.d.newpassword1.encode('utf-8')
         try:
             self._ldap_user_operations(
@@ -956,7 +847,7 @@ def run():
     # Change to directory where the script is located
     os.chdir(os.path.dirname(sys.argv[0]))
     # Set error handling
-    if WEB_ERROR == False:
+    if not WEB_ERROR:
         app.internalerror = False
     # Start the internal web server
     app.run()

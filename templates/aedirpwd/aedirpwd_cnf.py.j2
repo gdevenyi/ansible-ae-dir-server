@@ -4,7 +4,7 @@ Configuration module for aepwd_web and aepwd_cron
 """
 
 # LDAP-URL describing the connection parameters and bind information
-PWD_LDAP_URL = r'{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub??trace=0'
+PWD_LDAP_URL = r'{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub??trace=0,x-saslmech=EXTERNAL'
 
 # Filter string templates for the various use-cases
 # String-keyed dictionary with input field names used
