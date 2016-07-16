@@ -50,13 +50,6 @@ AE_DEPT_OID = AE_OID_PREFIX+'.6.29'
 
 
 syntax_registry.registerAttrType(
-  NotAfter.oid,[
-    AE_OID_PREFIX+'.4.23', # aeNotAfter
-  ]
-)
-
-
-syntax_registry.registerAttrType(
   DNSDomain.oid,[
     AE_OID_PREFIX+'.4.10',   # aeFqdn
   ]
@@ -374,12 +367,6 @@ syntax_registry.registerAttrType(
   ],
 )
 
-syntax_registry.registerAttrType(
-  AEGroupDN.oid,[
-    AE_OID_PREFIX+'.4.1',  # aeOwnerGroup
-  ]
-)
-
 
 class AESrvGroupRightsGroupDN(DynamicDNSelectList):
   oid = 'AESrvGroupRightsGroupDN-oid'
@@ -407,7 +394,6 @@ class AESrvGroupRightsGroupDN(DynamicDNSelectList):
 
 syntax_registry.registerAttrType(
   AESrvGroupRightsGroupDN.oid,[
-    AE_OID_PREFIX+'.4.1',  # aeOwnerGroup
     AE_OID_PREFIX+'.4.4',  # aeLoginGroups
     AE_OID_PREFIX+'.4.6',  # aeSetupGroups
     AE_OID_PREFIX+'.4.7',  # aeLogStoreGroups
