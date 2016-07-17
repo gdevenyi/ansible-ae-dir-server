@@ -64,15 +64,6 @@
 - name: "Install AE-DIR password service (aedirpwd)"
   include: "aedirpwd.yml"
 
-- name: Run update_memberurl_groups.py as CRON job
-  cron:
-    name: "update_memberurl_groups"
-    state: present
-    user: root
-    cron_file: update_memberurl_groups
-    minute: "*/3"
-    job: "{{ aedir_sbin }}/update_memberurl_groups.py"
-
 - name: "Install CRON/demon scripts from templates"
   template:
     src: "scripts/{{ item }}.j2"
@@ -84,6 +75,15 @@
     - aeperson2aeuser.py
     - ae-dir-slapcat.sh
     - update_memberurl_groups.py
+
+- name: Run update_memberurl_groups.py as CRON job
+  cron:
+    name: "update_memberurl_groups"
+    state: present
+    user: root
+    cron_file: update_memberurl_groups
+    minute: "*/3"
+    job: "{{ aedir_sbin }}/update_memberurl_groups.py {{ openldap_ldapi_uri }}/{{ aedir_suffix }}"
 
 - name: Run aeperson2aeuser.py as CRON job
   cron:
