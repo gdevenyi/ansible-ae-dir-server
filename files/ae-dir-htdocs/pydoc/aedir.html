@@ -7,12 +7,16 @@
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
 <tr bgcolor="#7799ee">
 <td valign=bottom>&nbsp;<br>
-<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>aedir</strong></big></big> (version 0.0.2)</font></td
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>aedir</strong></big></big> (version 0.0.4)</font></td
 ><td align=right valign=bottom
 ><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/michael/Proj/ae-dir/python-aedir/aedir.py">/home/michael/Proj/ae-dir/python-aedir/aedir.py</a></font></td></tr></table>
     <p><tt>aedir&nbsp;-&nbsp;Generic&nbsp;classes&nbsp;and&nbsp;functions&nbsp;for&nbsp;dealing&nbsp;with&nbsp;AE-DIR<br>
 &nbsp;<br>
-Based&nbsp;on&nbsp;python-ldap&nbsp;(see&nbsp;https://www.python-ldap.org</tt></p>
+Based&nbsp;on&nbsp;python-ldap&nbsp;(see&nbsp;https://www.python-ldap.org<br>
+&nbsp;<br>
+Requires:<br>
+-&nbsp;Python&nbsp;2.6+<br>
+-&nbsp;python-ldap&nbsp;2.4.25+</tt></p>
 <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#aa55cc">
@@ -20,14 +24,12 @@ Based&nbsp;on&nbsp;python-ldap&nbsp;(see&nbsp;https://www.python-ldap.org</tt></
 <font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
     
 <tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="pyasn1.codec.ber.decoder.html">pyasn1.codec.ber.decoder</a><br>
-<a href="ldap.html">ldap</a><br>
-</td><td width="25%" valign=top><a href="ldapurl.html">ldapurl</a><br>
-<a href="os.html">os</a><br>
-</td><td width="25%" valign=top><a href="pyasn1.html">pyasn1</a><br>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="ldap.html">ldap</a><br>
+<a href="ldapurl.html">ldapurl</a><br>
+</td><td width="25%" valign=top><a href="os.html">os</a><br>
 <a href="random.html">random</a><br>
 </td><td width="25%" valign=top><a href="time.html">time</a><br>
-</td></tr></table></td></tr></table><p>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ee77aa">
 <td colspan=3 valign=bottom>&nbsp;<br>
@@ -35,28 +37,28 @@ Based&nbsp;on&nbsp;python-ldap&nbsp;(see&nbsp;https://www.python-ldap.org</tt></
     
 <tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><dl>
-<dt><font face="helvetica, arial"><a href="__builtin__.html#object">__builtin__.object</a>
+<dt><font face="helvetica, arial"><a href="ldap.controls.openldap.html#SearchNoOpMixIn">ldap.controls.openldap.SearchNoOpMixIn</a>
 </font></dt><dd>
 <dl>
-<dt><font face="helvetica, arial"><a href="aedir.html#logger_fileobj">logger_fileobj</a>
-</font></dt></dl>
-</dd>
-<dt><font face="helvetica, arial"><a href="ldap.html#NO_SUCH_OBJECT">ldap.NO_SUCH_OBJECT</a>(<a href="ldap.html#LDAPError">ldap.LDAPError</a>)
-</font></dt><dd>
-<dl>
-<dt><font face="helvetica, arial"><a href="aedir.html#NO_UNIQUE_ENTRY">NO_UNIQUE_ENTRY</a>
+<dt><font face="helvetica, arial"><a href="aedir.html#AEDirObject">AEDirObject</a>(<a href="ldap.ldapobject.html#ReconnectLDAPObject">ldap.ldapobject.ReconnectLDAPObject</a>, <a href="ldap.resiter.html#ResultProcessor">ldap.resiter.ResultProcessor</a>, <a href="ldap.syncrepl.html#SyncreplConsumer">ldap.syncrepl.SyncreplConsumer</a>, <a href="ldap.controls.openldap.html#SearchNoOpMixIn">ldap.controls.openldap.SearchNoOpMixIn</a>)
 </font></dt></dl>
 </dd>
 <dt><font face="helvetica, arial"><a href="ldap.ldapobject.html#ReconnectLDAPObject">ldap.ldapobject.ReconnectLDAPObject</a>(<a href="ldap.ldapobject.html#SimpleLDAPObject">ldap.ldapobject.SimpleLDAPObject</a>)
 </font></dt><dd>
 <dl>
-<dt><font face="helvetica, arial"><a href="aedir.html#AEDirObject">AEDirObject</a>(<a href="ldap.ldapobject.html#ReconnectLDAPObject">ldap.ldapobject.ReconnectLDAPObject</a>, <a href="ldap.resiter.html#ResultProcessor">ldap.resiter.ResultProcessor</a>)
+<dt><font face="helvetica, arial"><a href="aedir.html#AEDirObject">AEDirObject</a>(<a href="ldap.ldapobject.html#ReconnectLDAPObject">ldap.ldapobject.ReconnectLDAPObject</a>, <a href="ldap.resiter.html#ResultProcessor">ldap.resiter.ResultProcessor</a>, <a href="ldap.syncrepl.html#SyncreplConsumer">ldap.syncrepl.SyncreplConsumer</a>, <a href="ldap.controls.openldap.html#SearchNoOpMixIn">ldap.controls.openldap.SearchNoOpMixIn</a>)
 </font></dt></dl>
 </dd>
 <dt><font face="helvetica, arial"><a href="ldap.resiter.html#ResultProcessor">ldap.resiter.ResultProcessor</a>
 </font></dt><dd>
 <dl>
-<dt><font face="helvetica, arial"><a href="aedir.html#AEDirObject">AEDirObject</a>(<a href="ldap.ldapobject.html#ReconnectLDAPObject">ldap.ldapobject.ReconnectLDAPObject</a>, <a href="ldap.resiter.html#ResultProcessor">ldap.resiter.ResultProcessor</a>)
+<dt><font face="helvetica, arial"><a href="aedir.html#AEDirObject">AEDirObject</a>(<a href="ldap.ldapobject.html#ReconnectLDAPObject">ldap.ldapobject.ReconnectLDAPObject</a>, <a href="ldap.resiter.html#ResultProcessor">ldap.resiter.ResultProcessor</a>, <a href="ldap.syncrepl.html#SyncreplConsumer">ldap.syncrepl.SyncreplConsumer</a>, <a href="ldap.controls.openldap.html#SearchNoOpMixIn">ldap.controls.openldap.SearchNoOpMixIn</a>)
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="ldap.syncrepl.html#SyncreplConsumer">ldap.syncrepl.SyncreplConsumer</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="aedir.html#AEDirObject">AEDirObject</a>(<a href="ldap.ldapobject.html#ReconnectLDAPObject">ldap.ldapobject.ReconnectLDAPObject</a>, <a href="ldap.resiter.html#ResultProcessor">ldap.resiter.ResultProcessor</a>, <a href="ldap.syncrepl.html#SyncreplConsumer">ldap.syncrepl.SyncreplConsumer</a>, <a href="ldap.controls.openldap.html#SearchNoOpMixIn">ldap.controls.openldap.SearchNoOpMixIn</a>)
 </font></dt></dl>
 </dd>
 <dt><font face="helvetica, arial"><a href="ldapurl.html#LDAPUrl">ldapurl.LDAPUrl</a>
@@ -70,7 +72,7 @@ Based&nbsp;on&nbsp;python-ldap&nbsp;(see&nbsp;https://www.python-ldap.org</tt></
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#ffc8d8">
 <td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="AEDirObject">class <strong>AEDirObject</strong></a>(<a href="ldap.ldapobject.html#ReconnectLDAPObject">ldap.ldapobject.ReconnectLDAPObject</a>, <a href="ldap.resiter.html#ResultProcessor">ldap.resiter.ResultProcessor</a>)</font></td></tr>
+<font color="#000000" face="helvetica, arial"><a name="AEDirObject">class <strong>AEDirObject</strong></a>(<a href="ldap.ldapobject.html#ReconnectLDAPObject">ldap.ldapobject.ReconnectLDAPObject</a>, <a href="ldap.resiter.html#ResultProcessor">ldap.resiter.ResultProcessor</a>, <a href="ldap.syncrepl.html#SyncreplConsumer">ldap.syncrepl.SyncreplConsumer</a>, <a href="ldap.controls.openldap.html#SearchNoOpMixIn">ldap.controls.openldap.SearchNoOpMixIn</a>)</font></td></tr>
     
 <tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
 <td colspan=2><tt>AE-DIR&nbsp;connection&nbsp;class<br>&nbsp;</tt></td></tr>
@@ -80,6 +82,8 @@ Based&nbsp;on&nbsp;python-ldap&nbsp;(see&nbsp;https://www.python-ldap.org</tt></
 <dd><a href="ldap.ldapobject.html#ReconnectLDAPObject">ldap.ldapobject.ReconnectLDAPObject</a></dd>
 <dd><a href="ldap.ldapobject.html#SimpleLDAPObject">ldap.ldapobject.SimpleLDAPObject</a></dd>
 <dd><a href="ldap.resiter.html#ResultProcessor">ldap.resiter.ResultProcessor</a></dd>
+<dd><a href="ldap.syncrepl.html#SyncreplConsumer">ldap.syncrepl.SyncreplConsumer</a></dd>
+<dd><a href="ldap.controls.openldap.html#SearchNoOpMixIn">ldap.controls.openldap.SearchNoOpMixIn</a></dd>
 </dl>
 <hr>
 Methods defined here:<br>
@@ -102,8 +106,6 @@ Extensions&nbsp;to&nbsp;parameters&nbsp;passed&nbsp;to&nbsp;<a href="ldap.ldapob
 
 <dl><dt><a name="AEDirObject-find_uid"><strong>find_uid</strong></a>(self, uid, attrlist<font color="#909090">=None</font>)</dt><dd><tt>Returns&nbsp;a&nbsp;unique&nbsp;aeUser&nbsp;or&nbsp;aeService&nbsp;entry&nbsp;found&nbsp;by&nbsp;uid</tt></dd></dl>
 
-<dl><dt><a name="AEDirObject-find_unique_entry"><strong>find_unique_entry</strong></a>(self, base, scope<font color="#909090">=2</font>, filterstr<font color="#909090">='(objectClass=*)'</font>, attrlist<font color="#909090">=None</font>, attrsonly<font color="#909090">=0</font>, serverctrls<font color="#909090">=None</font>, clientctrls<font color="#909090">=None</font>, timeout<font color="#909090">=-1</font>)</dt><dd><tt>Returns&nbsp;a&nbsp;unique&nbsp;entry,&nbsp;raises&nbsp;exception&nbsp;if&nbsp;not&nbsp;unique</tt></dd></dl>
-
 <dl><dt><a name="AEDirObject-flush_cache"><strong>flush_cache</strong></a>(self)</dt><dd><tt>reset/flush&nbsp;the&nbsp;internal&nbsp;cache</tt></dd></dl>
 
 <dl><dt><a name="AEDirObject-get_cache_hit_ratio"><strong>get_cache_hit_ratio</strong></a>(self)</dt><dd><tt>Returns&nbsp;percentage&nbsp;of&nbsp;cache&nbsp;hit&nbsp;ratio</tt></dd></dl>
@@ -113,36 +115,27 @@ aeHost/aeService&nbsp;specified&nbsp;by&nbsp;service_dn<br>
 &nbsp;<br>
 returns&nbsp;set&nbsp;of&nbsp;relationship&nbsp;attribute&nbsp;names</tt></dd></dl>
 
-<dl><dt><a name="AEDirObject-get_user_srvgroup_relations"><strong>get_user_srvgroup_relations</strong></a>(self, uid, aesrvgroup_dn, ref_attrs<font color="#909090">=None</font>)</dt><dd><tt>Gets&nbsp;relationship&nbsp;between&nbsp;a&nbsp;aeUser&nbsp;and&nbsp;a&nbsp;aeSrvGroup&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;by<br>
+<dl><dt><a name="AEDirObject-get_user_srvgroup_relations"><strong>get_user_srvgroup_relations</strong></a>(self, uid, aesrvgroup_dn, ref_attrs<font color="#909090">=None</font>)</dt><dd><tt>Gets&nbsp;relationship&nbsp;between&nbsp;a&nbsp;aeUser&nbsp;and&nbsp;a&nbsp;aeSrvGroup&nbsp;object&nbsp;by<br>
 simply&nbsp;returning&nbsp;the&nbsp;matching&nbsp;attributes&nbsp;of&nbsp;the&nbsp;aeSrvGroup&nbsp;entry</tt></dd></dl>
 
 <dl><dt><a name="AEDirObject-get_usergroups"><strong>get_usergroups</strong></a>(self, uid, memberof_attr<font color="#909090">=None</font>)</dt><dd><tt>Gets&nbsp;a&nbsp;set&nbsp;of&nbsp;DNs&nbsp;of&nbsp;aeGroup&nbsp;entries&nbsp;a&nbsp;AE-DIR&nbsp;user&nbsp;(aeUser&nbsp;or<br>
 aeService)&nbsp;is&nbsp;member&nbsp;of</tt></dd></dl>
 
-<dl><dt><a name="AEDirObject-get_zoneadmins"><strong>get_zoneadmins</strong></a>(self, dn, attrlist<font color="#909090">=None</font>)</dt><dd><tt>Returns&nbsp;LDAP&nbsp;search&nbsp;results&nbsp;of&nbsp;active&nbsp;aeUser&nbsp;entries&nbsp;of&nbsp;all<br>
-zone-admins&nbsp;responsible&nbsp;for&nbsp;the&nbsp;given&nbsp;`dn'.</tt></dd></dl>
-
-<dl><dt><a name="AEDirObject-noop_search_st"><strong>noop_search_st</strong></a>(self, base, scope<font color="#909090">=2</font>, filterstr<font color="#909090">='(objectClass=*)'</font>, timeout<font color="#909090">=-1</font>)</dt><dd><tt>returns&nbsp;2-tuple&nbsp;with&nbsp;counts&nbsp;of&nbsp;entries&nbsp;and&nbsp;referrals&nbsp;by&nbsp;sending&nbsp;a<br>
-search&nbsp;request&nbsp;with&nbsp;no-op&nbsp;search&nbsp;control</tt></dd></dl>
-
-<dl><dt><a name="AEDirObject-read_s"><strong>read_s</strong></a>(self, dn, filterstr<font color="#909090">='(objectClass=*)'</font>, attrlist<font color="#909090">=None</font>, serverctrls<font color="#909090">=None</font>, clientctrls<font color="#909090">=None</font>, timeout<font color="#909090">=-1</font>)</dt><dd><tt>Reads&nbsp;and&nbsp;returns&nbsp;a&nbsp;single&nbsp;entry&nbsp;specified&nbsp;by&nbsp;`dn'.<br>
-&nbsp;<br>
-Other&nbsp;attributes&nbsp;just&nbsp;like&nbsp;those&nbsp;passed&nbsp;to&nbsp;`<a href="#AEDirObject-search_ext_s">search_ext_s</a>()'</tt></dd></dl>
-
-<dl><dt><a name="AEDirObject-sasl_external_bind_s"><strong>sasl_external_bind_s</strong></a>(self, serverctrls<font color="#909090">=None</font>, clientctrls<font color="#909090">=None</font>, sasl_flags<font color="#909090">=2</font>, authz_id<font color="#909090">=''</font>)</dt><dd><tt>Send&nbsp;SASL&nbsp;bind&nbsp;request&nbsp;using&nbsp;SASL&nbsp;mech&nbsp;EXTERNAL</tt></dd></dl>
+<dl><dt><a name="AEDirObject-get_zoneadmins"><strong>get_zoneadmins</strong></a>(self, ae_object_dn, attrlist<font color="#909090">=None</font>, suppl_filter<font color="#909090">=''</font>)</dt><dd><tt>Returns&nbsp;LDAP&nbsp;search&nbsp;results&nbsp;of&nbsp;active&nbsp;aeUser&nbsp;entries&nbsp;of&nbsp;all<br>
+zone-admins&nbsp;responsible&nbsp;for&nbsp;the&nbsp;given&nbsp;`ae_object_dn'.</tt></dd></dl>
 
 <dl><dt><a name="AEDirObject-search_ext_s"><strong>search_ext_s</strong></a>(self, base, scope, filterstr<font color="#909090">='(objectClass=*)'</font>, attrlist<font color="#909090">=None</font>, attrsonly<font color="#909090">=0</font>, serverctrls<font color="#909090">=None</font>, clientctrls<font color="#909090">=None</font>, timeout<font color="#909090">=-1</font>, sizelimit<font color="#909090">=0</font>, nocache<font color="#909090">=0</font>)</dt><dd><tt>caching&nbsp;variant&nbsp;of&nbsp;LDAPObject.<a href="#AEDirObject-search_ext_s">search_ext_s</a>()</tt></dd></dl>
 
 <dl><dt><a name="AEDirObject-set_tls_options"><strong>set_tls_options</strong></a>(self, cacert_filename<font color="#909090">=None</font>, client_cert_filename<font color="#909090">=None</font>, client_key_filename<font color="#909090">=None</font>)</dt><dd><tt>set&nbsp;TLS&nbsp;options&nbsp;for&nbsp;connection&nbsp;even&nbsp;with&nbsp;checking&nbsp;whether&nbsp;cert/key<br>
 files&nbsp;are&nbsp;readable</tt></dd></dl>
 
-<dl><dt><a name="AEDirObject-uncache_entry"><strong>uncache_entry</strong></a>(self, dn)</dt><dd><tt>remove&nbsp;all&nbsp;cached&nbsp;entries&nbsp;related&nbsp;to&nbsp;dn&nbsp;from&nbsp;internal&nbsp;cache</tt></dd></dl>
+<dl><dt><a name="AEDirObject-uncache_entry"><strong>uncache_entry</strong></a>(self, entry_dn)</dt><dd><tt>remove&nbsp;all&nbsp;cached&nbsp;entries&nbsp;related&nbsp;to&nbsp;dn&nbsp;from&nbsp;internal&nbsp;cache</tt></dd></dl>
 
 <hr>
 Methods inherited from <a href="ldap.ldapobject.html#ReconnectLDAPObject">ldap.ldapobject.ReconnectLDAPObject</a>:<br>
-<dl><dt><a name="AEDirObject-__getstate__"><strong>__getstate__</strong></a>(self)</dt><dd><tt>return&nbsp;data&nbsp;representation&nbsp;for&nbsp;pickled&nbsp;<a href="__builtin__.html#object">object</a></tt></dd></dl>
+<dl><dt><a name="AEDirObject-__getstate__"><strong>__getstate__</strong></a>(self)</dt><dd><tt>return&nbsp;data&nbsp;representation&nbsp;for&nbsp;pickled&nbsp;object</tt></dd></dl>
 
-<dl><dt><a name="AEDirObject-__setstate__"><strong>__setstate__</strong></a>(self, d)</dt><dd><tt>set&nbsp;up&nbsp;the&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;from&nbsp;pickled&nbsp;data</tt></dd></dl>
+<dl><dt><a name="AEDirObject-__setstate__"><strong>__setstate__</strong></a>(self, d)</dt><dd><tt>set&nbsp;up&nbsp;the&nbsp;object&nbsp;from&nbsp;pickled&nbsp;data</tt></dd></dl>
 
 <dl><dt><a name="AEDirObject-add_ext_s"><strong>add_ext_s</strong></a>(self, *args, **kwargs)</dt></dl>
 
@@ -261,13 +254,15 @@ Methods inherited from <a href="ldap.ldapobject.html#SimpleLDAPObject">ldap.ldap
 &nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;If&nbsp;argument&nbsp;extop_resp_class&nbsp;is&nbsp;set&nbsp;to&nbsp;a&nbsp;sub-class&nbsp;of<br>
 &nbsp;&nbsp;&nbsp;&nbsp;ldap.extop.ExtendedResponse&nbsp;this&nbsp;class&nbsp;is&nbsp;used&nbsp;to&nbsp;return&nbsp;an<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;of&nbsp;this&nbsp;class&nbsp;instead&nbsp;of&nbsp;a&nbsp;raw&nbsp;BER&nbsp;value&nbsp;in&nbsp;respvalue.</tt></dd></dl>
+&nbsp;&nbsp;&nbsp;&nbsp;object&nbsp;of&nbsp;this&nbsp;class&nbsp;instead&nbsp;of&nbsp;a&nbsp;raw&nbsp;BER&nbsp;value&nbsp;in&nbsp;respvalue.</tt></dd></dl>
 
 <dl><dt><a name="AEDirObject-extop_result"><strong>extop_result</strong></a>(self, msgid<font color="#909090">=-1</font>, all<font color="#909090">=1</font>, timeout<font color="#909090">=None</font>)</dt></dl>
 
 <dl><dt><a name="AEDirObject-fileno"><strong>fileno</strong></a>(self)</dt><dd><tt>Returns&nbsp;file&nbsp;description&nbsp;of&nbsp;LDAP&nbsp;connection.<br>
 &nbsp;<br>
 Just&nbsp;a&nbsp;convenience&nbsp;wrapper&nbsp;for&nbsp;LDAPObject.<a href="#AEDirObject-get_option">get_option</a>(ldap.OPT_DESC)</tt></dd></dl>
+
+<dl><dt><a name="AEDirObject-find_unique_entry"><strong>find_unique_entry</strong></a>(self, base, scope<font color="#909090">=2</font>, filterstr<font color="#909090">='(objectClass=*)'</font>, attrlist<font color="#909090">=None</font>, attrsonly<font color="#909090">=0</font>, serverctrls<font color="#909090">=None</font>, clientctrls<font color="#909090">=None</font>, timeout<font color="#909090">=-1</font>)</dt><dd><tt>Returns&nbsp;a&nbsp;unique&nbsp;entry,&nbsp;raises&nbsp;exception&nbsp;if&nbsp;not&nbsp;unique</tt></dd></dl>
 
 <dl><dt><a name="AEDirObject-get_option"><strong>get_option</strong></a>(self, option)</dt></dl>
 
@@ -311,6 +306,10 @@ Just&nbsp;a&nbsp;convenience&nbsp;wrapper&nbsp;for&nbsp;LDAPObject.<a href="#AED
 <dl><dt><a name="AEDirObject-passwd"><strong>passwd</strong></a>(self, user, oldpw, newpw, serverctrls<font color="#909090">=None</font>, clientctrls<font color="#909090">=None</font>)</dt></dl>
 
 <dl><dt><a name="AEDirObject-passwd_s"><strong>passwd_s</strong></a>(self, user, oldpw, newpw, serverctrls<font color="#909090">=None</font>, clientctrls<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="AEDirObject-read_s"><strong>read_s</strong></a>(self, dn, filterstr<font color="#909090">=None</font>, attrlist<font color="#909090">=None</font>, serverctrls<font color="#909090">=None</font>, clientctrls<font color="#909090">=None</font>, timeout<font color="#909090">=-1</font>)</dt><dd><tt>Reads&nbsp;and&nbsp;returns&nbsp;a&nbsp;single&nbsp;entry&nbsp;specified&nbsp;by&nbsp;`dn'.<br>
+&nbsp;<br>
+Other&nbsp;attributes&nbsp;just&nbsp;like&nbsp;those&nbsp;passed&nbsp;to&nbsp;`<a href="#AEDirObject-search_ext_s">search_ext_s</a>()'</tt></dd></dl>
 
 <dl><dt><a name="AEDirObject-read_subschemasubentry_s"><strong>read_subschemasubentry_s</strong></a>(self, subschemasubentry_dn, attrs<font color="#909090">=None</font>)</dt><dd><tt>Returns&nbsp;the&nbsp;sub&nbsp;schema&nbsp;sub&nbsp;entry's&nbsp;data</tt></dd></dl>
 
@@ -382,6 +381,8 @@ Just&nbsp;a&nbsp;convenience&nbsp;wrapper&nbsp;for&nbsp;LDAPObject.<a href="#AED
 
 <dl><dt><a name="AEDirObject-result4"><strong>result4</strong></a>(self, msgid<font color="#909090">=-1</font>, all<font color="#909090">=1</font>, timeout<font color="#909090">=None</font>, add_ctrls<font color="#909090">=0</font>, add_intermediates<font color="#909090">=0</font>, add_extop<font color="#909090">=0</font>, resp_ctrl_classes<font color="#909090">=None</font>)</dt></dl>
 
+<dl><dt><a name="AEDirObject-sasl_external_bind_s"><strong>sasl_external_bind_s</strong></a>(self, serverctrls<font color="#909090">=None</font>, clientctrls<font color="#909090">=None</font>, sasl_flags<font color="#909090">=2</font>, authz_id<font color="#909090">=''</font>)</dt><dd><tt>Send&nbsp;SASL&nbsp;bind&nbsp;request&nbsp;using&nbsp;SASL&nbsp;mech&nbsp;EXTERNAL</tt></dd></dl>
+
 <dl><dt><a name="AEDirObject-sasl_gssapi_bind_s"><strong>sasl_gssapi_bind_s</strong></a>(self, serverctrls<font color="#909090">=None</font>, clientctrls<font color="#909090">=None</font>, sasl_flags<font color="#909090">=2</font>, authz_id<font color="#909090">=''</font>)</dt><dd><tt>Send&nbsp;SASL&nbsp;bind&nbsp;request&nbsp;using&nbsp;SASL&nbsp;mech&nbsp;GSSAPI</tt></dd></dl>
 
 <dl><dt><a name="AEDirObject-sasl_non_interactive_bind_s"><strong>sasl_non_interactive_bind_s</strong></a>(self, sasl_mech, serverctrls<font color="#909090">=None</font>, clientctrls<font color="#909090">=None</font>, sasl_flags<font color="#909090">=2</font>, authz_id<font color="#909090">=''</font>)</dt><dd><tt>Send&nbsp;a&nbsp;SASL&nbsp;bind&nbsp;request&nbsp;using&nbsp;a&nbsp;non-interactive&nbsp;SASL&nbsp;method&nbsp;(e.g.&nbsp;GSSAPI,&nbsp;EXTERNAL)</tt></dd></dl>
@@ -396,9 +397,9 @@ Just&nbsp;a&nbsp;convenience&nbsp;wrapper&nbsp;for&nbsp;LDAPObject.<a href="#AED
 &nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;Perform&nbsp;an&nbsp;LDAP&nbsp;search&nbsp;operation,&nbsp;with&nbsp;base&nbsp;as&nbsp;the&nbsp;DN&nbsp;of<br>
 &nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;entry&nbsp;at&nbsp;which&nbsp;to&nbsp;start&nbsp;the&nbsp;search,&nbsp;scope&nbsp;being&nbsp;one&nbsp;of<br>
-&nbsp;&nbsp;&nbsp;&nbsp;SCOPE_BASE&nbsp;(to&nbsp;search&nbsp;the&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;itself),&nbsp;SCOPE_ONELEVEL<br>
-&nbsp;&nbsp;&nbsp;&nbsp;(to&nbsp;search&nbsp;the&nbsp;<a href="__builtin__.html#object">object</a>'s&nbsp;immediate&nbsp;children),&nbsp;or&nbsp;SCOPE_SUBTREE<br>
-&nbsp;&nbsp;&nbsp;&nbsp;(to&nbsp;search&nbsp;the&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;and&nbsp;all&nbsp;its&nbsp;descendants).<br>
+&nbsp;&nbsp;&nbsp;&nbsp;SCOPE_BASE&nbsp;(to&nbsp;search&nbsp;the&nbsp;object&nbsp;itself),&nbsp;SCOPE_ONELEVEL<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(to&nbsp;search&nbsp;the&nbsp;object's&nbsp;immediate&nbsp;children),&nbsp;or&nbsp;SCOPE_SUBTREE<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(to&nbsp;search&nbsp;the&nbsp;object&nbsp;and&nbsp;all&nbsp;its&nbsp;descendants).<br>
 &nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;filter&nbsp;is&nbsp;a&nbsp;string&nbsp;representation&nbsp;of&nbsp;the&nbsp;filter&nbsp;to<br>
 &nbsp;&nbsp;&nbsp;&nbsp;apply&nbsp;in&nbsp;the&nbsp;search&nbsp;(see&nbsp;<a href="http://www.rfc-editor.org/rfc/rfc4515.txt">RFC&nbsp;4515</a>).<br>
@@ -451,8 +452,8 @@ not&nbsp;be&nbsp;determined.</tt></dd></dl>
 <a href="#AEDirObject-unbind_ext_s">unbind_ext_s</a>()&nbsp;-&gt;&nbsp;None<br>
 &nbsp;&nbsp;&nbsp;&nbsp;This&nbsp;call&nbsp;is&nbsp;used&nbsp;to&nbsp;unbind&nbsp;from&nbsp;the&nbsp;directory,&nbsp;terminate<br>
 &nbsp;&nbsp;&nbsp;&nbsp;the&nbsp;current&nbsp;association,&nbsp;and&nbsp;free&nbsp;resources.&nbsp;Once&nbsp;called,&nbsp;the<br>
-&nbsp;&nbsp;&nbsp;&nbsp;connection&nbsp;to&nbsp;the&nbsp;LDAP&nbsp;server&nbsp;is&nbsp;closed&nbsp;and&nbsp;the&nbsp;LDAP&nbsp;<a href="__builtin__.html#object">object</a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;is&nbsp;invalid.&nbsp;Further&nbsp;invocation&nbsp;of&nbsp;methods&nbsp;on&nbsp;the&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;will<br>
+&nbsp;&nbsp;&nbsp;&nbsp;connection&nbsp;to&nbsp;the&nbsp;LDAP&nbsp;server&nbsp;is&nbsp;closed&nbsp;and&nbsp;the&nbsp;LDAP&nbsp;object<br>
+&nbsp;&nbsp;&nbsp;&nbsp;is&nbsp;invalid.&nbsp;Further&nbsp;invocation&nbsp;of&nbsp;methods&nbsp;on&nbsp;the&nbsp;object&nbsp;will<br>
 &nbsp;&nbsp;&nbsp;&nbsp;yield&nbsp;an&nbsp;exception.<br>
 &nbsp;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;unbind&nbsp;and&nbsp;unbind_s&nbsp;methods&nbsp;are&nbsp;identical,&nbsp;and&nbsp;are<br>
@@ -470,6 +471,78 @@ Data and other attributes inherited from <a href="ldap.ldapobject.html#SimpleLDA
 Methods inherited from <a href="ldap.resiter.html#ResultProcessor">ldap.resiter.ResultProcessor</a>:<br>
 <dl><dt><a name="AEDirObject-allresults"><strong>allresults</strong></a>(self, msgid, timeout<font color="#909090">=-1</font>, add_ctrls<font color="#909090">=0</font>)</dt><dd><tt>Generator&nbsp;function&nbsp;which&nbsp;returns&nbsp;an&nbsp;iterator&nbsp;for&nbsp;processing&nbsp;all&nbsp;LDAP&nbsp;operation<br>
 results&nbsp;of&nbsp;the&nbsp;given&nbsp;msgid&nbsp;retrieved&nbsp;with&nbsp;LDAPObject.<a href="#AEDirObject-result3">result3</a>()&nbsp;-&gt;&nbsp;4-tuple</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="ldap.syncrepl.html#SyncreplConsumer">ldap.syncrepl.SyncreplConsumer</a>:<br>
+<dl><dt><a name="AEDirObject-syncrepl_delete"><strong>syncrepl_delete</strong></a>(self, uuids)</dt><dd><tt>Called&nbsp;by&nbsp;<a href="#AEDirObject-syncrepl_poll">syncrepl_poll</a>()&nbsp;to&nbsp;delete&nbsp;entries.&nbsp;A&nbsp;list<br>
+of&nbsp;UUIDs&nbsp;of&nbsp;the&nbsp;entries&nbsp;to&nbsp;be&nbsp;deleted&nbsp;is&nbsp;given&nbsp;in&nbsp;the<br>
+uuids&nbsp;parameter.</tt></dd></dl>
+
+<dl><dt><a name="AEDirObject-syncrepl_entry"><strong>syncrepl_entry</strong></a>(self, dn, attrs, uuid)</dt><dd><tt>Called&nbsp;by&nbsp;<a href="#AEDirObject-syncrepl_poll">syncrepl_poll</a>()&nbsp;for&nbsp;any&nbsp;added&nbsp;or&nbsp;modified&nbsp;entries.<br>
+&nbsp;<br>
+The&nbsp;provided&nbsp;uuid&nbsp;is&nbsp;used&nbsp;to&nbsp;identify&nbsp;the&nbsp;provided&nbsp;entry&nbsp;in<br>
+any&nbsp;future&nbsp;modification&nbsp;(including&nbsp;dn&nbsp;modification),&nbsp;deletion,<br>
+and&nbsp;presentation&nbsp;operations.</tt></dd></dl>
+
+<dl><dt><a name="AEDirObject-syncrepl_get_cookie"><strong>syncrepl_get_cookie</strong></a>(self)</dt><dd><tt>Called&nbsp;by&nbsp;<a href="#AEDirObject-syncrepl_search">syncrepl_search</a>()&nbsp;to&nbsp;retreive&nbsp;the&nbsp;cookie&nbsp;stored&nbsp;by&nbsp;<a href="#AEDirObject-syncrepl_set_cookie">syncrepl_set_cookie</a>()</tt></dd></dl>
+
+<dl><dt><a name="AEDirObject-syncrepl_poll"><strong>syncrepl_poll</strong></a>(self, msgid<font color="#909090">=-1</font>, timeout<font color="#909090">=None</font>, all<font color="#909090">=0</font>)</dt><dd><tt>polls&nbsp;for&nbsp;and&nbsp;processes&nbsp;responses&nbsp;to&nbsp;the&nbsp;<a href="#AEDirObject-syncrepl_search">syncrepl_search</a>()&nbsp;operation.<br>
+Returns&nbsp;False&nbsp;when&nbsp;operation&nbsp;finishes,&nbsp;True&nbsp;if&nbsp;it&nbsp;is&nbsp;in&nbsp;progress,&nbsp;or<br>
+raises&nbsp;an&nbsp;exception&nbsp;on&nbsp;error.<br>
+&nbsp;<br>
+If&nbsp;timeout&nbsp;is&nbsp;specified,&nbsp;raises&nbsp;ldap.TIMEOUT&nbsp;in&nbsp;the&nbsp;event&nbsp;of&nbsp;a&nbsp;timeout.<br>
+&nbsp;<br>
+If&nbsp;all&nbsp;is&nbsp;set&nbsp;to&nbsp;a&nbsp;nonzero&nbsp;value,&nbsp;poll()&nbsp;will&nbsp;return&nbsp;only&nbsp;when&nbsp;finished<br>
+or&nbsp;when&nbsp;an&nbsp;exception&nbsp;is&nbsp;raised.</tt></dd></dl>
+
+<dl><dt><a name="AEDirObject-syncrepl_present"><strong>syncrepl_present</strong></a>(self, uuids, refreshDeletes<font color="#909090">=False</font>)</dt><dd><tt>Called&nbsp;by&nbsp;<a href="#AEDirObject-syncrepl_poll">syncrepl_poll</a>()&nbsp;whenever&nbsp;entry&nbsp;UUIDs&nbsp;are&nbsp;presented&nbsp;to&nbsp;the&nbsp;client.<br>
+<a href="#AEDirObject-syncrepl_present">syncrepl_present</a>()&nbsp;is&nbsp;given&nbsp;a&nbsp;list&nbsp;of&nbsp;entry&nbsp;UUIDs&nbsp;(uuids)&nbsp;and&nbsp;a&nbsp;flag<br>
+(refreshDeletes)&nbsp;which&nbsp;indicates&nbsp;whether&nbsp;the&nbsp;server&nbsp;explicitly&nbsp;deleted<br>
+non-present&nbsp;entries&nbsp;during&nbsp;the&nbsp;refresh&nbsp;operation.<br>
+&nbsp;<br>
+If&nbsp;called&nbsp;with&nbsp;a&nbsp;list&nbsp;of&nbsp;uuids,&nbsp;the&nbsp;<a href="#AEDirObject-syncrepl_present">syncrepl_present</a>()&nbsp;implementation<br>
+should&nbsp;record&nbsp;those&nbsp;uuids&nbsp;as&nbsp;present&nbsp;in&nbsp;the&nbsp;directory.<br>
+&nbsp;<br>
+If&nbsp;called&nbsp;with&nbsp;uuids&nbsp;set&nbsp;to&nbsp;None&nbsp;and&nbsp;refreshDeletes&nbsp;set&nbsp;to&nbsp;False,<br>
+<a href="#AEDirObject-syncrepl_present">syncrepl_present</a>()&nbsp;should&nbsp;delete&nbsp;all&nbsp;non-present&nbsp;entries&nbsp;from&nbsp;the&nbsp;local<br>
+mirror,&nbsp;and&nbsp;reset&nbsp;the&nbsp;list&nbsp;of&nbsp;recorded&nbsp;uuids.<br>
+&nbsp;<br>
+If&nbsp;called&nbsp;with&nbsp;uuids&nbsp;set&nbsp;to&nbsp;None&nbsp;and&nbsp;refreshDeletes&nbsp;set&nbsp;to&nbsp;True,<br>
+<a href="#AEDirObject-syncrepl_present">syncrepl_present</a>()&nbsp;should&nbsp;reset&nbsp;the&nbsp;list&nbsp;of&nbsp;recorded&nbsp;uuids,&nbsp;without<br>
+deleting&nbsp;any&nbsp;entries.</tt></dd></dl>
+
+<dl><dt><a name="AEDirObject-syncrepl_refreshdone"><strong>syncrepl_refreshdone</strong></a>(self)</dt><dd><tt>Called&nbsp;by&nbsp;<a href="#AEDirObject-syncrepl_poll">syncrepl_poll</a>()&nbsp;between&nbsp;refresh&nbsp;and&nbsp;persist&nbsp;phase.<br>
+&nbsp;<br>
+It&nbsp;indicates&nbsp;that&nbsp;initial&nbsp;synchronization&nbsp;is&nbsp;done&nbsp;and&nbsp;persist&nbsp;phase<br>
+follows.</tt></dd></dl>
+
+<dl><dt><a name="AEDirObject-syncrepl_search"><strong>syncrepl_search</strong></a>(self, base, scope, mode<font color="#909090">='refreshOnly'</font>, cookie<font color="#909090">=None</font>, **search_args)</dt><dd><tt>Starts&nbsp;syncrepl&nbsp;search&nbsp;operation.<br>
+&nbsp;<br>
+base,&nbsp;scope,&nbsp;and&nbsp;search_args&nbsp;are&nbsp;passed&nbsp;along&nbsp;to<br>
+self.<strong>search_ext</strong>&nbsp;unmodified&nbsp;(aside&nbsp;from&nbsp;adding&nbsp;a&nbsp;Sync<br>
+Request&nbsp;control&nbsp;to&nbsp;any&nbsp;serverctrls&nbsp;provided).<br>
+&nbsp;<br>
+mode&nbsp;provides&nbsp;syncrepl&nbsp;mode.&nbsp;Can&nbsp;be&nbsp;'refreshOnly'<br>
+to&nbsp;finish&nbsp;after&nbsp;synchronization,&nbsp;or<br>
+'refreshAndPersist'&nbsp;to&nbsp;persist&nbsp;(continue&nbsp;to<br>
+receive&nbsp;updates)&nbsp;after&nbsp;synchronization.<br>
+&nbsp;<br>
+cookie:&nbsp;an&nbsp;opaque&nbsp;value&nbsp;representing&nbsp;the&nbsp;replication<br>
+state&nbsp;of&nbsp;the&nbsp;client.&nbsp;&nbsp;Subclasses&nbsp;should&nbsp;override<br>
+the&nbsp;<a href="#AEDirObject-syncrepl_set_cookie">syncrepl_set_cookie</a>()&nbsp;and&nbsp;<a href="#AEDirObject-syncrepl_get_cookie">syncrepl_get_cookie</a>()<br>
+methods&nbsp;to&nbsp;store&nbsp;the&nbsp;cookie&nbsp;appropriately,&nbsp;rather&nbsp;than<br>
+passing&nbsp;it.<br>
+&nbsp;<br>
+Only&nbsp;a&nbsp;single&nbsp;syncrepl&nbsp;search&nbsp;may&nbsp;be&nbsp;active&nbsp;on&nbsp;a&nbsp;<a href="ldap.syncrepl.html#SyncreplConsumer">SyncreplConsumer</a><br>
+object.&nbsp;&nbsp;Multiple&nbsp;concurrent&nbsp;syncrepl&nbsp;searches&nbsp;require&nbsp;multiple<br>
+separate&nbsp;<a href="ldap.syncrepl.html#SyncreplConsumer">SyncreplConsumer</a>&nbsp;objects&nbsp;and&nbsp;thus&nbsp;multiple&nbsp;connections<br>
+(LDAPObject&nbsp;instances).</tt></dd></dl>
+
+<dl><dt><a name="AEDirObject-syncrepl_set_cookie"><strong>syncrepl_set_cookie</strong></a>(self, cookie)</dt><dd><tt>Called&nbsp;by&nbsp;<a href="#AEDirObject-syncrepl_poll">syncrepl_poll</a>()&nbsp;to&nbsp;store&nbsp;a&nbsp;new&nbsp;cookie&nbsp;provided&nbsp;by&nbsp;the&nbsp;server.</tt></dd></dl>
+
+<hr>
+Methods inherited from <a href="ldap.controls.openldap.html#SearchNoOpMixIn">ldap.controls.openldap.SearchNoOpMixIn</a>:<br>
+<dl><dt><a name="AEDirObject-noop_search_st"><strong>noop_search_st</strong></a>(self, base, scope<font color="#909090">=2</font>, filterstr<font color="#909090">='(objectClass=*)'</font>, timeout<font color="#909090">=-1</font>)</dt></dl>
 
 </td></tr></table> <p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
@@ -520,91 +593,6 @@ hrefTarget<br>
 
 <dl><dt><a name="AEDirUrl-unparse"><strong>unparse</strong></a>(self)</dt><dd><tt>Returns&nbsp;LDAP&nbsp;URL&nbsp;depending&nbsp;on&nbsp;class&nbsp;attributes&nbsp;set.</tt></dd></dl>
 
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="NO_UNIQUE_ENTRY">class <strong>NO_UNIQUE_ENTRY</strong></a>(<a href="ldap.html#NO_SUCH_OBJECT">ldap.NO_SUCH_OBJECT</a>)</font></td></tr>
-    
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>Exception&nbsp;raised&nbsp;if&nbsp;a&nbsp;LDAP&nbsp;search&nbsp;returned&nbsp;more&nbsp;than&nbsp;entry&nbsp;entry<br>
-although&nbsp;assumed&nbsp;to&nbsp;return&nbsp;a&nbsp;unique&nbsp;single&nbsp;search&nbsp;result.<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%"><dl><dt>Method resolution order:</dt>
-<dd><a href="aedir.html#NO_UNIQUE_ENTRY">NO_UNIQUE_ENTRY</a></dd>
-<dd><a href="ldap.html#NO_SUCH_OBJECT">ldap.NO_SUCH_OBJECT</a></dd>
-<dd><a href="ldap.html#LDAPError">ldap.LDAPError</a></dd>
-<dd><a href="exceptions.html#Exception">exceptions.Exception</a></dd>
-<dd><a href="exceptions.html#BaseException">exceptions.BaseException</a></dd>
-<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
-</dl>
-<hr>
-Data descriptors inherited from <a href="ldap.html#LDAPError">ldap.LDAPError</a>:<br>
-<dl><dt><strong>__weakref__</strong></dt>
-<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
-</dl>
-<hr>
-Methods inherited from <a href="exceptions.html#Exception">exceptions.Exception</a>:<br>
-<dl><dt><a name="NO_UNIQUE_ENTRY-__init__"><strong>__init__</strong></a>(...)</dt><dd><tt>x.<a href="#NO_UNIQUE_ENTRY-__init__">__init__</a>(...)&nbsp;initializes&nbsp;x;&nbsp;see&nbsp;help(type(x))&nbsp;for&nbsp;signature</tt></dd></dl>
-
-<hr>
-Data and other attributes inherited from <a href="exceptions.html#Exception">exceptions.Exception</a>:<br>
-<dl><dt><strong>__new__</strong> = &lt;built-in method __new__ of type object&gt;<dd><tt>T.<a href="#NO_UNIQUE_ENTRY-__new__">__new__</a>(S,&nbsp;...)&nbsp;-&gt;&nbsp;a&nbsp;new&nbsp;<a href="__builtin__.html#object">object</a>&nbsp;with&nbsp;type&nbsp;S,&nbsp;a&nbsp;subtype&nbsp;of&nbsp;T</tt></dl>
-
-<hr>
-Methods inherited from <a href="exceptions.html#BaseException">exceptions.BaseException</a>:<br>
-<dl><dt><a name="NO_UNIQUE_ENTRY-__delattr__"><strong>__delattr__</strong></a>(...)</dt><dd><tt>x.<a href="#NO_UNIQUE_ENTRY-__delattr__">__delattr__</a>('name')&nbsp;&lt;==&gt;&nbsp;del&nbsp;x.name</tt></dd></dl>
-
-<dl><dt><a name="NO_UNIQUE_ENTRY-__getattribute__"><strong>__getattribute__</strong></a>(...)</dt><dd><tt>x.<a href="#NO_UNIQUE_ENTRY-__getattribute__">__getattribute__</a>('name')&nbsp;&lt;==&gt;&nbsp;x.name</tt></dd></dl>
-
-<dl><dt><a name="NO_UNIQUE_ENTRY-__getitem__"><strong>__getitem__</strong></a>(...)</dt><dd><tt>x.<a href="#NO_UNIQUE_ENTRY-__getitem__">__getitem__</a>(y)&nbsp;&lt;==&gt;&nbsp;x[y]</tt></dd></dl>
-
-<dl><dt><a name="NO_UNIQUE_ENTRY-__getslice__"><strong>__getslice__</strong></a>(...)</dt><dd><tt>x.<a href="#NO_UNIQUE_ENTRY-__getslice__">__getslice__</a>(i,&nbsp;j)&nbsp;&lt;==&gt;&nbsp;x[i:j]<br>
-&nbsp;<br>
-Use&nbsp;of&nbsp;negative&nbsp;indices&nbsp;is&nbsp;not&nbsp;supported.</tt></dd></dl>
-
-<dl><dt><a name="NO_UNIQUE_ENTRY-__reduce__"><strong>__reduce__</strong></a>(...)</dt></dl>
-
-<dl><dt><a name="NO_UNIQUE_ENTRY-__repr__"><strong>__repr__</strong></a>(...)</dt><dd><tt>x.<a href="#NO_UNIQUE_ENTRY-__repr__">__repr__</a>()&nbsp;&lt;==&gt;&nbsp;repr(x)</tt></dd></dl>
-
-<dl><dt><a name="NO_UNIQUE_ENTRY-__setattr__"><strong>__setattr__</strong></a>(...)</dt><dd><tt>x.<a href="#NO_UNIQUE_ENTRY-__setattr__">__setattr__</a>('name',&nbsp;value)&nbsp;&lt;==&gt;&nbsp;x.name&nbsp;=&nbsp;value</tt></dd></dl>
-
-<dl><dt><a name="NO_UNIQUE_ENTRY-__setstate__"><strong>__setstate__</strong></a>(...)</dt></dl>
-
-<dl><dt><a name="NO_UNIQUE_ENTRY-__str__"><strong>__str__</strong></a>(...)</dt><dd><tt>x.<a href="#NO_UNIQUE_ENTRY-__str__">__str__</a>()&nbsp;&lt;==&gt;&nbsp;str(x)</tt></dd></dl>
-
-<dl><dt><a name="NO_UNIQUE_ENTRY-__unicode__"><strong>__unicode__</strong></a>(...)</dt></dl>
-
-<hr>
-Data descriptors inherited from <a href="exceptions.html#BaseException">exceptions.BaseException</a>:<br>
-<dl><dt><strong>__dict__</strong></dt>
-</dl>
-<dl><dt><strong>args</strong></dt>
-</dl>
-<dl><dt><strong>message</strong></dt>
-</dl>
-</td></tr></table> <p>
-<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
-<tr bgcolor="#ffc8d8">
-<td colspan=3 valign=bottom>&nbsp;<br>
-<font color="#000000" face="helvetica, arial"><a name="logger_fileobj">class <strong>logger_fileobj</strong></a>(<a href="__builtin__.html#object">__builtin__.object</a>)</font></td></tr>
-    
-<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
-<td colspan=2><tt>file-like&nbsp;helper&nbsp;class&nbsp;which&nbsp;sends&nbsp;log&nbsp;lines&nbsp;to&nbsp;a&nbsp;logging&nbsp;instance<br>&nbsp;</tt></td></tr>
-<tr><td>&nbsp;</td>
-<td width="100%">Methods defined here:<br>
-<dl><dt><a name="logger_fileobj-__init__"><strong>__init__</strong></a>(self, logger, logging_level)</dt></dl>
-
-<dl><dt><a name="logger_fileobj-write"><strong>write</strong></a>(self, msg)</dt><dd><tt>write&nbsp;msg&nbsp;to&nbsp;log</tt></dd></dl>
-
-<hr>
-Data descriptors defined here:<br>
-<dl><dt><strong>__dict__</strong></dt>
-<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
-</dl>
-<dl><dt><strong>__weakref__</strong></dt>
-<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
-</dl>
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#eeaa77">
@@ -614,18 +602,9 @@ Data descriptors defined here:<br>
 <tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><dl><dt><a name="-aedir_aehost_dn"><strong>aedir_aehost_dn</strong></a>(fqdn, srvgrp<font color="#909090">=None</font>, zone<font color="#909090">=None</font>, aeroot_dn<font color="#909090">='ou=ae-dir'</font>)</dt><dd><tt>Returns&nbsp;a&nbsp;bind&nbsp;DN&nbsp;of&nbsp;a&nbsp;aeHost&nbsp;entry</tt></dd></dl>
  <dl><dt><a name="-aedir_aeuser_dn"><strong>aedir_aeuser_dn</strong></a>(uid, zone<font color="#909090">=None</font>, aeroot_dn<font color="#909090">='ou=ae-dir'</font>)</dt><dd><tt>Returns&nbsp;a&nbsp;bind&nbsp;DN&nbsp;of&nbsp;a&nbsp;aeUser&nbsp;entry</tt></dd></dl>
- <dl><dt><a name="-escape_string_tmpl"><strong>escape_string_tmpl</strong></a>(escape_func, str_tmpl, *args)</dt><dd><tt>return&nbsp;string&nbsp;based&nbsp;on&nbsp;str_tmpl&nbsp;with&nbsp;all&nbsp;*args<br>
-being&nbsp;escaped&nbsp;by&nbsp;escape_func()</tt></dd></dl>
- <dl><dt><a name="-extract_zone"><strong>extract_zone</strong></a>(dn, aeroot_dn<font color="#909090">='ou=ae-dir'</font>)</dt><dd><tt>return&nbsp;the&nbsp;extracted&nbsp;zone&nbsp;name&nbsp;from&nbsp;dn</tt></dd></dl>
- <dl><dt><a name="-is_dn"><strong>is_dn</strong></a>(dn_str)</dt><dd><tt>Returns&nbsp;True&nbsp;is&nbsp;`dn_str'&nbsp;can&nbsp;be&nbsp;parsed&nbsp;by&nbsp;libldap&nbsp;like&nbsp;as&nbsp;a&nbsp;distinguished<br>
-host_name&nbsp;(DN),&nbsp;otherwise&nbsp;False&nbsp;is&nbsp;returned.</tt></dd></dl>
+ <dl><dt><a name="-extract_zone"><strong>extract_zone</strong></a>(ae_object_dn, aeroot_dn<font color="#909090">='ou=ae-dir'</font>)</dt><dd><tt>return&nbsp;the&nbsp;extracted&nbsp;zone&nbsp;name&nbsp;from&nbsp;dn</tt></dd></dl>
  <dl><dt><a name="-ldap_strf_secs"><strong>ldap_strf_secs</strong></a>(secs)</dt><dd><tt>Convert&nbsp;seconds&nbsp;since&nbsp;epoch&nbsp;to&nbsp;a&nbsp;string&nbsp;compliant&nbsp;to&nbsp;LDAP&nbsp;syntax&nbsp;GeneralizedTime</tt></dd></dl>
  <dl><dt><a name="-ldap_strp_secs"><strong>ldap_strp_secs</strong></a>(dt_str)</dt><dd><tt>Convert&nbsp;LDAP&nbsp;syntax&nbsp;GeneralizedTime&nbsp;to&nbsp;seconds&nbsp;since&nbsp;epoch</tt></dd></dl>
- <dl><dt><a name="-parse_config_file"><strong>parse_config_file</strong></a>(config_filename, sep<font color="#909090">=None</font>)</dt><dd><tt>This&nbsp;function&nbsp;parses&nbsp;a&nbsp;sssd.conf&nbsp;or&nbsp;ldap.conf&nbsp;client&nbsp;configuration&nbsp;file<br>
-and&nbsp;returns&nbsp;a&nbsp;tuple&nbsp;of&nbsp;various&nbsp;parameters.<br>
-&nbsp;<br>
-Invoke&nbsp;it&nbsp;like&nbsp;this:<br>
-uri_list,who,cred,sasl_mech,cacert_filename&nbsp;=&nbsp;<a href="#-parse_config_file">parse_config_file</a>('/path/to/ldap.conf')</tt></dd></dl>
  <dl><dt><a name="-random_string"><strong>random_string</strong></a>(alphabet, length)</dt><dd><tt>Returns&nbsp;a&nbsp;random&nbsp;password&nbsp;byte&nbsp;string&nbsp;consisting&nbsp;of&nbsp;`length'&nbsp;bytes&nbsp;of<br>
 chars&nbsp;found&nbsp;in&nbsp;`alphabet'.</tt></dd></dl>
 </td></tr></table><p>
@@ -636,6 +615,15 @@ chars&nbsp;found&nbsp;in&nbsp;`alphabet'.</tt></dd></dl>
     
 <tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
 <td width="100%"><strong>AEDIR_SEARCH_BASE</strong> = 'ou=ae-dir'<br>
-<strong>__all__</strong> = ['AEDirUrl', 'AEDirObject', 'AEDIR_SEARCH_BASE', 'NO_UNIQUE_ENTRY', 'aedir_aehost_dn', 'aedir_aeuser_dn', 'escape_string_tmpl', 'extract_zone', 'is_dn', 'ldap_strf_secs', 'ldap_strp_secs', 'logger_fileobj', 'parse_config_file', 'random_string']<br>
-<strong>__version__</strong> = '0.0.2'</td></tr></table>
+<strong>__all__</strong> = ['AEDirUrl', 'AEDirObject', 'AEDIR_SEARCH_BASE', 'NO_UNIQUE_ENTRY', 'aedir_aehost_dn', 'aedir_aeuser_dn', 'extract_zone', 'ldap_strf_secs', 'ldap_strp_secs', 'logger_fileobj', 'parse_config_file', 'random_string']<br>
+<strong>__author__</strong> = 'Michael Stroeder &lt;michael@stroeder.com&gt;'<br>
+<strong>__license__</strong> = 'Apache License, Version 2.0'<br>
+<strong>__version__</strong> = '0.0.4'</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#7799ee">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Author</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#7799ee"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Michael&nbsp;Stroeder&nbsp;&lt;michael@stroeder.com&gt;</td></tr></table>
 </body></html>
