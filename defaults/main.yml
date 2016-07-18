@@ -148,6 +148,9 @@ aedir_hosts:
   # inventory host names of *all* consumer hosts
   consumer: "{{ groups['ae-dir-consumers'] }}"
 
+# main provider hostname (e.g. for HA setups)
+aedir_main_provider_hostname: "{{ groups['ae-dir-providers'][0] }}"
+
 #---------------------------------------------------------------------------
 # OpenLDAP parameters
 #---------------------------------------------------------------------------
