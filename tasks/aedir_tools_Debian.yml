@@ -43,11 +43,11 @@
     virtualenv_site_packages: yes
     extra_args: "--upgrade"
   with_items:
-    - aedir
     - mailutil
     - python-ldap
     - pyasn1
     - pyasn1_modules
+    - aedir
 
 #- name: "Grab list of python scripts installed in {{ aedir_bin }}/ and {{ aedir_sbin }}/"
 #  shell: "ls -1 {{ aedir_bin }}/*.py {{ aedir_sbin }}/*.py"
