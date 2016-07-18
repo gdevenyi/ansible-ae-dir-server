@@ -94,3 +94,12 @@
     name: "aedirpwd"
     state: started
     enabled: yes
+
+- name: Run aedirpwd_cron as CRON job
+  cron:
+    name: "aedirpwd_cron"
+    state: present
+    user: ae-dir-pwd
+    cron_file: aedirpwd_cron
+    minute: "*/2"
+    job: "{{ aedir_sbin }}/aedirpwd_cron.py"
