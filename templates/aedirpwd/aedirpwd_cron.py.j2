@@ -8,7 +8,7 @@ This CRON script performs two tasks:
 Author: Michael Ströder <michael@stroeder.com>
 """
 
-__version__ = '0.0.3'
+__version__ = '0.0.4'
 
 # from Python's standard lib
 import sys
@@ -56,9 +56,7 @@ else:
 # Logging format
 LOG_FORMAT = '%(asctime)s %(levelname)s %(message)s'
 
-# If non-zero this specifies to run step 2. only if the host's FQDN
-# is equal to this, else abort
-ENSURE_DNS_CNAME = None
+SERVER_ID = '{0:03x}'.format(int('{{ openldap_server_id }}'))
 
 # hostname to use in URLs generated in notification e-mails
 WEB_CTX_HOST = '{{ aedir_main_provider_hostname }}'
@@ -67,8 +65,8 @@ WEB_CTX_HOST = '{{ aedir_main_provider_hostname }}'
 FILTERSTR_EXPIRE = (
     ur'(&'
         '(objectClass=msPwdResetObject)'
-        '(!(msPwdResetExpirationTime=%(currenttime)s))'
-        '(msPwdResetExpirationTime<=%(currenttime)s)'
+        '(!(msPwdResetExpirationTime={currenttime}))'
+        '(msPwdResetExpirationTime<={currenttime})'
       ')'
 )
 FILTERSTR_NOPASSWORD = (
@@ -77,27 +75,35 @@ FILTERSTR_NOPASSWORD = (
         '(aeStatus=0)'
         '(uid=*)'
         '(mail=*)'
+        '(entryCSN:CSNSIDMatch:={serverid})'
         '(!'
           '(|'
+            '(aeTag=ae-tag-welcome-sent)'
             '(objectClass=msPwdResetObject)'
             '(userPassword=*)'
             '(pwdChangedTime=*)'
           ')'
         ')'
-        '(modifyTimestamp>=%(lasttime)s)(!(modifyTimestamp>=%(currenttime)s))'
+        '(modifyTimestamp>={lasttime})(!(modifyTimestamp>={currenttime}))'
       ')'
 )
 
 # Maximum timespan to search for password-less entries in the past
-NOTIFY_OLDEST_TIMESPAN = 7200.0
+#NOTIFY_OLDEST_TIMESPAN = 7200.0
+NOTIFY_OLDEST_TIMESPAN = 30*86400.0
 
 # Where to store the last run timestamp
 NOTIFY_STATE_FILENAME = '{{ aedir_rundir }}/aepwd_cron.state'
 
 # E-Mail subject for notification message
-NOTIFY_EMAIL_SUBJECT = u'New Æ-DIR account "%(user_uid)s" added for %(user_cn)s'
+NOTIFY_EMAIL_SUBJECT = u'New Æ-DIR account "{user_uid}" added for {user_cn}'
 # E-Mail body template file for notification message
 NOTIFY_EMAIL_TEMPLATE = '{{ aedir_etc }}/aedirpwd/templates/en/notify_user.txt'
+
+# modifications to be applied to user entry after successfully sending e-mail
+NOTIFY_SUCCESSFUL_MOD = [
+  (ldap.MOD_ADD, 'aeTag', ['ae-tag-welcome-sent'])
+]
 
 #-----------------------------------------------------------------------
 # Classes and functions
@@ -118,12 +124,14 @@ def run():
     my_logger.setLevel(LOG_LEVEL)
 
     host_fqdn = getfqdn()
-    my_logger.debug('Starting %s %s on %s', script_name, __version__, host_fqdn)
-
-    if ENSURE_DNS_CNAME and \
-       gethostbyname(ENSURE_DNS_CNAME) != gethostbyname(host_fqdn):
-        my_logger.info('%r is not %r => aborting', host_fqdn, ENSURE_DNS_CNAME)
-        sys.exit(0)
+    server_id = SERVER_ID
+    my_logger.debug(
+        'Starting %s %s on %s (%s)',
+        script_name,
+        __version__,
+        host_fqdn,
+        server_id,
+    )
 
     # Determine oldest possible last timestamp (sounds strange, yeah!)
     current_time = time.time()
@@ -178,6 +186,7 @@ def run():
     filterstr_inputs_dict = {
         'currenttime':current_run_timestr,
         'lasttime':last_run_timestr,
+        'serverid':server_id,
     }
     my_logger.debug('filterstr_inputs_dict = %s', filterstr_inputs_dict)
 
@@ -185,7 +194,7 @@ def run():
     #-----------------------------------------------------------------------
 
     expiration_filterstr = (
-        FILTERSTR_EXPIRE % filterstr_inputs_dict
+        FILTERSTR_EXPIRE.format(**filterstr_inputs_dict)
     ).encode('utf-8')
 
     ldap_results = ldap_conn.search_ext_s(
@@ -251,7 +260,7 @@ def run():
     #-----------------------------------------------------------------------
 
     nopassword_filterstr = (
-        FILTERSTR_NOPASSWORD % filterstr_inputs_dict
+        FILTERSTR_NOPASSWORD.format(**filterstr_inputs_dict)
     ).encode('utf-8')
 
     my_logger.debug(
@@ -318,7 +327,7 @@ def run():
                 'fromaddr':SMTP_FROM,
                 'user_dn':ldap_dn.decode('utf-8'),
                 'web_ctx_host':(
-                    WEB_CTX_HOST or ENSURE_DNS_CNAME or host_fqdn
+                    WEB_CTX_HOST or host_fqdn
                 ).decode('ascii'),
                 'app_path_prefix':APP_PATH_PREFIX,
                 'admin_cn':u'unknown',
@@ -363,8 +372,8 @@ def run():
                     )
                     break
 
-            smtp_message = smtp_message_tmpl % user_data_user
-            smtp_subject = NOTIFY_EMAIL_SUBJECT % user_data_user
+            smtp_message = smtp_message_tmpl.format(**user_data_user)
+            smtp_subject = NOTIFY_EMAIL_SUBJECT.format(**user_data_user)
             my_logger.debug('smtp_subject = %r', smtp_subject)
             my_logger.debug('smtp_message = %r', smtp_message)
             try:
@@ -386,6 +395,13 @@ def run():
                 )
                 continue
             else:
+                my_logger.info(
+                    'Sent notification for user %r with e-mail address %r',
+                    user_data_user['user_displayname'],
+                    to_addr,
+                )
+                if NOTIFY_SUCCESSFUL_MOD:
+                    ldap_conn.modify_s(ldap_dn, NOTIFY_SUCCESSFUL_MOD)
                 notification_counter += 1
 
         my_logger.info('Sent %d notifications', notification_counter)

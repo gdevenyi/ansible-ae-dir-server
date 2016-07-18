@@ -1,4 +1,4 @@
-Dear %(user_cn)s,
+Dear {user_cn},
 
 an Æ-DIR personal account has been created/activated for you.
 The next step is invoking the password reset process.
@@ -6,36 +6,36 @@ Please read the instructions in this e-mail carefully.
 
 --------------------------- Account details ----------------------------
 
-User name: %(user_uid)s
+User name: {user_uid}
 
 Full display name:
-%(user_displayname)s
+{user_displayname}
 
 Description in user entry:
-%(user_description)s
+{user_description}
 
 Distinguished name of user entry:
-%(user_dn)s
+{user_dn}
 
 Created/activated by:
-%(admin_cn)s <%(admin_mail)s>
+{admin_cn} <{admin_mail}>
 
 -------------------------- Password reset ------------------------------
 
 You can find detailed documentation about password reset process in
 the user guide:
 
-https://%(web_ctx_host)s/pwd.html
+https://{web_ctx_host}/pwd.html
 
 Please contact this zone admin now (e.g. by phone) and ask him/her 
 to assist you:
 
-%(admin_cn)s <%(admin_mail)s>
+{admin_cn} <{admin_mail}>
 
 After contacting the zone admin you can request a temporary password
 for your account here:
 
-https://%(web_ctx_host)s%(app_path_prefix)s/requestpw?username=%(user_uid)s
+https://{web_ctx_host}{app_path_prefix}/requestpw?username={user_uid}
 
 1. The 1st part of the temporary password will be sent to you by
    e-mail (simply click on the link in the e-mail).
@@ -48,14 +48,14 @@ https://%(web_ctx_host)s%(app_path_prefix)s/requestpw?username=%(user_uid)s
 
 Afterwards you can connect and login to Æ-DIR with web2ldap here:
 
-https://%(web_ctx_host)s/web2ldap/searchform?%(ldap_uri)s/ou=ae-dir????bindname=%(user_uid)s
+https://{web_ctx_host}/web2ldap/searchform?{ldap_uri}/ou=ae-dir????bindname={user_uid}
 
 You should add a bookmark for the link above
 because you will probably need it more often.
 
 You can find user guide for web2ldap here:
 
-https://%(web_ctx_host)s/web2ldap.html
+https://{web_ctx_host}/web2ldap.html
 
 ------------------------------------------------------------------------
 
