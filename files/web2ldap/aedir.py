@@ -97,6 +97,7 @@ class AEUIDNumber(UidNumber):
   oid = 'AEUIDNumber-oid'
   desc = 'numeric Unix-UID'
   object_classes = set(['posixAccount','posixGroup'])
+  editable = 0
 
   def formValue(self):
     try:
@@ -111,6 +112,16 @@ class AEUIDNumber(UidNumber):
     except KeyError:
       attrValues = []
     return attrValues
+
+  def formField(self):
+    input_field = HiddenInput(
+      self.attrType,
+      ': '.join([self.attrType,self.desc]),
+      self.maxLen,self.maxValues,None,
+      default=self.formValue()
+    )
+    input_field.charset = self._form.accept_charset
+    return input_field
 
 syntax_registry.registerAttrType(
   AEUIDNumber.oid,[
