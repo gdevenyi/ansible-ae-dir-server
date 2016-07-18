@@ -66,6 +66,12 @@ password-hash {CRYPT}
 password-crypt-salt-format "$6$%.12s"
 
 #---------------------------------------------------------------------------
+# SASL parameters
+#---------------------------------------------------------------------------
+
+sasl-host {{ openldap_service_fqdn }}
+
+#---------------------------------------------------------------------------
 # TLS parameters
 #---------------------------------------------------------------------------
 
@@ -165,6 +171,12 @@ access to
 database config
 
 require strong
+
+access to
+  dn.subtree="cn=config"
+  attrs=entry,objectClass,olcServerID,olcSaslHost
+    by dn.onelevel="cn=ae,{{ aedir_suffix }}" read
+    by * none break
 
 access to
   dn.subtree="cn=config"
