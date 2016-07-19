@@ -42,10 +42,10 @@ description: tag for all entries created during initial load
 objectClass: namedObject
 objectClass: aeTag
 
-dn: cn=ae-tag-welcome-sent,cn=ae,{{ aedir_suffix }}
+dn: cn=pub-tag-no-welcome-yet,cn=pub,{{ aedir_suffix }}
 aeStatus: 0
-cn: ae-tag-welcome-sent
-description: tag indicates that welcome e-mail was sent to user
+cn: pub-tag-no-welcome-yet
+description: tag indicates that welcome e-mail was not sent to user yet
 objectClass: namedObject
 objectClass: aeTag
 
@@ -365,6 +365,21 @@ pwdMinLength: 24
 pwdMustChange: FALSE
 pwdMaxAge: 1
 
+# SASL/EXTERNAL policy with password expiry after one second!
+dn: cn=ppolicy-sasl-external,cn=ae,{{ aedir_suffix }}
+cn: ppolicy-sasl-external
+description: Password policy for services which must use SASL/EXTERNAL
+objectClass: namedPolicy
+objectClass: pwdPolicy
+pwdAllowUserChange: FALSE
+pwdAttribute: userPassword
+pwdCheckQuality: 2
+pwdInHistory: 3
+pwdLockout: FALSE
+pwdMinLength: 24
+pwdMustChange: FALSE
+pwdMaxAge: 1
+
 # policy for aeService and aeHost entries
 dn: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
 cn: ppolicy-systems
@@ -481,6 +496,7 @@ objectClass: posixAccount
 objectClass: ldapPublicKey
 aeStatus: 0
 aeTag: ae-tag-init
+aeTag: pub-tag-no-welcome-yet
 aePerson: uniqueIdentifier={{ ae_user.unique_identifier }},cn={{ aedir_org_zone }},{{ aedir_suffix }}
 description: {{ ae_user.description }}
 homeDirectory: /home/{{ ae_user.uid }}

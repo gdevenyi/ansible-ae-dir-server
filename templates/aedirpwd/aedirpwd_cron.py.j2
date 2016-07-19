@@ -76,11 +76,11 @@ FILTERSTR_NOPASSWORD = (
         '(uid=*)'
         '(mail=*)'
         '(entryCSN:CSNSIDMatch:={serverid})'
+        '(aeTag=pub-tag-no-welcome-yet)'
         '(!'
           '(|'
-            '(aeTag=ae-tag-welcome-sent)'
             '(objectClass=msPwdResetObject)'
-            '(userPassword=*)'
+            #'(userPassword=*)'
             '(pwdChangedTime=*)'
           ')'
         ')'
@@ -89,8 +89,7 @@ FILTERSTR_NOPASSWORD = (
 )
 
 # Maximum timespan to search for password-less entries in the past
-#NOTIFY_OLDEST_TIMESPAN = 7200.0
-NOTIFY_OLDEST_TIMESPAN = 30*86400.0
+NOTIFY_OLDEST_TIMESPAN = 86400.0
 
 # Where to store the last run timestamp
 NOTIFY_STATE_FILENAME = '{{ aedir_rundir }}/aepwd_cron.state'
@@ -102,7 +101,7 @@ NOTIFY_EMAIL_TEMPLATE = '{{ aedir_etc }}/aedirpwd/templates/en/notify_user.txt'
 
 # modifications to be applied to user entry after successfully sending e-mail
 NOTIFY_SUCCESSFUL_MOD = [
-  (ldap.MOD_ADD, 'aeTag', ['ae-tag-welcome-sent'])
+  (ldap.MOD_DELETE, 'aeTag', ['pub-tag-no-welcome-yet'])
 ]
 
 #-----------------------------------------------------------------------

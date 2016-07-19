@@ -21,15 +21,27 @@
   </li>
 </ul>
 
-<h2>For &AElig; admins and &AElig; auditors</h2>
+<h2>For admins and auditors</h2>
 <ul>
   <li>
-    <a class="CommandLink" href="/web2ldap/searchform?{{ openldap_ldapi_uri }}/{{ aedir_accesslog_suffix }}????bindname=">Search access log</a>
-    (only &AElig; admins)
+    <a class="CommandLink"
+       href="/web2ldap/searchform?{{ openldap_ldapi_uri }}/{{ aedir_accesslog_suffix }}????bindname=">
+      Search access log
+    </a>
+    (only &AElig; admins/auditors)
   </li>
   <li>
-    <a class="CommandLink" href="/web2ldap?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub?(objectClass=pwdPolicy)?bindname=">Search password policies</a>
-    (only &AElig; admins)
+    <a class="CommandLink"
+       href="/web2ldap?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub?(objectClass=pwdPolicy)?bindname=">
+      Search password policies
+    </a>
+  </li>
+  <li>
+    <a title="Search personal user accounts which did not receive welcome e-mail yet"
+       class="CommandLink"
+       href="/web2ldap?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub?(&(objectClass=aeUser)(aeTag=pub-tag-no-welcome-yet))?bindname=">
+      No welcome e-mail yet
+    </a>
   </li>
 </ul>
 

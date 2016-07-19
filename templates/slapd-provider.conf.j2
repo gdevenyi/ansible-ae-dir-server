@@ -739,9 +739,12 @@ access to
     by group/aeGroup/member.expand="cn={{ aedir_org_zone }}-zone-auditors,cn={{ aedir_org_zone }},{{ aedir_suffix }}" read
     by * none break
 
-# After this ACL all inactive entries are only visible for all zone admins
+# not-active ACL
 #---------------------------------------------------------------------------
 
+# inactive entries are
+# 1. readable for all zone admins
+# 2. not visible to normal users/systems after this
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(&(aeStatus=*)(!(aeStatus=0)))"
@@ -753,15 +756,25 @@ access to
 
 # Access to objectClass value "msPwdResetObject"
 # 1. write access for password self-service application
-# 2. read access for zone admins and self
+# 2. read access for the user (self)
 access to
   dn.regex="^uid=({{ aedir_aeuser_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
   attrs=objectClass
   filter="(objectClass=aeUser)"
   val=msPwdResetObject
     by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" write
-    by group/aeGroup/member.expand="cn=${d2}-zone-admins,cn=${d1},{{ aedir_suffix }}" read
-    by group/aeGroup/member.expand="cn=${d2}-zone-auditors,cn=${d1},{{ aedir_suffix }}" read
+    by self read
+    by * none
+
+# Access to aeTag value "pub-tag-no-welcome-yet"
+# 1. write access for password self-service application
+# 2. read access for the user (self)
+access to
+  dn.regex="^uid=({{ aedir_aeuser_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  attrs=aeTag
+  filter="(objectClass=aeUser)"
+  val=pub-tag-no-welcome-yet
+    by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" write
     by self read
     by * none
 
@@ -790,7 +803,7 @@ access to
 # Allow read access on necessary attributes
 access to
   filter="(objectClass=aeUser)"
-  attrs=entry,uid,aeStatus,objectClass,mail,pwdPolicySubentry,pwdChangedTime
+  attrs=entry,uid,aeStatus,objectClass,mail,pwdPolicySubentry,pwdChangedTime,aeTag,cn,displayName,description,entryCSN,creatorsName,createTimestamp,modifiersName,modifyTimestamp,memberOf
     by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" read
     by * none break
 
