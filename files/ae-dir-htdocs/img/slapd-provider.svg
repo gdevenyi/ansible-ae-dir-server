@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.2" width="250.7mm" height="157.01mm" viewBox="2565 2800 25070 15701" preserveAspectRatio="xMidYMid" fill-rule="evenodd" stroke-width="28.222" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" xmlns:ooo="http://xml.openoffice.org/svg/export" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:presentation="http://sun.com/xmlns/staroffice/presentation" xmlns:smil="http://www.w3.org/2001/SMIL20/" xmlns:anim="urn:oasis:names:tc:opendocument:xmlns:animation:1.0" xml:space="preserve">
+<svg version="1.2" width="297mm" height="210mm" viewBox="0 0 29700 21000" preserveAspectRatio="xMidYMid" fill-rule="evenodd" stroke-width="28.222" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" xmlns:ooo="http://xml.openoffice.org/svg/export" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:presentation="http://sun.com/xmlns/staroffice/presentation" xmlns:smil="http://www.w3.org/2001/SMIL20/" xmlns:anim="urn:oasis:names:tc:opendocument:xmlns:animation:1.0" xml:space="preserve">
  <defs class="ClipPathGroup">
   <clipPath id="presentation_clip_path" clipPathUnits="userSpaceOnUse">
-   <rect x="2565" y="2800" width="25070" height="15701"/>
+   <rect x="0" y="0" width="29700" height="21000"/>
   </clipPath>
   <clipPath id="presentation_clip_path_shrink" clipPathUnits="userSpaceOnUse">
-   <rect x="2590" y="2815" width="25020" height="15670"/>
+   <rect x="29" y="21" width="29641" height="20958"/>
   </clipPath>
  </defs>
  <defs>
@@ -96,6 +96,12 @@
   </g>
  </defs>
  <defs class="TextEmbeddedBitmaps"/>
+ <g>
+  <g id="id2" class="Master_Slide">
+   <g id="bg-id2" class="Background"/>
+   <g id="bo-id2" class="BackgroundObjects"/>
+  </g>
+ </g>
  <g class="SlideGroup">
   <g>
    <g id="container-id1">
@@ -274,10 +280,10 @@
       </g>
       <g class="com.sun.star.drawing.ConnectorShape">
        <g id="id23">
-        <rect class="BoundingBox" stroke="none" fill="none" x="4499" y="2799" width="17352" height="4102"/>
-        <path fill="none" stroke="rgb(0,0,0)" d="M 4500,5400 L 4500,2800 21700,2800 21700,6470"/>
+        <rect class="BoundingBox" stroke="none" fill="none" x="4499" y="2099" width="17352" height="4802"/>
+        <path fill="none" stroke="rgb(0,0,0)" d="M 4500,5400 L 4500,2100 21700,2100 21700,6470"/>
         <path fill="rgb(0,0,0)" stroke="none" d="M 21700,6900 L 21850,6450 21550,6450 21700,6900 Z"/>
-        <text class="TextShape"><tspan class="TextParagraph" font-family="Liberation Sans, sans-serif" font-size="388px" font-weight="400"><tspan class="TextPosition" x="12465" y="3276"><tspan fill="rgb(0,0,0)" stroke="none">LDAPS</tspan></tspan></tspan></text>
+        <text class="TextShape"><tspan class="TextParagraph" font-family="Liberation Sans, sans-serif" font-size="388px" font-weight="400"><tspan class="TextPosition" x="12465" y="2576"><tspan fill="rgb(0,0,0)" stroke="none">LDAPS</tspan></tspan></tspan></text>
        </g>
       </g>
       <g class="com.sun.star.drawing.LineShape">
