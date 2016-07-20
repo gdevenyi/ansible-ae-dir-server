@@ -39,13 +39,6 @@ sys.path.extend([
 ])
 from aedirpwd_cnf import *
 
-# Timeout in seconds when connecting to local and remote LDAP servers
-# used for ldap.OPT_NETWORK_TIMEOUT and ldap.OPT_TIMEOUT
-LDAP_TIMEOUT = 10.0
-
-# Number of times connecting to LDAP is tried
-LDAP_MAXRETRYCOUNT = 4
-
 # Logging level and log formats
 SYSLOG_LOG_FORMAT = '%(levelname)s %(message)s'
 if os.environ.get('DEBUG', 'no') == 'yes':
