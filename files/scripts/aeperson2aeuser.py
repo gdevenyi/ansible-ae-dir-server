@@ -1,4 +1,4 @@
-#!{{ aedir_python }}
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
 Sync the personnel attributes (cn, sn, givenName, mail)
@@ -18,35 +18,23 @@ from logging.handlers import SysLogHandler
 
 # Import python-ldap modules/classes
 import ldap
-import ldap.sasl
 import ldap.modlist
-import ldap.resiter
 from ldap.ldapobject import ReconnectLDAPObject
+
+import aedir
 
 #-----------------------------------------------------------------------
 # Constants (configuration)
 #-----------------------------------------------------------------------
 
-__version__ = '0.0.2'
+__version__ = '0.0.3'
 
 # Trace level for python-ldap logs
 PYLDAP_TRACELEVEL = 0
 
-# Where to store the last run timestamp
-SYNC_STATE_FILENAME = '{{ aedir_rundir }}/aeperson2aeuser.state'
-
 # Number of times connecting to LDAP is tried
 LDAP_MAXRETRYCOUNT = 3
 LDAP_RETRYDELAY = 10.0
-
-AEDIR_LDAPI_URI = '{{ openldap_ldapi_uri }}'
-AEDIR_SEARCHBASE = '{{ aedir_suffix }}'
-AEDIR_PERSON_BASE = AEDIR_SEARCHBASE
-
-# Filter to be used to search for aePerson entries
-AEDIR_AEPERSON_FILTERSTR = '(objectClass=aePerson)'
-# Filter to be used to search for AE-DIR personal accounts
-AEDIR_AEUSER_FILTERSTR = '(objectClass=aeUser)'
 
 # List of attributes copied from aePerson to aeUser entries
 AEDIR_AEPERSON_ATTRS = [
@@ -72,7 +60,7 @@ def generalized_time(secs):
     return time.strftime('%Y%m%d%H%M%SZ', time.gmtime(secs))
 
 
-def delta_filter(
+def time_span_filter(
         filterstr,
         last_run_timestr,
         current_time_str,
@@ -84,11 +72,11 @@ def delta_filter(
     if not last_run_timestr:
         return filterstr
     return (
-    '(&'
-    '{filterstr}'
-    '({delta_attr}>={last_run_timestr})'
-    '(!({delta_attr}>={current_time_str}))'
-    ')'
+        '(&'
+        '{filterstr}'
+        '({delta_attr}>={last_run_timestr})'
+        '(!({delta_attr}>={current_time_str}))'
+        ')'
     ).format(
         filterstr=filterstr,
         delta_attr=delta_attr,
@@ -97,45 +85,24 @@ def delta_filter(
     )
 
 
-class LogWrapperFile(object):
-    """
-    file-like wrapper object around logging handler
-    """
-
-    def __init__(self, logger, log_level=logging.DEBUG):
-        self._logger = logger
-        self._log_level = log_level
-
-    def write(self, msg):
-        """
-        Write msg to logger
-        """
-        self._logger.log(self._log_level, msg[:-1])
-
-
-class MyLDAPObject(ReconnectLDAPObject, ldap.resiter.ResultProcessor):
-    """
-    own LDAPObject for stream processing of search results
-    """
-    pass
-
-
 class SyncProcess(object):
     """
     The sync process
     """
 
-    def __init__(self):
+    def __init__(self, ldap_url):
         self.script_name = os.path.basename(sys.argv[0])
         self.logger = self.get_logger()
-        self.state_filename = SYNC_STATE_FILENAME
-        self.ldap_uri = AEDIR_LDAPI_URI
+        self.state_filename = sys.argv[2]
+        self.ldap_url = ldap_url
         self.aeperson_counter = 0
         self.modify_counter = 0
         self.error_counter = 0
         self.deactivate_counter = 0
         self.current_time_str = generalized_time(time.time())
         self.ldap_conn = self.target_ldap_conn()
+        self.search_base = self.ldap_conn.ldap_url_obj.dn or \
+                           self.ldap_conn.find_search_base()
 
     def get_state(self):
         """
@@ -145,16 +112,16 @@ class SyncProcess(object):
             last_run_timestr = open(self.state_filename, 'rb').read().strip()
         except CatchAllException, err:
             self.logger.warn(
-                'Error reading file %s: %s',
-                repr(SYNC_STATE_FILENAME),
-                str(err)
+                'Error reading file %r: %s',
+                self.state_filename,
+                err
             )
             last_run_timestr = None
         else:
             self.logger.debug(
-                'Read last run timestamp %s from file %s',
-                repr(last_run_timestr),
-                repr(self.state_filename)
+                'Read last run timestamp %r from file %r',
+                last_run_timestr,
+                self.state_filename,
             )
         last_run_timestr = last_run_timestr or None
         if last_run_timestr:
@@ -162,9 +129,9 @@ class SyncProcess(object):
                 time.strptime(last_run_timestr, '%Y%m%d%H%M%SZ')
             except ValueError, err:
                 self.logger.warn(
-                    'Error parsing timestamp %s: %s',
-                    repr(last_run_timestr),
-                    str(err)
+                    'Error parsing timestamp %r: %s',
+                    last_run_timestr,
+                    err,
                 )
                 last_run_timestr = None
         return last_run_timestr # get_state()
@@ -178,15 +145,15 @@ class SyncProcess(object):
             open(self.state_filename, 'wb').write(current_time_str)
         except CatchAllException, err:
             self.logger.warn(
-                'Could not write %s: %s',
-                repr(SYNC_STATE_FILENAME),
-                str(err)
+                'Could not write %r: %s',
+                self.state_filename,
+                err,
             )
         else:
             self.logger.debug(
-                'Wrote %s to %s',
-                repr(current_time_str),
-                repr(SYNC_STATE_FILENAME)
+                'Wrote %r to %r',
+                current_time_str,
+                self.state_filename,
             )
         return # set_state()
 
@@ -237,22 +204,12 @@ class SyncProcess(object):
         """
         Connect and bind to local AE-DIR
         """
+        self.logger.debug('Connecting to %r...', self.ldap_url)
+        ldap_conn = aedir.AEDirObject(self.ldap_url)
         self.logger.debug(
-            'Connecting to %s...',
-            repr(AEDIR_LDAPI_URI)
-        )
-        ldap_conn = MyLDAPObject(
-            self.ldap_uri,
-            trace_level=PYLDAP_TRACELEVEL,
-            trace_file=LogWrapperFile(self.logger),
-            retry_max=LDAP_MAXRETRYCOUNT,
-            retry_delay=LDAP_RETRYDELAY,
-        )
-        ldap_conn.sasl_interactive_bind_s('', ldap.sasl.sasl({}, 'EXTERNAL'))
-        self.logger.debug(
-            'Successfully connected to %s as %s',
-            repr(self.ldap_uri),
-            repr(ldap_conn.whoami_s())
+            'Successfully connected to %r as %r',
+            self.ldap_url,
+            ldap_conn.whoami_s(),
         )
         return ldap_conn
 
@@ -266,27 +223,27 @@ class SyncProcess(object):
 
         last_run_timestr = self.get_state()
         self.logger.debug(
-            'current_time_str=%s last_run_timestr=%s',
-            repr(self.current_time_str),
-            repr(last_run_timestr)
+            'current_time_str=%r last_run_timestr=%r',
+            self.current_time_str,
+            last_run_timestr,
         )
 
         # Update aeUser entries
         #-----------------------------------------------------------------------
 
-        aeperson_filterstr = delta_filter(
-            AEDIR_AEPERSON_FILTERSTR,
+        aeperson_filterstr = time_span_filter(
+            '(objectClass=aePerson)',
             last_run_timestr,
             self.current_time_str
         )
 
         self.logger.debug(
-            'Searching in %s with filter %s',
-            repr(AEDIR_PERSON_BASE),
-            repr(aeperson_filterstr)
+            'Searching in %r with filter %r',
+            self.search_base,
+            aeperson_filterstr,
         )
         msg_id = self.ldap_conn.search(
-            AEDIR_PERSON_BASE,
+            self.search_base,
             ldap.SCOPE_SUBTREE,
             aeperson_filterstr,
             attrlist=AEDIR_AEPERSON_ATTRS,
@@ -299,9 +256,9 @@ class SyncProcess(object):
                 self.aeperson_counter += 1
 
                 aeuser_result = self.ldap_conn.search_s(
-                    AEDIR_SEARCHBASE,
+                    self.search_base,
                     ldap.SCOPE_SUBTREE,
-                    '(&%s(aePerson=%s))' % (AEDIR_AEUSER_FILTERSTR, aeperson_dn),
+                    '(&(objectClass=aeUser)(aePerson=%s))' % (aeperson_dn),
                     attrlist=AEDIR_AEPERSON_ATTRS+['uid', 'uidNumber', 'displayName'],
                 )
 
@@ -321,7 +278,7 @@ class SyncProcess(object):
                     # First preserve old status
                     aeperson_status = int(aeperson_entry['aeStatus'][0])
                     aeuser_status = int(aeuser_entry['aeStatus'][0])
-                    if not aeperson_status <= 0 and aeuser_status <= 0:
+                    if aeperson_status > 0 and aeuser_status <= 0:
                         new_aeuser_entry['aeStatus'] = '1'
                         self.deactivate_counter += 1
                     else:
@@ -336,29 +293,29 @@ class SyncProcess(object):
 
                     if not modlist:
                         self.logger.debug(
-                            'Nothing to do in %s => skipped',
-                            repr(aeuser_dn)
+                            'Nothing to do in %r => skipped',
+                            aeuser_dn,
                         )
                     else:
                         self.logger.debug(
-                            'Update existing entry %s: %s',
-                            repr(aeuser_dn),
-                            repr(modlist)
+                            'Update existing entry %r: %r',
+                            aeuser_dn,
+                            modlist,
                         )
                         try:
                             self.ldap_conn.modify_s(aeuser_dn, modlist)
                         except ldap.LDAPError, ldap_err:
                             self.logger.error(
-                                'LDAP error modifying %s: %s',
-                                repr(aeuser_dn),
-                                str(ldap_err)
+                                'LDAP error modifying %r: %s',
+                                aeuser_dn,
+                                ldap_err,
                             )
                             self.error_counter += 1
                         else:
                             self.logger.info(
-                                'Updated entry %s: %s',
-                                repr(aeuser_dn),
-                                repr(modlist)
+                                'Updated entry %r: %r',
+                                aeuser_dn,
+                                modlist,
                             )
                             self.modify_counter += 1
 
@@ -367,9 +324,9 @@ class SyncProcess(object):
             self.ldap_conn.unbind_s()
         except CatchAllException, err:
             self.logger.warn(
-                'Error while closing LDAP connection to %s: %s',
-                repr(self.ldap_conn._uri),
-                str(err)
+                'Error while closing LDAP connection to %r: %s',
+                self.ldap_conn.ldap_url_obj.initializeUrl(),
+                err,
             )
 
         # Write state
@@ -382,4 +339,4 @@ class SyncProcess(object):
 
 
 if __name__ == '__main__':
-    SyncProcess().run()
+    SyncProcess(sys.argv[1]).run()

@@ -8,11 +8,9 @@ __version__ = '0.0.1'
 
 import sys, csv, pprint
 
-import ldap, ldap.resiter
+import ldap
+import aedir
 from ldap.controls.deref import DereferenceControl
-
-AEDIR_LDAPI_URI = '{{ openldap_ldapi_uri }}'
-AEDIR_SEARCHBASE = '{{ aedir_suffix }}'
 
 PYLDAP_TRACE_LEVEL = 0
 
@@ -50,21 +48,17 @@ DEREF_CONTROL = DereferenceControl(
 )
 
 
-class MyLDAPObject(ldap.ldapobject.LDAPObject, ldap.resiter.ResultProcessor):
-    pass
-
 #---------------------------------------------------------------------------
 # main()
 #---------------------------------------------------------------------------
 
 ldap._trace_level = PYLDAP_TRACE_LEVEL
 
-ldap_conn = MyLDAPObject(AEDIR_LDAPI_URI, trace_level=PYLDAP_TRACE_LEVEL)
-ldap_conn.sasl_interactive_bind_s('', ldap.sasl.sasl({}, 'EXTERNAL'))
-
+ldap_conn = aedir.AEDirObject(None, trace_level=PYLDAP_TRACE_LEVEL)
+aedir_searchbase = ldap_conn.find_search_base()
 
 msg_id = ldap_conn.search_ext(
-    AEDIR_SEARCHBASE,
+    aedir_searchbase,
     ldap.SCOPE_SUBTREE,
     '(&(objectClass=aeUser)(aeStatus=0))',
     attrlist=USER_ATTRS,

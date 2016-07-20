@@ -9,13 +9,8 @@ This script must run locally run on a Æ-DIR provider
 
 import sys
 import random
-
-# from python-ldap
 import ldap
-import ldap.sasl
-
-AEDIR_LDAPI_URI = '{{ openldap_ldapi_uri }}'
-AEDIR_SEARCHBASE = '{{ aedir_suffix }}'
+import aedir
 
 PYLDAP_TRACE_LEVEL = 0
 
@@ -39,15 +34,12 @@ except Exception, err:
     )
     sys.exit(9)
 
-ldap_conn = ldap.initialize(AEDIR_LDAPI_URI, trace_level=PYLDAP_TRACE_LEVEL)
-ldap_conn.sasl_interactive_bind_s('', ldap.sasl.sasl({}, 'EXTERNAL'))
+ldap_conn = aedir.AEDirObject(None, trace_level=PYLDAP_TRACE_LEVEL)
+aedir_searchbase = ldap_conn.find_search_base()
 
 try:
-    ldap_result = ldap_conn.search_ext_s(
-        'cn={zone_cn},{AEDIR_SEARCHBASE}'.format(**vars()),
-        ldap.SCOPE_BASE,
-        '(objectClass=*)',
-        attrlist=['*', '+'],
+    ldap_result = ldap_conn.read_s(
+        'cn={zone_cn},{aedir_searchbase}'.format(**vars()),
     )
 except ldap.NO_SUCH_OBJECT:
     pass
@@ -55,7 +47,7 @@ else:
     sys.stderr.write('Zone {} already exists\n'.format(zone_cn))
     sys.exit(9)
 
-zone_dn = 'cn={zone_cn},{AEDIR_SEARCHBASE}'.format(**vars())
+zone_dn = 'cn={zone_cn},{aedir_searchbase}'.format(**vars())
 
 # add zone entry
 ldap_conn.add_s(

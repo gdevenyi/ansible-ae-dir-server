@@ -64,17 +64,24 @@
 - name: "Install AE-DIR password service (aedirpwd)"
   include: "aedirpwd.yml"
 
-- name: "Install CRON/demon scripts from templates"
-  template:
-    src: "scripts/{{ item }}.j2"
+- name: "Install various CRON scripts"
+  copy:
+    src: "scripts/{{ item }}"
     dest: "{{ aedir_sbin }}/{{ item }}"
     owner: root
     group: root
     mode: 0750
   with_items:
     - aeperson2aeuser.py
-    - ae-dir-slapcat.sh
     - update_memberurl_groups.py
+
+- name: "Install backup script from template"
+  template:
+    src: "scripts/ae-dir-slapcat.sh.j2"
+    dest: "{{ aedir_sbin }}/ae-dir-slapcat.sh"
+    owner: root
+    group: root
+    mode: 0750
 
 - name: Run update_memberurl_groups.py as CRON job
   cron:
@@ -83,7 +90,7 @@
     user: root
     cron_file: update_memberurl_groups
     minute: "*/3"
-    job: "{{ aedir_sbin }}/update_memberurl_groups.py {{ openldap_ldapi_uri }}/{{ aedir_suffix }}"
+    job: "{{ aedir_python }} {{ aedir_sbin }}/update_memberurl_groups.py {{ openldap_ldapi_uri }}/{{ aedir_suffix }}"
 
 - name: Run aeperson2aeuser.py as CRON job
   cron:
@@ -91,8 +98,8 @@
     state: present
     user: root
     cron_file: aeperson2aeuser
-    minute: "*/5"
-    job: "{{ aedir_sbin }}/aeperson2aeuser.py"
+    minute: "*/2"
+    job: "{{ aedir_python }} {{ aedir_sbin }}/aeperson2aeuser.py {{ openldap_ldapi_uri }}/{{ aedir_suffix }}????trace=0,x-saslmech=EXTERNAL {{ aedir_rundir }}/aeperson2aeuser.state"
 
 - name: Reset aeperson2aeuser.py as CRON job
   cron:

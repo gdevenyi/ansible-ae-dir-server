@@ -1,4 +1,4 @@
-#!{{ aedir_python }}
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
 This CRON script performs two tasks:
@@ -8,7 +8,7 @@ This CRON script performs two tasks:
 Author: Michael Ströder <michael@stroeder.com>
 """
 
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 
 # from Python's standard lib
 import sys
@@ -34,9 +34,7 @@ import aedir
 #-----------------------------------------------------------------------
 
 # Import constants from configuration module
-sys.path.extend([
-    '{{ aedir_etc }}/aedirpwd',
-])
+sys.path.append(sys.argv[1])
 from aedirpwd_cnf import *
 
 # Logging level and log formats
@@ -47,44 +45,6 @@ if os.environ.get('DEBUG', 'no') == 'yes':
 else:
     LOG_LEVEL = logging.INFO
     CONSOLE_LOG_FORMAT = None
-
-SERVER_ID = '{0:03x}'.format(int('{{ openldap_server_id }}'))
-
-# hostname to use in URLs generated in notification e-mails
-WEB_CTX_HOST = '{{ aedir_main_provider_hostname }}'
-
-# Filter string templates
-FILTERSTR_EXPIRE = (
-    ur'(&'
-        '(objectClass=msPwdResetObject)'
-        '(!(msPwdResetExpirationTime={currenttime}))'
-        '(msPwdResetExpirationTime<={currenttime})'
-      ')'
-)
-FILTERSTR_NO_WELCOME_YET = (
-    ur'(&'
-        '(objectClass=aeUser)'
-        '(aeStatus=0)'
-        '(uid=*)'
-        '(mail=*)'
-        '(entryCSN:CSNSIDMatch:={serverid})'
-        '(aeTag=pub-tag-no-welcome-yet)'
-        '(modifyTimestamp>={lasttime})'
-      ')'
-)
-
-# Maximum timespan to search for password-less entries in the past
-NOTIFY_OLDEST_TIMESPAN = 86400.0
-
-# E-Mail subject for notification message
-NOTIFY_EMAIL_SUBJECT = u'New Æ-DIR account "{user_uid}" added for {user_cn}'
-# E-Mail body template file for notification message
-NOTIFY_EMAIL_TEMPLATE = '{{ aedir_etc }}/aedirpwd/templates/en/notify_user.txt'
-
-# modifications to be applied to user entry after successfully sending e-mail
-NOTIFY_SUCCESSFUL_MOD = [
-  (ldap.MOD_DELETE, 'aeTag', ['pub-tag-no-welcome-yet'])
-]
 
 #-----------------------------------------------------------------------
 # Classes and functions
@@ -206,7 +166,7 @@ class AEDIRPwdJob(object):
         if isinstance(self._ldap_conn, aedir.AEDirObject):
             self._log.debug(
                 'Reuse existing LDAP connection to %r bound as %r',
-                self._ldap_conn.ldap_url_obj,
+                str(self._ldap_conn.ldap_url_obj),
                 self._ldap_conn.whoami_s(),
             )
             return self._ldap_conn
@@ -224,7 +184,7 @@ class AEDIRPwdJob(object):
             else:
                 self._log.debug(
                     'Successfully bound to %r as %r',
-                    self._ldap_conn.ldap_url_obj,
+                    str(self._ldap_conn.ldap_url_obj),
                     self._ldap_conn.whoami_s(),
                 )
         finally:

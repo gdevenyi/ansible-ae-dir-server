@@ -57,8 +57,8 @@
     - "restart aedirpwd"
 
 - name: "Install password service web application from template"
-  template:
-    src: "aedirpwd/{{ item }}.j2"
+  copy:
+    src: "aedirpwd/{{ item }}"
     dest: "{{ aedir_sbin }}/{{ item }}"
     owner: root
     group: "{{ aedirpwd_web_group }}"
@@ -69,8 +69,8 @@
     - "restart aedirpwd"
 
 - name: "Install password service CRON scripts from template"
-  template:
-    src: "aedirpwd/{{ item }}.j2"
+  copy:
+    src: "aedirpwd/{{ item }}"
     dest: "{{ aedir_sbin }}/{{ item }}"
     owner: root
     group: "{{ aedirpwd_web_group }}"
@@ -102,4 +102,4 @@
     user: ae-dir-pwd
     cron_file: aedirpwd_cron
     minute: "*/2"
-    job: "{{ aedir_sbin }}/aedirpwd_cron.py"
+    job: "{{ aedir_python }} {{ aedir_sbin }}/aedirpwd_cron.py {{ aedir_etc }}/aedirpwd"

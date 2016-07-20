@@ -1,4 +1,4 @@
-#!{{ aedir_python }}
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
 Web-interface for resetting/changing user passwords in a LDAP server
@@ -49,9 +49,7 @@ import mailutil
 import aedir
 
 # Import constants from configuration module
-sys.path.extend([
-    '{{ aedir_etc }}/aedirpwd',
-])
+sys.path.append(sys.argv[2])
 from aedirpwd_cnf import *
 
 #-----------------------------------------------------------------------

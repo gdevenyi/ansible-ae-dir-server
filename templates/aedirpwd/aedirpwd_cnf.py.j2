@@ -108,3 +108,43 @@ URL2CLASS_MAPPING = (
   '/requestpw', 'RequestPasswordReset',
   '/resetpw', 'FinishPasswordReset',
 )
+
+# MMR server ID of this particular provider replica
+# (must be 3 hex-digits with padded zeros)
+SERVER_ID = '{0:03x}'.format(int('{{ openldap_server_id }}'))
+
+# hostname to use in URLs generated in notification e-mails
+WEB_CTX_HOST = '{{ aedir_main_provider_hostname }}'
+
+# Filter string templates
+FILTERSTR_EXPIRE = (
+    ur'(&'
+        '(objectClass=msPwdResetObject)'
+        '(!(msPwdResetExpirationTime={currenttime}))'
+        '(msPwdResetExpirationTime<={currenttime})'
+      ')'
+)
+FILTERSTR_NO_WELCOME_YET = (
+    ur'(&'
+        '(objectClass=aeUser)'
+        '(aeStatus=0)'
+        '(uid=*)'
+        '(mail=*)'
+        '(entryCSN:CSNSIDMatch:={serverid})'
+        '(aeTag=pub-tag-no-welcome-yet)'
+        '(modifyTimestamp>={lasttime})'
+      ')'
+)
+
+# Maximum timespan to search for password-less entries in the past
+NOTIFY_OLDEST_TIMESPAN = 86400.0
+
+# E-Mail subject for notification message
+NOTIFY_EMAIL_SUBJECT = u'New Æ-DIR account "{user_uid}" added for {user_cn}'
+# E-Mail body template file for notification message
+NOTIFY_EMAIL_TEMPLATE = '{{ aedir_etc }}/aedirpwd/templates/en/notify_user.txt'
+
+# modifications to be applied to user entry after successfully sending e-mail
+NOTIFY_SUCCESSFUL_MOD = [
+  (1, 'aeTag', ['pub-tag-no-welcome-yet'])
+]

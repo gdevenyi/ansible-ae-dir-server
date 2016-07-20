@@ -1,4 +1,4 @@
-#!{{ aedir_python }}
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
 This script updates static group entries which contain attribute

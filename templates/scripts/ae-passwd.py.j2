@@ -9,16 +9,9 @@ This script must run locally run on a Æ-DIR provider
 
 import sys
 import getpass
-
-# from python-ldap
 import ldap
-import ldap.sasl
+import aedir
 
-
-AEDIR_TOOLS_CONFIG = '/opt/ae-dir/etc/ae-scripts.conf'
-
-AEDIR_LDAPI_URI = '{{ openldap_ldapi_uri }}'
-AEDIR_SEARCHBASE = '{{ aedir_suffix }}'
 LDAP_FILTER_TMPL = (
     '(|'
       '(&'
@@ -49,11 +42,11 @@ except IndexError:
 
 ldap_filter = LDAP_FILTER_TMPL.format(arg_value)
 
-ldap_conn = ldap.initialize(AEDIR_LDAPI_URI, trace_level=PYLDAP_TRACE_LEVEL)
-ldap_conn.sasl_interactive_bind_s('', ldap.sasl.sasl({}, 'EXTERNAL'))
+ldap_conn = aedir.AEDirObject(None, trace_level=PYLDAP_TRACE_LEVEL)
+aedir_searchbase = ldap_conn.find_search_base()
 
 ldap_result = ldap_conn.search_ext_s(
-    AEDIR_SEARCHBASE,
+    aedir_searchbase,
     ldap.SCOPE_SUBTREE,
     ldap_filter,
     attrlist=['1.1'],

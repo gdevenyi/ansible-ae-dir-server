@@ -17,7 +17,7 @@ After=local-fs.target remote-fs.target network.target
 [Service]
 Type=simple
 #PIDFile=
-ExecStart={{ aedir_sbin }}/aedirpwd_web.py 127.0.0.1:8080
+ExecStart={{ aedir_python }} {{ aedir_sbin }}/aedirpwd_web.py 127.0.0.1:8080 {{ aedir_etc }}/aedirpwd
 User={{ aedirpwd_web_user }}
 Group={{ aedirpwd_web_group }}
 
