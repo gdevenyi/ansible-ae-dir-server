@@ -19,7 +19,6 @@ from logging.handlers import SysLogHandler
 # Import python-ldap modules/classes
 import ldap
 import ldap.modlist
-from ldap.ldapobject import ReconnectLDAPObject
 
 import aedir
 
@@ -53,38 +52,6 @@ CatchAllException = Exception
 #-----------------------------------------------------------------------
 
 
-def generalized_time(secs):
-    """
-    Convert seconds since epoch into LDAP syntax GeneralizedTime
-    """
-    return time.strftime('%Y%m%d%H%M%SZ', time.gmtime(secs))
-
-
-def time_span_filter(
-        filterstr,
-        last_run_timestr,
-        current_time_str,
-        delta_attr='modifyTimestamp',
-    ):
-    """
-    If last_run_timestr is non-zero filterstr will be extended
-    """
-    if not last_run_timestr:
-        return filterstr
-    return (
-        '(&'
-        '{filterstr}'
-        '({delta_attr}>={last_run_timestr})'
-        '(!({delta_attr}>={current_time_str}))'
-        ')'
-    ).format(
-        filterstr=filterstr,
-        delta_attr=delta_attr,
-        last_run_timestr=last_run_timestr,
-        current_time_str=current_time_str,
-    )
-
-
 class SyncProcess(object):
     """
     The sync process
@@ -99,7 +66,7 @@ class SyncProcess(object):
         self.modify_counter = 0
         self.error_counter = 0
         self.deactivate_counter = 0
-        self.current_time_str = generalized_time(time.time())
+        self.current_time = time.time()
         self.ldap_conn = self.target_ldap_conn()
         self.search_base = self.ldap_conn.ldap_url_obj.dn or \
                            self.ldap_conn.find_search_base()
@@ -124,22 +91,23 @@ class SyncProcess(object):
                 self.state_filename,
             )
         last_run_timestr = last_run_timestr or None
+        last_run_time = 0
         if last_run_timestr:
             try:
-                time.strptime(last_run_timestr, '%Y%m%d%H%M%SZ')
+                last_run_time = aedir.ldap_strp_secs(last_run_timestr)
             except ValueError, err:
                 self.logger.warn(
                     'Error parsing timestamp %r: %s',
                     last_run_timestr,
                     err,
                 )
-                last_run_timestr = None
-        return last_run_timestr # get_state()
+        return last_run_time # get_state()
 
-    def set_state(self, current_time_str):
+    def set_state(self, current_time):
         """
         Write the current state
         """
+        current_time_str = aedir.ldap_strf_secs(self.current_time)
         try:
             # Write the last run timestamp
             open(self.state_filename, 'wb').write(current_time_str)
@@ -221,20 +189,20 @@ class SyncProcess(object):
         # Determine current state
         #-----------------------------------------------------------------------
 
-        last_run_timestr = self.get_state()
+        last_run_time = self.get_state()
         self.logger.debug(
-            'current_time_str=%r last_run_timestr=%r',
-            self.current_time_str,
-            last_run_timestr,
+            'current_time=%r last_run_time=%r',
+            self.current_time,
+            last_run_time,
         )
 
         # Update aeUser entries
         #-----------------------------------------------------------------------
 
-        aeperson_filterstr = time_span_filter(
+        aeperson_filterstr = aedir.time_span_filter(
             '(objectClass=aePerson)',
-            last_run_timestr,
-            self.current_time_str
+            last_run_time,
+            self.current_time
         )
 
         self.logger.debug(
@@ -330,7 +298,7 @@ class SyncProcess(object):
             )
 
         # Write state
-        self.set_state(self.current_time_str)
+        self.set_state(self.current_time)
 
         # Output summary
         self.log_summary()
