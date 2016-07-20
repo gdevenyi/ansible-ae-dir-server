@@ -24,14 +24,14 @@
     <a href="docs.html#schema-oc-aeHost">aeHost</a> entry.
   </li>
   <li>
-    Search all relevant
-    <a href="docs.html#schema-oc-aeSrvGroup">aeSrvGroup</a>
-    entries.
+    Send <em>Session Tracking</em> extended control
+    (see <a href="https://tools.ietf.org/html/draft-wahl-ldap-session">draft-wahl-ldap-session</a>)
   </li>
   <li>
     Construct the search filters for searching user, group and sudoers
-    entries based on the attributes found in <em>aeSrvGroup</em> entries
-    searched before:
+    entries based on the attributes found in all relevant
+    <a href="docs.html#schema-oc-aeSrvGroup">aeSrvGroup</a>
+    entries searched before:
     <ul>
       <li>aeLoginGroups</li>
       <li>aeVisibleGroups</li>
