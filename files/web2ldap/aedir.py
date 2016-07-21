@@ -128,7 +128,8 @@ syntax_registry.registerAttrType(
     '1.3.6.1.1.1.1.0', # uidNumber
   ],
   structural_oc_oids=[
-    AE_USER_OID, # aeUser
+    AE_USER_OID,    # aeUser
+    AE_SERVICE_OID, # aeService
   ],
 )
 
@@ -200,8 +201,9 @@ syntax_registry.registerAttrType(
     '1.3.6.1.1.1.1.1', # gidNumber
   ],
   structural_oc_oids=[
-    AE_USER_OID,  # aeUser
-    AE_GROUP_OID, # aeGroup
+    AE_USER_OID,    # aeUser
+    AE_GROUP_OID,   # aeGroup
+    AE_SERVICE_OID, # aeService
   ],
 )
 
