@@ -286,6 +286,9 @@ class AEHost(DynamicDNSelectList):
   oid = 'AEHost-oid'
   desc = 'AE-DIR: Host'
   ldap_url = 'ldap:///_?host?sub?(&(objectClass=aeHost)(aeStatus=0))'
+  ref_attrs = (
+    (None,u'Same host',None,u'Search all services running on same host'),
+  )
 
 syntax_registry.registerAttrType(
   AEHost.oid,[
@@ -365,7 +368,6 @@ class AEGroupDN(DynamicDNSelectList):
   oid = 'AEGroupDN-oid'
   desc = 'AE-DIR: DN of user group entry'
   ldap_url = 'ldap:///_?cn?sub?(&(objectClass=aeGroup)(aeStatus=0))'
-
   ref_attrs = (
     ('memberOf',u'Members',None,u'Search all member entries of this user group'),
   )
@@ -534,6 +536,9 @@ syntax_registry.registerAttrType(
 class AEEntryDNAEHost(DistinguishedName):
   oid = 'AEEntryDNAEHost-oid'
   desc = 'AE-DIR: entryDN of aeUser entry'
+  ref_attrs = (
+    ('aeHost',u'Services',None,u'Search all services running on this host'),
+  )
 
   def _additional_links(self):
     attr_value_u = self.attrValue.decode(self._ls.charset)
@@ -542,7 +547,8 @@ class AEEntryDNAEHost(DistinguishedName):
       u'(aeSrvGroup=%s)' % av.decode(self._ls.charset)
       for av in self._entry.get('aeSrvGroup',[])
     ])
-    r = [
+    r = DistinguishedName._additional_links(self)
+    r.extend([
       self._form.applAnchor(
         'search','Siblings',self._sid,
         (
@@ -558,8 +564,8 @@ class AEEntryDNAEHost(DistinguishedName):
           ),
         ),
         title=u'Search all host entries which are member in at least one common server group(s) with this host',
-      )
-    ]
+      ),
+    ])
     return r
 
 syntax_registry.registerAttrType(
