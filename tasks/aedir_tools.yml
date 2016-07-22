@@ -99,7 +99,7 @@
     user: root
     cron_file: aeperson2aeuser
     minute: "*/2"
-    job: "{{ aedir_python }} {{ aedir_sbin }}/aeperson2aeuser.py {{ openldap_ldapi_uri }}/{{ aedir_suffix }}????trace=0,x-saslmech=EXTERNAL {{ aedir_rundir }}/aeperson2aeuser.state"
+    job: "{{ aedir_python }} {{ aedir_sbin }}/aeperson2aeuser.py {{ openldap_ldapi_uri|replace('%', '\\%') }}/{{ aedir_suffix }}????trace=0,x-saslmech=EXTERNAL {{ aedir_rundir }}/aeperson2aeuser.state"
 
 - name: Reset aeperson2aeuser.py as CRON job
   cron:
@@ -109,3 +109,9 @@
     cron_file: aeperson2aeuser
     hour: "*/12"
     job: "rm {{ aedir_rundir }}/aeperson2aeuser.state > /dev/null 2>&1 || exit 0"
+
+- name: "ensure cron service is running"
+  service:
+    name: "cron"
+    state: started
+    enabled: yes
