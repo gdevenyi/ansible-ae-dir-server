@@ -308,7 +308,7 @@ class AEDIRPwdJob(object):
             )
         ).encode('utf-8')
         self._log.debug(
-            'Searching users without password with %r',
+            'User search filter: %r',
             nopassword_filterstr,
         )
         ldap_conn = self._ldap_connection()
