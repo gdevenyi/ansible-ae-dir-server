@@ -10,6 +10,7 @@
     - "restart {{ web_server }}"
     - restart web2ldap
   with_items:
+    - cron
     - python
     - python-aedir
     - python-paramiko

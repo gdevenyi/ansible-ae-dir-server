@@ -8,6 +8,7 @@
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
   with_items:
+    - cron
     - python
     - python-paramiko
     - python-webpy
