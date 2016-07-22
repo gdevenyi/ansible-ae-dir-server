@@ -90,7 +90,7 @@
     user: root
     cron_file: update_memberurl_groups
     minute: "*/3"
-    job: "{{ aedir_python }} {{ aedir_sbin }}/update_memberurl_groups.py {{ openldap_ldapi_uri }}/{{ aedir_suffix }}"
+    job: "{{ aedir_python }} {{ aedir_sbin }}/update_memberurl_groups.py {{ openldap_ldapi_uri|replace('%', '\\%') }}/{{ aedir_suffix }}"
 
 - name: Run aeperson2aeuser.py as CRON job
   cron:
