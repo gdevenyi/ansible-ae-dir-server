@@ -100,6 +100,6 @@
     name: "aedirpwd_cron"
     state: present
     user: ae-dir-pwd
-    cron_file: aedirpwd_cron
+    cron_file: aedir_tools
     minute: "*/2"
     job: "{{ aedir_python }} {{ aedir_sbin }}/aedirpwd_cron.py {{ aedir_etc }}/aedirpwd"

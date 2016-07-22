@@ -61,9 +61,6 @@
     - ae-person-report.py
     - ae-user-report.py
 
-- name: "Install AE-DIR password service (aedirpwd)"
-  include: "aedirpwd.yml"
-
 - name: "Install various CRON scripts"
   copy:
     src: "scripts/{{ item }}"
@@ -83,12 +80,21 @@
     group: root
     mode: 0750
 
+- name: "set env var HOME={{ aedir_rundir }} in /etc/cron.d/aedir_tools"
+  cron:
+    env: yes
+    name: "HOME"
+    value: "{{ aedir_rundir }}"
+    state: present
+    user: root
+    cron_file: aedir_tools
+
 - name: Run update_memberurl_groups.py as CRON job
   cron:
     name: "update_memberurl_groups"
     state: present
     user: root
-    cron_file: update_memberurl_groups
+    cron_file: aedir_tools
     minute: "*/3"
     job: "{{ aedir_python }} {{ aedir_sbin }}/update_memberurl_groups.py {{ openldap_ldapi_uri|replace('%', '\\%') }}/{{ aedir_suffix }}"
 
@@ -97,7 +103,7 @@
     name: "aeperson2aeuser"
     state: present
     user: root
-    cron_file: aeperson2aeuser
+    cron_file: aedir_tools
     minute: "*/2"
     job: "{{ aedir_python }} {{ aedir_sbin }}/aeperson2aeuser.py {{ openldap_ldapi_uri|replace('%', '\\%') }}/{{ aedir_suffix }}????trace=0,x-saslmech=EXTERNAL {{ aedir_rundir }}/aeperson2aeuser.state"
 
@@ -106,9 +112,12 @@
     name: "aeperson2aeuser_reset"
     state: present
     user: root
-    cron_file: aeperson2aeuser
+    cron_file: aedir_tools
     hour: "*/12"
     job: "rm {{ aedir_rundir }}/aeperson2aeuser.state > /dev/null 2>&1 || exit 0"
+
+- name: "Install AE-DIR password service (aedirpwd)"
+  include: "aedirpwd.yml"
 
 - name: "ensure cron service is running"
   service:
