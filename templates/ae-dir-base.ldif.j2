@@ -43,13 +43,6 @@ description: tag for all entries created during initial load
 objectClass: namedObject
 objectClass: aeTag
 
-dn: cn=pub-tag-no-welcome-yet,cn=pub,{{ aedir_suffix }}
-aeStatus: 0
-cn: pub-tag-no-welcome-yet
-description: tag indicates that welcome e-mail was not sent to user yet
-objectClass: namedObject
-objectClass: aeTag
-
 #---------------------------------------------------------------------------
 # aeZone entries (zone admins/auditors groups are added below)
 #---------------------------------------------------------------------------
@@ -111,6 +104,13 @@ serviceSearchDescriptor: shadow:{{ aedir_suffix }}?sub
 serviceSearchDescriptor: user_attr:{{ aedir_suffix }}?sub
 serviceSearchDescriptor: audit_user:{{ aedir_suffix }}?sub
 serviceSearchDescriptor: group:{{ aedir_suffix }}?sub
+
+dn: cn=pub-tag-no-welcome-yet,cn=pub,{{ aedir_suffix }}
+aeStatus: 0
+cn: pub-tag-no-welcome-yet
+description: tag indicates that welcome e-mail was not sent to user yet
+objectClass: namedObject
+objectClass: aeTag
 
 #---------------------------------------------------------------------------
 # black-list entries
