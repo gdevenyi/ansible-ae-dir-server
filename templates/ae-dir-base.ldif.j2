@@ -95,6 +95,7 @@ defaultServerList: {% for host in openldap_rootdse_alt_servers %}{{ hostvars[hos
 defaultSearchBase: {{ aedir_suffix }}
 defaultSearchScope: sub
 followReferrals: FALSE
+dereferenceAliases: FALSE
 bindTimeLimit: 10
 searchTimeLimit: 10
 credentialLevel: proxy
