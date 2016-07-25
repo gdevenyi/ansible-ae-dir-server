@@ -1,13 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-This script updates static group entries which contain attribute
+This script updates static aeGroup entries which contain attribute
 'memberURL'.
 
 It is designed to run as a CRON job.
 
 Author: Michael Ströder <michael@stroeder.com>
-License: Public domain
 """
 
 __version__ = '0.3.3'

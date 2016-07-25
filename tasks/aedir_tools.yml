@@ -70,7 +70,7 @@
     mode: 0750
   with_items:
     - aeperson2aeuser.py
-    - update_memberurl_groups.py
+    - aedir_update_groups.py
 
 - name: "Install backup script from template"
   template:
@@ -89,14 +89,14 @@
     user: root
     cron_file: aedir_tools
 
-- name: Run update_memberurl_groups.py as CRON job
+- name: Run aedir_update_groups.py as CRON job
   cron:
     name: "update_memberurl_groups"
     state: present
     user: root
     cron_file: aedir_tools
     minute: "*/3"
-    job: "{{ aedir_python }} {{ aedir_sbin }}/update_memberurl_groups.py {{ openldap_ldapi_uri|replace('%', '\\%') }}/{{ aedir_suffix }}"
+    job: "{{ aedir_python }} {{ aedir_sbin }}/aedir_update_groups.py {{ openldap_ldapi_uri|replace('%', '\\%') }}/{{ aedir_suffix }}"
 
 - name: Run aeperson2aeuser.py as CRON job
   cron:
