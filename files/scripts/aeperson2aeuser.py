@@ -19,6 +19,7 @@ from logging.handlers import SysLogHandler
 # Import python-ldap modules/classes
 import ldap
 import ldap.modlist
+from ldap.filter import time_span_filter
 
 import aedir
 
@@ -26,7 +27,7 @@ import aedir
 # Constants (configuration)
 #-----------------------------------------------------------------------
 
-__version__ = '0.0.3'
+__version__ = '0.0.4'
 
 # Trace level for python-ldap logs
 PYLDAP_TRACELEVEL = 0
@@ -94,7 +95,7 @@ class SyncProcess(object):
         last_run_time = 0
         if last_run_timestr:
             try:
-                last_run_time = aedir.ldap_strp_secs(last_run_timestr)
+                last_run_time = ldap.strp_secs(last_run_timestr)
             except ValueError, err:
                 self.logger.warn(
                     'Error parsing timestamp %r: %s',
@@ -107,7 +108,7 @@ class SyncProcess(object):
         """
         Write the current state
         """
-        current_time_str = aedir.ldap_strf_secs(self.current_time)
+        current_time_str = ldap.strf_secs(self.current_time)
         try:
             # Write the last run timestamp
             open(self.state_filename, 'wb').write(current_time_str)
@@ -199,7 +200,7 @@ class SyncProcess(object):
         # Update aeUser entries
         #-----------------------------------------------------------------------
 
-        aeperson_filterstr = aedir.time_span_filter(
+        aeperson_filterstr = time_span_filter(
             '(objectClass=aePerson)',
             last_run_time,
             self.current_time

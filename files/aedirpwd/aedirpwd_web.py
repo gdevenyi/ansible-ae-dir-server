@@ -264,7 +264,7 @@ class BaseApp(Default):
             for i in inputs
         ])
         filterstr_inputs_dict['currenttime'] = escape_filter_chars(
-            aedir.ldap_strf_secs(time.time())
+            ldap.strf_secs(time.time())
         )
         return self.ldap_conn.find_unique_entry(
             self.ldap_conn.ldap_url_obj.dn,
@@ -419,7 +419,7 @@ class CheckPassword(BaseApp):
             return self.GET(message=u'Internal error!')
         # Try to display until when password is still valid
         valid_until = u'unknown'
-        pwd_changed_timestamp = aedir.ldap_strp_secs(user_entry['pwdChangedTime'][0])
+        pwd_changed_timestamp = ldap.strp_secs(user_entry['pwdChangedTime'][0])
         pwd_policy_subentry_dn = user_entry['pwdPolicySubentry'][0]
         pwd_policy_subentry = self.ldap_conn.read_s(
             pwd_policy_subentry_dn,
@@ -670,12 +670,12 @@ class RequestPasswordReset(BaseApp):
             (
                 ldap.MOD_REPLACE,
                 'msPwdResetTimestamp',
-                [aedir.ldap_strf_secs(current_time)]
+                [ldap.strf_secs(current_time)]
             ),
             (
                 ldap.MOD_REPLACE,
                 'msPwdResetExpirationTime',
-                [aedir.ldap_strf_secs(current_time+PWD_EXPIRETIMESPAN)]
+                [ldap.strf_secs(current_time+PWD_EXPIRETIMESPAN)]
             ),
             (
                 ldap.MOD_REPLACE,

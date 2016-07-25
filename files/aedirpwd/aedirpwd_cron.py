@@ -135,8 +135,8 @@ class AEDIRPwdJob(object):
         2. and current time
         """
         current_time = time.time()
-        current_run_timestr = aedir.ldap_strf_secs(current_time)
-        last_run_timestr = aedir.ldap_strf_secs(
+        current_run_timestr = ldap.strf_secs(current_time)
+        last_run_timestr = ldap.strf_secs(
             current_time-self.notify_oldest_timespan
         )
         return last_run_timestr, current_run_timestr
