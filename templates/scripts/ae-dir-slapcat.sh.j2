@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# Don't use uninitialized vars
+set -o nounset
+# After here exit on any error
+set -e
+
 # current timestamp
 DATETIME="$(date +%Y%m%d%H%M%S)"
 
