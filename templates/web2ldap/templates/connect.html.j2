@@ -39,7 +39,7 @@
   <li>
     <a title="Search personal user accounts which did not receive welcome e-mail yet"
        class="CommandLink"
-       href="/web2ldap?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub?(&(objectClass=aeUser)(aeTag=pub-tag-no-welcome-yet))?bindname=">
+       href="/web2ldap?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub?(&(objectClass=aeUser)(aeStatus=0)(aeTag=pub-tag-no-welcome-yet))?bindname=">
       No welcome e-mail yet
     </a>
   </li>
