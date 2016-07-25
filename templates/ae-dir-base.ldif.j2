@@ -90,7 +90,7 @@ objectClass: top
 objectClass: DUAConfigProfile
 profileTTL: 864000
 serviceAuthenticationMethod: pam_ldap:tls:simple
-defaultServerList: {% for host in openldap_rootdse_alt_servers %}{{ hostvars[host]['openldap_service_fqdn'] }}{% endfor%}
+defaultServerList:{% for host in aedir_hosts.consumer %} {{ hostvars[host]['openldap_service_fqdn'] }}{% endfor%}
 
 defaultSearchBase: {{ aedir_suffix }}
 defaultSearchScope: sub
