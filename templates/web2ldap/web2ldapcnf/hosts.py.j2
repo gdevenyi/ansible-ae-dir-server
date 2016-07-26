@@ -484,9 +484,8 @@ ae_dir_config = Web2LDAPConfig(
     'pwdPolicySubentry',
   ],
   rename_supsearchurl={
-    u'Search whole naming context for aeZone':'ldap:///_??one?(objectClass=aeZone)',
-    u'Search below superior entry for aeSrvGroup':'ldap:///..??sub?(objectClass=aeSrvGroup)',
-    u'Search whole naming context for aeSrvGroup':'ldap:///_??sub?(objectClass=aeSrvGroup)',
+    u'Search for zone (aeZone)':'ldap:///_??one?(objectClass=aeZone)',
+    u'Search for server/service group (aeSrvGroup)':'ldap:///_??sub?(objectClass=aeSrvGroup)',
   },
   # Use delold: 1 with MODRDN requests when doing bulk renaming
   bulkmod_delold=1,
