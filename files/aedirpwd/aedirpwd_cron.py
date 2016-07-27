@@ -8,7 +8,7 @@ This CRON script performs two tasks:
 Author: Michael Ströder <michael@stroeder.com>
 """
 
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 
 # from Python's standard lib
 import sys
@@ -100,7 +100,12 @@ class AEDIRPwdJob(object):
         'description',
         'mail',
         'creatorsName',
-        'modifiersName'
+    ]
+    admin_attrs = [
+        'objectClass',
+        'uid',
+        'cn',
+        'mail'
     ]
 
     def __init__(self):
@@ -357,17 +362,17 @@ class AEDIRPwdJob(object):
                 admin_entry = ldap_conn.read_s(
                     admin_dn,
                     filterstr=FILTERSTR_USER.encode('utf-8'),
-                    attrlist=['objectClass', 'uid', 'cn', 'mail'],
+                    attrlist=self.admin_attrs,
                 )
-            except ldap.LDAPError, ldap_error:
-                self._log.debug(
-                    'LDAPError reading %r: %s',
+            except ldap.NO_SUCH_OBJECT:
+                admin_entry = {}
+            admin_entry = admin_entry or {}
+            if not admin_entry:
+                self._log.warning(
+                    'Admin entry %r referenced in %r not found',
                     admin_dn,
-                    ldap_error
+                    ldap_dn,
                 )
-                return
-            if admin_entry is None:
-                self._log.debug('No admin entry found for %r', admin_dn)
             msg_attrs['admin_cn'] = admin_entry.get(
                 'cn', ['unknown']
             )[0].decode('utf-8')
