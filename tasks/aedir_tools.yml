@@ -91,7 +91,7 @@
 
 - name: Run aedir_update_groups.py as CRON job
   cron:
-    name: "update_memberurl_groups"
+    name: "aedir_update_groups"
     state: present
     user: root
     cron_file: aedir_tools
