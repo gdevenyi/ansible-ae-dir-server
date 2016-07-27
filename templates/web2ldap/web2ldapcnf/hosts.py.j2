@@ -189,6 +189,7 @@ ae_dir_config = Web2LDAPConfig(
     # see RFC
     'createTimestamp','modifyTimestamp','creatorsName','modifiersName',
   ],
+  top_template= os.path.join(web2ldapcnf.templates_dir,'ae-dir','top.html'),
   login_template= os.path.join(web2ldapcnf.templates_dir,'ae-dir','login.html'),
   addform_parent_attrs=['entryUUID'],
   search_attrs=[
@@ -630,13 +631,13 @@ ldap_def = {
     rename_template= os.path.join(web2ldapcnf.templates_dir,'rename.html'),
 
     # HTML template file for whole top section
-    top_template= os.path.join(web2ldapcnf.templates_dir,'top.html'),
+    top_template= os.path.join(web2ldapcnf.templates_dir,'ae-dir','top.html'),
 
-    # HTML template file for password change  form
+    # HTML template file for password change form
     passwd_template= os.path.join(web2ldapcnf.templates_dir,'passwd.html'),
 
     # HTML template file for Login form
-    login_template= os.path.join(web2ldapcnf.templates_dir,'login.html'),
+    login_template= os.path.join(web2ldapcnf.templates_dir,'ae-dir','login.html'),
     # Default mechanism for BindRequest (empty string for simple bind)
     login_default_mech='',
 
