@@ -117,6 +117,14 @@ authz-regexp
   "cn=([a-zA-Z0-9.-]+)"
   "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=aeHost)(host=$1)(aeStatus=0))"
 
+# subject name patterns of internal Æ-DIR PKI
+authz-regexp
+  "cn=([a-zA-Z0-9.-]+),ou=host,ou=pki,{{ aedir_suffix }}"
+  "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=aeHost)(host=$1)(aeStatus=0))"
+authz-regexp
+  "cn=([a-zA-Z0-9.-]+),ou=uid,ou=pki,{{ aedir_suffix }}"
+  "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=account)(uid=$1)(aeStatus=0))"
+
 #---------------------------------------------------------------------------
 # Global access control and security restrictions
 #---------------------------------------------------------------------------
