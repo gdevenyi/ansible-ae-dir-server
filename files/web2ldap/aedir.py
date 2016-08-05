@@ -10,6 +10,7 @@ import re,time,calendar,socket
 
 # from python-ldap
 import ldap,ldap.filter
+from ldap.filter import escape_filter_chars
 
 # from pyweblib
 from pyweblib.forms import HiddenInput
@@ -57,6 +58,22 @@ syntax_registry.registerAttrType(
 
 
 class AEObjectUtil:
+
+  def _zone_entry(self,attrlist=None):
+    try:
+      ldap_result = self._ls.readEntry(
+        ldaputil.base.ParentDN(self._dn),
+        attrtype_list=attrlist,
+        search_filter='(objectClass=aeZone)',
+      )
+    except ldap.LDAPError:
+      zone_entry = {}
+    else:
+      if ldap_result:
+        _,zone_entry = ldap_result[0]
+      else:
+        zone_entry = {}
+      return zone_entry
 
   def _get_zone_name(self):
     dn_list = ldap.dn.str2dn(self._dn.encode(self._ls.charset))
@@ -274,6 +291,10 @@ syntax_registry.registerAttrType(
 class AETicketId(IA5String):
   oid = 'AETicketId-oid'
   desc = 'AE-DIR: Ticket no. related to last change of entry'
+  simpleSanitizers = (
+    str.upper,
+    str.strip,
+  )
 
 syntax_registry.registerAttrType(
   AETicketId.oid,[
@@ -483,9 +504,9 @@ class AEEntryDNAEPerson(DistinguishedName):
   oid = 'AEEntryDNAEPerson-oid'
   desc = 'AE-DIR: entryDN of aePerson entry'
   ref_attrs = (
-    ('aePerson',u'Users',None,u'Search all personal AE-DIR user accounts (aeUser entries) of this person'),
     ('manager',u'Manages',None,u'Search all entries managed by this person'),
-#    ('aePerson',u'Devices',None,u'Search all AE-DIR devices (aeDevice entries) of this person'),
+    ('aePerson',u'Users',None,'aeUser',u'Search all personal AE-DIR user accounts (aeUser entries) of this person.'),
+    ('aePerson',u'Devices',None,'aeDevice',u'Search all devices (aeDevice entries) assigned to this person.'),
   )
 
 syntax_registry.registerAttrType(
@@ -725,7 +746,8 @@ class AEEntryDNAEDept(DistinguishedName):
   oid = 'AEEntryDNAEDept-oid'
   desc = 'AE-DIR: entryDN of aePerson entry'
   ref_attrs = (
-    ('aeDept',u'Dept. members',None,u'Search all persons assigned to this department.'),
+    ('aeDept',u'Persons',None,'aePerson',u'Search all persons assigned to this department.'),
+    ('aeDept',u'Zones',None,'aeZone',u'Search all team-related zones associated with this department.'),
   )
 
 syntax_registry.registerAttrType(
@@ -743,7 +765,8 @@ class AEDept(DynamicDNSelectList):
   desc = 'AE-DIR: DN of department entry'
   ldap_url = 'ldap:///_?ou?sub?(&(objectClass=aeDept)(aeStatus=0))'
   ref_attrs = (
-    (None,u'Dept. members',None,u'Search all persons assigned to this department.'),
+    ('aeDept',u'Persons',None,'aePerson',u'Search all persons assigned to this department.'),
+    ('aeDept',u'Zones',None,'aeZone',u'Search all team-related zones associated with this department.'),
   )
 
 syntax_registry.registerAttrType(
@@ -758,8 +781,8 @@ class AEPerson(DynamicDNSelectList,AEObjectUtil):
   desc = 'AE-DIR: DN of person entry'
   ldap_url = 'ldap:///_?displayName?sub?(objectClass=aePerson)'
   ref_attrs = (
-    (None,u'Users',None,u'Search all personal AE-DIR user accounts associated with this person.'),
-#    (None,u'Devices','aeDevice',u'Search all personal AE-DIR user accounts associated with this person.'),
+    ('aePerson',u'Users',None,'aeUser',u'Search all personal AE-DIR user accounts (aeUser entries) of this person.'),
+    ('aePerson',u'Devices',None,'aeDevice',u'Search all devices (aeDevice entries) assigned to this person.'),
   )
   mail_zones = set(('base',))
   ae_status_map = {
@@ -771,15 +794,23 @@ class AEPerson(DynamicDNSelectList,AEObjectUtil):
 
   def _determineFilter(self):
     filter_components = [DynamicDNSelectList._determineFilter(self)]
+    aedept_filters = [
+      '(aeDept={0})'.format(escape_filter_chars(d))
+      for d in self._zone_entry(attrlist=['aeDept']).get('aeDept',[])
+    ]
+    if len(aedept_filters)>1:
+      filter_components.append('(|{})'.format(''.join(aedept_filters)))
+    elif len(aedept_filters)==1:
+      filter_components.append(aedept_filters[0])
     ae_status = int(self._entry.get('aeStatus',['0'])[0])
     aeperson_aestatus_filters = [
-      '(aeStatus={0})'.format(st)
+      '(aeStatus={0})'.format(escape_filter_chars(st))
       for st in map(str,self.ae_status_map.get(ae_status,[]))
     ]
     if len(aeperson_aestatus_filters)>1:
       filter_components.append('(|{})'.format(''.join(aeperson_aestatus_filters)))
     elif len(aeperson_aestatus_filters)==1:
-      filter_components.append(''.join(aeperson_aestatus_filters))
+      filter_components.append(aeperson_aestatus_filters[0])
     if self.mail_zones is None or not self._get_zone_name() in self.mail_zones:
       filter_components.append('(mail=*)')
     filter_str = '(&{})'.format(''.join(filter_components))
@@ -807,7 +838,7 @@ class AEPerson2(AEPerson):
     sanitize_filter = '(&{0}{1})'.format(
         self._determineFilter(),
         self.sanitize_filter_tmpl.format(
-          av=ldap.filter.escape_filter_chars(attrValues[0]),
+          av=escape_filter_chars(attrValues[0]),
         )
     )
     try:
