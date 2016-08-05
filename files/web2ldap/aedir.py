@@ -641,7 +641,7 @@ class AEEntryDNAEGroup(GroupEntryDN):
   def _additional_links(self):
     r = DistinguishedName._additional_links(self)
     r.append(self._form.applAnchor(
-      'search','SUDO rules',self._sid,
+      'search','Sudoers',self._sid,
       (
         ('dn',self._dn),
         ('search_root',self._ls.currentSearchRoot),
@@ -652,7 +652,7 @@ class AEEntryDNAEGroup(GroupEntryDN):
           'search_string','%'+self._entry['cn'][0].decode(self._ls.charset),
         ),
       ),
-      title=u'Search for SUDO rules\napplicable with this user group',
+      title=u'Search for SUDO rules\napplicable allowed for this user group',
     ))
     return r
 
