@@ -477,7 +477,7 @@ access to
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =sw
     by group/aeGroup/member.expand="cn=${d1}-zone-admins,cn=${d1},{{ aedir_suffix }}" =sw
     by set="user/entryDN & this/-1/aeSetupGroups/member" =sw
-    by set="user/entryDN & this/aeSrvGroup/aeSetupGroups/member" =sw
+    by set="user/entryDN & this/aeSrvGroup/aeSetupGroups/member" =s
     by * auth
 
 # no access to userPassword and pwdHistory as last catch
@@ -698,7 +698,7 @@ access to
   attrs=children
     by group/aeGroup/member.expand="cn=${d2}-zone-admins,cn=${d2},{{ aedir_suffix }}" write
     by set="user/entryDN & this/aeSetupGroups/member" write
-    by set="user/entryDN & this/aeSrvGroup/aeSetupGroups/member" write
+    by set="user/entryDN & this/aeSrvGroup/aeSetupGroups/member" read
     by group/aeGroup/member.expand="cn=${d2}-zone-auditors,cn=${d2},{{ aedir_suffix }}" read
     by * none break
 access to
@@ -707,7 +707,6 @@ access to
     by group/aeGroup/member.expand="cn=${d2}-zone-admins,cn=${d2},{{ aedir_suffix }}" write
     by group/aeGroup/member.expand="cn=${d2}-zone-auditors,cn=${d2},{{ aedir_suffix }}" read
     by set="user/entryDN & this/aeSetupGroups/member" read
-    by set="user/entryDN & this/aeSrvGroup/aeSetupGroups/member" read
     by * none break
 # aeHost entries have to be subordinate entries of aeSrvGroup entries
 access to
@@ -715,7 +714,7 @@ access to
   filter="(objectClass=aeHost)"
     by group/aeGroup/member.expand="cn=${d3}-zone-admins,cn=${d3},{{ aedir_suffix }}" write
     by set="user/entryDN & this/-1/aeSetupGroups/member" write
-    by set="user/entryDN & this/aeSrvGroup/aeSetupGroups/member" write
+    by set="user/entryDN & this/aeSrvGroup/aeSetupGroups/member" read
     by group/aeGroup/member.expand="cn=${d3}-zone-auditors,cn=${d3},{{ aedir_suffix }}" read
     by * none break
 # aeService entries can also be subordinate entries of aeSrvGroup
@@ -725,7 +724,7 @@ access to
   filter="(objectClass=aeService)"
     by group/aeGroup/member.expand="cn=${d3}-zone-admins,cn=${d3},{{ aedir_suffix }}" write
     by set="user/entryDN & this/-1/aeSetupGroups/member" write
-    by set="user/entryDN & this/aeSrvGroup/aeSetupGroups/member" write
+    by set="user/entryDN & this/aeSrvGroup/aeSetupGroups/member" read
     by group/aeGroup/member.expand="cn=${d3}-zone-auditors,cn=${d3},{{ aedir_suffix }}" read
     by * none break
 
