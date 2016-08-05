@@ -258,8 +258,8 @@ class AEUserId(IA5String):
       default=self.formValue()
     )
 
-  def sanitizeInput(self,inputValue):
-    return inputValue.strip().lower()
+  def sanitizeInput(self,attrValue):
+    return attrValue.strip().lower()
 
 syntax_registry.registerAttrType(
   AEUserId.oid,[
@@ -635,13 +635,13 @@ class AEEntryDNAEGroup(GroupEntryDN):
     ('aeLoginGroups',u'Login',None,u'Search all server/service groups (aeSrvGroup)\non which this user group has login right'),
     ('aeLogStoreGroups',u'View Logs',None,u'Search all server/service groups (aeSrvGroup)\non which this user group has log view right'),
     ('aeSetupGroups',u'Setup',None,u'Search all server/service groups (aeSrvGroup)\non which this user group has setup/installation rights'),
-    ('aeVisibleGroups',u'Visible',None,u'Search all server/service groups (aeSrvGroup)\non which this user group is only visible'),
+    ('aeVisibleGroups',u'Visible',None,u'Search all server/service groups (aeSrvGroup)\non which this user group is at least visible'),
   )
 
   def _additional_links(self):
     r = DistinguishedName._additional_links(self)
     r.append(self._form.applAnchor(
-      'search','Sudoers',self._sid,
+      'search','SUDO rules',self._sid,
       (
         ('dn',self._dn),
         ('search_root',self._ls.currentSearchRoot),
@@ -652,7 +652,7 @@ class AEEntryDNAEGroup(GroupEntryDN):
           'search_string','%'+self._entry['cn'][0].decode(self._ls.charset),
         ),
       ),
-      title=u'Search for SUDO rules\napplicable allowed for this user group',
+      title=u'Search for SUDO rules\napplicable with this user group',
     ))
     return r
 
