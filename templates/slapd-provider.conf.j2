@@ -1136,17 +1136,15 @@ constraint_attribute
   regex "^{{ aedir_aezone_cn_regex }}$"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeZone)"
 
-# check whether gidNumber is within valid range (see aeRoot)
-constraint_attribute gidNumber set
-  "(this/-2/entryDN & ([ldap:///]+this/-2/entryDN+[?entryDN?base?(&(objectClass=aeRoot)(entryDN=]+this/-2/entryDN+[)(aeGidNumberMin<=]+this/gidNumber+[)(aeGidNumberMax>=]+this/gidNumber+[))])/entryDN"
-  restrict="ldap:///ou=ae-dir??sub"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(&(|(objectClass=posixAccount)(objectClass=posixGroup))(!(entryDN:dnOneLevelMatch:=cn=ae,{{ aedir_suffix }})))"
-
 # check whether uidNumber is within valid range (see aeRoot)
 constraint_attribute uidNumber set
-  "(this/-2/entryDN & ([ldap:///]+this/-2/entryDN+[?entryDN?base?(&(objectClass=aeRoot)(entryDN=]+this/-2/entryDN+[)(aeUidNumberMin<=]+this/uidNumber+[)(aeUidNumberMax>=]+this/uidNumber+[))])/entryDN"
-  restrict="ldap:///ou=ae-dir??sub"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(&(|(objectClass=posixAccount)(objectClass=posixGroup))(!(entryDN:dnOneLevelMatch:=cn=ae,{{ aedir_suffix }})))"
+  "([{{ aedir_suffix }}] & ([ldap:///{{ aedir_suffix }}?entryDN?base?(&(objectClass=aeRoot)(aeUidNumberMin<=]+this/uidNumber+[)(aeUidNumberMax>=]+this/uidNumber+[))])/entryDN)"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(!(entryDN:dnOneLevelMatch:=cn=ae,{{ aedir_suffix }}))"
+
+# check whether gidNumber is within valid range (see aeRoot)
+constraint_attribute gidNumber set
+  "([{{ aedir_suffix }}] & ([ldap:///{{ aedir_suffix }}?entryDN?base?(&(objectClass=aeRoot)(aeGidNumberMin<=]+this/gidNumber+[)(aeGidNumberMax>=]+this/gidNumber+[))])/entryDN)"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(!(entryDN:dnOneLevelMatch:=cn=ae,{{ aedir_suffix }}))"
 
 # uidNumber and gidNumber in posixAccount entries must be the same value
 constraint_attribute uidNumber,gidNumber
@@ -1219,7 +1217,7 @@ constraint_attribute
 # if parent aeZone entry has aeDept set then it must match aeDept in aePerson
 constraint_attribute aePerson,entryDN set
   "this/-1/entryDN & ([ldap:///] + this/-1/entryDN + [?entryDN?base?(&(objectClass=aeZone)(|(!(aeDept=*))(aeDept=] + this/aePerson/aeDept + [)))])/entryDN"
-  restrict="ldap:///ou=ae-dir??sub?(objectClass=aeUser)"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeUser)"
 
 # restrict tag references
 constraint_attribute
@@ -1344,7 +1342,7 @@ constraint_attribute
 # Constraints on applicable password policy for certain object classes in certain zone
 constraint_attribute pwdPolicySubentry
   uri "ldap:///cn=ppolicy-users,cn=ae,{{ aedir_suffix }}?entryDN?base?(objectClass=pwdPolicy)"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(&(objectClass=aeUser)(!(entryDN:dnSubtreeMatch:=cn={{ aedir_base_zone }},ou=ae-dir)))"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(&(objectClass=aeUser)(!(entryDN:dnSubtreeMatch:=cn={{ aedir_base_zone }},{{ aedir_suffix }})))"
 constraint_attribute pwdPolicySubentry
   uri "ldap:///cn=ppolicy-base-users,cn=ae,{{ aedir_suffix }}?entryDN?base?(objectClass=pwdPolicy)"
   restrict="ldap:///cn={{ aedir_base_zone }},{{ aedir_suffix }}??sub?(objectClass=aeUser)"
