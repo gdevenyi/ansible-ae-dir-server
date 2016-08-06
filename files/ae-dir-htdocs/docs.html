@@ -9,7 +9,6 @@
   <li><a href="#dit">Directory Information Tree (DIT)</a></li>
   <li><a href="#eer">Entity Relationship</a></li>
   <li><a href="#schema">Schema</a></li>
-  <li><a href="#slapd.access">Access control</a></li>
   <li><a href="#slapd.conf">OpenLDAP configuration (slapd.conf)</a></li>
 </ol>
 
@@ -997,45 +996,6 @@
 </ul>
 
 
-<h1 id="slapd.access">Access control</h1>
-
-<p>
-  Security policies are enforced by different types of OpenLDAP ACLs:
-</p>
-<dl>
-  <dt>group</dt>
-  <dd>
-    Access rights are granted based on simple group membership.
-  </dd>
-  <dt>regex</dt>
-  <dd>
-    Access rights are granted based on <a href="#dit">DIT</a> with
-    distinguished names matching certain regex patterns.
-  </dd>
-  <dt>sets</dt>
-  <dd>
-    Access rights are granted based on (indirect)
-    <a href="#eer">entity relationship</a> by following the references from
-    entries to other entries.
-  </dd>
-</dl>
-
-<p>
-  If you want to understand the ACLs in detail you should consult various
-  on-line documentation:
-</p>
-<ul>
-  <li>
-    <a href="http://www.openldap.org/software/man.cgi?query=slapd.access">slapd.access(5)</a>
-  </li>
-  <li>
-    <a href="http://www.openldap.org/faq/data/cache/189.html">FAQ-O-MATIC: Access Control</a>
-  </li>
-  <li>
-    <a href="http://www.openldap.org/faq/data/cache/1133.html">FAQ-O-MATIC: Sets in Access Control</a>
-  </li>
-</ul>
-
 <h1 id="slapd.conf">OpenLDAP configuration (slapd.conf)</h1>
 
 <h2 id="slapd-roles">slapd replica roles</h2>
@@ -1137,5 +1097,47 @@
     <a href="http://www.openldap.org/software/man.cgi?query=slapo-refint">slapo-refint(5)</a>
   </dd>
 </dl>
+
+<h2 id="slapd.access">Access control</h2>
+
+<p>
+  Security policies are enforced by different types of OpenLDAP ACLs:
+</p>
+<dl>
+  <dt>group</dt>
+  <dd>
+    Access rights are granted based on simple group membership.
+  </dd>
+  <dt>regex</dt>
+  <dd>
+    Access rights are granted based on <a href="#dit">DIT</a> with
+    distinguished names matching certain regex patterns.
+  </dd>
+  <dt>sets</dt>
+  <dd>
+    Access rights are granted based on (indirect)
+    <a href="#eer">entity relationship</a> by following the references from
+    entries to other entries.
+  </dd>
+</dl>
+
+<p>
+  If you want to understand the ACLs in detail you should consult various
+  on-line documentation:
+</p>
+<ul>
+  <li>
+    <a href="http://www.openldap.org/doc/admin24/access-control.html">OpenLDAP Admin Guide -- Access control</a>
+  </li>
+  <li>
+    <a href="http://www.openldap.org/software/man.cgi?query=slapd.access">slapd.access(5)</a>
+  </li>
+  <li>
+    <a href="http://www.openldap.org/faq/data/cache/189.html">FAQ-O-MATIC: Access Control</a>
+  </li>
+  <li>
+    <a href="http://www.openldap.org/faq/data/cache/1133.html">FAQ-O-MATIC: Sets in Access Control</a>
+  </li>
+</ul>
 
 <!--#include file="ssi/footer.shtml" -->
