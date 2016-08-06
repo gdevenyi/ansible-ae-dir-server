@@ -937,10 +937,10 @@ access to
     by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups/member & this/entryDN" read
     by * none break
 
-# Access to pwdChangedTime for SSH key sync
+# Access to pwdChangedTime of referenced login user groups
 access to
   dn.subtree="{{ aedir_suffix }}"
-  filter="(&(objectClass=posixAccount)(objectClass=ldapPublicKey))"
+  filter="(objectClass=account)"
   attrs=pwdChangedTime
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeLoginGroups/member & this/entryDN" search
