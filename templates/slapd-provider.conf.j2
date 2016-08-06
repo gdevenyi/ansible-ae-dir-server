@@ -1149,7 +1149,7 @@ constraint_attribute gidNumber set
 # uidNumber and gidNumber in posixAccount entries must be the same value
 constraint_attribute uidNumber,gidNumber
   set "this/uidNumber & this/gidNumber"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(&(objectClass=posixAccount)(!(entryDN:dnOneLevelMatch:=cn=ae,{{ aedir_suffix }})))"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=posixAccount)"
 
 # Treat 'cn' as SINGLE-VALUE by constraint
 constraint_attribute
