@@ -1136,27 +1136,22 @@ constraint_attribute
   regex "^{{ aedir_aezone_cn_regex }}$"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeZone)"
 
-# Posix UID number must have at least five significant digits
-# Exceptional case: aeService entries in zone 'ae' for local LDAPI access
-constraint_attribute
-  uidNumber
-  regex "^[1-9][0-9]{4,}$"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(&(objectClass=posixAccount)(!(entryDN:dnOneLevelMatch:=cn=ae,{{ aedir_suffix }})))"
+# check whether gidNumber is within valid range (see aeRoot)
+constraint_attribute gidNumber set
+  "(this/-2/entryDN & ([ldap:///]+this/-2/entryDN+[?entryDN?base?(&(objectClass=aeRoot)(entryDN=]+this/-2/entryDN+[)(aeGidNumberMin<=]+this/gidNumber+[)(aeGidNumberMax>=]+this/gidNumber+[))])/entryDN"
+  restrict="ldap:///ou=ae-dir??sub"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(&(|(objectClass=posixAccount)(objectClass=posixGroup))(!(entryDN:dnOneLevelMatch:=cn=ae,{{ aedir_suffix }})))"
 
-# Posix GID number in group entries must have at least five significant digits
-constraint_attribute
-  gidNumber
-  regex "^[1-9][0-9]{4,}$"
+# check whether uidNumber is within valid range (see aeRoot)
+constraint_attribute uidNumber set
+  "(this/-2/entryDN & ([ldap:///]+this/-2/entryDN+[?entryDN?base?(&(objectClass=aeRoot)(entryDN=]+this/-2/entryDN+[)(aeUidNumberMin<=]+this/uidNumber+[)(aeUidNumberMax>=]+this/uidNumber+[))])/entryDN"
+  restrict="ldap:///ou=ae-dir??sub"
   restrict="ldap:///{{ aedir_suffix }}??sub?(&(|(objectClass=posixAccount)(objectClass=posixGroup))(!(entryDN:dnOneLevelMatch:=cn=ae,{{ aedir_suffix }})))"
 
 # uidNumber and gidNumber in posixAccount entries must be the same value
 constraint_attribute uidNumber,gidNumber
   set "this/uidNumber & this/gidNumber"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=posixAccount)"
-# if parent aeZone entry has aeDept set then it must match aeDept in aePerson
-constraint_attribute gidNumber set
-  "(this/-2/entryDN & ([ldap:///]+this/-2/entryDN+[?entryDN?base?(&(objectClass=aeRoot)(entryDN=]+this/-2/entryDN+[)(aeGidNumberMin<=]+this/gidNumber+[)(aeGidNumberMax>=]+this/gidNumber+[))])/entryDN"
-  restrict="ldap:///ou=ae-dir??sub"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(&(objectClass=posixAccount)(!(entryDN:dnOneLevelMatch:=cn=ae,{{ aedir_suffix }})))"
 
 # Treat 'cn' as SINGLE-VALUE by constraint
 constraint_attribute
