@@ -60,9 +60,10 @@ syntax_registry.registerAttrType(
 class AEObjectUtil:
 
   def _zone_entry(self,attrlist=None):
+    zone_dn = ','.join(ldap.dn.explode_dn(self._dn.encode(self._ls.charset))[-2:])
     try:
       ldap_result = self._ls.readEntry(
-        ldaputil.base.ParentDN(self._dn),
+        zone_dn,
         attrtype_list=attrlist,
         search_filter='(objectClass=aeZone)',
       )
