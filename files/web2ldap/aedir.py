@@ -763,7 +763,7 @@ syntax_registry.registerAttrType(
 class AEDept(DynamicDNSelectList):
   oid = 'AEDept-oid'
   desc = 'AE-DIR: DN of department entry'
-  ldap_url = 'ldap:///_?ou?sub?(&(objectClass=aeDept)(aeStatus=0))'
+  ldap_url = 'ldap:///_?displayName?sub?(&(objectClass=aeDept)(aeStatus=0))'
   ref_attrs = (
     ('aeDept',u'Persons',None,'aePerson',u'Search all persons assigned to this department.'),
     ('aeDept',u'Zones',None,'aeZone',u'Search all team-related zones associated with this department.'),
