@@ -1131,6 +1131,23 @@ syntax_registry.registerAttrType(
 )
 
 
+class AEDisplayNameDept(ComposedAttribute,DirectoryString):
+  oid = 'AEDisplayNameDept-oid'
+  desc = 'Attribute displayName in object class aeDept'
+  compose_templates = (
+    '{ou} ({departmentNumber})',
+    '{ou}',
+    '#{departmentNumber}',
+  )
+
+syntax_registry.registerAttrType(
+  AEDisplayNameDept.oid,[
+    '2.16.840.1.113730.3.1.241', # displayName
+  ],
+  structural_oc_oids=[AE_DEPT_OID], # aeDept
+)
+
+
 class AEDisplayNamePerson(DisplayNameInetOrgPerson):
   oid = 'AEDisplayNamePerson-oid'
   desc = 'Attribute displayName in object class aePerson'
