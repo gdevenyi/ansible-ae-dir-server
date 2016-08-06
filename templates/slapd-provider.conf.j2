@@ -1153,6 +1153,10 @@ constraint_attribute
 constraint_attribute uidNumber,gidNumber
   set "this/uidNumber & this/gidNumber"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=posixAccount)"
+# if parent aeZone entry has aeDept set then it must match aeDept in aePerson
+constraint_attribute gidNumber set
+  "(this/-2/entryDN & ([ldap:///]+this/-2/entryDN+[?entryDN?base?(&(objectClass=aeRoot)(entryDN=]+this/-2/entryDN+[)(aeGidNumberMin<=]+this/gidNumber+[)(aeGidNumberMax>=]+this/gidNumber+[))])/entryDN"
+  restrict="ldap:///ou=ae-dir??sub"
 
 # Treat 'cn' as SINGLE-VALUE by constraint
 constraint_attribute
