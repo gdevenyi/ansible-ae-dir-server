@@ -1189,19 +1189,18 @@ constraint_attribute
   sshPublicKey
   regex "(^|.* )ssh-(rsa|dss|ecdsa-sha2-nistp256) .+$"
 
-# restrict values of aeLoginGroups and aeVisibleGroups to DNs of active aeGroup entries
-# Excluded are special role groups:
-# - ae-admins, ae-auditors and ae-login-proxies
-# - zone-admins and zone-auditors
-# - pub-*
+# rights groups to DNs of active aeGroup entries
+# must not reference special role groups
 constraint_attribute
-  aeLoginGroups
-  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeGroup)(aeStatus=0)(!(|(cn=ae-admins)(cn=ae-auditors)(cn=ae-provider)(cn=ae-replicas)(cn=ae-login-proxies)(cn=*-zone-admins)(cn=*-zone-auditors))))"
-  restrict="ldap:///{{ aedir_suffix }}??sub"
+  aeLoginGroups,aeSetupGroups,aeLogStoreGroups,aeVisibleGroups
+  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeGroup)(aeStatus=0)(!(|(cn:dn:=ae)(cn:dn:=pub)(cn=*-zone-admins)(cn=*-zone-auditors))))"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(!(cn:dn:=ae))"
+
+# special rights groups constraints for zone ae
 constraint_attribute
-  aeVisibleGroups
-  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeGroup)(aeStatus=0)(!(|(cn=ae-admins)(cn=ae-auditors)(cn=ae-provider)(cn=ae-replicas)(cn=ae-login-proxies)(cn=*-zone-admins)(cn=*-zone-auditors))))"
-  restrict="ldap:///{{ aedir_suffix }}??sub"
+  aeLoginGroups,aeSetupGroups,aeLogStoreGroups,aeVisibleGroups
+  uri "ldap:///cn=ae,{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeGroup)(aeStatus=0)(!(|(cn=ae-admins)(cn=ae-auditors)(cn=ae-providers)(cn=ae-replicas)(cn=ae-login-proxies)(cn=*-zone-admins)(cn=*-zone-auditors))))"
+  restrict="ldap:///cn=ae,{{ aedir_suffix }}??sub"
 
 # restrict values of aeVisibleSudoers to DNs of active aeSudoRule entries
 constraint_attribute
