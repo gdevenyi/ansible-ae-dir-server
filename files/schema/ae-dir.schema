@@ -45,6 +45,12 @@ attributetype ( ae-dir-at:20
   DESC 'AE-DIR: DN(s) of group entries usable with a certain server group, server, or service'
   SUP distinguishedName )
 
+attributetype ( ae-dir-at:30
+  NAME 'aeDisplayNameGroups'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: DN(s) of group entries for which member personalnames are displayed'
+  SUP distinguishedName )
+
 attributetype ( ae-dir-at:21
   NAME 'aeVisibleSudoers'
   X-ORIGIN 'AE-DIR'
@@ -355,7 +361,7 @@ objectclass ( ae-dir-oc:13
   MUST ( cn $ description )
   MAY ( aeSrvGroup $ aeProxyFor $ aeLogStorePeriod $
         aeSetupGroups $ aeLogStoreGroups $ aeLoginGroups $
-        aeVisibleGroups $ aeVisibleSudoers $
+        aeVisibleGroups $ aeDisplayNameGroups $ aeVisibleSudoers $
         aeSSHProxyCommand ) )
 
 # Mailbox entries

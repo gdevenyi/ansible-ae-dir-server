@@ -848,6 +848,18 @@ access to
     by set="user/aeSrvGroup/aeVisibleSudoers & this/entryDN" read
     by * none
 
+# Give read access to personal names to servers
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(objectClass=account)"
+  attrs=cn,mail,givenName,sn,displayName
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
+    by set="user/-1/aeDisplayNameGroups/member & this/entryDN" read
+    by set="user/-1/aeProxyFor/aeDisplayNameGroups/member & this/entryDN" read
+    by set="user/aeSrvGroup/aeDisplayNameGroups/member & this/entryDN" read
+    by set="user/aeSrvGroup/aeProxyFor/aeDisplayNameGroups/member & this/entryDN" read
+    by * none break
+
 # Give read access to SSH public keys to servers which
 # shall allow login for the user's groups
 access to
@@ -1192,15 +1204,22 @@ constraint_attribute
 # rights groups to DNs of active aeGroup entries
 # must not reference special role groups
 constraint_attribute
-  aeLoginGroups,aeSetupGroups,aeLogStoreGroups,aeVisibleGroups
+  aeLoginGroups,aeSetupGroups,aeLogStoreGroups,aeVisibleGroups,aeDisplayNameGroups
   uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeGroup)(aeStatus=0)(!(|(cn:dn:=ae)(cn:dn:=pub)(cn=*-zone-admins)(cn=*-zone-auditors))))"
   restrict="ldap:///{{ aedir_suffix }}??sub?(!(cn:dn:=ae))"
 
 # special rights groups constraints for zone ae
 constraint_attribute
-  aeLoginGroups,aeSetupGroups,aeLogStoreGroups,aeVisibleGroups
+  aeLoginGroups,aeSetupGroups,aeLogStoreGroups,aeVisibleGroups,aeDisplayNameGroups
   uri "ldap:///cn=ae,{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeGroup)(aeStatus=0)(!(|(cn=ae-admins)(cn=ae-auditors)(cn=ae-providers)(cn=ae-replicas)(cn=ae-login-proxies)(cn=*-zone-admins)(cn=*-zone-auditors))))"
   restrict="ldap:///cn=ae,{{ aedir_suffix }}??sub"
+
+# groups for which user's name(s) should be displayed
+# must be referenced in aeLoginGroups or aeVisibleGroups
+constraint_attribute
+  aeDisplayNameGroups
+  set "this/aeDisplayNameGroups & ( this/aeLoginGroups | this/aeVisibleGroups )"
+  restrict="ldap:///{{ aedir_suffix }}??sub"
 
 # restrict values of aeVisibleSudoers to DNs of active aeSudoRule entries
 constraint_attribute
