@@ -860,25 +860,12 @@ access to
     by set="user/aeSrvGroup/aeProxyFor/aeDisplayNameGroups/member & this/entryDN" read
     by * none break
 
-# Give read access to SSH public keys to servers which
-# shall allow login for the user's groups
-access to
-  dn.subtree="{{ aedir_suffix }}"
-  filter="(objectClass=ldapPublicKey)"
-  attrs=sshPublicKey
-    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
-    by set="user/-1/aeLoginGroups/member & this/entryDN" read
-    by set="user/-1/aeProxyFor/aeLoginGroups/member & this/entryDN" read
-    by set="user/aeSrvGroup/aeLoginGroups/member & this/entryDN" read
-    by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups/member & this/entryDN" read
-    by * none break
-
-# Give read access to loginShell to servers which
+# Give read access to SSH keys and loginShell to servers which
 # shall allow login for the user's groups
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=posixAccount)"
-  attrs=loginShell
+  attrs=sshPublicKey,loginShell
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeLoginGroups/member & this/entryDN" read
     by set="user/-1/aeProxyFor/aeLoginGroups/member & this/entryDN" read
