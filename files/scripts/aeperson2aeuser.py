@@ -16,6 +16,8 @@ import time
 import logging
 from logging.handlers import SysLogHandler
 
+# set LDAPRC env var *before* importing ldap
+os.environ['LDAPRC'] = '/opt/ae-dir/etc/ldap.conf'
 # Import python-ldap modules/classes
 import ldap
 import ldap.modlist

@@ -17,6 +17,16 @@
     - "{{ aedir_sbin }}"
     - "{{ aedir_rundir }}"
 
+- name: "Create client config file {{ aedir_etc }}/ldap.conf from template"
+  template:
+    src: "ldap.conf.j2"
+    dest: "{{ aedir_etc }}/ldap.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+  - restart slapd
+
 - name: "install CA cert for SMTP/STARTTLS"
   copy:
     src: "{{ smtp_cacert_filename }}"

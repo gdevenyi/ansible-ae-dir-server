@@ -6,8 +6,10 @@ Generates a report of aePerson entries referenced by active aeUser entries
 
 __version__ = '0.0.1'
 
-import sys, csv, pprint
+import sys, os, csv, pprint
 
+# set LDAPRC env var *before* importing ldap
+os.environ['LDAPRC'] = '/opt/ae-dir/etc/ldap.conf'
 import ldap
 import aedir
 from ldap.controls.deref import DereferenceControl

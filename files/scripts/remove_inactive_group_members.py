@@ -15,8 +15,10 @@ __version__ = '0.0.1'
 #-----------------------------------------------------------------------
 
 # Modules from Python's standard library
-import sys
+import sys, os
 
+# set LDAPRC env var *before* importing ldap
+os.environ['LDAPRC'] = '/opt/ae-dir/etc/ldap.conf'
 # Import python-ldap modules/classes
 import ldap
 

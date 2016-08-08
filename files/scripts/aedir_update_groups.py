@@ -9,16 +9,20 @@ It is designed to run as a CRON job.
 Author: Michael Ströder <michael@stroeder.com>
 """
 
-__version__ = '0.4.0'
+__version__ = '0.4.2'
 
 #-----------------------------------------------------------------------
 # Imports
 #-----------------------------------------------------------------------
 
 import sys
-import aedir
+import os
+
+# set LDAPRC env var *before* importing ldap
+os.environ['LDAPRC'] = '/opt/ae-dir/etc/ldap.conf'
 import ldap
 import ldapurl
+import aedir
 
 #-----------------------------------------------------------------------
 # Configuration constants
@@ -49,13 +53,8 @@ def run():
     """
     the main program
     """
-    # LDAP-URL
-    try:
-        ldap_url = sys.argv[1]
-    except IndexError:
-        ldap_url = 'ldapi://'
 
-    ldap_conn = aedir.AEDirObject(ldap_url)
+    ldap_conn = aedir.AEDirObject(None)
 
     dynamic_groups = ldap_conn.search_s(
         ldap_conn.ldap_url_obj.dn or ldap_conn.find_search_base(),
