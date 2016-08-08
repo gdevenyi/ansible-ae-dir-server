@@ -2,7 +2,6 @@
 # handlers file for roles/ae-dir
 
 - name: reload systemd
-  sudo: yes
   command: systemctl daemon-reload
 
 - name: restart slapd
