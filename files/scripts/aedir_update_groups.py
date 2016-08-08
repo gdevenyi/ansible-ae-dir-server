@@ -57,12 +57,10 @@ def run():
     ldap_conn = aedir.AEDirObject(None)
 
     dynamic_groups = ldap_conn.search_s(
-        ldap_conn.ldap_url_obj.dn or ldap_conn.find_search_base(),
-        ldap_conn.ldap_url_obj.scope or ldap.SCOPE_SUBTREE,
-        ldap_conn.ldap_url_obj.filterstr or '(%s=*)' % (MEMBERURL_ATTR),
+        ldap_conn.find_search_base(),
+        ldap.SCOPE_SUBTREE,
+        '(%s=*)' % (MEMBERURL_ATTR),
         attrlist=[
-            'objectClass',
-            'cn',
             MEMBER_ATTR,
             MEMBERURL_ATTR,
         ],
