@@ -114,8 +114,6 @@ syntax_registry.registerAttrType(
 class AEUIDNumber(UidNumber):
   oid = 'AEUIDNumber-oid'
   desc = 'numeric Unix-UID'
-  object_classes = set(['posixAccount','posixGroup'])
-  editable = 0
 
   def formValue(self):
     try:
@@ -125,11 +123,7 @@ class AEUIDNumber(UidNumber):
     return form_value
 
   def transmute(self,attrValues):
-    try:
-      attrValues = self._entry['gidNumber']
-    except KeyError:
-      attrValues = []
-    return attrValues
+    return self._entry.get('gidNumber',[])
 
   def formField(self):
     input_field = HiddenInput(
@@ -337,31 +331,22 @@ syntax_registry.registerAttrType(
 class AEMemberUid(MemberUID):
   oid = 'AEMemberUid-oid'
   desc = 'AE-DIR: username (uid) of member of a group'
-  ldap_url = 'ldap:///_?uid,displayName?sub?(&(|(objectClass=aeUser)(objectClass=aeService))(aeStatus=0))'
-  editable = 0
+  ldap_url = None
 
   def _member_uids_from_member(self):
     return [
       dn[4:].split(',')[0]
-      for dn in self._entry['member']
+      for dn in self._entry.get('member',[])
     ]
 
   # Because AEMemberUid.transmute() always resets all attribute values it's
   # ok to not validate values thoroughly
   def _validate(self,attrValue):
-    try:
-      member_uids = set(self._member_uids_from_member())
-    except KeyError:
-      return False
-    else:
-      return attrValue in member_uids
+    return MemberUID._validate(self,attrValue) and \
+           attrValue in set(self._member_uids_from_member())
 
   def transmute(self,attrValues):
-    try:
-      attrValues = self._member_uids_from_member()
-    except KeyError:
-      pass
-    return attrValues
+    return filter(None,self._member_uids_from_member())
 
   def formValue(self):
     return u''
