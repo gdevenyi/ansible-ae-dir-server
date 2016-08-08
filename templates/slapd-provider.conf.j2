@@ -288,6 +288,7 @@ index uidNumber eq
 index gidNumber eq
 index member eq
 index memberUID eq
+index memberURL pres
 index memberOf eq
 index sudoUser pres,eq
 index seeAlso eq
@@ -1254,13 +1255,6 @@ constraint_attribute
   uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeHost)(aeStatus=0))"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeService)"
 
-# restrict references from user groups to have only active personal
-# and system user accounts as members
-constraint_attribute
-  member
-  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(|(objectClass=aeUser)(objectClass=aeService))(aeStatus=0))"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=groupOfEntries)"
-
 # 'mail' the same in personal user accounts and referenced person entries
 constraint_attribute aePerson,mail set
   "this/aePerson/mail & this/mail"
@@ -1296,10 +1290,21 @@ constraint_attribute cn,sn,givenName
   set "(this/givenName + [ ] + this/sn) & this/cn"
   restrict="ldap:///{{ aedir_suffix }}??sub?(|(objectClass=aePerson)(objectClass=aeUser))"
 
+# restrict references from user groups to have only active accounts as members
+constraint_attribute
+  member
+  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(|(objectClass=aeUser)(objectClass=aeService))(aeStatus=0))"
+  restrict="ldap:///{{ aedir_suffix }}??sub"
+
+# restrict memberUID to be uid of an active posixAccount
+constraint_attribute memberUID
+  uri "ldap:///{{ aedir_suffix }}?uid?sub?(&(|(objectClass=aeUser)(objectClass=aeService))(objectClass=posixAccount)(aeStatus=0))"
+  restrict="ldap:///{{ aedir_suffix }}??sub"
+
 # restrict memberUID to be consistent with group membership defined in member
 constraint_attribute memberUID,member
   set "this/memberUID & this/member/uid"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeGroup)"
+  restrict="ldap:///{{ aedir_suffix }}??sub"
 
 # the Yubikey serial number must be the same in various attributes
 # Example:
@@ -1357,12 +1362,6 @@ constraint_attribute pwdPolicySubentry
 constraint_attribute pwdPolicySubentry
   uri "ldap:///cn=ppolicy-otptokens,cn=ae,{{ aedir_suffix }}?entryDN?base?(objectClass=pwdPolicy)"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=oathToken)"
-
-
-# restrict memberUID to be consistent with group membership defined in member
-constraint_attribute memberUID
-  uri "ldap:///{{ aedir_suffix }}?uid?sub?(&(objectClass=posixAccount)(aeStatus=0))"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=posixGroup)"
 
 # restrict references from aeHost/aeService to active aeSrvGroup entries
 constraint_attribute
