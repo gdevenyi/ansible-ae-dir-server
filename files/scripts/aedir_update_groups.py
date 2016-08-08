@@ -66,7 +66,7 @@ def members2uids(members):
 
 class AEGroupUpdater(object):
     """
-    Process for updating "dynamic groups and remove
+    Group update process class
     """
 
     def __init__(self):
