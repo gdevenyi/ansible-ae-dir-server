@@ -5,6 +5,9 @@
 # AE-DIR parameters
 #---------------------------------------------------------------------------
 
+# whether to perform init tasks
+aedir_init: 0
+
 # base DN / search root for AE-DIR entries
 aedir_suffix: "ou=ae-dir"
 
