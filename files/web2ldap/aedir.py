@@ -858,10 +858,10 @@ syntax_registry.registerAttrType(
 )
 
 
-class AEManager(AEPerson):
+class AEManager(DynamicDNSelectList):
   oid = 'AEManager-oid'
   desc = 'AE-DIR: Manager responsible for a person/department'
-  mail_zones = None
+  ldap_url = 'ldap:///_?displayName?sub?(&(objectClass=aePerson)(aeStatus=0))'
 
 syntax_registry.registerAttrType(
   AEManager.oid,[
