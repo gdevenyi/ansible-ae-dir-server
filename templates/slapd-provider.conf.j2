@@ -832,12 +832,10 @@ access to
   filter="(objectClass=posixGroup)"
   attrs=entry,objectClass,entryUUID,modifyTimestamp,cn,gidNumber,member,memberUID
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
-    by set="user/-1/aeLoginGroups & this/entryDN" read
     by set="user/-1/aeVisibleGroups & this/entryDN" read
-    by set="user/-1/aeProxyFor/aeLoginGroups & this/entryDN" read
-    by set="user/aeSrvGroup/aeLoginGroups & this/entryDN" read
+    by set="user/-1/aeProxyFor/aeVisibleGroups & this/entryDN" read
     by set="user/aeSrvGroup/aeVisibleGroups & this/entryDN" read
-    by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups & this/entryDN" read
+    by set="user/aeSrvGroup/aeProxyFor/aeVisibleGroups & this/entryDN" read
     by * none break
 
 # Give read access to SUDO rules to servers
@@ -929,12 +927,10 @@ access to
   filter="(objectClass=posixAccount)"
   attrs=entry,objectClass,entryUUID,modifyTimestamp,uid,uidNumber,gidNumber,homeDirectory,gecos
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
-    by set="user/-1/aeLoginGroups/member & this/entryDN" read
     by set="user/-1/aeVisibleGroups/member & this/entryDN" read
-    by set="user/-1/aeProxyFor/aeLoginGroups/member & this/entryDN" read
-    by set="user/aeSrvGroup/aeLoginGroups/member & this/entryDN" read
+    by set="user/-1/aeProxyFor/aeVisibleGroups/member & this/entryDN" read
     by set="user/aeSrvGroup/aeVisibleGroups/member & this/entryDN" read
-    by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups/member & this/entryDN" read
+    by set="user/aeSrvGroup/aeProxyFor/aeVisibleGroups/member & this/entryDN" read
     by * none break
 
 # Access to pwdChangedTime of referenced login user groups
@@ -1202,11 +1198,14 @@ constraint_attribute
   uri "ldap:///cn=ae,{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeGroup)(aeStatus=0)(!(|(cn=ae-admins)(cn=ae-auditors)(cn=ae-providers)(cn=ae-replicas)(cn=ae-login-proxies)(cn=*-zone-admins)(cn=*-zone-auditors))))"
   restrict="ldap:///cn=ae,{{ aedir_suffix }}??sub"
 
-# groups for which user's name(s) should be displayed
-# must be referenced in aeLoginGroups or aeVisibleGroups
+# rights groups must be referenced in aeVisibleGroups
 constraint_attribute
   aeDisplayNameGroups
-  set "this/aeDisplayNameGroups & ( this/aeLoginGroups | this/aeVisibleGroups )"
+  set "this/aeDisplayNameGroups & this/aeVisibleGroups"
+  restrict="ldap:///{{ aedir_suffix }}??sub"
+constraint_attribute
+  aeLoginGroups
+  set "this/aeLoginGroups & this/aeVisibleGroups"
   restrict="ldap:///{{ aedir_suffix }}??sub"
 
 # restrict values of aeVisibleSudoers to DNs of active aeSudoRule entries

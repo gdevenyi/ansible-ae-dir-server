@@ -37,6 +37,42 @@
 </fieldset>
 
 <fieldset>
+  <legend>Group references</legend>
+  <table>
+    <tr>
+      <td>Setup admins (aeSetupGroups):</td>
+      <td>%(aeSetupGroups)s</td>
+    </tr>
+    <tr>
+      <td>Log viewers (aeLogStoreGroups):</td>
+      <td>%(aeLogStoreGroups)s</td>
+    </tr>
+    <tr>
+      <td>All visible groups (aeVisibleGroups):</td>
+      <td>%(aeVisibleGroups)s</td>
+    </tr>
+    <tr>
+      <td>Login groups (aeLoginGroups):</td>
+      <td>%(aeLoginGroups)s</td>
+    </tr>
+    <tr>
+      <td>Displayname groups (aeDisplayNameGroups):</td>
+      <td>%(aeDisplayNameGroups)s</td>
+    </tr>
+  </table>
+</fieldset>
+
+<fieldset>
+  <legend>SUDOERS</legend>
+  <table>
+    <tr>
+      <td>Enabled sudo rule(s) (aeVisibleSudoers):</td>
+      <td>%(aeVisibleSudoers)s</td>
+    </tr>
+  </table>
+</fieldset>
+
+<fieldset>
   <legend>Other system parameters</legend>
   <table>
     <tr>
@@ -46,42 +82,6 @@
     <tr>
       <td>Used as SSH proxy by (aeProxyFor):</td>
       <td>%(aeProxyFor)s</td>
-    </tr>
-  </table>
-</fieldset>
-
-<fieldset>
-  <legend>Groups with special rights</legend>
-  <table>
-    <tr>
-      <td>Group(s) with setup right (aeSetupGroups):</td>
-      <td>%(aeSetupGroups)s</td>
-    </tr>
-    <tr>
-      <td>Group(s) with log view right (aeLogStoreGroups):</td>
-      <td>%(aeLogStoreGroups)s</td>
-    </tr>
-    <tr>
-      <td>Group(s) allowed to log in (aeLoginGroups):</td>
-      <td>%(aeLoginGroups)s</td>
-    </tr>
-  </table>
-</fieldset>
-
-<fieldset>
-  <legend>Visible objects</legend>
-  <table>
-    <tr>
-      <td>Other visible group(s):</td>
-      <td>%(aeVisibleGroups)s</td>
-    </tr>
-    <tr>
-      <td>Display name group(s):</td>
-      <td>%(aeDisplayNameGroups)s</td>
-    </tr>
-    <tr>
-      <td>Visible sudo rule(s):</td>
-      <td>%(aeVisibleSudoers)s</td>
     </tr>
   </table>
 </fieldset>

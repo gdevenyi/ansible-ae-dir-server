@@ -412,7 +412,6 @@ class AESrvGroupRightsGroupDN(DynamicDNSelectList):
       ')'
     ')'
   )
-
   ref_attrs = (
     ('memberOf',u'Members',None,u'Search all member entries of this user group'),
   )
@@ -422,8 +421,28 @@ syntax_registry.registerAttrType(
     AE_OID_PREFIX+'.4.4',  # aeLoginGroups
     AE_OID_PREFIX+'.4.6',  # aeSetupGroups
     AE_OID_PREFIX+'.4.7',  # aeLogStoreGroups
-    AE_OID_PREFIX+'.4.20', # aeVisibleGroups
     AE_OID_PREFIX+'.4.30', # aeDisplayNameGroups
+  ]
+)
+
+
+class AEVisibleGroups(AESrvGroupRightsGroupDN):
+  oid = 'AEVisibleGroups-oid'
+  desc = 'AE-DIR: DN of visible user group entry'
+  always_add_groups = (
+    'aeLoginGroups',
+    'aeDisplayNameGroups',
+  )
+
+  def transmute(self,attrValues):
+    attrValues = set(attrValues)
+    for attr_type in self.always_add_groups:
+      attrValues.update(self._entry.get(attr_type,[]))
+    return list(attrValues)
+
+syntax_registry.registerAttrType(
+  AEVisibleGroups.oid,[
+    AE_OID_PREFIX+'.4.20', # aeVisibleGroups
   ]
 )
 
