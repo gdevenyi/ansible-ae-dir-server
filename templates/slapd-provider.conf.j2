@@ -1222,8 +1222,8 @@ constraint_attribute
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeUser)"
 # if parent aeZone entry has aeDept set then it must match aeDept in aePerson
 constraint_attribute aePerson,entryDN set
-  "this/-1/entryDN & ([ldap:///] + this/-1/entryDN + [?entryDN?base?(&(objectClass=aeZone)(|(!(aeDept=*))(aeDept=] + this/aePerson/aeDept + [)))])/entryDN"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeUser)"
+  "(this/-1/entryDN & ([ldap:///] + this/-1/entryDN + [?entryDN?base?(&(objectClass=aeZone)(!(aeDept=*)))])/entryDN) | (this/-1/entryDN & ([ldap:///] + this/-1/entryDN + [?entryDN?base?(&(objectClass=aeZone)(aeDept=] + this/aePerson/aeDept + [))])/entryDN)"
+  restrict="ldap:///ou=ae-dir??sub?(objectClass=aeUser)"
 
 # restrict tag references
 constraint_attribute
