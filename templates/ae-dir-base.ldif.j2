@@ -653,6 +653,7 @@ objectClass: aeObject
 objectClass: aeSrvGroup
 cn: ae-dir-{{ role }}-hosts
 aeSetupGroups: cn=ae-sys-admins,cn=ae,{{ aedir_suffix }}
+aeVisibleGroups: cn=ae-sys-admins,cn=ae,{{ aedir_suffix }}
 aeLoginGroups: cn=ae-sys-admins,cn=ae,{{ aedir_suffix }}
 aeLogStoreGroups: cn=ae-sys-admins,cn=ae,{{ aedir_suffix }}
 aeVisibleSudoers: cn=ae-sudo-sys-admins,cn=ae,{{ aedir_suffix }}
