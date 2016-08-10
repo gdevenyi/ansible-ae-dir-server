@@ -424,6 +424,12 @@ access to
   filter="(aeStatus=2)"
     by * none
 
+# block cross-zone access to zone 'ae'
+access to
+  dn.subtree="cn=ae,{{ aedir_suffix }}"
+    by dn.subtree="cn=ae,{{ aedir_suffix }}" none break
+    by * none
+
 # Public defaults
 #------------------------------------------------------------------
 
