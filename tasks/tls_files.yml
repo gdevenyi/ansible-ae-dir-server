@@ -75,9 +75,11 @@
 
 - name: "Generate new TLS server key pair in files {{ openldap_key_filename }} and {{ openldap_conf_prefix }}/tls/{{ openldap_service_fqdn }}.csr"
   command: "/usr/bin/openssl req -config /usr/local/openldap/etc/openldap/tls/gen_csr.cnf -batch -new  -nodes -out {{ openldap_conf_prefix }}/tls/{{ openldap_service_fqdn }}.csr -keyout {{ openldap_key_pathname }}"
-  when: openldap_key_stat.rc != 0 or
-        openldap_key_modulus.rc != 0 or
-        openldap_cert_modulus.stdout != openldap_key_modulus.stdout
+  when: openldap_key_gen == 1 and (
+          openldap_key_stat.rc != 0 or
+          openldap_key_modulus.rc != 0 or
+          openldap_cert_modulus.stdout != openldap_key_modulus.stdout
+        )
 
 - name: "TLS server key file ownership/permissions"
   file:
@@ -90,6 +92,7 @@
 
 - name: "Modulus of CSR {{ openldap_conf_prefix }}/tls/{{ openldap_service_fqdn }}.csr"
   command: "openssl req -in {{ openldap_conf_prefix }}/tls/{{ openldap_service_fqdn }}.csr -noout -modulus"
+  ignore_errors: yes
   register: openldap_csr_modulus
 
 - name: "Modulus of key {{ openldap_key_pathname }}"

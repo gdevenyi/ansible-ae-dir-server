@@ -234,6 +234,9 @@ openldap_key_filename: "{{ openldap_service_fqdn }}.key"
 # local directory for fetched CSRs
 local_openldap_csr_dir: "files/pki-csr-files"
 
+# whether to overwrite existing private key
+openldap_key_gen: 0
+
 # The full path names on the target system
 openldap_cacert_pathname: "{{ openldap_conf_prefix }}/tls/{{ openldap_cacert_filename }}"
 openldap_cert_pathname: "{{ openldap_conf_prefix }}/tls/{{ openldap_service_fqdn }}.crt"
