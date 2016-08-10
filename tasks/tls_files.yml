@@ -37,25 +37,71 @@
   notify:
   - restart slapd
 
-- name: TLS server certificate file
+- name: "Validate cert {{ openldap_cert_filename }} against CA certs {{ openldap_cacert_filename }}"
+  command: "openssl verify -purpose sslserver -CAfile files/{{ openldap_cacert_filename }} files/{{ openldap_cert_filename }}"
+  ignore_errors: yes
+  delegate_to: 127.0.0.1
+  register: openssl_verify_result
+
+- name: "Modulus of cert {{ openldap_cert_filename }}"
+  command: "openssl x509 -in files/{{ openldap_cert_filename }} -noout -modulus"
+  ignore_errors: yes
+  delegate_to: 127.0.0.1
+  register: openldap_cert_modulus
+
+- name: "Modulus of key {{ openldap_key_pathname }}"
+  command: "openssl rsa -in {{ openldap_key_pathname }} -noout -modulus"
+  ignore_errors: yes
+  register: openldap_key_modulus
+
+- name: "File stat of key {{ openldap_key_pathname }}"
+  command: "stat {{ openldap_key_pathname }}"
+  ignore_errors: yes
+  register: openldap_key_stat
+
+- name: "TLS server certificate file {{ openldap_cert_filename }} to {{ openldap_cert_pathname }}"
   copy:
     src: "{{ openldap_cert_filename }}"
     dest: "{{ openldap_cert_pathname }}"
     owner: root
     group: ldap
     mode: 0640
+  when: openssl_verify_result.rc == 0 and
+        openldap_cert_modulus.rc == 0 and
+        openldap_key_modulus.rc == 0 and
+        openldap_cert_modulus.stdout == openldap_key_modulus.stdout
   notify:
   - restart slapd
 
-- name: TLS server key file
-  copy:
-    src: "{{ openldap_key_filename }}"
-    dest: "{{ openldap_key_pathname }}"
+- name: "Generate new TLS server key pair in files {{ openldap_key_filename }} and {{ openldap_conf_prefix }}/tls/{{ openldap_service_fqdn }}.csr"
+  command: "/usr/bin/openssl req -config /usr/local/openldap/etc/openldap/tls/gen_csr.cnf -batch -new  -nodes -out {{ openldap_conf_prefix }}/tls/{{ openldap_service_fqdn }}.csr -keyout {{ openldap_key_pathname }}"
+  when: openldap_key_stat.rc != 0 or
+        openldap_key_modulus.rc != 0 or
+        openldap_cert_modulus.stdout != openldap_key_modulus.stdout
+
+- name: "TLS server key file ownership/permissions"
+  file:
+    path: "{{ openldap_key_pathname }}"
     owner: root
     group: ldap
     mode: 0640
   notify:
   - restart slapd
+
+- name: "Modulus of CSR {{ openldap_conf_prefix }}/tls/{{ openldap_service_fqdn }}.csr"
+  command: "openssl req -in {{ openldap_conf_prefix }}/tls/{{ openldap_service_fqdn }}.csr -noout -modulus"
+  register: openldap_csr_modulus
+
+- name: "Modulus of key {{ openldap_key_pathname }}"
+  command: "openssl rsa -in {{ openldap_key_pathname }} -noout -modulus"
+  register: openldap_key_modulus
+
+- name: "Fetch CSR file {{ openldap_conf_prefix }}/tls/{{ openldap_service_fqdn }}.csr to {{ local_openldap_csr_dir }}/{{ openldap_service_fqdn }}.csr"
+  fetch:
+    src: "{{ openldap_conf_prefix }}/tls/{{ openldap_service_fqdn }}.csr"
+    dest: "{{ local_openldap_csr_dir }}/{{ openldap_service_fqdn }}.csr"
+    flat: yes
+  when: openldap_csr_modulus.stdout == openldap_key_modulus.stdout
 
 - name: generate TLS DH parameter file
   command: "/usr/bin/openssl dhparam -out {{ openldap_dhparam_pathname }} {{ openldap_dhparam_numbits }}"
@@ -64,7 +110,7 @@
   notify:
   - restart slapd
 
-- name: TLS DH parameter file
+- name: "TLS DH parameter file ownership/permissions"
   file:
     path: "{{ openldap_dhparam_pathname }}"
     owner: root
@@ -72,3 +118,13 @@
     mode: 0640
   notify:
   - restart slapd
+
+- name: "Fail on false verification of server cert"
+  fail:
+    msg: "Verification of server cert {{ openldap_cert_filename }} failed: {{ openssl_verify_result.stdout }}"
+  when: openssl_verify_result.rc != 0
+
+- name: "Fail on different modulus of cert and key"
+  fail:
+    msg: "Different modulus in cert {{ openldap_cert_filename }} and {{ openldap_key_pathname }}"
+  when: openldap_cert_modulus.stdout != openldap_key_modulus.stdout
