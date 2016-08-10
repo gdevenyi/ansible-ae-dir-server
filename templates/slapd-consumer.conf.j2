@@ -99,7 +99,7 @@ authz-regexp
 # Rewrite any cert subject-DN by searching it in attribute seeAlso
 authz-regexp
   "(cn=[^,]+,{{ openldap_tls_cert_suffix }})"
-  "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=pkiUser)(seeAlso=$1)(aeStatus=0))"
+  "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=pkiUser)(seeAlso=$1)(seeAlso:dnSubordinateMatch:={{ openldap_tls_cert_suffix }})(aeStatus=0))"
 
 # Rewrite server cert subject-DN by searching FQDN in server entry
 authz-regexp
@@ -428,7 +428,7 @@ access to
 access to
   dn.subtree="cn=ae,{{ aedir_suffix }}"
     by dn.subtree="cn=ae,{{ aedir_suffix }}" none break
-    by * none
+    by * auth
 
 # Public defaults
 #------------------------------------------------------------------
