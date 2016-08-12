@@ -534,9 +534,10 @@ access to
   filter="(aeStatus=2)"
     by * none
 
-# block cross-zone access to zone 'ae'
+# block cross-zone access to zone 'ae' except password policy entries
 access to
   dn.subtree="cn=ae,{{ aedir_suffix }}"
+  filter="(!(|(objectClass=pwdPolicy)(&(objectClass=aeGroup)(cn=*-all-zone-*))))"
     by dn.subtree="cn=ae,{{ aedir_suffix }}" none break
     by * auth
 
