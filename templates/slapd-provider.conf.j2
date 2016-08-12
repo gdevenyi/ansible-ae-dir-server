@@ -534,13 +534,6 @@ access to
   filter="(aeStatus=2)"
     by * none
 
-# block cross-zone access to zone 'ae' except password policy entries
-access to
-  dn.subtree="cn=ae,{{ aedir_suffix }}"
-  filter="(!(|(objectClass=pwdPolicy)(&(objectClass=aeGroup)(cn=*-all-zone-*))))"
-    by dn.subtree="cn=ae,{{ aedir_suffix }}" none break
-    by * auth
-
 # Public defaults
 #------------------------------------------------------------------
 
@@ -740,12 +733,13 @@ access to
     by group/aeGroup/member.expand="cn={{ aedir_org_zone }}-zone-admins,cn={{ aedir_org_zone }},{{ aedir_suffix }}" write
     by group/aeGroup/member.expand="cn={{ aedir_org_zone }}-zone-auditors,cn={{ aedir_org_zone }},{{ aedir_suffix }}" read
     by * none break
-# administration of aeDept entries beneath aeZone cn={{ aedir_org_zone }}
+# administration and readability of aeDept entries beneath aeZone cn={{ aedir_org_zone }}
 access to
   dn.regex="^departmentNumber=({{ aedir_aedept_deptnumber_regex }}),cn={{ aedir_org_zone }},{{ aedir_suffix }}$"
   filter="(objectClass=aeDept)"
     by group/aeGroup/member.expand="cn={{ aedir_org_zone }}-zone-admins,cn={{ aedir_org_zone }},{{ aedir_suffix }}" write
     by group/aeGroup/member.expand="cn={{ aedir_org_zone }}-zone-auditors,cn={{ aedir_org_zone }},{{ aedir_suffix }}" read
+    by set="user/entryDN & ([ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(member=] + user/entryDN + [))])/member" read
     by * none break
 
 # not-active ACL
