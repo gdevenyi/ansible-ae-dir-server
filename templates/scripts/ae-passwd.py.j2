@@ -1,33 +1,23 @@
 #!{{ aedir_python }}
 # -*- coding: utf-8 -*-
 """
-Sets the password of the specified aeUser or aeService referenced by
-uid attribute
+Sets the password of the specified aeUser/aeService or aeHost entry
+referenced by uid or host attribute
 
-This script must run locally run on a Æ-DIR provider
+This script must run locally on a Æ-DIR provider
 """
+
+__version__ = '0.0.2'
 
 import sys
 import os
 import getpass
+import string
 
 # set LDAPRC env var *before* importing ldap
 os.environ['LDAPRC'] = '/opt/ae-dir/etc/ldap.conf'
 import ldap
 import aedir
-
-LDAP_FILTER_TMPL = (
-    '(|'
-      '(&'
-        '(|(objectClass=aeUser)(objectClass=aeService))'
-        '(uid={0})'
-      ')'
-      '(&'
-        '(objectClass=aeHost)'
-        '(host={0})'
-      ')'
-    ')'
-)
 
 PYLDAP_TRACE_LEVEL = 0
 
@@ -37,54 +27,63 @@ PYLDAP_TRACE_LEVEL = 0
 
 ldap._trace_level = PYLDAP_TRACE_LEVEL
 
-
 try:
     arg_value = sys.argv[1]
 except IndexError:
     sys.stderr.write('Usage: {} <username|hostname>\n'.format(sys.argv[0]))
     sys.exit(9)
 
-ldap_filter = LDAP_FILTER_TMPL.format(arg_value)
+ldap_filter = aedir.AUTHC_ENTITY_FILTER_TMPL.format(arg_value)
 
 ldap_conn = aedir.AEDirObject(None, trace_level=PYLDAP_TRACE_LEVEL)
-aedir_searchbase = ldap_conn.find_search_base()
 
-ldap_result = ldap_conn.search_ext_s(
-    aedir_searchbase,
-    ldap.SCOPE_SUBTREE,
-    ldap_filter,
-    attrlist=['1.1'],
-    sizelimit=2,
+dn, entry = ldap_conn.find_unique_entry(
+    ldap_conn.find_search_base(),
+    scope=ldap.SCOPE_SUBTREE,
+    filterstr=ldap_filter,
+    attrlist=['pwdPolicySubentry'],
 )
 
-if not ldap_result:
-    sys.stderr.write(
-        'No search result found with filter {}\n'.format(
-            repr(ldap_filter)
-        )
+try:
+    pwd_policy_subentry = entry['pwdPolicySubentry'][0]
+except KeyError:
+    pwd_min_length = 0
+else:
+    pwd_policy = ldap_conn.read_s(
+        pwd_policy_subentry,
+        filterstr='(objectClass=pwdPolicy)',
+        attrlist=['pwdMinLength'],
     )
-    sys.exit(1)
-elif len(ldap_result) > 1:
-    sys.stderr.write(
-        'More than one search result found with filter {}\n'.format(
-            repr(ldap_filter)
-        )
-    )
-    sys.exit(1)
+    pwd_min_length = int(pwd_policy.get('pwdMinLength', ['0'])[0])
 
-dn, _ = ldap_result[0]
+new_password1 = getpass.getpass(
+    'Enter new password for {} (empty generates password): '.format(dn)
+)
 
-new_password1 = getpass.getpass('new password for {}: '.format(dn))
-new_password2 = getpass.getpass('repeat password: ')
-
-if new_password1 != new_password2:
-    sys.stderr.write('2nd input for new password differs!\n')
-    sys.exit(1)
+if new_password1:
+    # check minimum password length
+    if len(new_password1) < pwd_min_length:
+        sys.stderr.write('Minimum required password length is %d (see %s)!\n' % (
+            pwd_min_length,
+            pwd_policy_subentry,
+        ))
+        sys.exit(1)
+    # ask to repeat password input
+    new_password2 = getpass.getpass('repeat password: ')
+    if new_password1 != new_password2:
+        sys.stderr.write('2nd input for new password differs!\n')
+        sys.exit(1)
+else:
+    # empty password input => generate random password
+    new_password2 = aedir.random_string(length=max(aedir.PWD_LENGTH, pwd_min_length))
+    sys.stdout.write('Generated password: %s\n' % (new_password2))
 
 try:
-    ldap_conn.passwd_s(dn, None, new_password1)
+    ldap_conn.passwd_s(dn, None, new_password2)
 except ldap.LDAPError, ldap_err:
     sys.stderr.write('LDAPError: {}\n'.format(str(ldap_err)))
     sys.exit(1)
+else:
+    sys.stdout.write('Successfully set password of entry %s\n' % (dn))
 
 ldap_conn.unbind_s()
