@@ -29,6 +29,14 @@
     group: root
     mode: 0644
 
+- name: "Create search provider file pointing to {{ aedir_main_provider_hostname }}"
+  template:
+    src: "web2ldap/opensearch-ae-dir.xml.j2"
+    dest: "{{ aedir_prefix }}/htdocs/opensearch-ae-dir.xml"
+    owner: root
+    group: root
+    mode: 0644
+
 - name: "web2ldap HTML and LDIF templates for AE-DIR (copy)"
   copy:
     src: "{{ item }}"

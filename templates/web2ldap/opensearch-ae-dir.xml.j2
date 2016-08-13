@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+  <ShortName>Æ on {{ aedir_main_provider_hostname }}</ShortName>
+  <LongName>Search Æ provider on {{ aedir_main_provider_hostname }}</LongName>
+  <Description>Search Æ on provider server {{ aedir_main_provider_hostname }} beneath {{ aedir_suffix }}</Description>
+  <Tags>web2ldap</Tags>
+  <!--Contact>info@ae-dir.com</Contact-->
+  <Url
+    type="text/html"
+    rel="results"
+    template="https://{{ aedir_main_provider_hostname }}/web2ldap?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub?(|(cn=*{searchTerms}*)(uid={searchTerms})(host={searchTerms}))?bindname="
+  />
+</OpenSearchDescription>
