@@ -242,6 +242,8 @@ class BaseApp(Default):
     Request handler base class which is not used directly
     """
 
+    post_form = None
+
     get_form = web.form.Form(USERNAME_FIELD)
 
     def _sess_track_ctrl(self, username='-/-'):
@@ -421,13 +423,13 @@ class CheckPassword(BaseApp):
         valid_until = u'unknown'
         pwd_changed_timestamp = ldap.strp_secs(user_entry['pwdChangedTime'][0])
         pwd_policy_subentry_dn = user_entry['pwdPolicySubentry'][0]
-        pwd_policy_subentry = self.ldap_conn.read_s(
-            pwd_policy_subentry_dn,
-            attrlist=[
-                'pwdMaxAge',
-                'pwdExpireWarning'
-            ],
-        )
+        try:
+            pwd_policy_subentry = self.ldap_conn.read_s(
+                pwd_policy_subentry_dn,
+                attrlist=['pwdMaxAge', 'pwdExpireWarning'],
+            )
+        except ldap.LDAPError:
+            return self.GET(message=u'Internal error!')
         try:
             pwd_max_age = int(pwd_policy_subentry['pwdMaxAge'][0])
         except (ValueError, KeyError):
