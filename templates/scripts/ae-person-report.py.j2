@@ -4,7 +4,7 @@
 Generates a report of aePerson entries referenced by active aeUser entries
 """
 
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 
 import sys, os, csv, pprint
 
@@ -57,10 +57,9 @@ DEREF_CONTROL = DereferenceControl(
 ldap._trace_level = PYLDAP_TRACE_LEVEL
 
 ldap_conn = aedir.AEDirObject(None, trace_level=PYLDAP_TRACE_LEVEL)
-aedir_searchbase = ldap_conn.find_search_base()
 
 msg_id = ldap_conn.search_ext(
-    aedir_searchbase,
+    ldap_conn.find_search_base(),
     ldap.SCOPE_SUBTREE,
     '(&(objectClass=aeUser)(aeStatus=0))',
     attrlist=USER_ATTRS,
