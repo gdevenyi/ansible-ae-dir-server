@@ -50,19 +50,51 @@
   entries. Furthermore this role has full read access to the audit
   database.
 </p>
+
 <p>
   Typically the &AElig; admins are not expected to know the systems
-  attached to &AElig;-DIR or the users in detail. Therefore &AElig; admins are
-  adviced not to perform daily maintenance tasks except those directly
-  related to &AElig;-DIR systems (e.g. adding new zones).
+  using &AElig;-DIR or the users in detail. Therefore &AElig; admins
+  are adviced <strong>not</strong> to perform daily maintenance
+  tasks except those directly related to &AElig;-DIR systems.
 </p>
+
+<p>Typical tasks:</p>
+<ul>
+  <li>
+    add/modify zone entries (see <a href="schema-oc-aeZone">aeZone</a>)
+  </li>
+  <li>
+    entitle <a href="#role-ae-auditor">&AElig; auditors</a>
+  </li>
+  <li>
+    entitle <a href="#role-zone-admin">zone admin(s)</a>
+    in new or orphaned zones
+  </li>
+  <li>
+    add/modify/remove <a href="#role-ae-replica">replicas</a>
+  </li>
+</ul>
+<p>Exceptional tasks (need careful consideration):</p>
+<ul>
+  <li>
+    add/modify password policies (possibly also requires
+    modification of system configuration)
+  </li>
+  <li>
+    maintain arbitrary entries in case responsible
+    <a href="#role-zone-admin">zone admin(s)</a> are not available
+  </li>
+  <li>
+    repair broken entries circumventing constraints
+  </li>
+</ul>
 
 <h2 id="role-ae-auditor">&AElig; Auditor</h2>
 <p>
   <em>&AElig; auditors</em> (role assigned by membership in group
   <em>ae-auditors</em>) have full read access to all LDAP entries including
   the audit database. Even when added to another user group members of
-  group <em>ae-auditors</em> will not gain any write access.
+  group <em>ae-auditors</em> will <strong>not</strong> gain any write access.
 </p>
 
 <h2 id="role-zone-admin">Zone Admin</h2>
