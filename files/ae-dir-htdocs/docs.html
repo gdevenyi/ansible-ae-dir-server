@@ -172,7 +172,7 @@
 <p>Typical tasks:</p>
 <ul>
   <li>
-    The setup admins add/modify/deletes hosts
+    The setup admins add/modify/delete hosts
     (<a href="#schema-oc-aeHost">aeHost</a>) and
     services (<a href="#schema-oc-aeService">aeService</a>) entries.
   </li>
@@ -255,22 +255,22 @@
   </tr>
   <tr>
     <td>cn=ae-admins</td>
-    <td>Group members can manage all &AElig;-DIR entries</td>
+    <td>Group members can manage all &AElig;-DIR entries (see also role <a href="#role-ae-admin">&AElig; Admin</a>)</td>
     <td>aeGroup</td>
   </tr>
   <tr>
     <td>cn=ae-auditors</td>
-    <td>Group members can read all &AElig;-DIR entries</td>
+    <td>Group members can read all &AElig;-DIR entries (see also role <a href="#role-ae-auditor">&AElig; Auditor</a>)</td>
     <td>aeGroup</td>
   </tr>
   <tr>
     <td>cn=ae-all-zone-admins</td>
-    <td>&AElig;-DIR user group entry updated by a CRON job to contain all active zone admins</td>
+    <td>&AElig;-DIR user group entry updated by a CRON job to contain all active zone admins (see also role <a href="#role-zone-admin">Zone Admin</a>)</td>
     <td>aeGroup</td>
   </tr>
   <tr>
     <td>cn=ae-all-zone-auditors</td>
-    <td>This &AElig;-DIR user group entry is updated by a CRON job to contain all active zone auditors</td>
+    <td>This &AElig;-DIR user group entry is updated by a CRON job to contain all active zone auditors (see also role <a href="#role-zone-auditor">Zone Auditor</a>)</td>
     <td>aeGroup</td>
   </tr>
   <tr>
@@ -288,17 +288,18 @@
     <td>
       Members are central login (proxy) components which are allowed to see
       all users/groups and must determine login user/target relation themselves
+      (see also role <a href="#"></a>)
     </td>
     <td>aeGroup</td>
   </tr>
   <tr>
-    <td>cn=ae-providers</td>
-    <td>Members of this group are AE-DIR provider replicas</td>
+    <td>cn=ae-replicas</td>
+    <td>Members of this group are AE-DIR replicas including providers and consumers (see also role <a href="#role-ae-replica">&AElig; Replica</a>)</td>
     <td>aeGroup</td>
   </tr>
   <tr>
-    <td>cn=ae-replicas</td>
-    <td>Members of this group are AE-DIR replicas (providers and consumers)</td>
+    <td>cn=ae-providers</td>
+    <td>Members of this group are AE-DIR provider replicas (see also role <a href="#role-ae-provider">&AElig; Provider</a>)</td>
     <td>aeGroup</td>
   </tr>
   <tr>
@@ -327,40 +328,23 @@
     <td>namedObject</td>
   </tr>
   <tr>
-    <td>
-    cn=ppolicy-base-users
-    </td>
-    <td>
-    Password policy for primary personal user accounts (aeUser) in
-    zone base
-    </td>
+    <td>cn=ppolicy-base-users</td>
+    <td>Password policy for primary personal user accounts (aeUser) in zone <em>base</em></td>
     <td>namedPolicy</td>
   </tr>
   <tr>
-    <td>
-    cn=ppolicy-default
-    </td>
-    <td>
-    Unusable default password policy
-    </td>
+    <td>cn=ppolicy-default</td>
+    <td>Unusable default password policy</td>
     <td>namedPolicy</td>
   </tr>
   <tr>
-    <td>
-    cn=ppolicy-otptokens
-    </td>
-    <td>
-    Password policy for OTP enrollment
-    </td>
+    <td>cn=ppolicy-otptokens</td>
+    <td>Password policy for OTP enrollment</td>
     <td>namedPolicy</td>
   </tr>
   <tr>
-    <td>
-    cn=ppolicy-sasl-external
-    </td>
-    <td>
-    Password policy for services which must use SASL/EXTERNAL
-    </td>
+    <td>cn=ppolicy-sasl-external</td>
+    <td>Password policy for services which must use SASL/EXTERNAL</td>
     <td>namedPolicy</td>
   </tr>
   <tr>
