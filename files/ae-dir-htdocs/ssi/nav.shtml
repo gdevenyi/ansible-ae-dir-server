@@ -5,6 +5,6 @@
   <a href="user.html" title="User guide">Usage</a> /
   <a href="apps.html" title="Application examples">Apps</a> /
   <a href="python.html" title="Python scripting">Python</a> /
-  <a href="demo.html" title="Online demonstration">Demo</a> /
+  <!--a href="demo.html" title="Online demonstration">Demo</a> /-->
   <a href="todo.html" title="Next steps / to-do list">Next</a>
 </div>
