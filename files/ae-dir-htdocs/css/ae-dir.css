@@ -78,6 +78,7 @@ p.pagetitle {
   font-size:1.5em;
   padding-bottom:0.3em;
   counter-reset: h1counter;
+  margin-left:0;
 }
 
 h1 {
