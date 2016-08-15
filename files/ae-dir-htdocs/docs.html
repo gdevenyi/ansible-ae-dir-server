@@ -3,7 +3,11 @@
 <!--#set var="base_path" value="" -->
 <!--#include file="ssi/head.shtml" -->
 
-<p>Intended Audience: System architects, developers and system admins</p>
+<p>
+  <strong>Intended Audience:</strong>
+  <br>
+  System architects, developers and system administrators
+</p>
 
 <ol>
   <li><a href="#sys-arch">System architecture</a></li>
@@ -41,7 +45,7 @@
 <p>
   This chapter gives a high-level overview over the different roles and
   their access rights in &AElig;-DIR. See chapter
-  <a href="#slapd.access">Access control</a> for details.
+  <a href="#slapd.access">access control</a> for details.
 </p>
 
 <h2 id="role-ae-admin">&AElig; Admin</h2>
@@ -160,7 +164,9 @@
   <em>Setup admins</em> can maintain (add/modify/delete) member
   hosts/services of a service group typically while setting up a
   hosts/services instances. They can read but not write the service group
-  entry. Especially the setup admins set passwords for hosts/services.
+  entry. Especially the setup admins set passwords for hosts
+  (<a href="#schema-oc-aeHost">aeHost</a>) and
+  services (<a href="#schema-oc-aeService">aeService</a>) entries.
   The role is assigned by adding a user to a user group referenced in
   attribute <var>aeSetupGroups</var> in the service group
   (<a href="#schema-oc-aeSrvGroup">aeSrvGroup</a>).
@@ -168,34 +174,45 @@
 
 <h2 id="role-ae-user">&AElig; User</h2>
 <p>
-  Normal <em>&AElig; users</em> can read their own person and user entries
-  and all user entries which are in at least one common user group.
-  Users can set their own password but not read it.
+  Normal <em>&AElig; users</em> can read their own person and user
+  entries including own group membership and all user entries which
+  are in at least one common user group. Users can set their own
+  password but not read it.
 </p>
 
 <h2 id="role-ae-replica">&AElig; Replica</h2>
 <p>
-  The system role <em>&AElig; replicas</em> (role assigned by membership in
-  group <em>ae-replicas</em>) can read all entries including
+  The system role <em>&AElig; replicas</em> can read all entries including
   <var>userPassword</var> except some sensitive attributes only used on
   &AElig; providers.
+  The role is assigned to service accounts
+  (<a href="#schema-oc-aeService">aeService</a>)
+  by adding them to user group <em>ae-replicas</em>.
 </p>
 
 <h2 id="role-ae-provider">&AElig; Provider</h2>
 <p>
-  The system role <em>&AElig; providers</em> (role assigned by membership
-  in group <em>ae-providers</em>). Additionally to the rights assigned to
-  role <em>&AElig; replicas</em> this role has read access to organizational
-  entries (<a href="#schema-oc-aePerson">aePerson</a> and
-  <a href="#schema-oc-aeDept">aeDept</a>) also to some
-  more credential attributes (e.g. shared secrets used for
-  two-factor authentication).
+  Additionally to the rights assigned to role <em>&AElig; replica</em>
+  the role <em>&AElig; provider</em> has read access to:
+  <ul>
+    <li>
+      organizational entries (<a href="#schema-oc-aePerson">aePerson</a> and
+      <a href="#schema-oc-aeDept">aeDept</a>)
+    </li>
+    <li>
+      some more credential attributes (e.g. shared secrets used for
+      two-factor authentication and password history)
+    </li>
+  </ul>
+  The role is assigned to service accounts
+  (<a href="#schema-oc-aeService">aeService</a>)
+  by adding them to user group <em>ae-providers</em>.
 </p>
 
 <h1 id="dit">Directory Information Tree (DIT)</h1>
 <p>
   The following diagram illustrates the directory information tree (DIT)
-  structure of Æ-DIR. The nodes contain the <em>relative distinguished
+  structure of &AElig;-DIR. The nodes contain the <em>relative distinguished
   name</em> (RDN) and the <a href="#schema-soc">structural object class</a>
   used for that entry.
   The tree structure is also formally specified (within web2ldap's
@@ -212,6 +229,7 @@
 <h2 id="dit-zone-ae">cn=ae,ou=ae-dir</h2>
 <p>
   Zone <em>ae</em> is used for administration of &AElig;-DIR itself.
+  Therefore some special restrictions apply.
 </p>
 <p>
   <img
@@ -220,6 +238,149 @@
     title="sub-tree structure of zone ae"
   >
 </p>
+
+<table>
+  <tr>
+    <th>RDN</th>
+    <th>Description</th>
+    <th>Structural object class</th>
+  </tr>
+  <tr>
+    <td>cn=ae-admins</td>
+    <td>Group members can manage all &AElig;-DIR entries</td>
+    <td>aeGroup</td>
+  </tr>
+  <tr>
+    <td>cn=ae-auditors</td>
+    <td>Group members can read all &AElig;-DIR entries</td>
+    <td>aeGroup</td>
+  </tr>
+  <tr>
+    <td>cn=ae-all-zone-admins</td>
+    <td>&AElig;-DIR user group entry updated by a CRON job to contain all active zone admins</td>
+    <td>aeGroup</td>
+  </tr>
+  <tr>
+    <td>cn=ae-all-zone-auditors</td>
+    <td>This &AElig;-DIR user group entry is updated by a CRON job to contain all active zone auditors</td>
+    <td>aeGroup</td>
+  </tr>
+  <tr>
+    <td>cn=ae-dir-provider-hosts</td>
+    <td>Server group for all AE-DIR provider hosts</td>
+    <td>aeSrvGroup</td>
+  </tr>
+  <tr>
+    <td>cn=ae-dir-consumer-hosts</td>
+    <td>Server group for all AE-DIR consumer hosts</td>
+    <td>aeSrvGroup</td>
+  </tr>
+  <tr>
+    <td>cn=ae-login-proxies</td>
+    <td>
+      Members are central login (proxy) components which are allowed to see
+      all users/groups and must determine login user/target relation themselves
+    </td>
+    <td>aeGroup</td>
+  </tr>
+  <tr>
+    <td>cn=ae-providers</td>
+    <td>Members of this group are AE-DIR provider replicas</td>
+    <td>aeGroup</td>
+  </tr>
+  <tr>
+    <td>cn=ae-replicas</td>
+    <td>Members of this group are AE-DIR replicas (providers and consumers)</td>
+    <td>aeGroup</td>
+  </tr>
+  <tr>
+    <td>cn=ae-sudo-sys-admins</td>
+    <td>allows <code>su - root</code> for AE-DIR system admins (group <em>ae-sys-admins</em>)</td>
+    <td>aeSudoRule</td>
+  </tr>
+  <tr>
+    <td>cn=ae-sys-admins</td>
+    <td>Members are system admins for AE-DIR servers</td>
+    <td>aeGroup</td>
+  </tr>
+  <tr>
+    <td>cn=ae-tag-init</td>
+    <td>Tag for all entries created during initial load</td>
+    <td>aeTag</td>
+  </tr>
+  <tr>
+    <td>cn=ae-uid-badwords</td>
+    <td>UID blacklist containing bad words</td>
+    <td>namedObject</td>
+  </tr>
+  <tr>
+    <td>cn=ae-uid-blacklist</td>
+    <td>This entry contains a blacklist for 'uid' values</td>
+    <td>namedObject</td>
+  </tr>
+  <tr>
+    <td>
+    cn=ppolicy-base-users
+    </td>
+    <td>
+    Password policy for primary personal user accounts (aeUser) in
+    zone base
+    </td>
+    <td>namedPolicy</td>
+  </tr>
+  <tr>
+    <td>
+    cn=ppolicy-default
+    </td>
+    <td>
+    Unusable default password policy
+    </td>
+    <td>namedPolicy</td>
+  </tr>
+  <tr>
+    <td>
+    cn=ppolicy-otptokens
+    </td>
+    <td>
+    Password policy for OTP enrollment
+    </td>
+    <td>namedPolicy</td>
+  </tr>
+  <tr>
+    <td>
+    cn=ppolicy-sasl-external
+    </td>
+    <td>
+    Password policy for services which must use SASL/EXTERNAL
+    </td>
+    <td>namedPolicy</td>
+  </tr>
+  <tr>
+    <td>cn=ppolicy-systems</td>
+    <td>Password policy for hosts and system/service accounts (aeHost and aeService)</td>
+    <td>namedPolicy</td>
+  </tr>
+  <tr>
+    <td>cn=ppolicy-users</td>
+    <td>Password policy for personal user accounts (aeUser)</td>
+    <td>namedPolicy</td>
+  </tr>
+  <tr>
+    <td>uid=ae-dir-otpenroll</td>
+    <td>Service account for two-factor (OATH-LDAP) enrollment application</td>
+    <td>aeService</td>
+  </tr>
+  <tr>
+    <td>uid=ae-dir-otpverify</td>
+    <td>Service account for OATH-LDAP validator demon</td>
+    <td>aeService</td>
+  </tr>
+  <tr>
+    <td>uid=ae-dir-pwd</td>
+    <td>Service account for password self-service application and CRON job</td>
+    <td>aeService</td>
+  </tr>
+</table>
 
 <h2 id="dit-zone-people">cn=people,ou=ae-dir</h2>
 <p>
