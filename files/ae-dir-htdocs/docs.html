@@ -11,11 +11,52 @@
 
 <ol>
   <li><a href="#sys-arch">System architecture</a></li>
-  <li><a href="#roles">Roles and Access Rights</a></li>
-  <li><a href="#dit">Directory Information Tree (DIT)</a></li>
-  <li><a href="#eer">Entity Relationship</a></li>
-  <li><a href="#schema">Schema</a></li>
-  <li><a href="#slapd.conf">OpenLDAP configuration (slapd.conf)</a></li>
+  <li>
+    <a href="#roles">Roles and Access Rights</a>
+    <ol>
+      <li><a href="#role-ae-admin">&AElig; Admin</a></li>
+      <li><a href="#role-ae-auditor">&AElig; Auditor</a></li>
+      <li><a href="#role-zone-admin">Zone Admin</a></li>
+      <li><a href="#role-zone-auditor">Zone Auditor</a></li>
+      <li><a href="#role-setup-admin">Setup Admin</a></li>
+      <li><a href="#role-ae-user">&AElig; User</a></li>
+      <li><a href="#role-ae-replica">&AElig; Replica</a></li>
+      <li><a href="#role-ae-provider">&AElig; Provider</a></li>
+    </ol>
+  </li>
+  <li>
+    <a href="#dit">Directory Information Tree (DIT)</a>
+    <ol>
+      <li>
+        <a href="#dit-ae-dir">ou=ae-dir</a>
+        <ol>
+          <li><a href="#dit-zone-ae">cn=ae,ou=ae-dir</a></li>
+          <li><a href="#dit-zone-people">cn=people,ou=ae-dir</a></li>
+          <li><a href="#dit-zone-pub">cn=pub,ou=ae-dir</a></li>
+        </ol>
+      </li>
+      <li><a href="#dit-accesslog">cn=accesslog-ae-dir</a></li>
+    </ol>
+  </li>
+  <li>
+    <a href="#eer">Entity Relationship</a>
+  </li>
+  <li>
+    <a href="#schema">Schema</a>
+    <ol>
+      <li><a href="#schema-soc">Structural Object Classes</a></li>
+      <li><a href="#schema-aux-oc">Auxiliary Object Classes</a></li>
+    </ol>
+  </li>
+  <li>
+    <a href="#slapd.conf">OpenLDAP configuration (slapd.conf)</a>
+    <ol>
+      <li><a href="#slapd-roles">slapd replica roles</a></li>
+      <li><a href="#backends">Backends</a></li>
+      <li><a href="#overlays">Overlays</a></li>
+      <li><a href="#slapd.access">Access control</a></li>
+    </ol>
+  </li>
 </ol>
 
 <h1 id="sys-arch">System architecture</h1>
@@ -41,11 +82,11 @@
 <p>
 </p>
 
-<h1 id="roles">Roles and Access Rights</h1>
+<h1 id="roles">Roles</h1>
 <p>
   This chapter gives a high-level overview over the different roles and
   their access rights in &AElig;-DIR. See chapter
-  <a href="#slapd.access">access control</a> for details.
+  <a href="#slapd.access">access control</a> for technical details.
 </p>
 
 <h2 id="role-ae-admin">&AElig; Admin</h2>
@@ -163,7 +204,7 @@
 <p>
   <em>Setup admins</em> can maintain (add/modify/delete) member
   hosts/services of a service group typically while setting up a
-  hosts/services instances. They can read but not write the service 
+  hosts/services instances. They can read but not write the service
   group (<a href="#schema-oc-aeSrvGroup">aeSrvGroup</a>) entry.
   The role is assigned by adding a user to a user group referenced in
   attribute <var>aeSetupGroups</var> in the service group
@@ -218,11 +259,14 @@
 </p>
 
 <h1 id="dit">Directory Information Tree (DIT)</h1>
+
+<h2 id="dit-ae-dir">ou=ae-dir</h2>
 <p>
   The following diagram illustrates the directory information tree (DIT)
-  structure of &AElig;-DIR. The nodes contain the <em>relative distinguished
-  name</em> (RDN) and the <a href="#schema-soc">structural object class</a>
-  used for that entry.
+  structure of &AElig;-DIR in namin context <em>ou=ae-dir</em> where
+  all &AElig;-DIR entities are stored as separate LDAP entries.
+  The nodes contain the <em>relative distinguished name</em> (RDN) and
+  the <a href="#schema-soc">structural object class</a> used for that entry.
   The tree structure is also formally specified (within web2ldap's
   configuration) with DIT structure rules and name forms.
 </p>
@@ -234,7 +278,7 @@
   >
 </p>
 
-<h2 id="dit-zone-ae">cn=ae,ou=ae-dir</h2>
+<h3 id="dit-zone-ae">cn=ae,ou=ae-dir</h3>
 <p>
   Zone <em>ae</em> is used for administration of &AElig;-DIR itself.
   Therefore some special restrictions apply.
@@ -256,32 +300,32 @@
   <tr>
     <td>cn=ae-admins</td>
     <td>Group members can manage all &AElig;-DIR entries (see also role <a href="#role-ae-admin">&AElig; Admin</a>)</td>
-    <td>aeGroup</td>
+    <td><a href="#schema-oc-aeGroup">aeGroup</a></td>
   </tr>
   <tr>
     <td>cn=ae-auditors</td>
     <td>Group members can read all &AElig;-DIR entries (see also role <a href="#role-ae-auditor">&AElig; Auditor</a>)</td>
-    <td>aeGroup</td>
+    <td><a href="#schema-oc-aeGroup">aeGroup</a></td>
   </tr>
   <tr>
     <td>cn=ae-all-zone-admins</td>
     <td>&AElig;-DIR user group entry updated by a CRON job to contain all active zone admins (see also role <a href="#role-zone-admin">Zone Admin</a>)</td>
-    <td>aeGroup</td>
+    <td><a href="#schema-oc-aeGroup">aeGroup</a></td>
   </tr>
   <tr>
     <td>cn=ae-all-zone-auditors</td>
     <td>This &AElig;-DIR user group entry is updated by a CRON job to contain all active zone auditors (see also role <a href="#role-zone-auditor">Zone Auditor</a>)</td>
-    <td>aeGroup</td>
+    <td><a href="#schema-oc-aeGroup">aeGroup</a></td>
   </tr>
   <tr>
     <td>cn=ae-dir-provider-hosts</td>
     <td>Server group for all AE-DIR provider hosts</td>
-    <td>aeSrvGroup</td>
+    <td><a href="#schema-oc-aeSrvGroup">aeSrvGroup</a></td>
   </tr>
   <tr>
     <td>cn=ae-dir-consumer-hosts</td>
     <td>Server group for all AE-DIR consumer hosts</td>
-    <td>aeSrvGroup</td>
+    <td><a href="#schema-oc-aeSrvGroup">aeSrvGroup</a></td>
   </tr>
   <tr>
     <td>cn=ae-login-proxies</td>
@@ -290,32 +334,32 @@
       all users/groups and must determine login user/target relation themselves
       (see also role <a href="#"></a>)
     </td>
-    <td>aeGroup</td>
+    <td><a href="#schema-oc-aeGroup">aeGroup</a></td>
   </tr>
   <tr>
     <td>cn=ae-replicas</td>
     <td>Members of this group are AE-DIR replicas including providers and consumers (see also role <a href="#role-ae-replica">&AElig; Replica</a>)</td>
-    <td>aeGroup</td>
+    <td><a href="#schema-oc-aeGroup">aeGroup</a></td>
   </tr>
   <tr>
     <td>cn=ae-providers</td>
     <td>Members of this group are AE-DIR provider replicas (see also role <a href="#role-ae-provider">&AElig; Provider</a>)</td>
-    <td>aeGroup</td>
+    <td><a href="#schema-oc-aeGroup">aeGroup</a></td>
   </tr>
   <tr>
     <td>cn=ae-sudo-sys-admins</td>
     <td>allows <code>su - root</code> for AE-DIR system admins (group <em>ae-sys-admins</em>)</td>
-    <td>aeSudoRule</td>
+    <td><a href="#schema-oc-aeSudoRule">aeSudoRule</a></td>
   </tr>
   <tr>
     <td>cn=ae-sys-admins</td>
     <td>Members are system admins for AE-DIR servers</td>
-    <td>aeGroup</td>
+    <td><a href="#schema-oc-aeGroup">aeGroup</a></td>
   </tr>
   <tr>
     <td>cn=ae-tag-init</td>
     <td>Tag for all entries created during initial load</td>
-    <td>aeTag</td>
+    <td><a href="#schema-oc-aeTag">aeTag</a></td>
   </tr>
   <tr>
     <td>cn=ae-uid-badwords</td>
@@ -360,31 +404,63 @@
   <tr>
     <td>uid=ae-dir-otpenroll</td>
     <td>Service account for two-factor (OATH-LDAP) enrollment application</td>
-    <td>aeService</td>
+    <td><a href="#schema-oc-aeService">aeService</a></td>
   </tr>
   <tr>
     <td>uid=ae-dir-otpverify</td>
     <td>Service account for OATH-LDAP validator demon</td>
-    <td>aeService</td>
+    <td><a href="#schema-oc-aeService">aeService</a></td>
   </tr>
   <tr>
     <td>uid=ae-dir-pwd</td>
     <td>Service account for password self-service application and CRON job</td>
-    <td>aeService</td>
+    <td><a href="#schema-oc-aeService">aeService</a></td>
   </tr>
 </table>
 
-<h2 id="dit-zone-people">cn=people,ou=ae-dir</h2>
+<h3 id="dit-zone-people">cn=people,ou=ae-dir</h3>
 <p>
-  Zone <em>people</em> is used for maintaining <var>aePerson</var> entries
-  synced with a HR system or similar.
+  Zone <em>people</em> is used for storing
+  person (<a href="#schema-oc-aePerson">aePerson</a>) and
+  department (<a href="#schema-oc-aeDept">aeDept</a>) entries.
+  These can be maintained manually or could be synced with a HR
+  system or similar if appropriate.
+  Make sure to avoid hen-and-egg issues when syncing entries.
 </p>
 
-<h2 id="dit-zone-pub">cn=pub,ou=ae-dir</h2>
+<h3 id="dit-zone-pub">cn=pub,ou=ae-dir</h3>
 <p>
   Zone <em>pub</em> contains entries which are globally readable by all
-  clients.
+  authenticated clients:
 </p>
+<table>
+  <tr>
+    <th>RDN</th>
+    <th>Description</th>
+    <th>Structural object class</th>
+  </tr>
+  <tr>
+    <td>cn=sudo-defaults</td>
+    <td>sets <em>sudoers</em> defaults</td>
+    <td>sudoRole</td>
+  </tr>
+  <tr>
+    <td>cn=pub-tag-no-welcome-yet</td>
+    <td>tag used with aeUser entries indicating that welcome e-mail was not sent to user yet</td>
+    <td><a href="#schema-oc-aeTag">aeTag</a></td>
+  </tr>
+  <tr>
+    <td>cn=dua-profile</td>
+    <td>client configuration profile (see <a href="https://tools.ietf.org/html/rfc4876">RFC 4876</a>)</td>
+    <td>DUAConfigProfile</td>
+  </tr>
+</table>
+
+<h2 id="dit-accesslog">cn=accesslog-ae-dir</h2>
+<p>
+  <a href="https://tools.ietf.org/html/draft-chu-ldap-logschema">draft-chu-ldap-logschema</a>
+</p>
+
 
 <h1 id="eer">Entity Relationship</h1>
 <p>
@@ -449,7 +525,7 @@
         <li><a href="#schema-oc-aeObject">aeObject</a></li>
       </ul>
     </td>
-    <td>aePosixIdRanges</td>
+    <td><a href="#schema-oc-aePosixIdRanges">aePosixIdRanges</a></td>
   </tr>
   <tr>
     <th><a href="#schema-oc-aeDept">aeDept</a></th>
@@ -487,7 +563,7 @@
         <li>namedObject</li>
       </ul>
     </td>
-    <td>aePosixIdRanges</td>
+    <td><a href="#schema-oc-aePosixIdRanges">aePosixIdRanges</a></td>
   </tr>
   <tr>
     <th><a href="#schema-oc-aePerson">aePerson</a></th>
@@ -575,7 +651,7 @@
     <th><a href="#schema-oc-aeHost">aeHost</a></th>
     <td>host</td>
     <td>host information and for host authentication</td>
-    <td>aeDevice</td>
+    <td><a href="#schema-oc-aeDevice">aeDevice</a></td>
     <td>
       <ul>
         <li><a href="#schema-oc-posixAccount">posixAccount</a></li>
@@ -589,7 +665,7 @@
     <th><a href="#schema-oc-aeNwDevice">aeNwDevice</a></th>
     <td>cn</td>
     <td>Network device information</td>
-    <td>aeDevice</td>
+    <td><a href="#schema-oc-aeDevice">aeDevice</a></td>
     <td>
       <ul>
         <li>ipHost</li>
@@ -1259,19 +1335,47 @@
 <h2 id="backends">Backends</h2>
 
 <p>
-  Backends used are:
+  Different backends are used on all <em>slapd</em> instances listed in the following table.
 </p>
-<dl>
-  <dt id="slapd-mdb">slapd-mdb</dt>
-  <dd>
-    <a href="http://www.openldap.org/software/man.cgi?query=slapd-mdb">slapd-mdb(5)</a>
-  </dd>
-  <dt id="slapd-sock">slapd-sock</dt>
-  <dd>
-    only for multi-factor authentication used as overlay
-    <a href="http://www.openldap.org/software/man.cgi?query=slapd-sock">slapd-sock(5)</a>
-  </dd>
-</dl>
+<table>
+  <tr>
+    <th>name</th>
+    <th>used for</th>
+    <th>man page</th>
+  </tr>
+  <tr>
+    <td id="slapd-config">slapd-config</td>
+    <td>used in read-only mode for retrieving configuration (e.g. for monitoring)</td>
+    <td>
+      <a href="http://www.openldap.org/software/man.cgi?query=slapd-config">slapd-config(5)</a>
+    </td>
+  </tr>
+  <tr>
+    <td id="slapd-mdb">slapd-mdb</td>
+    <td>
+      real database storage backend used for
+      &AElig;-DIR itself (<a href="#dit-ae-dir">ou=ae-dir</a>) and
+      the accesslog DB (<a href="#dit-accesslog">cn=accesslog-ae-dir</a>)
+    </td>
+    <td>
+      <a href="http://www.openldap.org/software/man.cgi?query=slapd-mdb">slapd-mdb(5)</a>
+    </td>
+  </tr>
+  <tr>
+    <td id="slapd-sock">slapd-sock</td>
+    <td>used as overlay for processing simple bind requests during multi-factor authentication (OATH-LDAP)</td>
+    <td>
+      <a href="http://www.openldap.org/software/man.cgi?query=slapd-sock">slapd-sock(5)</a>
+    </td>
+  </tr>
+  <tr>
+    <td id="slapd-monitor">slapd-monitor</td>
+    <td>used for retrieving performance monitor data</td>
+    <td>
+      <a href="http://www.openldap.org/software/man.cgi?query=slapd-monitor">slapd-monitor(5)</a>
+    </td>
+  </tr>
+</table>
 
 <h2 id="overlays">Overlays</h2>
 
