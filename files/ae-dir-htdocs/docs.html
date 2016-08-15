@@ -67,7 +67,7 @@
 <p>Typical tasks:</p>
 <ul>
   <li>
-    add/modify zone entries (see <a href="schema-oc-aeZone">aeZone</a>)
+    add/modify zone entries (see <a href="#schema-oc-aeZone">aeZone</a>)
   </li>
   <li>
     entitle <a href="#role-ae-auditor">&AElig; auditors</a>
@@ -194,16 +194,18 @@
 <p>
   Additionally to the rights assigned to role <em>&AElig; replica</em>
   the role <em>&AElig; provider</em> has read access to:
-  <ul>
-    <li>
-      organizational entries (<a href="#schema-oc-aePerson">aePerson</a> and
-      <a href="#schema-oc-aeDept">aeDept</a>)
-    </li>
-    <li>
-      some more credential attributes (e.g. shared secrets used for
-      two-factor authentication and password history)
-    </li>
-  </ul>
+</p>
+<ul>
+  <li>
+    organizational entries (<a href="#schema-oc-aePerson">aePerson</a> and
+    <a href="#schema-oc-aeDept">aeDept</a>)
+  </li>
+  <li>
+    some more credential attributes (e.g. shared secrets used for
+    two-factor authentication and password history)
+  </li>
+</ul>
+<p>
   The role is assigned to service accounts
   (<a href="#schema-oc-aeService">aeService</a>)
   by adding them to user group <em>ae-providers</em>.
