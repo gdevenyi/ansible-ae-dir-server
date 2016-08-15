@@ -3,7 +3,11 @@
 <!--#set var="base_path" value="" -->
 <!--#include file="ssi/head.shtml" -->
 
-<p>Intended Audience: All roles maintaining/accessing &AElig;-DIR via web2ldap admin UI</p>
+<p>
+  <strong>Intended Audience:</strong>
+  <br>
+  All roles maintaining/accessing &AElig;-DIR via web2ldap admin UI
+</p>
 
 <p>
   This document describes how to maintain various entries in &AElig;-DIR with
@@ -32,6 +36,7 @@
       <li><a href="#search-aeUser">Search a single user by username</a></li>
       <li><a href="#search-aeSrvGroup">Search service group</a></li>
       <li><a href="#search-aeHost-export">Export servers in a service group</a></li>
+      <li><a href="#search-display-self">Display own entry</a></li>
     </ol>
   </li>
   <li>
@@ -262,7 +267,7 @@
 <p>Steps:</p>
 <ol>
   <li>
-    <a href="/web2ldap">Connect to local web2ldap</a>
+    <a href="/web2ldap">Connect to web2ldap</a>
   </li>
   <li>
     Choose link <span class="web2ldap-internal-link">General administration</span>.
@@ -347,6 +352,32 @@
   access control restrictions. So some attributes might not be visible for
   you even though they are present and have some effect.
 </p>
+
+<h2 id="search-display-self">Display own account and group membership</h2>
+<ol>
+  <li>
+    <a href="#connect-and-bind">Connect and bind</a>
+  </li>
+  <li>
+    Select link <span class="web2ldap-menu-button">ConnInfo</span>
+    from the main menu on the left.
+  </li>
+  <li>
+    In the middle area there is your bind-DN displayed after
+    description <em>Bound as:</em> where you can
+    select <span class="web2ldap-internal-link">Read</span>.
+  </li>
+  <li>
+    Your own personal user account is displayed in the middle area
+    with a table row described as <em>Member in group(s):</em> where you
+    can check the group membership of your account.
+  </li>
+  <li>
+    Click link <span class="web2ldap-internal-link">Members</span>
+    in the middle area near the group name to search all members of
+    this particular user group.
+  </li>
+</ol>
 
 <h2 id="search-zone">Search zone</h2>
 <ol>
@@ -1424,9 +1455,8 @@
 
 <p>Bookmark:</p>
 <p>
-  Directly jump into the
-  <a href="https://demo.ae-dir.com/web2ldap/oid?ldapi:///ou=ae-dir????bindname=user,X-BINDPW=foobar42">schema browser</a>
-  of online demo.
+  Jump into
+  <a href="/web2ldap/oid?ldapi:///ou=ae-dir????bindname=">schema browser</a>
 </p>
 
 <!--#include file="ssi/footer.shtml" -->
