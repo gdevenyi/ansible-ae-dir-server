@@ -163,14 +163,20 @@
 <p>
   <em>Setup admins</em> can maintain (add/modify/delete) member
   hosts/services of a service group typically while setting up a
-  hosts/services instances. They can read but not write the service group
-  entry. Especially the setup admins set passwords for hosts
-  (<a href="#schema-oc-aeHost">aeHost</a>) and
-  services (<a href="#schema-oc-aeService">aeService</a>) entries.
+  hosts/services instances. They can read but not write the service 
+  group (<a href="#schema-oc-aeSrvGroup">aeSrvGroup</a>) entry.
   The role is assigned by adding a user to a user group referenced in
   attribute <var>aeSetupGroups</var> in the service group
   (<a href="#schema-oc-aeSrvGroup">aeSrvGroup</a>).
 </p>
+<p>Typical tasks:</p>
+<ul>
+  <li>
+    The setup admins add/modify/deletes hosts
+    (<a href="#schema-oc-aeHost">aeHost</a>) and
+    services (<a href="#schema-oc-aeService">aeService</a>) entries.
+  </li>
+</ul>
 
 <h2 id="role-ae-user">&AElig; User</h2>
 <p>
