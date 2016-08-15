@@ -74,18 +74,18 @@
     add/modify/remove <a href="#role-ae-replica">replicas</a>
   </li>
 </ul>
-<p>Exceptional tasks (need careful consideration):</p>
+<p>Exceptional tasks (requires careful consideration):</p>
 <ul>
+  <li>
+    tasks usually done by <a href="#role-zone-admin">zone admin(s)</a>
+  </li>
   <li>
     add/modify password policies (possibly also requires
     modification of system configuration)
   </li>
   <li>
-    maintain arbitrary entries in case responsible
-    <a href="#role-zone-admin">zone admin(s)</a> are not available
-  </li>
-  <li>
-    repair broken entries circumventing constraints
+    repair broken entries which requires circumventing constraints
+    and therefore needs manage privilege
   </li>
 </ul>
 
@@ -96,16 +96,49 @@
   the audit database. Even when added to another user group members of
   group <em>ae-auditors</em> will <strong>not</strong> gain any write access.
 </p>
+<p>Typical tasks:</p>
+<ul>
+  <li>
+    review normal entries to ensure compliance to internal security policies
+  </li>
+  <li>
+    search accesslog database(s) to clarify impact of possible security incidents
+  </li>
+</ul>
 
 <h2 id="role-zone-admin">Zone Admin</h2>
 <p>
   <em>Zone admins</em> have full write access (but no <var>manage</var>
   privilege) to all entries within a zone. The role is assigned to a user
   account by adding it to the group <var>[zone name]-zone-admins</var>).
-  Typically zone admins perform the daily maintenance tasks, e.g.
-  adding/modifying personal and system user accounts, adding/modifying user
-  and service groups, help users with password reset procedure.
+  Typically zone admins perform the daily maintenance tasks and are
 </p>
+<p>Typical tasks:</p>
+<ul>
+  <li>
+    entitle other <a href="#role-zone-admin">zone admin(s)</a>
+  </li>
+  <li>
+    entitle <a href="#role-zone-auditor">zone auditor(s)</a>
+  </li>
+  <li>
+    add/modify personal user accounts (<a href="#schema-oc-aeUser">aeUser</a>)
+    and help the users with password reset procedure
+  </li>
+  <li>
+    add/modify service accounts for client systems (<a href="#schema-oc-aeService">aeService</a>)
+  </li>
+  <li>
+    add/modify user groups (<a href="#schema-oc-aeGroup">aeGroup</a>)
+  </li>
+  <li>
+    add/modify/delete server/service groups (<a href="#schema-oc-aeSrvGroup">aeSrvGroup</a>)
+  </li>
+  <li>
+    add/modify/delete service accounts (<a href="#schema-oc-aeService">aeService</a>)
+    or hosts/servers (<a href="#schema-oc-aeHost">aeHost</a>) within a server/service group.
+  </li>
+</ul>
 
 <h2 id="role-zone-auditor">Zone Auditor</h2>
 <p>
@@ -113,6 +146,12 @@
   The role is assigned to a user account by adding it to the group
   <var>[zone name]-zone-auditors</var>).
 </p>
+<p>Typical tasks:</p>
+<ul>
+  <li>
+    review normal entries to ensure correct functional behaviour
+  </li>
+</ul>
 
 <h2 id="role-setup-admin">Setup Admin</h2>
 <p>
@@ -121,7 +160,8 @@
   hosts/services instances. They can read but not write the service group
   entry. Especially the setup admins set passwords for hosts/services.
   The role is assigned by adding a user to a user group referenced in
-  attribute <var>aeSetupGroups</var> in the service group.
+  attribute <var>aeSetupGroups</var> in the service group
+  (<a href="#schema-oc-aeSrvGroup">aeSrvGroup</a>).
 </p>
 
 <h2 id="role-ae-user">&AElig; User</h2>
@@ -143,8 +183,11 @@
 <p>
   The system role <em>&AElig; providers</em> (role assigned by membership
   in group <em>ae-providers</em>). Additionally to the rights assigned to
-  role <em>&AElig; replicas</em> this role has read access also to some
-  more credential attributes.
+  role <em>&AElig; replicas</em> this role has read access to organizational
+  entries (<a href="#schema-oc-aePerson">aePerson</a> and
+  <a href="#schema-oc-aeDept">aeDept</a>) also to some
+  more credential attributes (e.g. shared secrets used for
+  two-factor authentication).
 </p>
 
 <h1 id="dit">Directory Information Tree (DIT)</h1>
@@ -805,7 +848,6 @@
 </dl>
 
 <h3 id="schema-oc-aeSudoRule">aeSudoRule</h3>
-
 <p>
   <em>sudoers</em> rules are stored in entries of object class
   <var>aeSudoRule</var>. The attributes are compatible to those defined for
@@ -838,13 +880,15 @@
 
 <h3 id="schema-oc-aeService">aeService</h3>
 <p>
-  Object class <var>aeService</var> is used for creating accounts for
-  services (sometimes called tool accounts or similar).
-  The service must authenticate by using bind-DN/password or TLS client cert.
-  So Those entries may
-  have a password to authenticate to &AElig;-DIR. X.509 client certificate(s)
-  may be associated by using AUX object class <var>pkiUser</var> and
-  setting the attribute <var>seeAlso</var> to the client certs subject-DN.
+  Object class <var>aeService</var> is used for creating accounts
+  for services (sometimes called tool / machine / system account or similar).
+  The service must authenticate by using bind-DN/password or TLS
+  client cert.
+  <em>aeService</em> entries may have a password (attribute
+  <var>userPassword</var>) to authenticate to &AElig;-DIR.
+  X.509 client certificate(s) may be associated by adding AUX object
+  class <a href="#schema-oc-pkiUser">pkiUser</a> and setting the
+  attribute <var>seeAlso</var> to the client certs subject-DN.
 </p>
 <p>
   Two possible usage types (roles):
@@ -902,12 +946,13 @@
     The host must authenticate by using bind-DN/password or TLS client cert.
   </li>
   <li>
-    Entries may have a password to authenticate to &AElig;-DIR.
+    Entries may have a password (attribute <var>userPassword</var>)
+    to authenticate to &AElig;-DIR.
   </li>
   <li>
-    X.509 client certificate(s) may be associated by using AUX object class
-    <var>pkiUser</var> and setting the attribute <var>seeAlso</var> to the
-    client certs subject-DN.
+    X.509 client certificate(s) may be associated by adding AUX object
+    class <a href="#schema-oc-pkiUser">pkiUser</a> and setting the
+    attribute <var>seeAlso</var> to the client certs subject-DN.
   </li>
   <li>
     SSH host keys may be associated by using AUX object class
