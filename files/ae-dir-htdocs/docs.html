@@ -10,7 +10,13 @@
 </p>
 
 <ol>
-  <li><a href="#sys-arch">System architecture</a></li>
+  <li>
+    <a href="#sys-arch">System architecture</a>
+    <ol>
+      <li><a href="#sys-provider">&AElig;-DIR provider</a></li>
+      <li><a href="#sys-consumer">&AElig;-DIR consumer</a></li>
+    </ol>
+  </li>
   <li>
     <a href="#roles">Roles and Access Rights</a>
     <ol>
@@ -78,9 +84,54 @@
   >
 </p>
 
+<p>
+  The following system components are running on each
+  &AElig;-DIR provider system:
+</p>
+<dl>
+  <dt id="sys-slapd-provider">slapd provider</dt>
+  <dd>
+    <a href="http://www.openldap.org">OpenLDAP's slapd</a>
+    (see also <a href="#slapd-role-provider">provider configuration</a>)
+  </dd>
+  <dt id="sys-web2ldap">web2ldap</dt>
+  <dd>
+    <a href="https://web2ldap.de">web2ldap</a> is a web-based LDAPv3 client
+    to access and maintain LDAP servers. It is used as &AElig;-DIR's main
+    admin user interface.
+    Check out the
+    <a href="https://www.web2ldap.de/docs.html">documentation</a>
+    to find out about fine-tuning, customizing etc.
+  </dd>
+  <dt id="sys-aedirpwd_web">aedirpwd_web</dt>
+  <dd>
+    <em>aedirpwd_web</em> is a small web application for password
+    self-service (see <a href="pwd.html">user guide</a> for instructions
+    how to use it).
+  </dd>
+  <dt id="sys-aedirpwd_cron">aedirpwd_cron</dt>
+  <dd>
+    <em>aedirpwd_cron</em> is a small Python script running as CRON job
+    which performs the following tasks:
+    <ul>
+      <li>remove expired password reset attributes</li>
+      <li>send welcome e-mails to new users especially with password reset instructions</li>
+    </ul>
+  </dd>
+</dl>
+
 <h2 id="sys-consumer">&AElig;-DIR consumer</h2>
 <p>
+  There is currently only one component running on on each
+  &AElig;-DIR consumer system:
 </p>
+<dl>
+  <dt id="sys-slapd-consumer">slapd consumer</dt>
+  <dd>
+    <a href="http://www.openldap.org">OpenLDAP's slapd</a>
+    (see also <a href="#slapd-role-consumer">consumer configuration</a>)
+  </dd>
+</dl>
 
 <h1 id="roles">Roles</h1>
 <p>
@@ -1317,16 +1368,6 @@
 <h3 id="slapd-role-provider">slapd provider</h3>
 <p>
 </p>
-
-<dl>
-  <dt>web2ldap</dt>
-  <dd>
-    <a href="https://web2ldap.de/">web2ldap</a> is used as interactive
-    management user interface. Check out the
-    <a href="https://www.web2ldap.de/docs.html">documentation</a>
-    to find out about fine-tuning, customizing etc.
-  </dd>
-</dl>
 
 <h3 id="slapd-role-consumer">slapd consumer</h3>
 <p>
