@@ -4,6 +4,40 @@
 <!--#include file="ssi/head.shtml" -->
 
 <p>
+  <strong>Intended Audience:</strong>
+  <br>
+  System architects, developers and system administrators
+</p>
+
+<h1>OpenLDAP command-line tools</h1>
+<p>
+</p>
+
+<h2>ldapwhoami</h2>
+<p><a href="http://www.openldap.org/software/man.cgi?query=ldapwhoami">ldapwhoami(1)</a></p>
+
+<p>Check aeUser or aeService password with short bind-DN:</p>
+<code>
+</code>
+
+<p>Check aeHost password with short bind-DN:</p>
+<code>
+</code>
+
+<h2>ldapsearch</h2>
+<p><a href="http://www.openldap.org/software/man.cgi?query=ldapsearch">ldapsearch(1)</a></p>
+
+<p>Search aeUser:</p>
+<code>
+</code>
+
+<p>Search on behalf of aeHost:</p>
+<code>
+</code>
+
+<h1>&AElig;-DIR command-line tools</h1>
+
+<p>
   Various command-line tools are installed on the provider systems
   into directory <code>/opt/ae-dir/bin/</code>:
 </p>
@@ -19,7 +53,7 @@
   </dd>
 </dl>
 
-<h1 id="ae-passwd">ae-passwd.py</h1>
+<h2 id="ae-passwd">ae-passwd.py</h2>
 
 <p>Roles:</p>
 <ul>
@@ -40,7 +74,7 @@ new password for uid=bart,cn=ae,ou=ae-dir:
 repeat password:
 </pre>
 
-<h1 id="ae-add-zone">ae-add-zone.py</h1>
+<h2 id="ae-add-zone">ae-add-zone.py</h2>
 
 <p>Roles:</p>
 <ul>
