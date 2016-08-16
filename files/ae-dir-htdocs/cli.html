@@ -9,7 +9,7 @@
   Developers and system administrators
 </p>
 
-<h1>OpenLDAP command-line tools</h1>
+<h1 id="openldap">OpenLDAP command-line tools</h1>
 <p>
   Relevant OpenLDAP documentation:
 </p>
@@ -25,29 +25,69 @@
   </li>
 </ul>
 
-<h2>ldapwhoami</h2>
-<p><a href="http://www.openldap.org/software/man.cgi?query=ldapwhoami">ldapwhoami(1)</a></p>
+<h2 id="openldap-ldapwhoami">ldapwhoami</h2>
+<p>
+  The OpenLDAP command-line tool
+  <a href="http://www.openldap.org/software/man.cgi?query=ldapwhoami">ldapwhoami(1)</a>
+  binds and sends a "Who am I?" extended operation
+  (see <a href="https://tools.ietf.org/html/rfc4532">RFC 4532</a>)
+  to the LDAP server. This is handy to test various authentication mechs and
+  <a href="http://www.openldap.org/doc/admin24/sasl.html#Mapping%20Authentication%20Identities">authz-ID mappings</a>.
+</p>
 
-<p>Check aeUser or aeService password with short bind-DN:</p>
-<code>
-</code>
+<dl>
 
-<p>Check aeHost password with short bind-DN:</p>
-<code>
-</code>
+  <dt>Check <var>aeUser</var> or <var>aeService</var> password via simple bind request with short bind-DN interactively asking for password:</dt>
+  <dd>
+    <code>
+      ldapwhoami -x -D "uid=lisa,ou=ae-dir" -W
+    </code>
+  </dd>
 
-<h2>ldapsearch</h2>
-<p><a href="http://www.openldap.org/software/man.cgi?query=ldapsearch">ldapsearch(1)</a></p>
+  <dt>Check <var>aeHost</var> password via simple bind request with short bind-DN and given password:</dt>
+  <dd>
+    <code>
+      ldapwhoami -x -D "host=bart.example.com,ou=ae-dir" -w
+    </code>
+  </dd>
 
-<p>Search aeUser:</p>
-<code>
-</code>
+  <dt>Check <var>aeService</var> authentication via SASL/EXTERNAL bind request and client cert:</dt>
+  <dd>
+    <code>
+      LDAPTLS_CERT=/path/to/client.crt LDAPTLS_KEY=/path/to/client.key ldapwhoami -Y EXTERNAL
+    </code>
+  </dd>
 
-<p>Search on behalf of aeHost:</p>
-<code>
-</code>
+</dl>
 
-<h1>&AElig;-DIR command-line tools</h1>
+<h2 id="openldap-ldapsearch">ldapsearch</h2>
+
+<p>
+  The OpenLDAP command-line tool
+  <a href="http://www.openldap.org/software/man.cgi?query=ldapsearch">ldapsearch(1)</a>
+  sends a search request to the LDAP server and outputs search results
+  retrieved as LDIF (see <a href="https://tools.ietf.org/html/rfc2849">RFC 2849</a>).
+</p>
+
+<dl>
+
+  <dt>Search for <var>aeUser</var> with username "lisa" by <var>uid</var>:</dt>
+  <dd>
+    <code>
+      ldapsearch -b ou=ae-dir -s sub "(uid=lisa)"
+    </code>
+  </dd>
+
+  <dt>Search on behalf of an <var>aeService</var> (with -X):</dt>
+  <dd>
+  <code>
+    ldapsearch -b ou=ae-dir -s sub -X 'dn:uid=system_test-1,cn=test-servers-1,cn=test,ou=ae-dir' "*" "+"
+  </code>
+  </dd>
+
+</dl>
+
+<h1 id="ae-dir">&AElig;-DIR command-line tools</h1>
 
 <p>
   Various command-line tools are installed on the provider systems
