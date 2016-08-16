@@ -57,7 +57,7 @@
 <p>Steps:</p>
 <ol>
   <li>
-    Choose "Change" in the top menu.
+    Choose "Change" in the menu at the top.
   </li>
   <li>
     A simple input form is displayed.
@@ -113,7 +113,7 @@
 <p>Steps:</p>
 <ol>
   <li>
-    Choose "Check" in the top menu.
+    Choose "Check" in the menu at the top.
   </li>
   <li>
     A simple input form is displayed.
@@ -133,12 +133,41 @@
 </ol>
 
 <h1 id="reset-procedure">Password reset process</h1>
+
 <p>
   If you forgot your old password or you need initial password for a new
   account you have to go through this two-step password reset process.
 </p>
 
 <h2 id="requestpw">Request password reset</h2>
+
+<p>
+  This function lets a user request a password reset in case the
+  user does not know the current password anymore or the current
+  password is expired.
+</p>
+
+<p>
+  Hints:
+</p>
+<ul>
+  <li>
+    Starting the password reset procedure does <strong>not</strong>
+    invalidate your current password.
+  </li>
+  <li>
+    For security reasons the user needs help of a responsible
+    <a href="docs.html#role-zone-admin">Zone Admin</a>
+    to finish password reset procedure. Hence you should contact
+    a zone admin now (e.g. by phone).
+  </li>
+  <li>
+    This procedure does <strong>not</strong> work for personal user
+    account serving as mailbox account (hen-and-egg problem)!
+    Ask <a href="docs.html#role-zone-admin">Zone Admin</a> for
+    password reset procedure in this case.
+  </li>
+</ul>
 
 <p>Prerequisites:</p>
 <ol>
@@ -153,29 +182,48 @@
 <p>Steps:</p>
 <ol>
   <li>
+    Choose "Reset" in the menu at the top.
   </li>
   <li>
-    you will be sent a new temporary password
+    A simple input form is displayed.
+  </li>
+  <li>
+    Enter your user name and the accompanying e-mail address.
+  </li>
+  <li>
+    Press button
+    <button class="web2ldap-submit-button">Request</button>
+    to submit the data to the application.
+  </li>
+  <li>
+    A message is displayed informing you that e-mail will be sent
+    to the given address.
+  </li>
+  <li>
+    you will be sent a new temporary password, check your mailbox now
   </li>
 </ol>
 
 <h2 id="resetpw">Finish password reset</h2>
 
-<p>Prerequisites:</p>
-<ol>
-  <li>
-    part of temporary reset password has been received before via e-mail.
-  </li>
-  <li>
-    part of temporary reset password has been told to you by responsible
-    zone admin (e.g. via phone).
-  </li>
-</ol>
+<p>
+  This function lets a user request finish password reset process
+  and is typically invoked by clicking on the link in the password
+  reset e-mail requested before.
+</p>
 
 <p>
   Hints:
 </p>
 <ul>
+  <li>
+    The temporary reset password is only valid for a couple of minutes.
+  </li>
+  <li>
+     The 2nd part of the temporary reset password is given to you by
+     the responsible <a href="docs.html#role-zone-admin">Zone Admin
+     </a>. Contact him now!
+  </li>
   <li>
     You <strong>must not</strong> use old passwords
     (checked against password history).
@@ -189,11 +237,46 @@
   </li>
 </ul>
 
+<p>Prerequisites:</p>
+<ol>
+  <li>
+    1st part of temporary reset password has been received before via e-mail.
+  </li>
+  <li>
+    2nd part of temporary reset password has been told to you by responsible
+    zone admin (e.g. via phone).
+  </li>
+</ol>
+
 <p>Steps:</p>
 <ol>
   <li>
+    Click link in the e-mail which already contains 1st part of 
+    temporary reset password.
   </li>
   <li>
+    A simple input form is displayed.
+  </li>
+  <li>
+    Enter your user name (should be already set).
+  </li>
+  <li>
+    Enter 1st part of temporary reset password (should be already set).
+  </li>
+  <li>
+    Enter 2nd part of temporary reset password given to you by zone admin.
+  </li>
+  <li>
+    Enter your new password twice.
+  </li>
+  <li>
+    Press button
+    <button class="web2ldap-submit-button">Set new password</button>
+    to submit the data to the application.
+  </li>
+  <li>
+    A message is displayed informing you whether the new password was set correctly.
+    In case of an error the input form is displayed again.
   </li>
 </ol>
 
