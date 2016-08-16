@@ -11,7 +11,7 @@ web.py 0.37+ (see http://webpy.org/)
 python-ldap 2.4.25+ (see http://www.python-ldap.org/)
 """
 
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 
 # from Python's standard lib
 import string
@@ -783,6 +783,9 @@ class FinishPasswordReset(BaseApp):
                 ('msPwdResetEnabled', None),
             )
         ]
+        ldap_mod_list.append(
+            (ldap.MOD_REPLACE, 'userPassword', [new_password_ldap]),
+        )
         if PWD_ADMIN_LEN:
             ldap_mod_list.append(
                 (ldap.MOD_DELETE, 'msPwdResetAdminPw', None)
@@ -790,12 +793,6 @@ class FinishPasswordReset(BaseApp):
         self.ldap_conn.modify_ext_s(
             user_dn,
             ldap_mod_list,
-            serverctrls=[self._sess_track_ctrl(user_dn)],
-        )
-        self.ldap_conn.passwd_s(
-            user_dn,
-            None,
-            new_password_ldap,
             serverctrls=[self._sess_track_ctrl(user_dn)],
         )
         return
@@ -827,8 +824,7 @@ class FinishPasswordReset(BaseApp):
             res = self.GET(
                 message=(
                     u'Constraint violation! '
-                    u'Probably password rules violated. '
-                    u'You have to request new temporary password.'
+                    u'Probably password rules violated.'
                 )
             )
         except ldap.LDAPError:
