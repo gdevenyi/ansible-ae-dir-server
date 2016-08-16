@@ -10,10 +10,15 @@
 </p>
 
 <p>
-  This document describes how to use the &AElig;-DIR password self-service
-  web application running on all
-  <a href="docs.html#sys-provider">&AElig;-DIR provider</a> systems.
+  This document describes how to use the
+  <a href="/pwd">&AElig;-DIR password self-service</a>
+  which implements the following use-cases:
 </p>
+<ol>
+  <li><a href="#changepw">Change own password</a></li>
+  <li><a href="#checkpw">Check own password</a></li>
+  <li><a href="#reset-procedure">Password reset process</a></li>
+</ol>
 
 <h1 id="changepw">Change own password</h1>
 
@@ -22,10 +27,27 @@
   personal user account.
 </p>
 
+<p>
+  Hints:
+</p>
+<ul>
+  <li>
+    You <strong>must not</strong> use old passwords
+    (checked against password history).
+  </li>
+  <li>
+    Your password MUST be sufficiently long (read your password policy).
+  </li>
+  <li>
+    You cannot change your password again for a certain period of time
+    after changing it (read your password policy).
+  </li>
+</ul>
+
 <p>Prerequisites:</p>
 <ol>
   <li>
-    Active <a href="#oc-aeUser">aeUser</a> entry has been added for user.
+    Active <a href="#oc-aeUser">aeUser</a> entry exists for user.
   </li>
   <li>
     User knows user name and current password.
@@ -35,6 +57,22 @@
 <p>Steps:</p>
 <ol>
   <li>
+    Choose "Change" in the top menu.
+  </li>
+  <li>
+    A simple input form is displayed.
+  </li>
+  <li>
+    Enter your user name, your old password and your new password twice.
+  </li>
+  <li>
+    Press button
+    <button class="web2ldap-submit-button">Set new password</button>
+    to submit the data to the application.
+  </li>
+  <li>
+    A message is displayed informing you whether the new password was set correctly.
+    In case of an error the input form is displayed again.
   </li>
 </ol>
 
@@ -48,10 +86,24 @@
   soon.
 </p>
 
+<p>
+  Hints:
+</p>
+<ul>
+  <li>
+    Especially you should use this <strong>before</strong> your on-call duty
+    shift begins to check whether passwords of rarely used accounts for
+    managing production systems are still valid!
+  </li>
+  <li>
+    If your password is soon to expire then change it immediately!
+  </li>
+</ul>
+
 <p>Prerequisites:</p>
 <ol>
   <li>
-    Active <a href="#oc-aeUser">aeUser</a> entry has been added for user.
+    Active <a href="#oc-aeUser">aeUser</a> entry exists for user.
   </li>
   <li>
     User knows user name and current password.
@@ -61,6 +113,22 @@
 <p>Steps:</p>
 <ol>
   <li>
+    Choose "Check" in the top menu.
+  </li>
+  <li>
+    A simple input form is displayed.
+  </li>
+  <li>
+    Enter your user name and your password.
+  </li>
+  <li>
+    Press button
+    <button class="web2ldap-submit-button">Check password</button>
+    to submit the data to the application.
+  </li>
+  <li>
+    A message is displayed informing you whether the password was correct
+    and how long it is still valid.
   </li>
 </ol>
 
@@ -103,6 +171,23 @@
     zone admin (e.g. via phone).
   </li>
 </ol>
+
+<p>
+  Hints:
+</p>
+<ul>
+  <li>
+    You <strong>must not</strong> use old passwords
+    (checked against password history).
+  </li>
+  <li>
+    Your password MUST be sufficiently long (read your password policy).
+  </li>
+  <li>
+    You cannot change your password again for a certain period of time
+    after changing it (read your password policy).
+  </li>
+</ul>
 
 <p>Steps:</p>
 <ol>
