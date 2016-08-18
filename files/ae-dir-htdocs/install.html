@@ -84,7 +84,12 @@
   <li>
     Invoke ansible play in sub-directory <code>ansible/</code>
     (here using command <code>su</code>):
-    <pre>ANSIBLE_HOSTS=hosts ansible-playbook ae-dir-servers.yml --become -K --become-method=su</pre>
+    <pre>ANSIBLE_HOSTS=hosts ansible-playbook ae-dir-servers.yml --become -K --become-method=su --extra-vars="aedir_init=1"</pre>
+  </li>
+  <li>
+    Log into the system become user <em>root</em> and add
+    the basic &AElig;-DIR entries with OpenLDAP command-line tools:
+    <pre>ldapadd -f /opt/ae-dir/etc/ae-dir-base.ldif</pre>
   </li>
 </ol>
 
