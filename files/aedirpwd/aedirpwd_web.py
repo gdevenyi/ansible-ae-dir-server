@@ -11,7 +11,7 @@ web.py 0.37+ (see http://webpy.org/)
 python-ldap 2.4.27+ (see http://www.python-ldap.org/)
 """
 
-__version__ = '0.2.1'
+__version__ = '0.2.2'
 
 # from Python's standard lib
 import string
@@ -42,6 +42,7 @@ from ldap.filter import escape_filter_chars
 from ldap.controls.ppolicy import PasswordPolicyControl
 from ldap.controls.sessiontrack import SessionTrackingControl
 from ldap.controls.sessiontrack import SESSION_TRACKING_FORMAT_OID_USERNAME
+from ldap.controls.deref import DereferenceControl
 
 # mail utility module
 import mailutil
@@ -51,6 +52,25 @@ import aedir
 # Import constants from configuration module
 sys.path.append(sys.argv[2])
 from aedirpwd_cnf import *
+
+PWDPOLICY_EXPIRY_ATTRS = [
+    'pwdMaxAge',
+    'pwdExpireWarning',
+]
+
+# request control for dereferencing password policy entry's attributes
+PWDPOLICY_DEREF_CONTROL = DereferenceControl(
+    True,
+    {
+        'pwdPolicySubentry':[
+            'pwdAllowUserChange',
+            'pwdAttribute',
+            'pwdInHistory',
+            'pwdMinAge',
+            'pwdMinLength',
+        ]+PWDPOLICY_EXPIRY_ATTRS,
+    }
+)
 
 #-----------------------------------------------------------------------
 # utility functions
@@ -268,7 +288,7 @@ class BaseApp(Default):
         filterstr_inputs_dict['currenttime'] = escape_filter_chars(
             ldap.strf_secs(time.time())
         )
-        return self.ldap_conn.find_unique_entry(
+        user_entry = self.ldap_conn.find_unique_entry(
             self.ldap_conn.ldap_url_obj.dn,
             ldap.SCOPE_SUBTREE,
             filterstr=(
@@ -282,7 +302,9 @@ class BaseApp(Default):
                 'pwdChangedTime',
                 'pwdPolicySubentry',
             ],
+            serverctrls=[PWDPOLICY_DEREF_CONTROL],
         )
+        return user_entry
 
     def POST(self):
         """
@@ -295,7 +317,7 @@ class BaseApp(Default):
             return self.GET(message=u'Invalid input!')
         # Make connection to LDAP server
         try:
-            self.ldap_conn = aedir.AEDirObject(PWD_LDAP_URL)
+            self.ldap_conn = aedir.AEDirObject(PWD_LDAP_URL, trace_level=2)
         except ldap.SERVER_DOWN:
             res = self.GET(message=u'LDAP server not reachable!')
         except ldap.LDAPError:
@@ -426,7 +448,7 @@ class CheckPassword(BaseApp):
         try:
             pwd_policy_subentry = self.ldap_conn.read_s(
                 pwd_policy_subentry_dn,
-                attrlist=['pwdMaxAge', 'pwdExpireWarning'],
+                attrlist=PWDPOLICY_EXPIRY_ATTRS,
             )
         except ldap.LDAPError:
             return self.GET(message=u'Internal error!')
@@ -783,9 +805,6 @@ class FinishPasswordReset(BaseApp):
                 ('msPwdResetEnabled', None),
             )
         ]
-        ldap_mod_list.append(
-            (ldap.MOD_REPLACE, 'userPassword', [new_password_ldap]),
-        )
         if PWD_ADMIN_LEN:
             ldap_mod_list.append(
                 (ldap.MOD_DELETE, 'msPwdResetAdminPw', None)
@@ -793,6 +812,12 @@ class FinishPasswordReset(BaseApp):
         self.ldap_conn.modify_ext_s(
             user_dn,
             ldap_mod_list,
+            serverctrls=[self._sess_track_ctrl(user_dn)],
+        )
+        self.ldap_conn.passwd_s(
+            user_dn,
+            None,
+            new_password_ldap,
             serverctrls=[self._sess_track_ctrl(user_dn)],
         )
         return
@@ -819,12 +844,13 @@ class FinishPasswordReset(BaseApp):
                 new_password_ldap
             )
         except ldap.NO_SUCH_ATTRIBUTE:
-            res = self.GET(message=u'Temporary password wrong!')
+            res = self.GET(message=u'Temporary password(s) wrong!')
         except ldap.CONSTRAINT_VIOLATION:
             res = self.GET(
                 message=(
                     u'Constraint violation! '
-                    u'Probably password rules violated.'
+                    u'Probably password rules violated. '
+                    u'You have to request password reset again.'
                 )
             )
         except ldap.LDAPError:
