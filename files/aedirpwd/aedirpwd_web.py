@@ -8,7 +8,7 @@ Author: Michael Ströder <michael@stroeder.com>
 Tested with:
 Python 2.7+ (see http://www.python.org/)
 web.py 0.37+ (see http://webpy.org/)
-python-ldap 2.4.25+ (see http://www.python-ldap.org/)
+python-ldap 2.4.27+ (see http://www.python-ldap.org/)
 """
 
 __version__ = '0.2.1'
