@@ -65,7 +65,6 @@ PWDPOLICY_DEREF_CONTROL = DereferenceControl(
         'pwdPolicySubentry':[
             'pwdAllowUserChange',
             'pwdAttribute',
-            'pwdInHistory',
             'pwdMinAge',
             'pwdMinLength',
         ]+PWDPOLICY_EXPIRY_ATTRS,
@@ -288,23 +287,38 @@ class BaseApp(Default):
         filterstr_inputs_dict['currenttime'] = escape_filter_chars(
             ldap.strf_secs(time.time())
         )
-        user_entry = self.ldap_conn.find_unique_entry(
+        filterstr=(
+            self.filterstr_template % filterstr_inputs_dict
+        ).encode('utf-8')
+        msg_id = self.ldap_conn.search_ext(
             self.ldap_conn.ldap_url_obj.dn,
             ldap.SCOPE_SUBTREE,
-            filterstr=(
-                self.filterstr_template % filterstr_inputs_dict
-            ).encode('utf-8'),
+            filterstr=filterstr,
             attrlist=[
                 'objectClass',
                 'uid',
                 'cn',
                 'mail',
+                'displayName',
                 'pwdChangedTime',
                 'pwdPolicySubentry',
             ],
+            sizelimit=2,
             serverctrls=[PWDPOLICY_DEREF_CONTROL],
         )
-        return user_entry
+        resp_data = self.ldap_conn.result4(
+            msg_id,
+            all=1,
+            add_ctrls=1,
+        )[1]
+        if not resp_data or len(resp_data) != 1:
+            raise ldap.NO_UNIQUE_ENTRY('No or non-unique search result for %s' % (repr(filterstr)))
+        user_dn, user_entry, user_controls  = resp_data[0]
+        if user_controls:
+            deref_control = user_controls[0]
+            deref_dn, deref_entry = deref_control.derefRes['pwdPolicySubentry'][0]
+            user_entry.update(deref_entry)
+        return user_dn, user_entry
 
     def POST(self):
         """
