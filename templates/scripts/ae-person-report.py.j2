@@ -72,10 +72,11 @@ for res_type, res_data, res_msgid, res_controls in ldap_conn.allresults(
     msg_id,
     add_ctrls=1
 ):
-    for dn, entry, deref_control in res_data:
+    for dn, entry, controls in res_data:
         # process dn and entry
-        if deref_control:
-            deref_dn, deref_entry = deref_control[0].derefRes['aePerson'][0]
+        if controls:
+            deref_control = controls[0]
+            deref_dn, deref_entry = deref_control.derefRes['aePerson'][0]
             person_dict[deref_dn.lower()] = dict([
                 (at,av[0])
                 for at,av in deref_entry.items()
