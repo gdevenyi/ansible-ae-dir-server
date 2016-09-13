@@ -18,12 +18,6 @@ import ldap
 
 # internal configuration import
 import web2ldapcnf.misc
-import web2ldapcnf.hosts
-import web2ldapcnf.monitor
-import w2lapp.schema.syntaxes
-
-# this import is needed for the following code lines being executed after this import
-import web2ldapcnf.plugins
 
 #-----------------------------------------------------------------------
 # session limit/expiration parameters
@@ -37,6 +31,15 @@ web2ldapcnf.misc.session_per_ip_limit = 20
 # Amount of time in seconds after which inactive sessions will be expired
 # and the session data is removed silently without the possibility to relogin.
 web2ldapcnf.misc.session_remove = 900
+
+#-----------------------------------------------------------------------
+
+import web2ldapcnf.hosts
+import web2ldapcnf.monitor
+import w2lapp.schema.syntaxes
+
+# this import is needed for the following code lines being executed after this import
+import web2ldapcnf.plugins
 
 #-----------------------------------------------------------------------
 
