@@ -876,7 +876,7 @@ class FinishPasswordReset(ChangePassword):
             res = self.GET(
                 message=(
                     u'Constraint violation (password rules): {0}'
-                    u'You have to request password reset again.'
+                    u'You have to request password reset again!'
                  ).format(unicode(ldap_error.args[0]['info']))
            )
         except ldap.LDAPError:
