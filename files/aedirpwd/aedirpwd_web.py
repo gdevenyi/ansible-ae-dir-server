@@ -11,7 +11,7 @@ web.py 0.37+ (see http://webpy.org/)
 python-ldap 2.4.27+ (see http://www.python-ldap.org/)
 """
 
-__version__ = '0.2.2'
+__version__ = '0.3.0'
 
 # from Python's standard lib
 import string
@@ -216,11 +216,6 @@ NEWPASSWORD2_FIELD = web.form.Password(
     description=u'New password (repeat)'
 )
 
-NEWPASSWORD_VALIDATOR = web.form.Validator(
-    u'New password input does not match',
-    lambda i: i.newpassword1 == i.newpassword2
-)
-
 
 class Default(object):
     """
@@ -337,14 +332,15 @@ class BaseApp(Default):
         except ldap.LDAPError:
             res = self.GET(message=u'Internal LDAP error!')
         else:
-            # Call specific handler for LDAP user
             try:
+                # search user entry
                 user_dn, user_entry = self.search_user_entry(self.form.inputs)
             except ValueError:
                 res = self.GET(message=u'Error searching user entry!')
             except ldap.LDAPError:
-                res = self.GET(message=u'Internal LDAP error!')
+                res = self.GET(message=u'LDAP error searching user entry!')
             else:
+                # Call specific handler for LDAP user
                 res = self.handle_user_request(user_dn, user_entry)
         # Anyway we should try to close the LDAP connection
         try:
@@ -503,7 +499,6 @@ class ChangePassword(BaseApp):
             type='submit',
             description=u'Change password'
         ),
-        validators=[NEWPASSWORD_VALIDATOR],
     )
 
     def GET(self, message=u''):
@@ -537,10 +532,35 @@ class ChangePassword(BaseApp):
         )
         return
 
+    def _check_pw_input(self, user_entry):
+        if self.form.d.newpassword1 != self.form.d.newpassword2:
+            return self.GET(message=u'New password values differ!')
+        pwd_min_len = int(user_entry['pwdMinLength'][0])
+        if len(self.form.d.newpassword1) < pwd_min_len:
+            return self.GET(
+                message=u'New password must be at least %d characters long!' % (
+                    pwd_min_len
+                )
+            )
+        if 'pwdChangedTime' in user_entry and 'pwdMinAge' in user_entry:
+            pwd_changed_timestamp = ldap.strp_secs(user_entry['pwdChangedTime'][0])
+            pwd_min_age = int(user_entry['pwdMinAge'][0])
+            next_pwd_change_timespan = pwd_changed_timestamp + pwd_min_age - time.time()
+            if next_pwd_change_timespan > 0:
+                return self.GET(
+                    message=u'Password is too young to change! You can try again after %d secs.' % (
+                        next_pwd_change_timespan
+                    )
+                )
+        return None # end of _check_pw_input()
+
     def handle_user_request(self, user_dn, user_entry):
         """
         set new password
         """
+        pw_input_check_msg = self._check_pw_input(user_entry)
+        if not pw_input_check_msg is None:
+            return pw_input_check_msg
         old_password_ldap = self.form.d.oldpassword.encode('utf-8')
         new_password_ldap = self.form.d.newpassword1.encode('utf-8')
         try:
@@ -551,13 +571,11 @@ class ChangePassword(BaseApp):
             )
         except ldap.INVALID_CREDENTIALS:
             res = self.GET(message=u'Old password wrong!')
-        except ldap.CONSTRAINT_VIOLATION:
+        except ldap.CONSTRAINT_VIOLATION, ldap_error:
             res = self.GET(
                 message=(
-                    u'Constraint violation! '
-                    u'Probably password rules violated. '
-                    u'Try again with stronger password.'
-                )
+                    u'Constraint violation (password rules): {0}'
+                ).format(unicode(ldap_error.args[0]['info']))
             )
         except ldap.LDAPError:
             res = self.GET(message=u'Internal error!')
@@ -764,7 +782,7 @@ class RequestPasswordReset(BaseApp):
         return res
 
 
-class FinishPasswordReset(BaseApp):
+class FinishPasswordReset(ChangePassword):
     """
     Handler for finishing password reset procedure
     """
@@ -787,7 +805,6 @@ class FinishPasswordReset(BaseApp):
             type='submit',
             description=u'Change password'
         ),
-        validators=[NEWPASSWORD_VALIDATOR],
     )
 
     def GET(self, message=u''):
@@ -850,6 +867,9 @@ class FinishPasswordReset(BaseApp):
                 self.form.d.temppassword2,
             )).encode('utf-8')
         )
+        pw_input_check_msg = self._check_pw_input(user_entry)
+        if not pw_input_check_msg is None:
+            return pw_input_check_msg
         new_password_ldap = self.form.d.newpassword1.encode('utf-8')
         try:
             self._ldap_user_operations(
@@ -859,14 +879,13 @@ class FinishPasswordReset(BaseApp):
             )
         except ldap.NO_SUCH_ATTRIBUTE:
             res = self.GET(message=u'Temporary password(s) wrong!')
-        except ldap.CONSTRAINT_VIOLATION:
+        except ldap.CONSTRAINT_VIOLATION, ldap_error:
             res = self.GET(
                 message=(
-                    u'Constraint violation! '
-                    u'Probably password rules violated. '
+                    u'Constraint violation (password rules): {0}'
                     u'You have to request password reset again.'
-                )
-            )
+                 ).format(unicode(ldap_error.args[0]['info']))
+           )
         except ldap.LDAPError:
             res = self.GET(message=u'Internal error!')
         else:
