@@ -535,9 +535,10 @@ class ChangePassword(BaseApp):
     def _check_pw_input(self, user_entry):
         if self.form.d.newpassword1 != self.form.d.newpassword2:
             return u'New password values differ!'
-        pwd_min_len = int(user_entry['pwdMinLength'][0])
-        if len(self.form.d.newpassword1) < pwd_min_len:
-            return u'New password must be at least %d characters long!' % (pwd_min_len)
+        if 'pwdMinLength' in user_entry:
+            pwd_min_len = int(user_entry['pwdMinLength'][0])
+            if len(self.form.d.newpassword1) < pwd_min_len:
+                return u'New password must be at least %d characters long!' % (pwd_min_len)
         if 'pwdChangedTime' in user_entry and 'pwdMinAge' in user_entry:
             pwd_changed_timestamp = ldap.strp_secs(user_entry['pwdChangedTime'][0])
             pwd_min_age = int(user_entry['pwdMinAge'][0])
