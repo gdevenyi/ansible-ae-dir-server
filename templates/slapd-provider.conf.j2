@@ -1004,10 +1004,13 @@ access to
 # Password policy entries
 #------------------------------------------------------------------
 
-# aeUser entries are allowed to read all password policy entries
+# Read access for
+# 1. Password self-service application
+# 2. active aeUser entries
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=pwdPolicy)"
+    by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" read
     by set="user/entryDN & ([ldap:///] + user/entryDN + [?entryDN?base?(&(objectClass=aeUser)(aeStatus=0))])/entryDN" read
     by * auth
 
