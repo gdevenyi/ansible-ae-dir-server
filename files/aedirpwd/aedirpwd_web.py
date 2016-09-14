@@ -534,24 +534,16 @@ class ChangePassword(BaseApp):
 
     def _check_pw_input(self, user_entry):
         if self.form.d.newpassword1 != self.form.d.newpassword2:
-            return self.GET(message=u'New password values differ!')
+            return u'New password values differ!'
         pwd_min_len = int(user_entry['pwdMinLength'][0])
         if len(self.form.d.newpassword1) < pwd_min_len:
-            return self.GET(
-                message=u'New password must be at least %d characters long!' % (
-                    pwd_min_len
-                )
-            )
+            return u'New password must be at least %d characters long!' % (pwd_min_len)
         if 'pwdChangedTime' in user_entry and 'pwdMinAge' in user_entry:
             pwd_changed_timestamp = ldap.strp_secs(user_entry['pwdChangedTime'][0])
             pwd_min_age = int(user_entry['pwdMinAge'][0])
             next_pwd_change_timespan = pwd_changed_timestamp + pwd_min_age - time.time()
             if next_pwd_change_timespan > 0:
-                return self.GET(
-                    message=u'Password is too young to change! You can try again after %d secs.' % (
-                        next_pwd_change_timespan
-                    )
-                )
+                return u'Password is too young to change! You can try again after %d secs.' % (next_pwd_change_timespan)
         return None # end of _check_pw_input()
 
     def handle_user_request(self, user_dn, user_entry):
@@ -560,7 +552,7 @@ class ChangePassword(BaseApp):
         """
         pw_input_check_msg = self._check_pw_input(user_entry)
         if not pw_input_check_msg is None:
-            return pw_input_check_msg
+            return self.GET(message=pw_input_check_msg)
         old_password_ldap = self.form.d.oldpassword.encode('utf-8')
         new_password_ldap = self.form.d.newpassword1.encode('utf-8')
         try:
@@ -869,7 +861,7 @@ class FinishPasswordReset(ChangePassword):
         )
         pw_input_check_msg = self._check_pw_input(user_entry)
         if not pw_input_check_msg is None:
-            return pw_input_check_msg
+            return self.GET(message=pw_input_check_msg)
         new_password_ldap = self.form.d.newpassword1.encode('utf-8')
         try:
             self._ldap_user_operations(
