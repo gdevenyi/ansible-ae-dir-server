@@ -17,12 +17,7 @@ from ldap.controls.deref import DereferenceControl
 PYLDAP_TRACE_LEVEL = 0
 
 USER_ATTRS = [
-    'uid',
-    'uidNumber',
-    'entryUUID',
-    'aeTicketId',
-    'description',
-    'memberOf'
+    '1.1'
 ]
 
 DEREF_PERSON_ATTRS = [
@@ -33,6 +28,7 @@ DEREF_PERSON_ATTRS = [
     'employeeNumber',
     'telephoneNumber',
     'mobile',
+    'homePhone',
     'aeDept',
     'ou',
     'departmentNumber',
@@ -78,7 +74,7 @@ for res_type, res_data, res_msgid, res_controls in ldap_conn.allresults(
             deref_control = controls[0]
             deref_dn, deref_entry = deref_control.derefRes['aePerson'][0]
             person_dict[deref_dn.lower()] = dict([
-                (at,av[0])
+                (at,'|'.join(av))
                 for at,av in deref_entry.items()
             ])
 
