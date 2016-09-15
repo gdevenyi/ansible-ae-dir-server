@@ -24,7 +24,12 @@ USER_ATTRS = [
     'entryUUID',
     'aeTicketId',
     'description',
-    'memberOf'
+    'memberOf',
+    'aeNotBefore',
+    'aeNotAfter',
+    'pwdChangedTime',
+    'createTimestamp',
+    'modifyTimestamp',
 ]
 
 DEREF_PERSON_ATTRS = [
@@ -33,8 +38,10 @@ DEREF_PERSON_ATTRS = [
     'cn',
     'mail',
     'employeeNumber',
+    'employeeType',
     'telephoneNumber',
     'mobile',
+    'homePhone',
     'aeDept',
     'ou',
     'departmentNumber',
@@ -51,6 +58,9 @@ DEREF_CONTROL = DereferenceControl(
     }
 )
 
+VIRTUAL_ATTRS = [
+    'aeZoneName',
+]
 
 #---------------------------------------------------------------------------
 # main()
@@ -60,8 +70,10 @@ ldap._trace_level = PYLDAP_TRACE_LEVEL
 
 ldap_conn = aedir.AEDirObject(None, trace_level=PYLDAP_TRACE_LEVEL)
 
+aedir_search_base = ldap_conn.find_search_base()
+
 msg_id = ldap_conn.search_ext(
-    ldap_conn.find_search_base(),
+    aedir_search_base,
     ldap.SCOPE_SUBTREE,
     '(&(objectClass=aeUser)(aeStatus=0))',
     attrlist=USER_ATTRS,
@@ -75,8 +87,9 @@ for res_type, res_data, res_msgid, res_controls in ldap_conn.allresults(
     add_ctrls=1
 ):
     for dn, entry, controls in res_data:
+        entry['aeZoneName'] = [aedir.extract_zone(dn, aeroot_dn=aedir_search_base)]
         user_dict[dn] = dict([
-            (at,av[0])
+            (at,'|'.join(av))
             for at,av in entry.items()
         ])
         # process dn and entry
@@ -84,19 +97,17 @@ for res_type, res_data, res_msgid, res_controls in ldap_conn.allresults(
             deref_control = controls[0]
             deref_dn, deref_entry = deref_control.derefRes['aePerson'][0]
             user_dict[dn].update(dict([
-                (at,av[0])
+                (at,'|'.join(av))
                 for at,av in deref_entry.items()
             ]))
 
-csv_writer = csv.DictWriter(
-    sys.stdout,
-    USER_ATTRS+DEREF_PERSON_ATTRS,
-    dialect='excel'
-)
+COLUMN_ATTRS = USER_ATTRS+DEREF_PERSON_ATTRS+VIRTUAL_ATTRS
+
+csv_writer = csv.DictWriter(sys.stdout, COLUMN_ATTRS, dialect='excel')
 csv_writer.writerow(
     dict([
         (at, at)
-        for at in USER_ATTRS+DEREF_PERSON_ATTRS
+        for at in COLUMN_ATTRS
     ])
 )
 csv_writer.writerows(user_dict.values())
