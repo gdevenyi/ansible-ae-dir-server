@@ -31,7 +31,7 @@ from w2lapp.schema.plugins.nis import UidNumber,GidNumber,MemberUID
 from w2lapp.schema.plugins.ppolicy import PwdExpireWarning,PwdMaxAge
 from w2lapp.schema.plugins.inetorgperson import DisplayNameInetOrgPerson
 from w2lapp.schema.plugins.groups import GroupEntryDN
-
+from w2lapp.schema.plugins.opensshlpk import ParamikoSshPublicKey
 from w2lapp.schema.plugins.posixautogen import AutogenGIDNumber,HomeDirectory
 
 # OID arc for AE-DIR, see stroeder.com-oid-macros.schema
@@ -1488,6 +1488,36 @@ syntax_registry.registerAttrType(
   ],
   structural_oc_oids=[
     AE_SUDORULE_OID, # aeSudoRule
+  ]
+)
+
+
+class AEServiceSshPublicKey(ParamikoSshPublicKey):
+  oid = 'AEServiceSshPublicKey-oid'
+  desc = 'AE-DIR: aeService:sshPublicKey'
+  reObj = re.compile('(^|.* )(ssh-rsa|ssh-dss|ecdsa-sha2-nistp256|ssh-ed25519) (?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)? .+$')
+
+syntax_registry.registerAttrType(
+  AEServiceSshPublicKey.oid,[
+    '1.3.6.1.4.1.24552.500.1.1.1.13', # sshPublicKey
+  ],
+  structural_oc_oids=[
+    AE_SERVICE_OID, # aeService
+  ]
+)
+
+
+class AEUserSshPublicKey(ParamikoSshPublicKey):
+  oid = 'AEUserSshPublicKey-oid'
+  desc = 'AE-DIR: aeUser:sshPublicKey'
+  reObj = re.compile('(^|.* )(ssh-rsa|ssh-dss|ecdsa-sha2-nistp256|ssh-ed25519) .+$')
+
+syntax_registry.registerAttrType(
+  AEUserSshPublicKey.oid,[
+    '1.3.6.1.4.1.24552.500.1.1.1.13', # sshPublicKey
+  ],
+  structural_oc_oids=[
+    AE_USER_OID, # aeUser
   ]
 )
 
