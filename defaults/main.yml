@@ -55,6 +55,10 @@ aeticketid_regex: "[A-Z]+-[0-9]+"
 # for entries beneath cn={{ aedir_org_zone }}
 aedir_aeperson_uniqueid_regex: "[a-zA-Z0-9_.:/-]+"
 aedir_aedept_deptnumber_regex: "[a-zA-Z0-9_.:/-]+"
+# special regex policy rules for SSH public keys
+# e.g. for specifying algorithms or naming conventions for key comment
+aedir_aeservice_sshpubkey_regex: "(ssh-rsa|ssh-dss|ecdsa-sha2-nistp256|ssh-ed25519) [A-Za-z0-9+=/]+ .+"
+aedir_aeuser_sshpubkey_regex: "(ssh-rsa|ssh-dss|ecdsa-sha2-nistp256|ssh-ed25519) [A-Za-z0-9+=/]+ .+"
 
 # ticket identifier of initial ldapadd
 aedir_init_ticket_id: "INIT-42"

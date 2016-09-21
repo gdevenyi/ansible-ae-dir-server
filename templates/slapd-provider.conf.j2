@@ -1181,7 +1181,12 @@ constraint_attribute
 
 constraint_attribute
   sshPublicKey
-  regex "(^|.* )ssh-(rsa|dss|ecdsa-sha2-nistp256) .+$"
+  regex "^{{ aedir_aeservice_sshpubkey_regex }}$"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeService)"
+constraint_attribute
+  sshPublicKey
+  regex "^{{ aedir_aeuser_sshpubkey_regex }}$"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeUser)"
 
 # rights groups to DNs of active aeGroup entries
 # must not reference special role groups
