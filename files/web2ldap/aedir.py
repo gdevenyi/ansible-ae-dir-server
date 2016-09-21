@@ -32,7 +32,7 @@ from w2lapp.schema.plugins.ppolicy import PwdExpireWarning,PwdMaxAge
 from w2lapp.schema.plugins.inetorgperson import DisplayNameInetOrgPerson
 from w2lapp.schema.plugins.groups import GroupEntryDN
 from w2lapp.schema.plugins.opensshlpk import ParamikoSshPublicKey
-from w2lapp.schema.plugins.posixautogen import AutogenGIDNumber,HomeDirectory
+from w2lapp.schema.plugins.posixautogen import HomeDirectory
 
 # OID arc for AE-DIR, see stroeder.com-oid-macros.schema
 AE_OID_PREFIX = '1.3.6.1.4.1.5427.1.389.100'
@@ -115,15 +115,8 @@ class AEUIDNumber(UidNumber):
   oid = 'AEUIDNumber-oid'
   desc = 'numeric Unix-UID'
 
-  def formValue(self):
-    try:
-      form_value = self._entry['gidNumber'][0].decode(self._ls.charset)
-    except KeyError:
-      form_value = UidNumber.formValue(self)
-    return form_value
-
   def transmute(self,attrValues):
-    return self._entry.get('gidNumber',[])
+    return self._entry.get('gidNumber',[''])
 
   def formField(self):
     input_field = HiddenInput(
@@ -152,10 +145,10 @@ class AEGIDNumber(GidNumber):
   minNewValue = 30000L
   maxNewValue = 49999L
 
-  def formValue(self):
-    form_value = GidNumber.formValue(self)
-    if form_value:
-      return form_value
+  def transmute(self,attrValues):
+    attrValues = GidNumber.transmute(self,attrValues)
+    if attrValues and attrValues[0]:
+      return attrValues
     try:
       ldap_result = self._ls.l.search_s(
         self._ls.getSearchRoot(self._dn),
@@ -180,19 +173,21 @@ class AEGIDNumber(GidNumber):
       ldap.TIMELIMIT_EXCEEDED,
     ):
       # search failed => no value suggested
-      return u''
+      return ['']
     idnumber_set = set()
     for ldap_dn,ldap_entry in ldap_result:
       if ldap_dn!=None:
         ldap_dn = ldap_dn.decode(self._ls.charset)
+        # avoid returning a new ID value instead of ID existing in entry
         if ldap_dn==self._dn:
-          return ldap_entry[self.attrType][0].decode(self._ls.charset)
+          return ldap_entry[self.attrType]
         else:
           for attr_type in ('uidNumber','gidNumber'):
             try:
               idnumber_set.add(int(ldap_entry[attr_type][0]))
             except KeyError:
               pass
+    # search next free ID within range from last found gap to maximum
     for idnumber in xrange(self.__class__.minNewValue,self.maxNewValue+1):
       if idnumber in idnumber_set:
         self.__class__.minNewValue = idnumber
@@ -200,10 +195,13 @@ class AEGIDNumber(GidNumber):
         break
     if idnumber>self.maxNewValue:
       # end of valid range reached => no value suggested
-      form_value = u''
+      result = ['']
     else:
-      form_value = unicode(idnumber)
-    return form_value # formValue()
+      result = [str(idnumber)]
+    return result # formValue()
+
+  def formValue(self):
+    return IntegerRange.formValue(self)
 
   def formField(self):
     return IntegerRange.formField(self)
