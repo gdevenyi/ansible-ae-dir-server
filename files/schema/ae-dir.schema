@@ -250,7 +250,8 @@ objectclass ( ae-dir-oc:1
   DESC 'AE-DIR: Group entry'
   STRUCTURAL
   SUP ( groupOfEntries $ posixGroup $ groupOfURLs $ aeObject )
-  MUST ( description ) )
+  MUST ( description )
+  MAY ( aeDept ) )
 
 ditcontentrule ( ae-dir-oc:1
   NAME 'aeGroup-dcr'

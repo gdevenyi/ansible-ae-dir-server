@@ -1298,6 +1298,12 @@ constraint_attribute
   uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(|(objectClass=aeUser)(objectClass=aeService))(aeStatus=0))"
   restrict="ldap:///{{ aedir_suffix }}??sub"
 
+# department-constraint groups must contain only aeUser members assigned to a specific department
+constraint_attribute
+  member
+  set "this/member/aePerson/aeDept & this/aeDept"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(&(objectClass=aeGroup)(aeDept=*))"
+
 # restrict memberUID to be uid of an active posixAccount
 constraint_attribute memberUID
   uri "ldap:///{{ aedir_suffix }}?uid?sub?(&(|(objectClass=aeUser)(objectClass=aeService))(objectClass=posixAccount)(aeStatus=0))"
