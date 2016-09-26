@@ -316,6 +316,45 @@ class AEGroupMember(DynamicDNSelectList):
   desc = 'AE-DIR: Member of a group'
   ldap_url = 'ldap:///_?displayName?sub?(&(|(objectClass=aeUser)(objectClass=aeService))(aeStatus=0))'
 
+  def _determineFilter(self):
+    aedept_filters = [
+      '(aeDept={0})'.format(escape_filter_chars(d))
+      for d in self._entry.get('aeDept',[])
+    ]
+    if len(aedept_filters)>1:
+      aedept_filter = '(|{})'.format(''.join(aedept_filters))
+    elif len(aedept_filters)==1:
+      aedept_filter = aedept_filters[0]
+    try:
+      ldap_result = self._ls.l.search_s(
+        self._determineSearchDN(self._dn,self.lu_obj.dn),
+        ldap.SCOPE_SUBTREE,
+        '(&(objectClass=aePerson)(aeStatus=0){})'.format(aedept_filter),
+        attrlist=['1.1'],
+      )
+    except (
+      ldap.NO_SUCH_OBJECT,
+      ldap.INSUFFICIENT_ACCESS,
+      ldap.SIZELIMIT_EXCEEDED,
+      ldap.TIMELIMIT_EXCEEDED,
+    ):
+      aeperson_filters = []
+    else:
+      aeperson_filters = [
+        '(aePerson={0})'.format(escape_filter_chars(dn))
+        for dn,_ in ldap_result
+      ]
+    if len(aeperson_filters)>1:
+      aeperson_filter = '(|{})'.format(''.join(aeperson_filters))
+    elif len(aeperson_filters)==1:
+      aeperson_filter = aeperson_filters[0]
+    filter_components = [DynamicDNSelectList._determineFilter(self)]
+    filter_str = '(&{0}{1})'.format(
+      ''.join(filter_components),
+      aeperson_filter,
+    )
+    return filter_str
+
 syntax_registry.registerAttrType(
   AEGroupMember.oid,[
     '2.5.4.31', # member
