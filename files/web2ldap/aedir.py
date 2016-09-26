@@ -1471,7 +1471,7 @@ syntax_registry.registerAttrType(
 )
 
 
-class AEStatus(SelectList):
+class AEStatus(SelectList,IntegerRange):
   oid = 'AEStatus-oid'
   desc = 'AE-DIR: Status of object'
   attr_value_dict = {
@@ -1523,6 +1523,12 @@ class AEStatus(SelectList):
       if ae_status<=0 and current_time > ae_not_after:
         ae_status = 1
     return [str(ae_status)]
+
+  def displayValue(self,valueindex=0,commandbutton=0):
+    if not commandbutton:
+      return IntegerRange.displayValue(self,valueindex)
+    else:
+      return SelectList.displayValue(self,valueindex,commandbutton)
 
 syntax_registry.registerAttrType(
   AEStatus.oid,[

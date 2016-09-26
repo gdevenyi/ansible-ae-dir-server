@@ -177,6 +177,7 @@ cn_config = Web2LDAPConfig(
 
 ae_dir_config = Web2LDAPConfig(
   description=u'Æ-DIR',
+  top_template= os.path.join(web2ldapcnf.templates_dir,'ae-dir','top.html'),
   binddnsearch=ur'(|(uid=%s)(uidNumber=%s))',
   boundas_template= {
     'aeUser':r'<span title="%(displayName)s: %(description)s">%(uid)s: %(description)s</span>',
@@ -189,8 +190,8 @@ ae_dir_config = Web2LDAPConfig(
     # see RFC
     'createTimestamp','modifyTimestamp','creatorsName','modifiersName',
   ],
-  top_template= os.path.join(web2ldapcnf.templates_dir,'ae-dir','top.html'),
-  login_template= os.path.join(web2ldapcnf.templates_dir,'ae-dir','login.html'),
+  top_template=os.path.join(web2ldapcnf.templates_dir,'ae-dir','top.html'),
+  login_template=os.path.join(web2ldapcnf.templates_dir,'ae-dir','login.html'),
   addform_parent_attrs=['entryUUID'],
   search_attrs=[
     'aeDept',
@@ -299,7 +300,7 @@ ae_dir_config = Web2LDAPConfig(
   },
   search_tdtemplate= {
     'aeUser':r"""
-    <div class="aestatus_%(aeStatus)s">
+    <div class="aestatus%(aeStatus)s">
       <var>%(entryDN)s</var><br>
       %(displayName)s / %(description)s<br>
       <dl>
@@ -309,47 +310,47 @@ ae_dir_config = Web2LDAPConfig(
     </div>
     """,
     'aeDept':r"""
-    <div class="aestatus_%(aeStatus)s">
+    <div class="aestatus%(aeStatus)s">
       <var>%(entryDN)s</var><br>
       %(ou)s (%(departmentNumber)s)
     </div>
     """,
     'aePerson':r"""
-    <div class="aestatus_%(aeStatus)s">
+    <div class="aestatus%(aeStatus)s">
       <var>%(entryDN)s</var><br>
       %(displayName)s &lt;%(mail)s&gt;
     </div>
     """,
     'aeGroup':r"""
-    <div class="aestatus_%(aeStatus)s">
+    <div class="aestatus%(aeStatus)s">
       <var>%(entryDN)s</var><br>
       User group %(cn)s (%(gidNumber)s):<br>
       %(description)s
     </div>
     """,
     'aeSrvGroup':r"""
-    <div class="aestatus_%(aeStatus)s">
+    <div class="aestatus%(aeStatus)s">
       <var>%(entryDN)s</var><br>
       Server group %(cn)s:<br>
       %(description)s
     </div>
     """,
     'aeService':r"""
-    <div class="aestatus_%(aeStatus)s">
+    <div class="aestatus%(aeStatus)s">
       <var>%(entryDN)s</var><br>
       Service account %(uid)s:<br>
       %(description)s
     </div>
     """,
     'aeHost':r"""
-    <div class="aestatus_%(aeStatus)s">
+    <div class="aestatus%(aeStatus)s">
       <var>%(entryDN)s</var><br>
       Server %(cn)s: %(host)s<br>
       %(description)s
     </div>
     """,
     'aeNwDevice':r"""
-    <div class="aestatus_%(aeStatus)s">
+    <div class="aestatus%(aeStatus)s">
       <var>%(entryDN)s</var><br>
       %(aeFqdn)s:<br>
       inet addr:%(ipHostNumber)s<br>
@@ -357,26 +358,26 @@ ae_dir_config = Web2LDAPConfig(
     </div>
     """,
     'aeSudoRule':r"""
-    <div class="aestatus_%(aeStatus)s">
+    <div class="aestatus%(aeStatus)s">
       <var>%(entryDN)s</var><br>
       Sudo rule %(cn)s:<br>
       %(description)s
     </div>
     """,
     'aeTag':r"""
-    <div class="aestatus_%(aeStatus)s">
+    <div class="aestatus%(aeStatus)s">
       <var>%(entryDN)s</var><br>
       Tag %(cn)s: %(description)s
     </div>
     """,
     'aeZone':r"""
-    <div class="aestatus_%(aeStatus)s">
+    <div class="aestatus%(aeStatus)s">
       <var>%(entryDN)s</var><br>
       Zone %(cn)s: %(description)s
     </div>
     """,
     'aeRoot':r"""
-    <div class="aestatus_%(aeStatus)s">
+    <div class="aestatus%(aeStatus)s">
       <var>%(entryDN)s</var><br>
       Org unit %(ou)s:<br>
       %(description)s
@@ -634,13 +635,13 @@ ldap_def = {
     rename_template= os.path.join(web2ldapcnf.templates_dir,'rename.html'),
 
     # HTML template file for whole top section
-    top_template= os.path.join(web2ldapcnf.templates_dir,'ae-dir','top.html'),
+    top_template=os.path.join(web2ldapcnf.templates_dir,'ae-dir','top.html'),
 
     # HTML template file for password change form
-    passwd_template= os.path.join(web2ldapcnf.templates_dir,'passwd.html'),
+    passwd_template=os.path.join(web2ldapcnf.templates_dir,'passwd.html'),
 
     # HTML template file for Login form
-    login_template= os.path.join(web2ldapcnf.templates_dir,'ae-dir','login.html'),
+    login_template=os.path.join(web2ldapcnf.templates_dir,'ae-dir','login.html'),
     # Default mechanism for BindRequest (empty string for simple bind)
     login_default_mech='',
 
