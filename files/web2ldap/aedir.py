@@ -613,6 +613,33 @@ class AEEntryDNAEZone(DistinguishedName):
   def _additional_links(self):
     attr_value_u = self.attrValue.decode(self._ls.charset)
     r = DistinguishedName._additional_links(self)
+    zone_cn = self._entry['cn'][0].decode('utf-8')
+    if zone_cn=='ae':
+      group_name_ext = ''
+    else:
+      group_name_ext = '-zone'
+    zone_admins_group_dn = u'cn={group_name},{entry_dn}'.format(
+      group_name=zone_cn+group_name_ext+u'-admins',
+      entry_dn=self._dn,
+    )
+    zone_auditors_group_dn = u'cn={group_name},{entry_dn}'.format(
+      group_name=zone_cn+group_name_ext+u'-auditors',
+      entry_dn=self._dn,
+    )
+    r.append(self._form.applAnchor(
+      'read','Zone Admins',self._sid,
+      (
+        ('dn',zone_admins_group_dn),
+      ),
+      title=u'Display zone admin group %s' % (zone_admins_group_dn),
+    ))
+    r.append(self._form.applAnchor(
+      'read','Zone Auditors',self._sid,
+      (
+        ('dn',zone_auditors_group_dn),
+      ),
+      title=u'Display zone auditor group %s' % (zone_auditors_group_dn),
+    ))
     audit_context = self._ls.getAuditContext(self._ls.currentSearchRoot)
     if audit_context:
       r.append(self._form.applAnchor(
