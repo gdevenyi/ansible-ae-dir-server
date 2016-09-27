@@ -37,6 +37,7 @@ moduleload deref
 #moduleload noopsrch
 
 # only on provider replicas
+moduleload sssvlv
 moduleload constraint
 moduleload refint
 moduleload unique
@@ -612,7 +613,8 @@ access to
 # 1. written by OTP registration/enrollment admins
 # 2. read by OTP validator
 # 3. read by referencing personal user account
-# 4. read by zone admins of referencing users
+# 4. read by all zone admins
+#    (FIX ME: limited to zone admins of referencing users)
 access to
   dn.onelevel="cn=otp,{{ aedir_suffix }}"
   filter="(objectClass=oathToken)"
@@ -746,7 +748,7 @@ access to
 #---------------------------------------------------------------------------
 
 # inactive entries are
-# 1. readable for all zone admins
+# 1. later evaluated for all zone admins
 # 2. not visible to normal users/systems after this
 access to
   dn.subtree="{{ aedir_suffix }}"
@@ -1001,6 +1003,14 @@ access to
     by set="this/memberOf & ( [ldap:///] + user/entryDN + [?memberOf?base?(&(objectClass=aeUser)(aeStatus=0))])/memberOf" read
     by * auth
 
+# read access to the POSIX ID ranges for all zone admins
+#------------------------------------------------------------------
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  attrs=@aePosixIdRanges
+    by set="user/entryDN & ([ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(member=] + user/entryDN + [))])/member" read
+    by * none
+
 # Password policy entries
 #------------------------------------------------------------------
 
@@ -1077,6 +1087,9 @@ rwm-rewriteRule "^(host=[^,]+),{{ aedir_suffix }}$" "${host2dn($1)}" ":@I"
 
 # for counting search results without retrieving them
 #overlay noopsrch
+
+# for server-side sorting
+overlay sssvlv
 
 # for dereferencing attributes
 overlay deref
