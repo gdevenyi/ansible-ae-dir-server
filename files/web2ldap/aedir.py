@@ -17,6 +17,7 @@ from pyweblib.forms import HiddenInput
 
 # from internal base modules
 import ldaputil.base
+from ldap.controls.readentry import PreReadControl
 
 # web2ldap's internal application modules
 import w2lapp.searchform,w2lapp.schema.plugins.inetorgperson,w2lapp.schema.plugins.sudoers
@@ -145,59 +146,53 @@ class AEGIDNumber(GidNumber):
   minNewValue = 30000L
   maxNewValue = 49999L
 
+  def _get_next_gid(self):
+      """
+      consumes next ID by sending MOD_INCREMENT modify operation with
+      pre-read entry control
+      """
+      id_pool_dn = self._ls.getSearchRoot(self._dn)
+      id_pool_attr = 'aeGidNumberNext'
+      prc = PreReadControl(criticality=True, attrList=[id_pool_attr])
+      msg_id = self._ls.l.modify_ext(
+          id_pool_dn,
+          [(ldap.MOD_INCREMENT, id_pool_attr, '1')],
+          serverctrls=[prc],
+      )
+      _, _, _, resp_ctrls = self._ls.l.result3(msg_id)
+      return int(resp_ctrls[0].entry[id_pool_attr][0])
+
   def transmute(self,attrValues):
     attrValues = GidNumber.transmute(self,attrValues)
     if attrValues and attrValues[0]:
       return attrValues
+    # first try to re-read gidNumber from existing entry
     try:
-      ldap_result = self._ls.l.search_s(
-        self._ls.getSearchRoot(self._dn),
-        ldap.SCOPE_SUBTREE,
-        (
-          '(&'
-            '(|(objectClass=posixAccount)(objectClass=posixGroup))'
-            '(|'
-              '(uidNumber>={0})(uidNumber<={1})'
-              '(gidNumber>={0})(gidNumber<={1})'
-            ')'
-          ')'
-        ).format(
-          self.__class__.minNewValue,
-          self.__class__.maxNewValue
-        ),
-        attrlist=['uidNumber','gidNumber'],
+      ldap_result = self._ls.readEntry(
+        self._dn,
+        attrtype_list=['gidNumber'],
+        search_filter='(gidNumber=*)',
       )
     except (
       ldap.NO_SUCH_OBJECT,
-      ldap.SIZELIMIT_EXCEEDED,
-      ldap.TIMELIMIT_EXCEEDED,
+      ldap.INSUFFICIENT_ACCESS,
+    ):
+      # search failed => ignore
+      pass
+    else:
+      if ldap_result:
+        return ldap_result[0][1]['gidNumber']
+    # consume next ID from pool entry
+    try:
+      next_gid = self._get_next_gid()
+    except (
+      ldap.NO_SUCH_OBJECT,
+      ldap.INSUFFICIENT_ACCESS,
     ):
       # search failed => no value suggested
       return ['']
-    idnumber_set = set()
-    for ldap_dn,ldap_entry in ldap_result:
-      if ldap_dn!=None:
-        ldap_dn = ldap_dn.decode(self._ls.charset)
-        # avoid returning a new ID value instead of ID existing in entry
-        if ldap_dn==self._dn:
-          return ldap_entry[self.attrType]
-        else:
-          for attr_type in ('uidNumber','gidNumber'):
-            try:
-              idnumber_set.add(int(ldap_entry[attr_type][0]))
-            except KeyError:
-              pass
-    # search next free ID within range from last found gap to maximum
-    for idnumber in xrange(self.__class__.minNewValue,self.maxNewValue+1):
-      if idnumber in idnumber_set:
-        self.__class__.minNewValue = idnumber
-      else:
-        break
-    if idnumber>self.maxNewValue:
-      # end of valid range reached => no value suggested
-      result = ['']
     else:
-      result = [str(idnumber)]
+      result = [str(next_gid)]
     return result # formValue()
 
   def formValue(self):
