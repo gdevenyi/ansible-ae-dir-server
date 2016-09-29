@@ -70,6 +70,7 @@
     - ae-add-zone.py
     - ae-passwd.py
     - ae-person-report.py
+    - ae-set-next-gid.py
     - ae-user-report.py
 
 - name: "Install various CRON scripts"

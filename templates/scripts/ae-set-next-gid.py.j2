@@ -1,0 +1,92 @@
+#!{{ aedir_python }}
+# -*- coding: utf-8 -*-
+"""
+Sets next GID number to highest GID found + 1
+
+This script must run locally on a Æ-DIR provider
+"""
+
+__version__ = '0.0.1'
+
+import sys
+import os
+
+# set LDAPRC env var *before* importing ldap
+os.environ['LDAPRC'] = '/opt/ae-dir/etc/ldap.conf'
+import ldap
+import aedir
+from ldap.controls.sss import SSSRequestControl
+
+PYLDAP_TRACE_LEVEL = 0
+
+GID_ATTR = 'gidNumber'
+
+NEXT_GID_ATTR = 'aeGidNumberNext'
+
+#---------------------------------------------------------------------------
+# main()
+#---------------------------------------------------------------------------
+
+ldap._trace_level = PYLDAP_TRACE_LEVEL
+
+ldap_conn = aedir.AEDirObject(None, trace_level=PYLDAP_TRACE_LEVEL)
+aedir_searchbase = ldap_conn.find_search_base()
+
+# reverse sorting request control
+sss_control = SSSRequestControl(ordering_rules=['-'+GID_ATTR])
+# send search request
+msg_id = ldap_conn.search_ext(
+    aedir_searchbase,
+    ldap.SCOPE_SUBTREE,
+    '({}=*)'.format(GID_ATTR),
+    attrlist=[GID_ATTR],
+    sizelimit=1,
+    serverctrls=[sss_control],
+)
+# collect result
+ldap_result = []
+try:
+    for _, res_data, _, res_controls in ldap_conn.allresults(
+            msg_id,
+            add_ctrls=0
+        ):
+        ldap_result.extend(res_data)
+except ldap.SIZELIMIT_EXCEEDED:
+    pass
+
+if not ldap_result:
+    sys.stderr.write('No entry with attribute {0} found!\n'.format(GID_ATTR))
+    sys.exit(1)
+
+highest_gid_number = int(ldap_result[0][1][GID_ATTR][0])
+sys.stdout.write('Highest {0} value found: {1}\n'.format(
+    GID_ATTR,
+    highest_gid_number,
+))
+
+aeroot_entry = ldap_conn.read_s(
+    aedir_searchbase,
+    attrlist=[NEXT_GID_ATTR]
+)
+
+current_next_gid = int(aeroot_entry[NEXT_GID_ATTR][0])
+sys.stdout.write('Current {0} value: {1}\n'.format(
+    NEXT_GID_ATTR,
+    current_next_gid,
+))
+
+if current_next_gid != highest_gid_number+1:
+    ldap_conn.modify_s(
+        aedir_searchbase,
+        [
+            (ldap.MOD_DELETE, NEXT_GID_ATTR, [str(current_next_gid)]),
+            (ldap.MOD_ADD, NEXT_GID_ATTR, [str(highest_gid_number+1)]),
+        ]
+    )
+    sys.stdout.write('Updated {0} value {1} -> {2}\n'.format(
+        NEXT_GID_ATTR,
+        current_next_gid,
+        highest_gid_number+1,
+    ))
+else:
+    sys.stdout.write('Ok => no change.\n')
