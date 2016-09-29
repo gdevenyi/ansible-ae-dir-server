@@ -9,7 +9,9 @@ for a couple of minutes.
 https://%(web_ctx_host)s%(app_path_prefix)s/resetpw?username=%(username)s&temppassword1=%(temppassword1)s
 
 You will need a 2nd part of your temporary password. This will be 
-given to you by the admin mentioned in the welcome e-mail.
+given to you by one of your zone admins:
+
+%(admin_email_addrs)s
 
 If you react too late to this e-mail and above link does not work you can 
 simply request the password reset again with this link:

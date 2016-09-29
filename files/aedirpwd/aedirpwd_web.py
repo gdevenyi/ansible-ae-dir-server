@@ -672,6 +672,9 @@ class RequestPasswordReset(BaseApp):
                 ),
                 smtp_message,
             )
+        else:
+            admin_addrs = []
+
         #-----------------------------------------------------------------------
         # Now send (rest of) clear-text password to user
         #-----------------------------------------------------------------------
@@ -686,6 +689,7 @@ class RequestPasswordReset(BaseApp):
             'web_ctx_host':web.ctx.host,
             'app_path_prefix':APP_PATH_PREFIX,
             'ldap_uri':self.ldap_conn.ldap_url_obj.initializeUrl(),
+            'admin_email_addrs':u'\n'.join(admin_addrs),
         }
         smtp_message = smtp_message_tmpl % user_data_user
         smtp_subject = EMAIL_SUBJECT_PERSONAL % user_data_user
