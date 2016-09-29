@@ -292,12 +292,15 @@
 
 <h2 id="role-ae-replica">&AElig; Replica</h2>
 <p>
-  The system role <em>&AElig; replicas</em> can read all entries including
-  <var>userPassword</var> except some sensitive attributes only used on
-  &AElig; providers.
+  The system role <em>&AElig; replicas</em> can read all entries
+  including <var>userPassword</var> except some sensitive attributes
+  only usable by role <a href="#role-ae-provider">&AElig; provider</a>.
+</p>
+<p>
   The role is assigned to service accounts
   (<a href="#schema-oc-aeService">aeService</a>)
-  by adding them to user group <em>ae-replicas</em>.
+  of all provider and replica slapd instances by adding them to user
+  group <em>ae-replicas</em>.
 </p>
 
 <h2 id="role-ae-provider">&AElig; Provider</h2>
@@ -318,7 +321,8 @@
 <p>
   The role is assigned to service accounts
   (<a href="#schema-oc-aeService">aeService</a>)
-  by adding them to user group <em>ae-providers</em>.
+  of all provider slapd instances by adding them to user
+  group <em>ae-providers</em>.
 </p>
 
 <h1 id="dit">Directory Information Tree (DIT)</h1>
