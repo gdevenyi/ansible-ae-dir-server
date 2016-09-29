@@ -138,7 +138,12 @@ repeat password:
   Example usage:
 </p>
 <pre class="cli-ae-add-zone-example">
-root@ae-dir-deb-p1:~# /opt/ae-dir/bin/ae-add-zone.py mike FOO-45 "Michael's testing playground"
+root@ae-dir-deb-p1:~# /opt/ae-dir/bin/ae-add-zone.py test42 IAM-42 "the definite answer"
+Added cn=test42,ou=ae-dir
+Added cn=test42-init,cn=test42,ou=ae-dir
+Tagged cn=test42,ou=ae-dir
+Added cn=test42-zone-admins,cn=test42,ou=ae-dir
+Added cn=test42-zone-auditors,cn=test42,ou=ae-dir
 </pre>
 
 <!--#include file="ssi/footer.shtml" -->

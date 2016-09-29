@@ -53,9 +53,8 @@ else:
     sys.stderr.write('Zone {} already exists\n'.format(zone_cn))
     sys.exit(9)
 
-zone_dn = 'cn={zone_cn},{aedir_searchbase}'.format(**vars())
-
 # add zone entry
+zone_dn = 'cn={zone_cn},{aedir_searchbase}'.format(**vars())
 ldap_conn.add_s(
     zone_dn,
     [
@@ -66,10 +65,12 @@ ldap_conn.add_s(
         ('description', [zone_desc]),
     ]
 )
+sys.stdout.write('Added {}\n'.format(zone_dn))
 
 # add init tag entry
+tag_dn = 'cn={zone_cn}-init,{zone_dn}'.format(**vars())
 ldap_conn.add_s(
-    'cn={zone_cn}-init,{zone_dn}'.format(**vars()),
+    tag_dn,
     [
         ('objectClass', ['namedObject', 'aeTag']),
         ('aeStatus', ['0']),
@@ -77,16 +78,19 @@ ldap_conn.add_s(
         ('description', ['Initialization of "{zone_desc}"'.format(**vars())]),
     ]
 )
+sys.stdout.write('Added {}\n'.format(tag_dn))
 
 # add init tag to zone entry
 ldap_conn.modify_s(
     zone_dn,
     [(ldap.MOD_ADD, 'aeTag', [zone_cn+'-init'])]
 )
+sys.stdout.write('Tagged {}\n'.format(zone_dn))
 
 # add zone admins group entry
+zone_admins_dn = 'cn={zone_cn}-zone-admins,{zone_dn}'.format(**vars())
 ldap_conn.add_s(
-    'cn={zone_cn}-zone-admins,{zone_dn}'.format(**vars()),
+    zone_admins_dn,
     [
         (
             'objectClass',
@@ -107,10 +111,12 @@ ldap_conn.add_s(
         ('gidNumber', [str(ldap_conn.get_next_id(id_pool_dn=aedir_searchbase, id_pool_attr='aeGidNumberNext'))]),
     ]
 )
+sys.stdout.write('Added {}\n'.format(zone_admins_dn))
 
 # add zone auditors group entry
+zone_auditors_dn = 'cn={zone_cn}-zone-auditors,{zone_dn}'.format(**vars())
 ldap_conn.add_s(
-    'cn={zone_cn}-zone-auditors,{zone_dn}'.format(**vars()),
+    zone_auditors_dn,
     [
         (
             'objectClass',
@@ -129,5 +135,6 @@ ldap_conn.add_s(
         ('gidNumber', [str(ldap_conn.get_next_id(id_pool_dn=aedir_searchbase, id_pool_attr='aeGidNumberNext'))]),
     ]
 )
+sys.stdout.write('Added {}\n'.format(zone_auditors_dn))
 
 ldap_conn.unbind_s()
