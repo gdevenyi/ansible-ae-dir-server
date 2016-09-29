@@ -137,37 +137,43 @@ attributetype ( ae-dir-at:17.1
   NAME 'aeUidNumberMin'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: minimum uidNumber value'
-  SUP aePosixId )
+  SUP aePosixId
+  SINGLE-VALUE )
 
 attributetype ( ae-dir-at:17.2
   NAME 'aeUidNumberMax'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: maximum uidNumber value'
-  SUP aePosixId )
+  SUP aePosixId
+  SINGLE-VALUE )
 
 attributetype ( ae-dir-at:17.3
   NAME 'aeUidNumberNext'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: next uidNumber value'
-  SUP aePosixId )
+  SUP aePosixId
+  SINGLE-VALUE )
 
 attributetype ( ae-dir-at:17.4
   NAME 'aeGidNumberMin'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: minimum gidNumber value'
-  SUP aePosixId )
+  SUP aePosixId
+  SINGLE-VALUE )
 
 attributetype ( ae-dir-at:17.5
   NAME 'aeGidNumberMax'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: maximum gidNumber value'
-  SUP aePosixId )
+  SUP aePosixId
+  SINGLE-VALUE )
 
 attributetype ( ae-dir-at:17.6
   NAME 'aeGidNumberNext'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: next gidNumber value'
-  SUP aePosixId )
+  SUP aePosixId
+  SINGLE-VALUE )
 
 objectclass ( ae-dir-oc:23
   NAME 'aePosixIdRanges'
