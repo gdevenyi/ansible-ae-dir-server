@@ -1005,8 +1005,10 @@
   Person entries are added using object class <var>aePerson</var>.
   Note that such an entry is not a user account and thus cannot
   authenticate to a the directory.
-  Typically <var>aePerson</var> are synchronized from a human resource (HR)
-  or a customer relationship management (CRM) database or similar.
+  Typically <var>aePerson</var> are maintained by human resource
+  (HR) or sales departments (for customers), optionally synchronized
+  from HR database or a customer relationship management (CRM)
+  database or similar.
 </p>
 <dl id="schema-oc-aePerson-attributes">
   <dt>uniqueIdentifier</dt>
@@ -1035,8 +1037,9 @@
   For compability reasons with existing software <var>aeUser</var> is
   derived from the superior object classes <var>account</var> and
   <var>inetOrgPerson</var>.
-  This object class <strong>should not</strong> be used when creating
-  system/service/tool accounts.
+  This object class <strong>must not</strong> be used when creating
+  system/service/tool accounts. For these use
+  <a href="schema-oc-aeService">aeService</a> instead.
 </p>
 <dl id="schema-oc-aeUser-attributes">
   <dt>uid</dt>
