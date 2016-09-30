@@ -533,8 +533,13 @@
   <a href="https://tools.ietf.org/html/draft-chu-ldap-logschema">draft-chu-ldap-logschema</a>.
 </p>
 
-
 <h1 id="eer">Entity Relationship</h1>
+<p>
+  The following diagram illustrates how the different entities in
+  &AElig;-DIR are referenced from each other. This entity
+  relationship is evaluated by the OpenLDAP ACLs to determine access
+  rights of bound entity.
+</p>
 <p>
   <img
     class="svg_image"
@@ -542,6 +547,78 @@
     title="entity relationship diagram"
   >
 </p>
+<ul>
+  <li>
+    A reference is set by adding an appropriate value to a link attribute.
+  </li>
+  <li>
+    Cross-zone references are allowed for cross-zone delegation
+    (except <em>aeProxyFor</em> and <em>aeSrvGroup</em> → )
+  </li>
+  <li>
+    Almost all references by distinguished name of referenced entry
+    (except <em>sudoUser</em> → <em>aeGroup</em> by prefixed group
+    name for backward compability)
+  </li>
+  <li>
+    Sometimes references are implicit by tree structure (child of):
+    <ul>
+      <li>aeZone → ae*</li>
+      <li>aeSrvGroup → aeHost / aeService</li>
+    </ul>
+  </li>
+</ul>
+<p>
+  The cross-zone references allows zone admins to delegate tasks to
+  zone admins of other zones:
+</p>
+<ol>
+  <li>
+    Strictest level for preservation of full control:
+    <br>
+    Users, user groups, service groups and services / hosts all in
+    one zone. This gives the responsible zone admins full control
+    over all authentication and authorization but also places the
+    burden of having to maintain all these entries on them.
+    <br>
+    This model should be used for hosts/services with high security
+    requirements with access probably only for rather few
+    administrators.
+  </li>
+  <li>
+    Preservation of permissions control,
+    user maintenance delegation to foreign zone:
+    <br>
+    A zone admin can add users located in foreign zones to user
+    groups in their zone. The rights to assign permissionsto users
+    is preserved but user maintenance (e.g. helping with password
+    reset) is delegated to foreign zone admins.
+    <br>
+    This model is reasonable for most hosts/services.
+    <br>
+    The cross-zone reference link from
+    <a href="#schema-oc-aeGroup">aeGroup</a> to
+    <a href="#schema-oc-aeUser">aeUser</a>/
+    <a href="#schema-oc-aeService">aeService</a>/.
+  </li>
+  <li>
+    Full foreign zone delegation of user and permission group
+    maintenance:
+    <br>
+    Delegating permission assignment (granted by group membership)
+    can be achieved by referencing user groups in another zone from
+    a server group.
+    Note that different permissions are assigned by different link
+    attributes and application-specific permissions for groups
+    within services.
+    <br>
+    This model is reasonable for most hosts/services.
+    <br>
+    The cross-zone reference link from
+    <a href="#schema-oc-aeSrvGroup">aeSrvGroup</a> to
+    <a href="#schema-oc-aeGroup">aeGroup</a>.
+  </li>
+</ol>
 
 <h1 id="schema">Schema</h1>
 
