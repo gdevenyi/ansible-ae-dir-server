@@ -326,7 +326,7 @@ class BaseApp(Default):
             return self.GET(message=u'Invalid input!')
         # Make connection to LDAP server
         try:
-            self.ldap_conn = aedir.AEDirObject(PWD_LDAP_URL, trace_level=2)
+            self.ldap_conn = aedir.AEDirObject(PWD_LDAP_URL, trace_level=0)
         except ldap.SERVER_DOWN:
             res = self.GET(message=u'LDAP server not reachable!')
         except ldap.LDAPError:
