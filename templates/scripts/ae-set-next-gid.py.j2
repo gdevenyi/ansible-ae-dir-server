@@ -69,20 +69,29 @@ aeroot_entry = ldap_conn.read_s(
     attrlist=[NEXT_GID_ATTR]
 )
 
-current_next_gid = int(aeroot_entry[NEXT_GID_ATTR][0])
-sys.stdout.write('Current {0} value: {1}\n'.format(
-    NEXT_GID_ATTR,
-    current_next_gid,
-))
+try:
+    current_next_gid = int(aeroot_entry[NEXT_GID_ATTR][0])
+except KeyError:
+    current_next_gid = None
+    sys.stdout.write('Current {0} value: {1}\n'.format(
+        NEXT_GID_ATTR,
+        current_next_gid,
+    ))
+else:
+    sys.stdout.write('Current {0} value: {1}\n'.format(
+        NEXT_GID_ATTR,
+        current_next_gid,
+    ))
 
 if current_next_gid != highest_gid_number+1:
-    ldap_conn.modify_s(
-        aedir_searchbase,
-        [
-            (ldap.MOD_DELETE, NEXT_GID_ATTR, [str(current_next_gid)]),
-            (ldap.MOD_ADD, NEXT_GID_ATTR, [str(highest_gid_number+1)]),
-        ]
-    )
+    modlist = [
+        (ldap.MOD_ADD, NEXT_GID_ATTR, [str(highest_gid_number+1)])
+    ]
+    if current_next_gid is not None:
+        modlist.append(
+            (ldap.MOD_DELETE, NEXT_GID_ATTR, [str(current_next_gid)])
+        )
+    ldap_conn.modify_s(aedir_searchbase, modlist)
     sys.stdout.write('Updated {0} value {1} -> {2}\n'.format(
         NEXT_GID_ATTR,
         current_next_gid,
