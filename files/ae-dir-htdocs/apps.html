@@ -3,9 +3,187 @@
 <!--#set var="base_path" value="" -->
 <!--#include file="ssi/head.shtml" -->
 
+<h1>Client parameters</h1>
+<p>
+  Integrating an LDAP-enabled application/system with &AElig;-DIR does not
+  require detailed configuration tweaking. In general setting less
+  special parameters are better than more because &AElig;-DIR ACLs
+  internally sort out most stuff.
+</p>
+
+<h2 id="search-params">Search parameters</h2>
+<dl>
+  <dt>
+    Search base:
+  </dt>
+  <dd>
+    <code>ou=ae-dir</code>
+    (or whatever you configured in ansible default variable
+    <var>aedir_suffix</var>)
+  </dd>
+  <dt>
+    Search scope:
+  </dt>
+  <dd>
+    <code>subtree</code>
+  </dd>
+  <dt>
+    Various possible filters for searching for all visible users accounts:
+  </dt>
+  <dd>
+    <ul>
+      <li><code>(objectClass=account)</code></li>
+      <li><code>(objectClass=inetOrgPerson)</code></li>
+      <li><code>(objectClass=person)</code></li>
+    </ul>
+  </dd>
+  <dt>
+    Filter for searching a particular account...
+  </dt>
+  <dd>
+    <dl>
+      <dt>
+        ...by username
+      </dt>
+      <dd>
+        <code>(uid=&lt;username&gt;)</code>
+      </dd>
+      <dt>
+        ...by e-mail address
+      </dt>
+      <dd>
+        <code>(mail=&lt;e-mail address&gt;)</code>
+      </dd>
+    </dl>
+  </dd>
+  <dt>
+    Additionally ensure the found user has login right on your system:
+  </dt>
+  <dd>
+    <code>(&(uid=&lt;username&gt;)(pwdChangedTime=*))</code>
+  </dd>
+  <dt>
+  </dt>
+  <dd>
+  </dd>
+</dl>
+
+<h2 id="bind-params">Bind parameters</h2>
+<p>
+  Bear in mind that your system always <strong>must bind</strong> to
+  be granted access for searching users and groups etc.
+</p>
+
+<h3 id="tls-params">TLS parameters</h3>
+<p>
+  Clear-text connections are strictly disallowed. Therefore your system has
+  to know the following parameters for estabilishing a validated TLS
+  connection:
+</p>
+<ul>
+  <li>CA certificate</li>
+  <li>strict validation mode</li>
+  <li>
+    strong cipher suites matching what's configured with slapd.conf
+    directive <var>TLSCipherSuite</var>
+  </li>
+</ul>
+
+<h3 id="simple-bind">Simple bind</h3>
+<dl>
+  <dt>
+    Bind-DN
+  </dt>
+  <dd>
+    <p>
+      The bind-DN can be configured in a unique short-form instead of the
+      complete DN. This allows moving the accompanying
+      <a href="docs.html#schema-oc-aeHost">host</a> or
+      <a href="docs.html#schema-oc-aeService">service</a> entry within
+      the DIT to other <a href="docs.html#schema-oc-aeZone">zones</a> or
+      <a href="docs.html#schema-oc-aeSrvGroup">service groups</a> without
+      having to reconfigure the client side.
+    </p>
+    <dl>
+      <dt>Hosts (OS login):</dt>
+      <dd>
+        <code>host=&lt;canonical hostname&gt;,ou=ae-dir</code>
+      </dd>
+      <dt>Server services (application/service login):</dt>
+      <dd>
+        <code>uid=&lt;service name&gt;,ou=ae-dir</code>
+      </dd>
+    </dl>
+  </dd>
+  <dt>
+  </dt>
+  <dd>
+  </dd>
+</dl>
+
+<h3 id="sasl-external-bind">SASL/EXTERNAL bind with client certificates</h3>
+<p>
+  The OpenLDAP server can use authentication credentials available at the
+  transport layer to authenticate the client if it connects via
+  <a href="https://tools.ietf.org/html/draft-chu-ldap-ldapi">LDAP over IPC (LDAPI)</a>
+  or with <em>TLS encryption</em> and sends a SASL bind operation with
+  mechanism <em>EXTERNAL</em>.
+</p>
+<p>
+  In case of TLS with client cert authentication the configuration requires
+  these parameters to be set:
+</p>
+<ul>
+  <li>
+    client public-key certificate and key
+  </li>
+  <li>
+    private client key (matching client cert)
+  </li>
+  <li>
+    Subject DN of client cert must be written to attribute <var>seeAlso</var>
+    in <a href="docs.html#schema-oc-aeService">aeService</a> entry in LDAP
+    string representation.
+  </li>
+</ul>
+
 <h1>PAM/NSS services</h1>
 
 <h2 id="pam-nss-simple">Simple PAM/NSS clients</h2>
+<p>
+  Simple PAM/NSS clients do not have any special knowledge about
+  &AElig;-DIR DIT and schema.
+</p>
+
+<h3 id="pam-nss-linux-sssd">Linux PAM/NSS with sssd</h3>
+<p>
+  While <a href="https://fedorahosted.org/sssd/">sssd</a> itself is not a
+  simple component the configuration of <em>sssd-ldap(5)</em> does
+  deliberately not leverage any of its special features.
+</p>
+<p>
+  The following diagram illustrates the integration of <em>sssd</em> into 
+  Linux login:
+</p>
+<p>
+  <img
+    class="svg_image"
+    src="img/linux-client.svg"
+    title="&AElig;-DIR integration of Linux with sssd components"
+  >
+</p>
+<p>
+  Example configuration files: <code>client-examples/sssd/</code>
+</p>
+<p>
+  See also:
+</p>
+<ul>
+  <li>
+    <a href="https://jhrozek.wordpress.com/2015/03/11/anatomy-of-sssd-user-lookup/">
+    Blog article: Anatomy of sssd user lookup</a>
+  </li>
+</ul>
 
 <h2 id="pam-nss-smart">Smart PAM/NSS clients</h2>
 <p>Smart clients optimized for &AElig;-DIR should do the following:</p>
@@ -39,18 +217,6 @@
     </ul>
   </li>
 </ul>
-
-<h2 id="pam-nss-linux-sssd">Linux with sssd</h2>
-<p>
-  Example configuration files: <code>client-examples/sssd/</code>
-</p>
-<p>
-  <img
-    class="svg_image"
-    src="img/linux-client.svg"
-    title="&AElig;-DIR integration of Linux with sssd components"
-  >
-</p>
 
 <h1 id="ssh-proxy">SSH proxy</h1>
 <p>
