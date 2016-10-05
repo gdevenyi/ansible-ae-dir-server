@@ -162,7 +162,7 @@
   deliberately not leverage any of its special features.
 </p>
 <p>
-  The following diagram illustrates the integration of <em>sssd</em> into 
+  The following diagram illustrates the integration of <em>sssd</em> into
   Linux login:
 </p>
 <p>
@@ -202,10 +202,13 @@
     Send <em>LDAP Who Am I?</em> extended operation
     (see <a href="https://tools.ietf.org/html/rfc4532">RFC 4352</a>)
     to find the real DN of their own
-    <a href="docs.html#schema-oc-aeHost">aeHost</a> entry.
+    <a href="docs.html#schema-oc-aeHost">aeHost</a> entry
+    for determining <a href="docs.html#schema-oc-aeSrvGroup">aeSrvGroup</a>
+    membership.
   </li>
   <li>
-    Send <em>Session Tracking</em> extended control
+    Send <em>Session Tracking</em> extended control with the IP address of
+    the client system accessing the service
     (see <a href="https://tools.ietf.org/html/draft-wahl-ldap-session">draft-wahl-ldap-session</a>)
   </li>
   <li>
