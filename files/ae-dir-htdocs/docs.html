@@ -78,6 +78,8 @@
 <h2 id="sys-provider">&AElig;-DIR provider</h2>
 <p>
   For maintaining entries the &AElig;-DIR provider are used.
+</p>
+<p>
   The following roles may access &AElig;-DIR provider:
 </p>
 <ul>
@@ -87,7 +89,12 @@
   <li><a href="docs.html#role-ae-auditor">&AElig; Auditor</a></li>
   <li><a href="docs.html#role-setup-admin">Setup Admin</a></li>
   <li><a href="docs.html#role-ae-user">&AElig; User</a></li>
+  <li><a href="docs.html#role-ae-replica">&AElig; Replica</a></li>
 </ul>
+<p>
+  Note: It is recommended to restrict network access to IP networks used by
+  the roles above.
+</p>
 <p>
   <img
     class="svg_image"
@@ -141,6 +148,20 @@
   passwords. Write access to consumers is deliberately disallowed.
   All write operations must be sent to
   the <a href="#sys-provider">&AElig;-DIR provider systems</a>.
+</p>
+<p>
+  The following roles may access &AElig;-DIR provider:
+</p>
+<ul>
+  <li><a href="docs.html#role-zone-admin">Zone Admin</a></li>
+  <li><a href="docs.html#role-ae-admin">&AElig; Admin</a></li>
+  <li><a href="docs.html#role-ae-auditor">&AElig; Auditor</a></li>
+  <li><a href="docs.html#role-host">&AElig; Host</a></li>
+  <li><a href="docs.html#role-server-service">&AElig; Server Service</a></li>
+</ul>
+<p>
+  Note: It is recommended to restrict network access to IP networks used by
+  the roles above.
 </p>
 <p>
   There is currently only one component running on on each
@@ -310,6 +331,21 @@
   entries including own group membership and all user entries which
   are in at least one common user group. Users can set their own
   password but cannot read it.
+</p>
+
+<h2 id="role-client-service">&AElig; client service</h2>
+<p>
+  <em>&AElig; client services</em>
+</p>
+
+<h2 id="role-server-service">&AElig; server service</h2>
+<p>
+  <em>&AElig; server services</em>
+</p>
+
+<h2 id="role-host">&AElig; host</h2>
+<p>
+  <em>&AElig; host</em>
 </p>
 
 <h2 id="role-ae-replica">&AElig; Replica</h2>
