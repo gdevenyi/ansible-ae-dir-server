@@ -77,6 +77,18 @@
 
 <h2 id="sys-provider">&AElig;-DIR provider</h2>
 <p>
+  For maintaining entries the &AElig;-DIR provider are used.
+  The following roles may access &AElig;-DIR provider:
+</p>
+<ul>
+  <li><a href="docs.html#role-zone-admin">Zone Admin</a></li>
+  <li><a href="docs.html#role-zone-auditor">Zone Auditor</a></li>
+  <li><a href="docs.html#role-ae-admin">&AElig; Admin</a></li>
+  <li><a href="docs.html#role-ae-auditor">&AElig; Auditor</a></li>
+  <li><a href="docs.html#role-setup-admin">Setup Admin</a></li>
+  <li><a href="docs.html#role-ae-user">&AElig; User</a></li>
+</ul>
+<p>
   <img
     class="svg_image"
     src="img/slapd-provider.svg"
@@ -91,7 +103,9 @@
 <dl>
   <dt id="sys-slapd-provider">slapd provider</dt>
   <dd>
-    <a href="http://www.openldap.org">OpenLDAP's slapd</a>
+    <a href="http://www.openldap.org">OpenLDAP's slapd</a> acting as roles
+    <a href="#role-ae-provider">&AElig; Replica</a> and
+    <a href="#role-ae-provider">&AElig; Provider</a>
     (see also <a href="#slapd-role-provider">provider configuration</a>)
   </dd>
   <dt id="sys-web2ldap">web2ldap</dt>
@@ -122,13 +136,21 @@
 
 <h2 id="sys-consumer">&AElig;-DIR consumer</h2>
 <p>
+  All integrated hosts and services query the <em>&AElig;-DIR
+  consumers</em> for accessing user and group entries and checking user
+  passwords. Write access to consumers is deliberately disallowed.
+  All write operations must be sent to
+  the <a href="#sys-provider">&AElig;-DIR provider systems</a>.
+</p>
+<p>
   There is currently only one component running on on each
   &AElig;-DIR consumer system:
 </p>
 <dl>
   <dt id="sys-slapd-consumer">slapd consumer</dt>
   <dd>
-    <a href="http://www.openldap.org">OpenLDAP's slapd</a>
+    <a href="http://www.openldap.org">OpenLDAP's slapd</a> acting as role
+    <a href="#role-ae-provider">&AElig; Replica</a>
     (see also <a href="#slapd-role-consumer">consumer configuration</a>)
   </dd>
 </dl>
