@@ -2,10 +2,10 @@
 # tasks file for roles/ae-dir-server
 
 - name: "OS base configuration"
-  include: "baseos_{{ ansible_os_family }}.yml"
+  include: "baseos_{{ ansible_lsb.id }}.yml"
 
 - name: "Install OpenLDAP packages"
-  include: "install_openldap_{{ ansible_os_family }}.yml"
+  include: "install_openldap_{{ ansible_lsb.id }}.yml"
 
 - name: "TLS configuration for OpenLDAP slapd"
   include: tls_files.yml

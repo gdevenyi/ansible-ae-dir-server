@@ -81,7 +81,7 @@
 - name: Install systemd files from templates
   template:
     src: "aedirpwd/aedirpwd.service.j2"
-    dest: "{{ web2ldap_systemd_dir[ansible_os_family] }}/aedirpwd.service"
+    dest: "{{ web2ldap_systemd_dir[ansible_lsb.id] }}/aedirpwd.service"
     owner: root
     group: root
     mode: 0644

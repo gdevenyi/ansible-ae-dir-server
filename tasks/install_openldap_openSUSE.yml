@@ -18,7 +18,7 @@
 
 - name: Create /etc/sysconfig/openldap
   template:
-    src: "{{ ansible_os_family }}/sysconfig_openldap.j2"
+    src: "{{ ansible_lsb.id }}/sysconfig_openldap.j2"
     dest: "/etc/sysconfig/openldap"
     owner: root
     group: ldap

@@ -56,8 +56,8 @@
     mode: 0644
   when: aedir_init == "1"
 
-- name: "Specific installation for {{ ansible_os_family }}"
-  include: "aedir_tools_{{ ansible_os_family }}.yml"
+- name: "Specific installation for {{ ansible_lsb.id }}"
+  include: "aedir_tools_{{ ansible_lsb.id }}.yml"
 
 - name: "Install tool scripts"
   template:

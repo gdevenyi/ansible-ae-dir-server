@@ -1,6 +1,6 @@
 ---
 
-- name: "Install base packages on {{ ansible_os_family }}"
+- name: "Install base packages on {{ ansible_lsb.id }}"
   apt:
     name: "{{ item }}"
     state: installed
@@ -13,14 +13,14 @@
     - python-paramiko
     - python-webpy
 
-- name: "PIP installation packages on {{ ansible_os_family }}"
+- name: "PIP installation packages on {{ ansible_lsb.id }}"
   apt:
     name: "{{ item }}"
     state: installed
     update_cache: yes
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
-  when: ansible_os_family == 'Debian'
+  when: ansible_lsb.id == 'Debian'
   notify:
     - "restart {{ web_server }}"
   with_items:

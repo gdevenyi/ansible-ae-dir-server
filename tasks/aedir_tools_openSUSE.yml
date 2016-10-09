@@ -1,6 +1,6 @@
 ---
 
-- name: "Install additional base packages on {{ ansible_os_family }}"
+- name: "Install additional base packages on {{ ansible_lsb.id }}"
   zypper:
     name: "{{ item }}"
     state: present
