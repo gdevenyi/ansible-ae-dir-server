@@ -6,7 +6,7 @@ Sets next GID number to highest GID found + 1
 This script must run locally on a Æ-DIR provider
 """
 
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 
 import sys
 import os
@@ -33,7 +33,7 @@ ldap_conn = aedir.AEDirObject(None, trace_level=PYLDAP_TRACE_LEVEL)
 aedir_searchbase = ldap_conn.find_search_base()
 
 # reverse sorting request control
-sss_control = SSSRequestControl(ordering_rules=['-'+GID_ATTR])
+sss_control = SSSRequestControl(criticality=True, ordering_rules=['-'+GID_ATTR])
 # send search request
 msg_id = ldap_conn.search_ext(
     aedir_searchbase,
