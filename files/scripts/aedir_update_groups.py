@@ -8,9 +8,14 @@ This script performs two tasks:
 It is designed to run as a CRON job.
 
 Author: Michael Ströder <michael@stroeder.com>
+
+Requires:
+- Python 2.6+
+- python-ldap 2.4.27+
+- python-aedir 0.0.10+
 """
 
-__version__ = '0.4.2'
+__version__ = '0.5.0'
 
 #-----------------------------------------------------------------------
 # Imports
@@ -53,16 +58,6 @@ STALE_MEMBER_FILTER = (
 #-----------------------------------------------------------------------
 # Classes and functions
 #-----------------------------------------------------------------------
-
-def members2uids(members):
-    """
-    transforms list of member DNs into list of uid values
-    """
-    return [
-        dn[4:].split(',')[0]
-        for dn in members
-    ]
-
 
 class AEGroupUpdater(object):
     """
@@ -154,14 +149,14 @@ class AEGroupUpdater(object):
 
             ldap_group_modlist = []
 
-            remove_members = old_members-new_members
+            remove_members = old_members - new_members
             if remove_members:
                 ldap_group_modlist.extend([
                     (ldap.MOD_DELETE, MEMBER_ATTR, list(remove_members)),
                     (ldap.MOD_DELETE, MEMBERUID_ATTR, list(members2uids(remove_members))),
                 ])
 
-            add_members = new_members-old_members
+            add_members = new_members - old_members
             if add_members:
                 ldap_group_modlist.extend([
                     (ldap.MOD_ADD, MEMBER_ATTR, list(add_members)),
