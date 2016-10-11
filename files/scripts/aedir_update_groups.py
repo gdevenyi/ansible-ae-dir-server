@@ -84,7 +84,7 @@ class AEGroupUpdater(object):
                         group_dn,
                         [
                             (ldap.MOD_DELETE, 'member', [member_dn]),
-                            (ldap.MOD_DELETE, 'memberUID', members2uids([member_dn])),
+                            (ldap.MOD_DELETE, 'memberUID', aedir.members2uids([member_dn])),
                         ]
                     )
                 except ldap.LDAPError, ldap_error:
@@ -153,14 +153,14 @@ class AEGroupUpdater(object):
             if remove_members:
                 ldap_group_modlist.extend([
                     (ldap.MOD_DELETE, MEMBER_ATTR, list(remove_members)),
-                    (ldap.MOD_DELETE, MEMBERUID_ATTR, list(members2uids(remove_members))),
+                    (ldap.MOD_DELETE, MEMBERUID_ATTR, list(aedir.members2uids(remove_members))),
                 ])
 
             add_members = new_members - old_members
             if add_members:
                 ldap_group_modlist.extend([
                     (ldap.MOD_ADD, MEMBER_ATTR, list(add_members)),
-                    (ldap.MOD_ADD, MEMBERUID_ATTR, list(members2uids(add_members))),
+                    (ldap.MOD_ADD, MEMBERUID_ATTR, list(aedir.members2uids(add_members))),
                 ])
 
             if ldap_group_modlist:
