@@ -83,6 +83,7 @@
   with_items:
     - aeperson2aeuser.py
     - aedir_update_groups.py
+    - aedir_fix_groups.py
 
 - name: "Install backup script from template"
   template:
