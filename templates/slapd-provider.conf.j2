@@ -76,10 +76,11 @@ sasl-host {{ openldap_service_fqdn }}
 # TLS parameters
 #---------------------------------------------------------------------------
 
-# require at least TLS 1.0
-TLSProtocolMin 3.1
+# optional usage of TLS client certs
 TLSVerifyClient allow
-TLSCipherSuite DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:AES256-SHA:!ADH
+
+TLSProtocolMin {{ openldap_tls_protocol_min }}
+TLSCipherSuite {{ openldap_tls_cipher_suite }}
 
 TLSCACertificateFile {{ openldap_cacert_pathname }}
 TLSCertificateFile {{ openldap_cert_pathname }}

@@ -241,6 +241,13 @@ local_openldap_csr_dir: "files/pki-csr-files"
 # whether to overwrite existing private key
 openldap_key_gen: 0
 
+# value for slapd.conf directive TLSProtocolMin
+# 3.<x> means TLSv1.<x-1>
+openldap_tls_protocol_min: "3.3"
+
+# value for slapd.conf directive TLSCipherSuite
+openldap_tls_cipher_suite: "ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDH-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES128-GCM-SHA256:ECDH-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:!ADH"
+
 # The full path names on the target system
 openldap_cacert_pathname: "{{ openldap_conf_prefix }}/tls/{{ openldap_cacert_filename }}"
 openldap_cert_pathname: "{{ openldap_conf_prefix }}/tls/{{ openldap_service_fqdn }}.crt"
