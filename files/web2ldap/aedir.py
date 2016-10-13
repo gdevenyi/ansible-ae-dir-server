@@ -58,6 +58,25 @@ syntax_registry.registerAttrType(
 )
 
 
+def ae_validity_filter(secs=None):
+  if secs is None:
+    secs = time.time()
+  return (
+    '(&'
+      '(|'
+        '(!(aeNotBefore=*))'
+        '(aeNotBefore<={0})'
+      ')'
+      '(|'
+        '(!(aeNotAfter=*))'
+        '(aeNotAfter>={0})'
+      ')'
+    ')'
+  ).format(
+    time.strftime('%Y%m%d%H%M%SZ', time.gmtime(secs))
+  )
+
+
 class AEObjectUtil:
 
   def _zone_entry(self,attrlist=None):
@@ -866,7 +885,10 @@ class AEPerson(DynamicDNSelectList,AEObjectUtil):
   }
 
   def _determineFilter(self):
-    filter_components = [DynamicDNSelectList._determineFilter(self)]
+    filter_components = [
+      DynamicDNSelectList._determineFilter(self),
+      ae_validity_filter(),
+    ]
     aedept_filters = [
       '(aeDept={0})'.format(escape_filter_chars(d))
       for d in self._zone_entry(attrlist=['aeDept']).get('aeDept',[])
