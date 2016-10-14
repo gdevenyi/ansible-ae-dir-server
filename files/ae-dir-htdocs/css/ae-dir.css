@@ -159,6 +159,7 @@ img {
   border:1px #202020 solid;
 }
 
+/*
 img:hover {
   position:fixed;
   display:block;
@@ -169,6 +170,7 @@ img:hover {
   background-color:#ffffff;
   border:10px solid #f8f8f8;
 }
+*/
 
 a {
   text-decoration:underline;
@@ -286,4 +288,32 @@ span.web2ldap-msg-error {
   font-weight:bold;
   padding:0.1em;
   border: 3px solid #c81f2a;
+}
+
+.thumbnail {
+  max-width: 40%;
+}
+
+.lightbox {
+	display: none;
+	position: fixed;
+	z-index: 999;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	top: 0;
+	left: 0;
+	background: rgba(255,255,255,0.9);
+}
+
+.lightbox img {
+	max-width: 90%;
+	max-height: 85%;
+	margin-top: 2%;
+  background-color: #ffffff;
+}
+
+.lightbox:target {
+	outline: none;
+	display: block;
 }
