@@ -27,6 +27,14 @@
   notify:
   - restart slapd
 
+- name: "Create logging config file {{ aedir_etc }}/ae-logging.conf from template"
+  template:
+    src: "ae-logging.conf.j2"
+    dest: "{{ aedir_etc }}/ae-logging.conf"
+    owner: root
+    group: root
+    mode: 0644
+
 - name: "install CA cert for SMTP/STARTTLS"
   copy:
     src: "{{ smtp_cacert_filename }}"

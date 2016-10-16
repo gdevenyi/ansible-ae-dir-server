@@ -1,0 +1,56 @@
+#--------------------------------------------------------------------------------
+# Logging configuration for all AE-DIR demons and scripts written in Python
+#
+# see format in Python 2.x library docs:
+# https://docs.python.org/2/library/logging.config.html#configuration-file-format
+#
+# {{ ansible_managed }}
+#--------------------------------------------------------------------------------
+
+[loggers]
+keys=root,syslog,console
+
+[handlers]
+keys=syslog,console
+
+[formatters]
+keys=syslog,console
+
+[logger_root]
+handlers=syslog,console
+level=NOTSET
+qualname=aedir
+
+[logger_syslog]
+handlers=syslog
+propagate=0
+facility=local7
+qualname=aedir.syslog
+
+[handler_syslog]
+class=logging.handlers.SysLogHandler
+level=INFO
+formatter=syslog
+facility=CRON
+args=('/dev/log',)
+
+[formatter_syslog]
+class=logging.Formatter
+format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+datefmt=
+
+[logger_console]
+handlers=console
+propagate=0
+qualname=aedir.console
+
+[handler_console]
+class=logging.StreamHandler
+level=DEBUG
+formatter=console
+args=(sys.stdout,)
+
+[formatter_console]
+class=logging.Formatter
+format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+datefmt=
