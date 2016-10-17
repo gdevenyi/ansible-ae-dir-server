@@ -320,6 +320,10 @@ index aeVisibleSudoers eq
 index aeProxyFor pres,eq
 index aeSSHProxyCommand pres,eq,sub
 
+# zones
+index aeZoneAdmins pres,eq
+index aeZoneAuditors pres,eq
+
 # service attributes
 index aeHost eq
 
@@ -627,8 +631,8 @@ access to
   dn.onelevel="cn=otp,{{ aedir_suffix }}"
   filter="(objectClass=oathToken)"
     by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" read
-    by group/aeGroup/member="cn=otp-zone-admins,cn=otp,{{ aedir_suffix }}" write
-    by group/aeGroup/member="cn=otp-zone-auditors,cn=otp,{{ aedir_suffix }}" read
+    by set.expand="user & this/aeZoneAdmins/member" read
+    by set.expand="user & this/aeZoneAuditors/member" read
     by set="user/oathHOTPToken & this" read
     by set="user & ([ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(member=] + user + [))])/member" read
     by * none
@@ -641,97 +645,97 @@ access to
 access to
   dn.regex="^cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
   attrs=children
-    by group/aeGroup/member.expand="cn=${d1}-zone-admins,cn=${d1},{{ aedir_suffix }}" write
-    by group/aeGroup/member.expand="cn=${d1}-zone-auditors,cn=${d1},{{ aedir_suffix }}" read
+    by set.expand="user & this/aeZoneAdmins/member" write
+    by set.expand="user & this/aeZoneAuditors/member" read
     by set="user/-1 & this" search
     by * none break
 access to
   dn.regex="^cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
-    by group/aeGroup/member.expand="cn=${d1}-zone-admins,cn=${d1},{{ aedir_suffix }}" read
-    by group/aeGroup/member.expand="cn=${d1}-zone-auditors,cn=${d1},{{ aedir_suffix }}" read
+    by set.expand="user & this/aeZoneAdmins/member" read
+    by set.expand="user & this/aeZoneAuditors/member" read
     by set="user/-1 & this" read
-    by users search
+    by users search break
     by * none break
 # aeSudoRule entries
 access to
   dn.regex="^cn=({{ aedir_aesudorule_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
   filter="(objectClass=aeSudoRule)"
-    by group/aeGroup/member.expand="cn=${d2}-zone-admins,cn=${d2},{{ aedir_suffix }}" write
-    by group/aeGroup/member.expand="cn=${d2}-zone-auditors,cn=${d2},{{ aedir_suffix }}" read
+    by set="user & this/-1/aeZoneAdmins/member" write
+    by set="user & this/-1/aeZoneAuditors/member" read
     by * none break
 # aeGroup entries add-only attributes
 access to
   dn.regex="^cn=({{ aedir_aegroup_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
   filter="(objectClass=aeGroup)"
   attrs=objectClass,entry,cn,gidNumber
-    by group/aeGroup/member.expand="cn=${d2}-zone-admins,cn=${d2},{{ aedir_suffix }}" =arscxd
-    by group/aeGroup/member.expand="cn=${d2}-zone-auditors,cn=${d2},{{ aedir_suffix }}" read
+    by set="user & this/-1/aeZoneAdmins/member" write
+    by set="user & this/-1/aeZoneAuditors/member" read
     by * none break
 # aeGroup entries
 access to
   dn.regex="^cn=({{ aedir_aegroup_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
   filter="(objectClass=aeGroup)"
-    by group/aeGroup/member.expand="cn=${d2}-zone-admins,cn=${d2},{{ aedir_suffix }}" write
-    by group/aeGroup/member.expand="cn=${d2}-zone-auditors,cn=${d2},{{ aedir_suffix }}" read
+    by set="user & this/-1/aeZoneAdmins/member" write
+    by set="user & this/-1/aeZoneAuditors/member" read
     by * none break
 # aeUser entries add-only attributes
 access to
   dn.regex="^uid=({{ aedir_aeuser_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
   filter="(objectClass=aeUser)"
   attrs=objectClass,entry,uid,uidNumber,aePerson
-    by group/aeGroup/member.expand="cn=${d2}-zone-admins,cn=${d2},{{ aedir_suffix }}" =arscxd
-    by group/aeGroup/member.expand="cn=${d2}-zone-auditors,cn=${d2},{{ aedir_suffix }}" read
+    by set="user & this/-1/aeZoneAdmins/member" write
+    by set="user & this/-1/aeZoneAuditors/member" read
     by * none break
 # aeUser entries not archived
 access to
   dn.regex="^uid=({{ aedir_aeuser_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
   filter="(objectClass=aeUser)"
   attrs=!msPwdResetObject
-    by group/aeGroup/member.expand="cn=${d2}-zone-admins,cn=${d2},{{ aedir_suffix }}" write
-    by group/aeGroup/member.expand="cn=${d2}-zone-auditors,cn=${d2},{{ aedir_suffix }}" read
+    by set="user & this/-1/aeZoneAdmins/member" write
+    by set="user & this/-1/aeZoneAuditors/member" read
     by * none break
 # aeService entries
 access to
   dn.regex="^uid=({{ aedir_aeservice_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
   filter="(objectClass=aeService)"
-    by group/aeGroup/member.expand="cn=${d2}-zone-admins,cn=${d2},{{ aedir_suffix }}" write
-    by group/aeGroup/member.expand="cn=${d2}-zone-auditors,cn=${d2},{{ aedir_suffix }}" read
+    by set="user & this/-1/aeZoneAdmins/member" write
+    by set="user & this/-1/aeZoneAuditors/member" read
     by * none break
 # aeSrvGroup entries
 access to
   dn.regex="^cn=({{ aedir_aesrvgroup_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
   filter="(objectClass=aeSrvGroup)"
   attrs=children
-    by group/aeGroup/member.expand="cn=${d2}-zone-admins,cn=${d2},{{ aedir_suffix }}" write
+    by set="user & this/-1/aeZoneAdmins/member" write
     by set="user & this/aeSetupGroups/member" write
     by set="user & this/aeSrvGroup/aeSetupGroups/member" read
-    by group/aeGroup/member.expand="cn=${d2}-zone-auditors,cn=${d2},{{ aedir_suffix }}" read
+    by set="user & this/-1/aeZoneAuditors/member" read
     by * none break
 access to
   dn.regex="^cn=({{ aedir_aesrvgroup_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
   filter="(objectClass=aeSrvGroup)"
-    by group/aeGroup/member.expand="cn=${d2}-zone-admins,cn=${d2},{{ aedir_suffix }}" write
-    by group/aeGroup/member.expand="cn=${d2}-zone-auditors,cn=${d2},{{ aedir_suffix }}" read
+    by set="user & this/-1/aeZoneAdmins/member" write
+    by set="user & this/-1/aeZoneAuditors/member" read
     by set="user & this/aeSetupGroups/member" read
     by * none break
 # aeHost entries have to be subordinate entries of aeSrvGroup entries
 access to
   dn.regex="^host=([a-z]?[a-z0-9.-]+),cn=({{ aedir_aesrvgroup_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
   filter="(objectClass=aeHost)"
-    by group/aeGroup/member.expand="cn=${d3}-zone-admins,cn=${d3},{{ aedir_suffix }}" write
+    by set="user & this/-2/aeZoneAdmins/member" write
     by set="user & this/-1/aeSetupGroups/member" write
     by set="user & this/aeSrvGroup/aeSetupGroups/member" read
-    by group/aeGroup/member.expand="cn=${d3}-zone-auditors,cn=${d3},{{ aedir_suffix }}" read
+    by set="user & this/-2/aeZoneAuditors/member" read
     by * none break
 # aeService entries can also be subordinate entries of aeSrvGroup
 # entries if the need read access to aeUser and aeGroup entries
 access to
   dn.regex="^uid=({{ aedir_aeservice_uid_regex }}),cn=({{ aedir_aesrvgroup_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
   filter="(objectClass=aeService)"
-    by group/aeGroup/member.expand="cn=${d3}-zone-admins,cn=${d3},{{ aedir_suffix }}" write
+    by set="user & this/-2/aeZoneAdmins/member" write
     by set="user & this/-1/aeSetupGroups/member" write
     by set="user & this/aeSrvGroup/aeSetupGroups/member" read
-    by group/aeGroup/member.expand="cn=${d3}-zone-auditors,cn=${d3},{{ aedir_suffix }}" read
+    by set="user & this/-2/aeZoneAuditors/member" read
     by * none break
 
 # Zone cn={{ aedir_org_zone }}
@@ -741,15 +745,15 @@ access to
 access to
   dn.regex="^uniqueIdentifier=({{ aedir_aeperson_uniqueid_regex }}),cn={{ aedir_org_zone }},{{ aedir_suffix }}$"
   filter="(objectClass=aePerson)"
-    by group/aeGroup/member.expand="cn={{ aedir_org_zone }}-zone-admins,cn={{ aedir_org_zone }},{{ aedir_suffix }}" write
-    by group/aeGroup/member.expand="cn={{ aedir_org_zone }}-zone-auditors,cn={{ aedir_org_zone }},{{ aedir_suffix }}" read
+    by set="user & this/-1/aeZoneAdmins/member" write
+    by set="user & this/-1/aeZoneAuditors/member" read
     by * none break
 # administration and readability of aeDept entries beneath aeZone cn={{ aedir_org_zone }}
 access to
   dn.regex="^departmentNumber=({{ aedir_aedept_deptnumber_regex }}),cn={{ aedir_org_zone }},{{ aedir_suffix }}$"
   filter="(objectClass=aeDept)"
-    by group/aeGroup/member.expand="cn={{ aedir_org_zone }}-zone-admins,cn={{ aedir_org_zone }},{{ aedir_suffix }}" write
-    by group/aeGroup/member.expand="cn={{ aedir_org_zone }}-zone-auditors,cn={{ aedir_org_zone }},{{ aedir_suffix }}" read
+    by set="user & this/-1/aeZoneAdmins/member" write
+    by set="user & this/-1/aeZoneAuditors/member" read
     by set="user & ([ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(member=] + user + [))])/member" read
     by * none break
 
@@ -815,6 +819,13 @@ access to
 access to
   filter="(objectClass=aeUser)"
   attrs=entry,uid,aeStatus,objectClass,mail,pwdPolicySubentry,pwdChangedTime,aeTag,cn,displayName,description,entryCSN,creatorsName,createTimestamp,modifiersName,modifyTimestamp,memberOf
+    by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" read
+    by * none break
+
+# Allow read access to zone admin group references
+access to
+  filter="(objectClass=aeZone)"
+  attrs=entry,objectClass,cn,aeZoneAdmins
     by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" read
     by * none break
 
@@ -1018,14 +1029,6 @@ access to
   attrs=memberOf
   val.exact="cn=ae-all-zone-auditors,cn=ae,ou=ae-dir"
     by * none
-
-# Read access to aeZone entries for all aeUser entries beneath the aeZone entry
-access to
-  dn.onelevel="{{ aedir_suffix }}"
-  filter="(objectClass=aeZone)"
-    by set="user/-1 & this" read
-    by users search
-    by * auth
 
 # Read access for all active group members
 # Notes:
@@ -1266,6 +1269,15 @@ constraint_attribute
   sshPublicKey
   regex "^{{ aedir_aeuser_sshpubkey_regex }}$"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeUser)"
+
+# zone admin/auditor groups to DNs of active aeGroup entries
+# must solely reference special zone role groups
+constraint_attribute
+  aeZoneAdmins
+  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(!(|(cn:dn:=ae)(cn:dn:=pub))))"
+constraint_attribute
+  aeZoneAuditors
+  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeGroup)(aeStatus=0)(|(cn=*-zone-admins)(cn=*-zone-auditors))(!(|(cn:dn:=ae)(cn:dn:=pub))))"
 
 # rights groups to DNs of active aeGroup entries
 # must not reference special role groups

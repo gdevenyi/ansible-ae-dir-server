@@ -231,6 +231,18 @@ ditcontentrule ( ae-dir-oc:29
 # Zones
 #-----------------------------------------------------------------------
 
+attributetype ( ae-dir-at:31
+  NAME 'aeZoneAdmins'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: DN of groups of users entitled zone admin'
+  SUP distinguishedName )
+
+attributetype ( ae-dir-at:32
+  NAME 'aeZoneAuditors'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: DN of groups of users entitled zone auditor'
+  SUP distinguishedName )
+
 objectclass ( ae-dir-oc:20
   NAME 'aeZone'
   X-ORIGIN 'AE-DIR'
@@ -238,7 +250,7 @@ objectclass ( ae-dir-oc:20
   STRUCTURAL
   SUP ( namedObject $ aeObject )
   MUST ( description )
-  MAY ( aeDept ) )
+  MAY ( aeDept $ aeZoneAdmins $ aeZoneAuditors ) )
 
 ditcontentrule ( ae-dir-oc:20
   NAME 'aeZone-dcr'

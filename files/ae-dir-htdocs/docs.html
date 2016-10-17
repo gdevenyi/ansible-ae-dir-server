@@ -271,9 +271,13 @@
 <h2 id="role-zone-admin">Zone Admin</h2>
 <p>
   <em>Zone admins</em> have full write access (but no <var>manage</var>
-  privilege) to all entries within a zone. The role is assigned to a user
-  account by adding it to the group <var>[zone name]-zone-admins</var>).
-  Typically zone admins perform the daily maintenance tasks and are
+  privilege) to all entries within a zone. Typically they perform
+  the daily data maintenance tasks.
+</p>
+<p>
+  The role is assigned to a user account by adding it to a user group with
+  name <var>*-zone-admins</var> which is referenced by attribute
+  <var>aeZoneAdmins</var> in the <a href="#schema-oc-aeZone">aeZone</a> entry.
 </p>
 <p>Typical tasks:</p>
 <ul>
@@ -316,9 +320,15 @@
 
 <h2 id="role-zone-auditor">Zone Auditor</h2>
 <p>
-  <em>Zone auditors</em> have full read access to all entries within a zone.
-  The role is assigned to a user account by adding it to the group
-  <var>[zone name]-zone-auditors</var>).
+  <em>Zone auditors</em> have full read access to all entries within a
+  zone. Typically zone auditors need to read entries to reference them from
+  another zone where they act as zone admin.
+</p>
+<p>
+  The role is assigned to a user account by adding it to a user group with
+  name <var>*-zone-admins</var> or <var>*-zone-auditors</var> which is
+  referenced by attribute <var>aeZoneAuditors</var> in the
+  <a href="#schema-oc-aeZone">aeZone</a> entry.
 </p>
 <p>Typical tasks:</p>
 <ul>
@@ -1199,6 +1209,16 @@
   </dd>
   <dt>meta attributes</dt>
   <dd>see <a href="#schema-oc-aeObject-attributes">aeObject</a></dd>
+  <dt>aeZoneAdmins</dt>
+  <dd>
+    Distinguished names of all <var>aeGroup</var> entries which's members
+    act with role <a href="#role-zone-admin">zone admin</a> for the zone.
+  </dd>
+  <dt>aeZoneAuditors</dt>
+  <dd>
+    Distinguished names of all <var>aeGroup</var> entries which's members
+    act with role <a href="#role-zone-auditor">zone admin</a> for the zone.
+  </dd>
 </dl>
 
 <h3 id="schema-oc-aePerson">aePerson</h3>

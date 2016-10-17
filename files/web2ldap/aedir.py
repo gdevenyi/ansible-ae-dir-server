@@ -446,6 +446,65 @@ syntax_registry.registerAttrType(
 )
 
 
+class AEZoneAdminGroupDN(DynamicDNSelectList):
+  oid = 'AEZoneAdminGroupDN-oid'
+  desc = 'AE-DIR: DN of zone admin group entry'
+  ldap_url = (
+    'ldap:///_?cn?sub?'
+    '(&'
+      '(objectClass=aeGroup)'
+      '(aeStatus=0)'
+      '(cn=*-zone-admins)'
+      '(!'
+        '(|'
+          '(cn:dn:=pub)'
+          '(cn:dn:=ae)'
+        ')'
+      ')'
+    ')'
+  )
+  ref_attrs = (
+    ('memberOf',u'Members',None,u'Search all member entries of this user group'),
+  )
+
+syntax_registry.registerAttrType(
+  AEZoneAdminGroupDN.oid,[
+    AE_OID_PREFIX+'.4.31',  # aeZoneAdmins
+  ]
+)
+
+
+class AEZoneAuditorGroupDN(DynamicDNSelectList):
+  oid = 'AEZoneAuditorGroupDN-oid'
+  desc = 'AE-DIR: DN of zone auditor group entry'
+  ldap_url = (
+    'ldap:///_?cn?sub?'
+    '(&'
+      '(objectClass=aeGroup)'
+      '(aeStatus=0)'
+      '(|'
+        '(cn=*-zone-admins)'
+        '(cn=*-zone-auditors)'
+      ')'
+      '(!'
+        '(|'
+          '(cn:dn:=pub)'
+          '(cn:dn:=ae)'
+        ')'
+      ')'
+    ')'
+  )
+  ref_attrs = (
+    ('memberOf',u'Members',None,u'Search all member entries of this user group'),
+  )
+
+syntax_registry.registerAttrType(
+  AEZoneAuditorGroupDN.oid,[
+    AE_OID_PREFIX+'.4.32',  # aeZoneAuditors
+  ]
+)
+
+
 class AESrvGroupRightsGroupDN(DynamicDNSelectList):
   oid = 'AESrvGroupRightsGroupDN-oid'
   desc = 'AE-DIR: DN of user group entry'
@@ -457,11 +516,7 @@ class AESrvGroupRightsGroupDN(DynamicDNSelectList):
       '(!'
         '(|'
           '(cn:dn:=pub)'
-          '(cn=ae-admins)'
-          '(cn=ae-auditors)'
-          '(cn=ae-providers)'
-          '(cn=ae-replicas)'
-          '(cn=ae-login-proxies)'
+          '(cn:dn:=ae)'
           '(cn=*-zone-admins)'
           '(cn=*-zone-auditors)'
         ')'
@@ -684,20 +739,6 @@ class AEEntryDNAEZone(DistinguishedName):
       group_name=zone_cn+group_name_ext+u'-auditors',
       entry_dn=self._dn,
     )
-    r.append(self._form.applAnchor(
-      'read','Zone Admins',self._sid,
-      (
-        ('dn',zone_admins_group_dn),
-      ),
-      title=u'Display zone admin group %s' % (zone_admins_group_dn),
-    ))
-    r.append(self._form.applAnchor(
-      'read','Zone Auditors',self._sid,
-      (
-        ('dn',zone_auditors_group_dn),
-      ),
-      title=u'Display zone auditor group %s' % (zone_auditors_group_dn),
-    ))
     audit_context = self._ls.getAuditContext(self._ls.currentSearchRoot)
     if audit_context:
       r.append(self._form.applAnchor(

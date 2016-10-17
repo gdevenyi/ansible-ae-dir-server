@@ -443,8 +443,8 @@ access to
 # stripped down to reviewing all entries within a zone by the zone admins/auditors
 access to
   dn.regex="^.*cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
-    by group/aeGroup/member.expand="cn=${d1}-zone-admins,cn=${d1},{{ aedir_suffix }}" read
-    by group/aeGroup/member.expand="cn=${d1}-zone-auditors,cn=${d1},{{ aedir_suffix }}" read
+    by set.expand="user & [cn=${d1},{{ aedir_suffix }}]/aeZoneAdmins/member" read
+    by set.expand="user & [cn=${d1},{{ aedir_suffix }}]/aeZoneAuditors/member" read
     by * none break
 
 #---------------------------------------------------------------------------
