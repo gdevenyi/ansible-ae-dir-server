@@ -1213,11 +1213,18 @@
   <dd>
     Distinguished names of all <var>aeGroup</var> entries which's members
     act with role <a href="#role-zone-admin">zone admin</a> for the zone.
+    <br>
+    Constraint enforces that the group exists, is active and has
+    name (attribute <var>cn</var>) of the form <em>*-zone-admins</em>.
   </dd>
   <dt>aeZoneAuditors</dt>
   <dd>
     Distinguished names of all <var>aeGroup</var> entries which's members
     act with role <a href="#role-zone-auditor">zone admin</a> for the zone.
+    <br>
+    Constraint enforces that the group exists, is active and has
+    name (attribute <var>cn</var>) of the form <em>*-zone-admins</em> or
+    <em>*-zone-auditors</em>.
   </dd>
 </dl>
 
