@@ -702,6 +702,7 @@ syncrepl rid=0{{ loop.index }}
   tls_cacert={{ openldap_cacert_pathname }}
   tls_cert={{ openldap_cert_pathname }}
   tls_key={{ openldap_key_pathname }}
+  tls_protocol_min={{ openldap_syncrepl_tls_protocol_min }}
   tls_cipher_suite={{ openldap_syncrepl_tls_cipher_suite }}
 
 {% endfor %}
