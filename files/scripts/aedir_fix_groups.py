@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 This script performs two tasks:
-1. Fixes missing/obsolete 'memberUID' values in all active aeGroup entries
+1. Removes obsolete 'member' and 'memberUID' values and adds
+   missing 'memberUID' values in all active aeGroup entries
 2. TO DO: Fixes missing 'memberOf' values
 
 It is designed to run as a CRON job rather rarely.
@@ -22,8 +23,8 @@ import os
 # set LDAPRC env var *before* importing ldap
 os.environ['LDAPRC'] = '/opt/ae-dir/etc/ldap.conf'
 import ldap
-import ldapurl
 import aedir
+from ldap.controls.deref import DereferenceControl
 
 #-----------------------------------------------------------------------
 # Configuration constants
@@ -37,6 +38,14 @@ MEMBER_ATTR = 'member'
 # Attribute containing the group members' uid values
 MEMBERUID_ATTR = 'memberUid'
 
+# deref control for
+AEUSER_DEREF_CONTROL = DereferenceControl(
+    True,
+    {
+        MEMBER_ATTR: ['aeStatus', 'uid'],
+    }
+)
+
 #-----------------------------------------------------------------------
 # Classes and functions
 #-----------------------------------------------------------------------
@@ -49,11 +58,12 @@ class AEGroupFixer(object):
     def __init__(self):
         self.ldap_conn = aedir.AEDirObject(None, trace_level=PYLDAP_TRACELEVEL)
 
-    def fix_memberuid(self):
+    def fix_members(self):
         """
-        1. Fixes missing/obsolete 'memberUID' values in all active aeGroup entries
+        1. Removes obsolete 'member' and 'memberUID' values and adds
+           missing 'memberUID' values in all active aeGroup entries
         """
-        msg_id = self.ldap_conn.search(
+        msg_id = self.ldap_conn.search_ext(
             self.ldap_conn.find_search_base(),
             ldap.SCOPE_SUBTREE,
             '(&(objectClass=aeGroup)(aeStatus=0))',
@@ -61,17 +71,38 @@ class AEGroupFixer(object):
                 MEMBER_ATTR,
                 MEMBERUID_ATTR,
             ],
+            serverctrls=[AEUSER_DEREF_CONTROL],
         )
 
-        for _, ldap_results, _, _ in self.ldap_conn.allresults(msg_id):
+        for _, ldap_results, _, _ in self.ldap_conn.allresults(
+                msg_id,
+                add_ctrls=1,
+            ):
 
-            for ldap_group_dn, ldap_group_entry in ldap_results:
+            for ldap_group_dn, ldap_group_entry, ldap_resp_controls in ldap_results:
 
-                members = ldap_group_entry.get(MEMBER_ATTR, [])
+                if not ldap_resp_controls:
+                    continue
+
+                member_deref_result = ldap_resp_controls[0].derefRes[MEMBER_ATTR]
+
+                old_members = set(ldap_group_entry.get(MEMBER_ATTR, []))
                 old_member_uids = set(ldap_group_entry.get(MEMBERUID_ATTR, []))
-                new_member_uids = set(aedir.members2uids(members))
+                new_members = set()
+                new_member_uids = set()
+                for deref_dn, deref_entry in member_deref_result:
+                    if deref_entry['aeStatus'][0] == '0':
+                        new_members.add(deref_dn)
+                        new_member_uids.add(deref_entry['uid'][0])
 
                 ldap_group_modlist = []
+
+                remove_members = old_members - new_members
+                if remove_members:
+                    ldap_group_modlist.append(
+                        (ldap.MOD_DELETE, MEMBER_ATTR, list(remove_members)),
+                    )
+
                 remove_member_uids = old_member_uids - new_member_uids
                 if remove_member_uids:
                     ldap_group_modlist.append(
@@ -108,7 +139,7 @@ class AEGroupFixer(object):
         the main program
         """
         try:
-            self.fix_memberuid()
+            self.fix_members()
         finally:
             try:
                 self.ldap_conn.unbind_s()
