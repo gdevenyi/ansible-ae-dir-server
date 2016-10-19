@@ -42,17 +42,20 @@
   ignore_errors: yes
   delegate_to: 127.0.0.1
   register: openssl_verify_result
+  changed_when: False
 
 - name: "Modulus of cert {{ openldap_cert_filename }}"
   command: "openssl x509 -in files/{{ openldap_cert_filename }} -noout -modulus"
   ignore_errors: yes
   delegate_to: 127.0.0.1
   register: openldap_cert_modulus
+  changed_when: False
 
 - name: "Modulus of key {{ openldap_key_pathname }}"
   command: "openssl rsa -in {{ openldap_key_pathname }} -noout -modulus"
   ignore_errors: yes
   register: openldap_key_modulus
+  changed_when: False
 
 - name: "Key generation tasks"
   include: tls_keygen.yml
