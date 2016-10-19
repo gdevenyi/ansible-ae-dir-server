@@ -13,6 +13,7 @@
     install_recommends: yes
     dpkg_options: 'force-confold,force-confdef'
   with_items:
+    - openssl
     - iptables
 #    - netfilter-persistent
 #    - iptables-persistent

@@ -8,5 +8,6 @@
     disable_recommends: yes
     type: package
   with_items:
+    - openssl
     - iptables
     - joe
