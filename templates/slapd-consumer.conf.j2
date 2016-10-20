@@ -33,8 +33,9 @@ moduleload syncprov
 # contrib modules
 moduleload lastbind
 moduleload deref
-# these would be handy but are not available with LTB packages
-#moduleload noopsrch
+{% if openldap_noopsrch_enabled %}
+moduleload noopsrch
+{% endif %}
 
 #---------------------------------------------------------------------------
 # slapd global parameters
@@ -230,8 +231,10 @@ access
 # overlays used within {{ aedir_accesslog_suffix }}
 #---------------------------------------------------------------------------
 
+{% if openldap_noopsrch_enabled %}
 # for counting search results without retrieving them
-#overlay noopsrch
+overlay noopsrch
+{% endif %}
 
 # for dereferencing control
 overlay deref
@@ -643,8 +646,10 @@ rwm-rewriteMap slapd host2dn "ldap:///{{ aedir_suffix }}?entryDN?sub?"
 rwm-rewriteContext bindDN
 rwm-rewriteRule "^(host=[^,]+),{{ aedir_suffix }}$" "${host2dn($1)}" ":@I"
 
+{% if openldap_noopsrch_enabled %}
 # for counting search results without retrieving them
-#overlay noopsrch
+overlay noopsrch
+{% endif %}
 
 # for dereferencing attributes
 overlay deref
