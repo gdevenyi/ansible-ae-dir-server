@@ -740,6 +740,13 @@ access to
     by set="user & this/aeSrvGroup/aeSetupGroups/member" read
     by set="user & this/-2/aeZoneAuditors/member" read
     by * none break
+# aeTag entries
+access to
+  dn.regex="^cn=({{ aedir_aetag_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(objectClass=aeTag)"
+    by set="user & this/-1/aeZoneAdmins/member" write
+    by set="user & this/-1/aeZoneAuditors/member" read
+    by * none break
 
 # Zone cn={{ aedir_org_zone }}
 #------------------------------------------------------------------

@@ -45,6 +45,7 @@ aedir_python: "{{ aedir_platform_python[ansible_lsb.id] }}"
 # attribute 'cn'
 aedir_aezone_cn_regex: "[a-z0-9]+"
 aedir_aegroup_cn_regex: "[a-z0-9]?[a-z0-9-]+"
+aedir_aetag_cn_regex: "[a-z0-9]?[a-z0-9-]+"
 aedir_aesudorule_cn_regex: "{{ aedir_aegroup_cn_regex }}"
 aedir_aesrvgroup_cn_regex: "{{ aedir_aegroup_cn_regex }}"
 # attribute 'uid'
