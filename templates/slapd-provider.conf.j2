@@ -468,7 +468,7 @@ access to
   filter="(&(objectClass=aeUser)(aeStatus=0))"
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =sw
     by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" =w
-    by set="user & this/-1/aePasswordAdmins/member" =w
+    by set="(user & this/-1/aePasswordAdmins/member) & (user & this/-1/aeZoneAdmins/member)" =w
     by self =w
     by * auth
 
