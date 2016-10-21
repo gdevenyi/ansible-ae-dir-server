@@ -1219,6 +1219,15 @@
     Constraint enforces that the group exists, is active and has
     name (attribute <var>cn</var>) of the form <em>*-zone-admins</em>.
   </dd>
+  <dt>aePasswordAdmins</dt>
+  <dd>
+    Distinguished names of all <var>aeGroup</var> entries which's members
+    are allowed to change password of <a href="#schema-oc-aeUser">aeUser</a>
+    entries and thus circumventing the password reset process.
+    <br>
+    Constraint enforces that the values are a subset of <var>aeZoneAdmins</var>.
+    </ul>
+  </dd>
   <dt>aeZoneAuditors</dt>
   <dd>
     Distinguished names of all <var>aeGroup</var> entries which's members

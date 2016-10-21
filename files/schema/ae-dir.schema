@@ -243,6 +243,12 @@ attributetype ( ae-dir-at:32
   DESC 'AE-DIR: DN of groups of users entitled zone auditor'
   SUP distinguishedName )
 
+attributetype ( ae-dir-at:33
+  NAME 'aePasswordAdmins'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: DN of groups of users allowed to set personal user account passwords'
+  SUP distinguishedName )
+
 objectclass ( ae-dir-oc:20
   NAME 'aeZone'
   X-ORIGIN 'AE-DIR'
@@ -250,7 +256,7 @@ objectclass ( ae-dir-oc:20
   STRUCTURAL
   SUP ( namedObject $ aeObject )
   MUST ( description )
-  MAY ( aeDept $ aeZoneAdmins $ aeZoneAuditors ) )
+  MAY ( aeDept $ aeZoneAdmins $ aeZoneAuditors $ aePasswordAdmins ) )
 
 ditcontentrule ( ae-dir-oc:20
   NAME 'aeZone-dcr'

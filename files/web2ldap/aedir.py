@@ -470,6 +470,7 @@ class AEZoneAdminGroupDN(DynamicDNSelectList):
 syntax_registry.registerAttrType(
   AEZoneAdminGroupDN.oid,[
     AE_OID_PREFIX+'.4.31',  # aeZoneAdmins
+    AE_OID_PREFIX+'.4.33',  # aePasswordAdmins
   ]
 )
 

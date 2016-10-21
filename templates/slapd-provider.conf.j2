@@ -325,6 +325,7 @@ index aeSSHProxyCommand pres,eq,sub
 
 # zones
 index aeZoneAdmins pres,eq
+index aePasswordAdmins pres,eq
 index aeZoneAuditors pres,eq
 
 # service attributes
@@ -457,9 +458,7 @@ access to
   attrs=userPassword
   filter="(&(objectClass=aeUser)(aeStatus=0)(oathToken=*))"
     by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" =r
-    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" break
-    by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" break
-    by self break
+    by users none break
     by * none
 
 # Active users may authenticate via LDAP simple bind and change own password
@@ -469,6 +468,7 @@ access to
   filter="(&(objectClass=aeUser)(aeStatus=0))"
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =sw
     by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" =w
+    by set="user & this/-1/aePasswordAdmins/member" =w
     by self =w
     by * auth
 
@@ -482,7 +482,7 @@ access to
   attrs=userPassword
   filter="(&(|(objectClass=aeHost)(objectClass=aeService))(aeStatus=0)(!(|(uidNumber<=9999)(gidNumber<=9999))))"
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =w
-    by group/aeGroup/member.expand="cn=${d1}-zone-admins,cn=${d1},{{ aedir_suffix }}" =w
+    by set="user & this/-2/aeZoneAdmins/member" =w
     by set="user & this/-1/aeSetupGroups/member" =w
     by * auth
 
@@ -1282,11 +1282,19 @@ constraint_attribute
   regex "^{{ aedir_aeuser_sshpubkey_regex }}$"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeUser)"
 
-# zone admin/auditor groups to DNs of active aeGroup entries
+# zone (password) admin/auditor groups to DNs of active aeGroup entries
 # must solely reference special zone role groups
 constraint_attribute
   aeZoneAdmins
   uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(!(|(cn:dn:=ae)(cn:dn:=pub))))"
+constraint_attribute
+  aePasswordAdmins
+  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(!(|(cn:dn:=ae)(cn:dn:=pub))))"
+# aePasswordAdmins must be subset of aeZoneAdmins
+constraint_attribute
+  aePasswordAdmins
+  set "this/aePasswordAdmins & this/aeZoneAdmins"
+  restrict="ldap:///{{ aedir_suffix }}??sub"
 constraint_attribute
   aeZoneAuditors
   uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeGroup)(aeStatus=0)(|(cn=*-zone-admins)(cn=*-zone-auditors))(!(|(cn:dn:=ae)(cn:dn:=pub))))"
