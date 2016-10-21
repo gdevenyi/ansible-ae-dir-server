@@ -785,15 +785,27 @@ syntax_registry.registerAttrType(
 class AEEntryDNAEGroup(GroupEntryDN):
   oid = 'AEEntryDNAEGroup-oid'
   desc = 'AE-DIR: entryDN of aeGroup entry'
-  ref_attrs = (
+  ref_attrs = [
     ('memberOf',u'Members',None,u'Search all member entries of this user group'),
     ('aeLoginGroups',u'Login',None,u'Search all server/service groups (aeSrvGroup)\non which this user group has login right'),
     ('aeLogStoreGroups',u'View Logs',None,u'Search all server/service groups (aeSrvGroup)\non which this user group has log view right'),
     ('aeSetupGroups',u'Setup',None,u'Search all server/service groups (aeSrvGroup)\non which this user group has setup/installation rights'),
     ('aeVisibleGroups',u'Visible',None,u'Search all server/service groups (aeSrvGroup)\non which this user group is at least visible'),
-  )
+  ]
 
   def _additional_links(self):
+    aegroup_cn = self._entry['cn'][0]
+    ref_attrs = list(AEEntryDNAEGroup.ref_attrs)
+    if aegroup_cn.endswith('zone-admins'):
+      ref_attrs.extend([
+        ('aeZoneAdmins',u'Zone Admins',None,u'Search all zones (aeZone)\nfor which members of this user group act as zone admins'),
+        ('aePasswordAdmins',u'Password Admins',None,u'Search all zones (aeZone)\nfor which members of this user group act as password admins'),
+      ])
+    if aegroup_cn.endswith('zone-auditors') or aegroup_cn.endswith('zone-admins'):
+      ref_attrs.append(
+        ('aeZoneAuditors',u'Zone Auditors',None,u'Search all zones (aeZone)\nfor which members of this user group act as zone auditors'),
+      )
+    self.ref_attrs = tuple(ref_attrs)
     r = DistinguishedName._additional_links(self)
     r.append(self._form.applAnchor(
       'search','SUDO rules',self._sid,
