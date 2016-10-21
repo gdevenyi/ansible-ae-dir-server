@@ -474,7 +474,7 @@ objectclass ( ae-dir-oc:6.1
   STRUCTURAL
   SUP aeDevice
   MUST ( host )
-  MAY ( aeSrvGroup $ aeStockId $ userPassword ) )
+  MAY ( aeSrvGroup $ aeStockId $ aeRemoteHost $ userPassword ) )
 
 ditcontentrule ( ae-dir-oc:6.1
   NAME 'aeHost-dcr'
