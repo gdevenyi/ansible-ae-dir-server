@@ -659,6 +659,7 @@ access to
     by set="user/-1 & this" read
     by users search break
     by * none break
+
 # aeSudoRule entries
 access to
   dn.regex="^cn=({{ aedir_aesudorule_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
@@ -666,12 +667,13 @@ access to
     by set="user & this/-1/aeZoneAdmins/member" write
     by set="user & this/-1/aeZoneAuditors/member" read
     by * none break
+
 # aeGroup entries add-only attributes
 access to
   dn.regex="^cn=({{ aedir_aegroup_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
   filter="(objectClass=aeGroup)"
   attrs=objectClass,entry,cn,gidNumber
-    by set="user & this/-1/aeZoneAdmins/member" write
+    by set="user & this/-1/aeZoneAdmins/member" =arscxd
     by set="user & this/-1/aeZoneAuditors/member" read
     by * none break
 # aeGroup entries
@@ -681,12 +683,13 @@ access to
     by set="user & this/-1/aeZoneAdmins/member" write
     by set="user & this/-1/aeZoneAuditors/member" read
     by * none break
+
 # aeUser entries add-only attributes
 access to
   dn.regex="^uid=({{ aedir_aeuser_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
   filter="(objectClass=aeUser)"
   attrs=objectClass,entry,uid,uidNumber,aePerson
-    by set="user & this/-1/aeZoneAdmins/member" write
+    by set="user & this/-1/aeZoneAdmins/member" =arscxd
     by set="user & this/-1/aeZoneAuditors/member" read
     by * none break
 # aeUser entries not archived
@@ -697,6 +700,7 @@ access to
     by set="user & this/-1/aeZoneAdmins/member" write
     by set="user & this/-1/aeZoneAuditors/member" read
     by * none break
+
 # aeService entries
 access to
   dn.regex="^uid=({{ aedir_aeservice_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
@@ -704,6 +708,7 @@ access to
     by set="user & this/-1/aeZoneAdmins/member" write
     by set="user & this/-1/aeZoneAuditors/member" read
     by * none break
+
 # aeSrvGroup entries
 access to
   dn.regex="^cn=({{ aedir_aesrvgroup_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
@@ -721,6 +726,7 @@ access to
     by set="user & this/-1/aeZoneAuditors/member" read
     by set="user & this/aeSetupGroups/member" read
     by * none break
+
 # aeHost entries have to be subordinate entries of aeSrvGroup entries
 access to
   dn.regex="^host=([a-z]?[a-z0-9.-]+),cn=({{ aedir_aesrvgroup_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
@@ -730,6 +736,7 @@ access to
     by set="user & this/aeSrvGroup/aeSetupGroups/member" read
     by set="user & this/-2/aeZoneAuditors/member" read
     by * none break
+
 # aeService entries can also be subordinate entries of aeSrvGroup
 # entries if the need read access to aeUser and aeGroup entries
 access to
@@ -740,6 +747,7 @@ access to
     by set="user & this/aeSrvGroup/aeSetupGroups/member" read
     by set="user & this/-2/aeZoneAuditors/member" read
     by * none break
+
 # aeTag entries
 access to
   dn.regex="^cn=({{ aedir_aetag_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
