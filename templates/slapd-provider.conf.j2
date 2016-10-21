@@ -641,7 +641,7 @@ access to
     by * none
 
 #------------------------------------------------------------------
-# Security zones in general
+# Delegated administration of security zones
 #------------------------------------------------------------------
 
 # Delegated administration for zone subtrees
@@ -735,6 +735,16 @@ access to
     by set="user & this/-1/aeSetupGroups/member" write
     by set="user & this/aeSrvGroup/aeSetupGroups/member" read
     by set="user & this/-2/aeZoneAuditors/member" read
+    by * none break
+
+# aeHost entries have to be subordinate entries of aeSrvGroup entries
+access to
+  dn.regex="^cn=.+,host=([a-z]?[a-z0-9.-]+),cn=({{ aedir_aesrvgroup_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(objectClass=aeNwDevice)"
+    by set="user & this/-3/aeZoneAdmins/member" write
+    by set="user & this/-2/aeSetupGroups/member" write
+    by set="user & this/-1/aeSrvGroup/aeSetupGroups/member" read
+    by set="user & this/-3/aeZoneAuditors/member" read
     by * none break
 
 # aeService entries can also be subordinate entries of aeSrvGroup
@@ -1189,6 +1199,7 @@ unique_uri "ldap:///cn={{ aedir_base_zone }},{{ aedir_suffix }}?aePerson?sub"
 # these two constraints are only possible with a negation filter
 unique_uri "ldap:///{{ aedir_suffix }}?cn?sub?(!(|(objectClass=aePerson)(objectClass=aeUser)(objectClass=aeNwDevice)))"
 unique_uri "ldap:///{{ aedir_suffix }}?gidNumber?sub"
+unique_uri "ldap:///{{ aedir_suffix }}?aeRemoteHost?sub?(!(objectClass=aeUser))"
 
 constraint_attribute
   host
