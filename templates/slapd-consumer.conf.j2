@@ -368,36 +368,17 @@ access to
     by set="user/aeStatus & [0]" break
     by * auth
 
-
-# Safety net for bugs in OATH-LDAP bind proxy:
-# Block auth access to password of OTP users because their simple bind request
-# must only be validated on providers
+# Access to userPassword
 #------------------------------------------------------------------
 
+# Entities may authenticate via LDAP simple bind with userPassword if:
+# - in active state
+# - not associated with a OATH-LDAP token
+# - UID and GID greater than {{ aedir_min_gid }}
 access to
   dn.subtree="{{ aedir_suffix }}"
   attrs=userPassword
-  filter="(&(objectClass=aeUser)(aeStatus=0)(oathToken=*))"
-    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" break
-    by * none
-
-# Active users may authenticate via LDAP simple bind and change own password
-access to
-  dn.subtree="{{ aedir_suffix }}"
-  attrs=userPassword
-  filter="(&(objectClass=aeUser)(aeStatus=0))"
-    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =s
-    by * auth
-
-# Subordinate aeHost and aeService entries beneath aeSrvGroup entries
-# Important note:
-# aeService entries running locally on AE-DIR servers MUST NOT have
-# userPassword attribute at all because they always MUST connect via LDAPI
-# and bind with SASL/EXTERNAL
-access to
-  dn.regex="^.+,cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
-  attrs=userPassword
-  filter="(&(|(objectClass=aeHost)(objectClass=aeService))(aeStatus=0)(!(|(uidNumber<=9999)(gidNumber<=9999))))"
+  filter="(&(aeStatus=0)(|(objectClass=aeUser)(objectClass=aeHost)(objectClass=aeService))(!(|(oathToken=*)(uidNumber<={{ aedir_min_gid-1 }})(gidNumber<={{ aedir_min_gid-1 }}))))"
     by * auth
 
 # no access to userPassword as last catch
