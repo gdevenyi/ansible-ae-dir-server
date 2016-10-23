@@ -736,7 +736,7 @@ access to
     by set="user & this/-2/aeZoneAuditors/member" read
     by * none break
 
-# aeHost entries have to be subordinate entries of aeSrvGroup entries
+# aeNwDevice entries have to be subordinate entries of aeHost entries
 access to
   dn.regex="^cn=.+,host=([a-z]?[a-z0-9.-]+),cn=({{ aedir_aesrvgroup_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
   filter="(objectClass=aeNwDevice)"
