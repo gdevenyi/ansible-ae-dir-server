@@ -36,7 +36,7 @@ args=('/dev/log',)
 
 [formatter_syslog]
 class=logging.Formatter
-format='%(name)s - %(levelname)s - %(message)s'
+format=%(name)s - %(levelname)s - %(message)s
 datefmt=
 
 [logger_console]
@@ -52,5 +52,5 @@ args=(sys.stdout,)
 
 [formatter_console]
 class=logging.Formatter
-format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+format=%(asctime)s - %(name)s - %(levelname)s - %(message)s
 datefmt=
