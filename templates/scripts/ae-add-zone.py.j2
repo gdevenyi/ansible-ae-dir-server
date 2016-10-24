@@ -18,11 +18,19 @@ os.environ['LDAPRC'] = '/opt/ae-dir/etc/ldap.conf'
 import ldap
 import aedir
 
-PYLDAP_TRACE_LEVEL = 0
+PYLDAP_TRACE_LEVEL = int(os.environ.get('PYLDAP_TRACE_LEVEL', '0'))
+
+AE_LOGGING_CONFIG = os.environ.get('AE_LOGGING_CONFIG', '/opt/ae-dir/etc/ae-logging.conf')
+AE_LOGGER_QUALNAME = os.environ.get('AE_LOGGER_QUALNAME', 'aedir')
 
 #---------------------------------------------------------------------------
 # main()
 #---------------------------------------------------------------------------
+
+logger = aedir.init_logger(log_name=sys.argv[0])
+
+logger.info('Starting %s %s', sys.argv[0], __version__)
+logger.debug('Imported aedir %s', aedir.__version__)
 
 ldap._trace_level = PYLDAP_TRACE_LEVEL
 
@@ -32,9 +40,9 @@ try:
         for arg in sys.argv[1:]
     ]
 except Exception, err:
-    sys.stderr.write('Error: {}\n\n'.format(str(err)))
+    logger.error('Error: %s', err)
     sys.stderr.write(
-        'Usage: {} <zone name> <ticket ID> <description>\n'.format(
+        '\n\nUsage: {} <zone name> <ticket ID> <description>\n'.format(
             sys.argv[0]
         )
     )
@@ -50,7 +58,7 @@ try:
 except ldap.NO_SUCH_OBJECT:
     pass
 else:
-    sys.stderr.write('Zone {} already exists\n'.format(zone_cn))
+    logger.error('Zone %r already exists', zone_cn)
     sys.exit(9)
 
 # add zone entry
@@ -65,7 +73,7 @@ ldap_conn.add_s(
         ('description', [zone_desc]),
     ]
 )
-sys.stdout.write('Added {}\n'.format(zone_dn))
+logger.info('Added %r', zone_dn)
 
 # add init tag entry
 tag_dn = 'cn={zone_cn}-init,{zone_dn}'.format(**vars())
@@ -78,7 +86,7 @@ ldap_conn.add_s(
         ('description', ['Initialization of "{zone_desc}"'.format(**vars())]),
     ]
 )
-sys.stdout.write('Added {}\n'.format(tag_dn))
+logger.info('Added %r', tag_dn)
 
 # add zone admins group entry
 zone_admins_dn = 'cn={zone_cn}-zone-admins,{zone_dn}'.format(**vars())
@@ -104,7 +112,7 @@ ldap_conn.add_s(
         ('gidNumber', [str(ldap_conn.get_next_id(id_pool_dn=aedir_searchbase, id_pool_attr='aeGidNumberNext'))]),
     ]
 )
-sys.stdout.write('Added {}\n'.format(zone_admins_dn))
+logger.info('Added %r', zone_admins_dn)
 
 # add zone auditors group entry
 zone_auditors_dn = 'cn={zone_cn}-zone-auditors,{zone_dn}'.format(**vars())
@@ -128,7 +136,7 @@ ldap_conn.add_s(
         ('gidNumber', [str(ldap_conn.get_next_id(id_pool_dn=aedir_searchbase, id_pool_attr='aeGidNumberNext'))]),
     ]
 )
-sys.stdout.write('Added {}\n'.format(zone_auditors_dn))
+logger.info('Added %r', zone_auditors_dn)
 
 # add init tag to zone entry
 ldap_conn.modify_s(
@@ -139,6 +147,6 @@ ldap_conn.modify_s(
         (ldap.MOD_ADD, 'aeZoneAuditors', [zone_auditors_dn]),
     ]
 )
-sys.stdout.write('Updated {}\n'.format(zone_dn))
+logger.info('Updated %r', zone_dn)
 
 ldap_conn.unbind_s()
