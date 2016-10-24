@@ -80,13 +80,6 @@ ldap_conn.add_s(
 )
 sys.stdout.write('Added {}\n'.format(tag_dn))
 
-# add init tag to zone entry
-ldap_conn.modify_s(
-    zone_dn,
-    [(ldap.MOD_ADD, 'aeTag', [zone_cn+'-init'])]
-)
-sys.stdout.write('Tagged {}\n'.format(zone_dn))
-
 # add zone admins group entry
 zone_admins_dn = 'cn={zone_cn}-zone-admins,{zone_dn}'.format(**vars())
 ldap_conn.add_s(
@@ -136,5 +129,16 @@ ldap_conn.add_s(
     ]
 )
 sys.stdout.write('Added {}\n'.format(zone_auditors_dn))
+
+# add init tag to zone entry
+ldap_conn.modify_s(
+    zone_dn,
+    [
+        (ldap.MOD_ADD, 'aeTag', [zone_cn+'-init']),
+        (ldap.MOD_ADD, 'aeZoneAdmins', [zone_admins_dn]),
+        (ldap.MOD_ADD, 'aeZoneAuditors', [zone_auditors_dn]),
+    ]
+)
+sys.stdout.write('Updated {}\n'.format(zone_dn))
 
 ldap_conn.unbind_s()
