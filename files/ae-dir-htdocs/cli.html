@@ -54,7 +54,7 @@
   <dt>Check <var>aeService</var> authentication via SASL/EXTERNAL bind request and client cert:</dt>
   <dd>
     <code>
-      LDAPTLS_CERT=/path/to/client.crt LDAPTLS_KEY=/path/to/client.key ldapwhoami -Y EXTERNAL
+      LDAPTLS_CACERT=/path/to/rootca.crt LDAPTLS_CERT=/path/to/client.crt LDAPTLS_KEY=/path/to/client.key ldapwhoami -Y EXTERNAL -H ldaps://ae-dir-p1.example.com
     </code>
   </dd>
 
@@ -145,5 +145,36 @@ Tagged cn=test42,ou=ae-dir
 Added cn=test42-zone-admins,cn=test42,ou=ae-dir
 Added cn=test42-zone-auditors,cn=test42,ou=ae-dir
 </pre>
+
+<h1 id="openssl">OpenSSL command-line tools</h1>
+<p>
+  Relevant OpenSSL documentation:
+</p>
+<ul>
+  <li>
+    <a href="https://www.openssl.org/docs/">Doc index</a>
+  </li>
+  <li>
+    <a href="https://www.openssl.org/docs/manpages.html">Man pages</a>
+  </li>
+</ul>
+
+<h2 id="openssl-s_client">openssl s_client</h2>
+<p>
+  The OpenSSL command-line tool
+  <a href="https://www.openssl.org/docs/manmaster/apps/s_client.html">s_client(1)</a>
+  opens a TLS connection to the server which is useful to test whether
+  server cert validation is correct.
+</p>
+<dl>
+  <dt>Open TLS connection to LDAPS port:</dt>
+  <dd>
+    <code>
+      openssl s_client -connect ae-dir-p1.example.com:636 -CAfile /path/to/rootca.crt
+    </code>
+    <br>
+    (should display &quot;Verify return code: 0 (ok)&quot;)
+  </dd>
+</dl>
 
 <!--#include file="ssi/footer.shtml" -->
