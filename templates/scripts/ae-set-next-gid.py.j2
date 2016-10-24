@@ -17,15 +17,23 @@ import ldap
 import aedir
 from ldap.controls.sss import SSSRequestControl
 
-PYLDAP_TRACE_LEVEL = 0
-
 GID_ATTR = 'gidNumber'
 
 NEXT_GID_ATTR = 'aeGidNumberNext'
 
+PYLDAP_TRACE_LEVEL = int(os.environ.get('PYLDAP_TRACE_LEVEL', '0'))
+
+AE_LOGGING_CONFIG = os.environ.get('AE_LOGGING_CONFIG', '/opt/ae-dir/etc/ae-logging.conf')
+AE_LOGGER_QUALNAME = os.environ.get('AE_LOGGER_QUALNAME', 'aedir')
+
 #---------------------------------------------------------------------------
 # main()
 #---------------------------------------------------------------------------
+
+logger = aedir.init_logger(log_name=sys.argv[0])
+
+logger.info('Starting %s %s', sys.argv[0], __version__)
+logger.debug('Imported aedir %s', aedir.__version__)
 
 ldap._trace_level = PYLDAP_TRACE_LEVEL
 
@@ -55,14 +63,11 @@ except ldap.SIZELIMIT_EXCEEDED:
     pass
 
 if not ldap_result:
-    sys.stderr.write('No entry with attribute {0} found!\n'.format(GID_ATTR))
+    logger.error('No entry with attribute %r found!', GID_ATTR)
     sys.exit(1)
 
 highest_gid_number = int(ldap_result[0][1][GID_ATTR][0])
-sys.stdout.write('Highest {0} value found: {1}\n'.format(
-    GID_ATTR,
-    highest_gid_number,
-))
+logger.debug('Highest %r value found: %d', GID_ATTR, highest_gid_number)
 
 aeroot_entry = ldap_conn.read_s(
     aedir_searchbase,
@@ -73,15 +78,7 @@ try:
     current_next_gid = int(aeroot_entry[NEXT_GID_ATTR][0])
 except KeyError:
     current_next_gid = None
-    sys.stdout.write('Current {0} value: {1}\n'.format(
-        NEXT_GID_ATTR,
-        current_next_gid,
-    ))
-else:
-    sys.stdout.write('Current {0} value: {1}\n'.format(
-        NEXT_GID_ATTR,
-        current_next_gid,
-    ))
+logger.debug('Current %r value: %s', NEXT_GID_ATTR, current_next_gid)
 
 if current_next_gid != highest_gid_number+1:
     modlist = [
@@ -92,10 +89,11 @@ if current_next_gid != highest_gid_number+1:
             (ldap.MOD_DELETE, NEXT_GID_ATTR, [str(current_next_gid)])
         )
     ldap_conn.modify_s(aedir_searchbase, modlist)
-    sys.stdout.write('Updated {0} value {1} -> {2}\n'.format(
+    logger.info(
+        'Updated %r value %s -> %d',
         NEXT_GID_ATTR,
         current_next_gid,
         highest_gid_number+1,
-    ))
+    )
 else:
-    sys.stdout.write('Ok => no change.\n')
+    logger.info('Current %r value %d seems ok => no change.', NEXT_GID_ATTR, current_next_gid)
