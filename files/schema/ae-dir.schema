@@ -455,6 +455,12 @@ attributetype ( ae-dir-at:14
   SUP name
   SINGLE-VALUE )
 
+attributetype ( ae-dir-at:34
+  NAME 'aeNwDevice'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: (Physical) device(s) for e.g. bridge interfaces'
+  SUP distinguishedName )
+
 # Generic base object class for a device mounted into a single case
 # not directly used
 objectclass ( ae-dir-oc:6
@@ -488,7 +494,7 @@ objectclass ( ae-dir-oc:6.2
   DESC 'AE-DIR: Single network adapter built into aeDevice'
   STRUCTURAL
   SUP aeDevice
-  MAY ( aeFqdn $ aeDeviceSlot $ aeDevicePort ) )
+  MAY ( aeFqdn $ aeDeviceSlot $ aeDevicePort $ aeNwDevice ) )
 
 ditcontentrule ( ae-dir-oc:6.2
   NAME 'aeNwDevice-dcr'

@@ -325,6 +325,21 @@ syntax_registry.registerAttrType(
 )
 
 
+class AENwDevice(DynamicDNSelectList):
+  oid = 'AENwDevice-oid'
+  desc = 'AE-DIR: network interface'
+  ldap_url = 'ldap:///..?cn?sub?(&(objectClass=aeNwDevice)(aeStatus=0))'
+  ref_attrs = (
+    (None,u'Siblings',None,u'Search sibling network devices'),
+  )
+
+syntax_registry.registerAttrType(
+  AENwDevice.oid,[
+    AE_OID_PREFIX+'.4.34', # aeNwDevice
+  ]
+)
+
+
 class AEGroupMember(DynamicDNSelectList):
   oid = 'AEGroupMember-oid'
   desc = 'AE-DIR: Member of a group'
