@@ -22,7 +22,9 @@ umask 077
   xargs -n1 -isuffix \
     {{ openldap_sbin }}/slapcat \
       -b 'suffix' \
-      -l "{{ openldap_data }}/suffix-${DATETIME}.ldif"
+      -l "{{ openldap_backup_path }}/suffix-${DATETIME}.ldif"
 
+{% if openldap_backup_compressor %}
 # compress all uncompressed LDIF files
-xz -9 {{ openldap_data }}/*.ldif
+{{ openldap_backup_compressor }} {{ openldap_backup_path }}/*.ldif
+{% endif %}

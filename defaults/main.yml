@@ -221,6 +221,11 @@ openldap_schema_files:
 
 # Pathname of backup script
 openldap_backup_script: "{{ aedir_sbin }}/ae-dir-slapcat.sh"
+# Pathname where to export the LDIF data to
+openldap_backup_path: "{{ openldap_data }}"
+# executable and options used to compress exported LDIF data
+# (set to empty string to disable compression)
+openldap_backup_compressor: "xz -9"
 
 # List of servers to be added to rootDSE attribute altServer (see RFC 4512)
 openldap_rootdse_alt_servers: "{{ aedir_hosts[openldap_role] }}"
