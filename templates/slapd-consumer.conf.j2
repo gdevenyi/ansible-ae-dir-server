@@ -555,6 +555,16 @@ access to
     by set="user/aeSrvGroup/aeProxyFor & this/-1" read
     by * none break
 
+# Read access to network device entries filtered by (objectClass=aeNwDevice)
+#------------------------------------------------------------------
+
+# aeNwDevice entries have to be subordinate entries of aeHost entries
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(objectClass=aeNwDevice)"
+    by set="user & this/-1" read
+    by * none break
+
 # Personal user accounts filtered by (objectClass=aeUser)
 #------------------------------------------------------------------
 

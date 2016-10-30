@@ -742,7 +742,8 @@ access to
   filter="(objectClass=aeNwDevice)"
     by set="user & this/-3/aeZoneAdmins/member" write
     by set="user & this/-2/aeSetupGroups/member" write
-    by set="user & this/-1/aeSrvGroup/aeSetupGroups/member" read
+    by set="user & this/-2/aeSrvGroup/aeSetupGroups/member" read
+    by set="user & this/-1" read
     by set="user & this/-3/aeZoneAuditors/member" read
     by * none break
 
