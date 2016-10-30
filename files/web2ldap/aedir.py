@@ -32,7 +32,11 @@ from w2lapp.schema.plugins.nis import UidNumber,GidNumber,MemberUID
 from w2lapp.schema.plugins.ppolicy import PwdExpireWarning,PwdMaxAge
 from w2lapp.schema.plugins.inetorgperson import DisplayNameInetOrgPerson
 from w2lapp.schema.plugins.groups import GroupEntryDN
-from w2lapp.schema.plugins.opensshlpk import ParamikoSshPublicKey
+try:
+  from w2lapp.schema.plugins.opensshlpk import ParamikoSshPublicKey as SshPublicKey
+except ImportError:
+  # paramiko is missing
+  from w2lapp.schema.plugins.opensshlpk import SshPublicKey
 from w2lapp.schema.plugins.posixautogen import HomeDirectory
 
 # OID arc for AE-DIR, see stroeder.com-oid-macros.schema
@@ -945,7 +949,6 @@ class AEPerson(DynamicDNSelectList,AEObjectUtil):
     ('aePerson',u'Users',None,'aeUser',u'Search all personal AE-DIR user accounts (aeUser entries) of this person.'),
     ('aePerson',u'Devices',None,'aeDevice',u'Search all devices (aeDevice entries) assigned to this person.'),
   )
-  mail_zones = set(('base',))
   ae_status_map = {
     -1:(0,),
     0:(0,),
@@ -956,7 +959,7 @@ class AEPerson(DynamicDNSelectList,AEObjectUtil):
   def _determineFilter(self):
     filter_components = [
       DynamicDNSelectList._determineFilter(self),
-      ae_validity_filter(),
+      # ae_validity_filter(),
     ]
     aedept_filters = [
       '(aeDept={0})'.format(escape_filter_chars(d))
@@ -975,7 +978,8 @@ class AEPerson(DynamicDNSelectList,AEObjectUtil):
       filter_components.append('(|{})'.format(''.join(aeperson_aestatus_filters)))
     elif len(aeperson_aestatus_filters)==1:
       filter_components.append(aeperson_aestatus_filters[0])
-    if self.mail_zones is None or not self._get_zone_name() in self.mail_zones:
+    ocs = self._entry.object_class_oid_set()
+    if 'inetLocalMailRecipient' not in ocs:
       filter_components.append('(mail=*)')
     filter_str = '(&{})'.format(''.join(filter_components))
     return filter_str
@@ -1653,7 +1657,7 @@ syntax_registry.registerAttrType(
 )
 
 
-class AEServiceSshPublicKey(ParamikoSshPublicKey):
+class AEServiceSshPublicKey(SshPublicKey):
   oid = 'AEServiceSshPublicKey-oid'
   desc = 'AE-DIR: aeService:sshPublicKey'
   reObj = re.compile('(^|.* )(ssh-rsa|ssh-dss|ecdsa-sha2-nistp256|ssh-ed25519) (?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)? .+$')
@@ -1668,7 +1672,7 @@ syntax_registry.registerAttrType(
 )
 
 
-class AEUserSshPublicKey(ParamikoSshPublicKey):
+class AEUserSshPublicKey(SshPublicKey):
   oid = 'AEUserSshPublicKey-oid'
   desc = 'AE-DIR: aeUser:sshPublicKey'
   reObj = re.compile('(^|.* )(ssh-rsa|ssh-dss|ecdsa-sha2-nistp256|ssh-ed25519) .+$')
