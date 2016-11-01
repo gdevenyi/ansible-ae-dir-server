@@ -783,6 +783,7 @@ access to
     by set="user & this/-1/aeZoneAdmins/member" write
     by set="user & this/-1/aeZoneAuditors/member" read
     by set="user & ([ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(member=] + user + [))])/member" read
+    by set="user/aePerson/aeDept & this" read
     by * none break
 
 #---------------------------------------------------------------------------
