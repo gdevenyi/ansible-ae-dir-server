@@ -317,6 +317,7 @@ syntax_registry.registerAttrType(
 class AEHost(DynamicDNSelectList):
   oid = 'AEHost-oid'
   desc = 'AE-DIR: Host'
+  input_fallback = False # no fallback to normal input field
   ldap_url = 'ldap:///_?host?sub?(&(objectClass=aeHost)(aeStatus=0))'
   ref_attrs = (
     (None,u'Same host',None,u'Search all services running on same host'),
@@ -332,6 +333,7 @@ syntax_registry.registerAttrType(
 class AENwDevice(DynamicDNSelectList):
   oid = 'AENwDevice-oid'
   desc = 'AE-DIR: network interface'
+  input_fallback = False # no fallback to normal input field
   ldap_url = 'ldap:///..?cn?sub?(&(objectClass=aeNwDevice)(aeStatus=0))'
   ref_attrs = (
     (None,u'Siblings',None,u'Search sibling network devices'),
@@ -347,6 +349,7 @@ syntax_registry.registerAttrType(
 class AEGroupMember(DynamicDNSelectList):
   oid = 'AEGroupMember-oid'
   desc = 'AE-DIR: Member of a group'
+  input_fallback = False # no fallback to normal input field
   ldap_url = 'ldap:///_?displayName?sub?(&(|(objectClass=aeUser)(objectClass=aeService))(aeStatus=0))'
 
   def _determineFilter(self):
@@ -449,6 +452,7 @@ syntax_registry.registerAttrType(
 class AEGroupDN(DynamicDNSelectList):
   oid = 'AEGroupDN-oid'
   desc = 'AE-DIR: DN of user group entry'
+  input_fallback = False # no fallback to normal input field
   ldap_url = 'ldap:///_?cn?sub?(&(objectClass=aeGroup)(aeStatus=0))'
   ref_attrs = (
     ('memberOf',u'Members',None,u'Search all member entries of this user group'),
@@ -468,6 +472,7 @@ syntax_registry.registerAttrType(
 class AEZoneAdminGroupDN(DynamicDNSelectList):
   oid = 'AEZoneAdminGroupDN-oid'
   desc = 'AE-DIR: DN of zone admin group entry'
+  input_fallback = False # no fallback to normal input field
   ldap_url = (
     'ldap:///_?cn?sub?'
     '(&'
@@ -497,6 +502,7 @@ syntax_registry.registerAttrType(
 class AEZoneAuditorGroupDN(DynamicDNSelectList):
   oid = 'AEZoneAuditorGroupDN-oid'
   desc = 'AE-DIR: DN of zone auditor group entry'
+  input_fallback = False # no fallback to normal input field
   ldap_url = (
     'ldap:///_?cn?sub?'
     '(&'
@@ -528,6 +534,7 @@ syntax_registry.registerAttrType(
 class AESrvGroupRightsGroupDN(DynamicDNSelectList):
   oid = 'AESrvGroupRightsGroupDN-oid'
   desc = 'AE-DIR: DN of user group entry'
+  input_fallback = False # no fallback to normal input field
   ldap_url = (
     'ldap:///_?cn?sub?'
     '(&'
@@ -581,6 +588,7 @@ syntax_registry.registerAttrType(
 class AESameZoneObject(DynamicDNSelectList):
   oid = 'AESameZoneObject-oid'
   desc = 'AE-DIR: DN of referenced aeSrvGroup entry this is proxy for'
+  input_fallback = False # no fallback to normal input field
   ldap_url = 'ldap:///_?cn?sub?(&(objectClass=aeObject)(aeStatus=0))'
 
   def _determineSearchDN(self,current_dn,ldap_url_dn):
@@ -928,6 +936,7 @@ syntax_registry.registerAttrType(
 class AEDept(DynamicDNSelectList):
   oid = 'AEDept-oid'
   desc = 'AE-DIR: DN of department entry'
+  input_fallback = False # no fallback to normal input field
   ldap_url = 'ldap:///_?displayName?sub?(&(objectClass=aeDept)(aeStatus=0))'
   ref_attrs = (
     ('aeDept',u'Persons',None,'aePerson',u'Search all persons assigned to this department.'),
@@ -1039,6 +1048,7 @@ syntax_registry.registerAttrType(
 class AEManager(DynamicDNSelectList):
   oid = 'AEManager-oid'
   desc = 'AE-DIR: Manager responsible for a person/department'
+  input_fallback = False # no fallback to normal input field
   ldap_url = 'ldap:///_?displayName?sub?(&(objectClass=aePerson)(aeStatus=0))'
 
 syntax_registry.registerAttrType(
@@ -1518,6 +1528,7 @@ syntax_registry.registerAttrType(
 class AESudoRuleDN(DynamicDNSelectList):
   oid = 'AESudoRuleDN-oid'
   desc = 'AE-DIR: DN(s) of visible SUDO rules'
+  input_fallback = False # no fallback to normal input field
   ldap_url = 'ldap:///_?cn?sub?(&(objectClass=aeSudoRule)(aeStatus=0))'
 
 syntax_registry.registerAttrType(
