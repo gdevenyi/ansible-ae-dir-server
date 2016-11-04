@@ -55,7 +55,9 @@
   </li>
   <li>
     Create DNS entries for all your &AElig;-DIR servers including correct
-    reverse DNS entries (PTR RRs)
+    reverse DNS entries (PTR RRs). While not strictly required it's a good
+    idea to choose a separate DNS subdomain especially not matched by any
+    wild-card certificate you might use.
   </li>
   <li>
     Prepare to have SSH access to all &AElig;-DIR servers as user
@@ -66,7 +68,9 @@
   <li>
     Issue X.509 TLS server certificates with appropriate <var>CN</var> and
     <var>subjectAltName</var> values for all replicas with your existing
-    PKI's certificate authority
+    PKI's certificate authority.<br>
+    The anti-security concept of wild-card certificates is not compatible
+    with &AElig;-DIR's security concept! Therefore these cannot be used!
   </li>
   <li>
     Get the ansible playbooks:
