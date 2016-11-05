@@ -25,7 +25,7 @@ Created/activated by:
 You can find detailed documentation about password reset process in
 the user guide:
 
-https://{web_ctx_host}/pwd.html
+https://{web_ctx_host}/pwd.html#reset-procedure
 
 Please contact this zone admin now (e.g. by phone) and ask him/her 
 to assist you:
