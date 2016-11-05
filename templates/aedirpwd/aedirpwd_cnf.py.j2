@@ -76,7 +76,8 @@ SMTP_URL = 'smtp://smtp.example.com:587/?STARTTLS'
 # Debug level for SMTP messages sent to stderr
 SMTP_DEBUGLEVEL = 0
 
-# Hostname to be sent in EHLO request, set to None for autmatically using the local hostname
+# Hostname to be sent in EHLO request,
+# set to None for automatically using the local hostname
 SMTP_LOCALHOSTNAME = '{{ ansible_fqdn }}'
 
 # Dictionary for key-word arguments to be used for function ssl.wrap_socket()
