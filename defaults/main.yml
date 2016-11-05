@@ -320,7 +320,7 @@ aedirpwd_web_group: ae-dir-pwd
 #---------------------------------------------------------------------------
 
 # The CA certificate file bundle for sending e-mail via SMTP/STARTTLS
-smtp_cacert_filename: "smtp-cacerts.pem"
+smtp_cacert_filename:  "{{ openldap_cacert_filename }}"
 
 # The CA certificate file for sending e-mail via SMTP/STARTTLS
 smtp_cacert_pathname: "{{ aedir_etc }}/{{ smtp_cacert_filename }}"
