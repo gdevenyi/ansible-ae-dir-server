@@ -397,7 +397,7 @@ objectclass ( ae-dir-oc:5
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: Mailbox entry'
   STRUCTURAL
-  SUP ( applicationProcess $ aeObject ) )
+  SUP ( namedObject $ aeObject ) )
 
 ditcontentrule ( ae-dir-oc:5
   NAME 'aeMailbox-dcr'
