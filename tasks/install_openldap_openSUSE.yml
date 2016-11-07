@@ -10,6 +10,7 @@
   notify:
     - restart slapd
   with_items:
+    - cyrus-sasl
     - openldap2
     - openldap2-back-sock
     - openldap2-client
