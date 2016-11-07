@@ -5,33 +5,33 @@
 
 <table>
   <tr>
-    <td>&AElig;-DIR user name:</td>
+    <td>&AElig;-DIR user name (uid):</td>
     <td>%(uid)s</td>
   </tr>
   <tr>
-    <td>Base person:</td>
+    <td>Base person (aePerson):</td>
     <td>%(aePerson)s</td>
   </tr>
   <tr>
-    <td>Intended purpose:</td>
+    <td>Intended purpose (description):</td>
     <td>
       %(description)s
     </td>
   </tr>
   <tr>
-    <td>Status:</td>
+    <td>Status (aeStatus):</td>
     <td>%(aeStatus)s</td>
   </tr>
   <tr>
-    <td>First and last name:</td>
+    <td>First and last name (givenName):</td>
     <td>%(givenName)s %(sn)s</td>
   </tr>
   <tr>
-    <td>Mail address:</td>
+    <td>Mail address (mail):</td>
     <td>%(mail)s</td>
   </tr>
   <tr>
-    <td>Ticket no. last change:</td>
+    <td>Ticket no. last change (aeTicketId):</td>
     <td>%(aeTicketId)s</td>
   </tr>
   <tr>
@@ -50,19 +50,23 @@
     <td>%(aeTag)s</td>
   </tr>
   <tr>
-    <td>Last password change time:</td>
+    <td>Last login time here (authTimestamp):</td>
+    <td>%(authTimestamp)s</td>
+  </tr>
+  <tr>
+    <td>Password change time (pwdChangedTime):</td>
     <td>%(pwdChangedTime)s</td>
   </tr>
   <tr>
-    <td>Member in group(s):</td>
+    <td>Member in group(s) (memberOf):</td>
     <td>%(memberOf)s</td>
   </tr>
     <tr>
-      <td>SSH public key(s) (sshPublicKey)</td>
+      <td>SSH public key(s) (sshPublicKey):</td>
       <td>%(sshPublicKey)s</td>
     </tr>
     <tr title="IP address(es) from where to expect logins">
-      <td>Remote login hosts (aeRemoteHost)</td>
+      <td>Remote login hosts (aeRemoteHost):</td>
       <td>%(aeRemoteHost)s</td>
     </tr>
 </table>
