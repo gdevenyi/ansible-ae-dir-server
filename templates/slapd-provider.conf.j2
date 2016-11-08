@@ -929,12 +929,12 @@ access to
     by set="user/aeSrvGroup/aeProxyFor/aeDisplayNameGroups/member & this" read
     by * none break
 
-# Give read access to SSH keys and loginShell to servers which
+# Give read access to SSH keys, X.509 cert and loginShell to servers which
 # shall allow login for the user's groups
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=posixAccount)"
-  attrs=sshPublicKey,loginShell
+  attrs=sshPublicKey,userCertificate,loginShell
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeLoginGroups/member & this" read
     by set="user/-1/aeProxyFor/aeLoginGroups/member & this" read
