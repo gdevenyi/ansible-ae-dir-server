@@ -339,6 +339,12 @@ class AENwDevice(DynamicDNSelectList):
     (None,u'Siblings',None,u'Search sibling network devices'),
   )
 
+  def _determineSearchDN(self,current_dn,ldap_url_dn):
+    if self._dn.startswith('host='):
+      return self._dn
+    else:
+      return DynamicDNSelectList._determineSearchDN(self,current_dn,ldap_url_dn)
+
   def _determineFilter(self):
     orig_filter = DynamicDNSelectList._determineFilter(self)
     try:
