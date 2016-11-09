@@ -77,6 +77,7 @@
       <li>
         Issue server certs to
         <a href="docs.html#schema-oc-aeHost">aeHost</var>,
+        <a href="docs.html#schema-oc-aeNwDevice">aeNwDevice</var>,
         <a href="docs.html#schema-oc-aeService">aeService</a> or
         <a href="docs.html#schema-oc-aeSrvGroup">aeSrvGroup</a>
         based on authorization of role
@@ -164,6 +165,25 @@
         eventually use
         <a href="http://www.grantjenks.com/docs/diskcache/">DiskCache</a>
         for persistent caching
+      </li>
+    </ul>
+  </dd>
+
+  <dt id="dns">DNS</dt>
+  <dd>
+    <ul>
+      <li>
+        use PowerDNS to serve attributes as DNS RRs from to augment regular DNS service:
+        <ul>
+          <li><a href="docs.html#schema-oc-aeHost">aeHost</var> (A and PTR)</li>
+          <li><a href="docs.html#schema-oc-aeNwDevice">aeNwDevice</var> (A and PTR)</li>
+          <li><a href="docs.html#schema-oc-aeZone">aeZone</var> (SOA)</li>
+        </ul>        
+      </li>
+      <li>
+        <a href="http://jpmens.net/2015/11/03/powerdns-with-the-remote-back-end-and-dnssec/">
+        use remote backend (preferrably with DNSSEC)</a> via
+        <a href="https://github.com/cmouse/pdns-remotebackend-python">pdns-remotebackend-python</a>
       </li>
     </ul>
   </dd>
