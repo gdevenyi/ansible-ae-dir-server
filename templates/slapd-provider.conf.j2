@@ -1194,7 +1194,7 @@ overlay constraint
 unique_uri "ldap:///{{ aedir_suffix }}?uid,uidNumber?sub?(objectClass=*)"
 unique_uri "ldap:///{{ aedir_suffix }}?mailLocalAddress?sub?(objectClass=*)"
 unique_uri "ldap:///{{ aedir_suffix }}?seeAlso?sub?(objectClass=*)"
-unique_uri "ldap:///{{ aedir_suffix }}?ipHostNumber,host,aeFqdn?sub?(objectClass=*)"
+unique_uri "ldap:///{{ aedir_suffix }}?ipHostNumber,host,aeFqdn,macAddress?sub?(objectClass=*)"
 unique_uri "ldap:///cn={{ aedir_org_zone }},{{ aedir_suffix }}?employeeNumber,uniqueIdentifier,displayName?sub"
 # only one primary aeUser entry per aePerson
 unique_uri "ldap:///cn={{ aedir_base_zone }},{{ aedir_suffix }}?aePerson?sub"
