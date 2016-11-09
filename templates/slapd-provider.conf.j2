@@ -1383,14 +1383,12 @@ constraint_attribute aeSrvGroup set
   "this/aeSrvGroup/-1 & this/-2"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeHost)"
 
-# restrict aeNwDevice in aeNwDevice entry to reference solely active aeNwDevice in same aeHost
-constraint_attribute
-  aeNwDevice
-  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeNwDevice)(aeStatus=0))"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeNwDevice)"
+# restrict aeNwDevice in aeNwDevice entry to reference
+# an active aeNwDevice in same aeHost but not itself
+constraint_attribute aeNwDevice set
+  "this/aeNwDevice & ([ldap:///]+this/aeNwDevice+[?entryDN?base?(&(objectClass=aeNwDevice)(aeStatus=0)(!(cn=]+this/cn+[)))])/entryDN"
 constraint_attribute aeNwDevice set
   "this/aeNwDevice/-1 & this/-1"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeNwDevice)"
 
 # restrict aeHost in aeService entry to reference solely active aeHost entry
 constraint_attribute
