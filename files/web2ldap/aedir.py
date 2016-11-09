@@ -339,6 +339,16 @@ class AENwDevice(DynamicDNSelectList):
     (None,u'Siblings',None,u'Search sibling network devices'),
   )
 
+  def _determineFilter(self):
+    orig_filter = DynamicDNSelectList._determineFilter(self)
+    try:
+      dev_name = self._entry['cn'][0]
+    except (KeyError,IndexError):
+      result_filter = orig_filter
+    else:
+      result_filter = '(&{0}(!(cn={1})))'.format(orig_filter,dev_name)
+    return result_filter
+
 syntax_registry.registerAttrType(
   AENwDevice.oid,[
     AE_OID_PREFIX+'.4.34', # aeNwDevice
