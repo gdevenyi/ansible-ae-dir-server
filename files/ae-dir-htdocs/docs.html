@@ -31,6 +31,7 @@
       <li><a href="#role-host">&AElig; host</a></li>
       <li><a href="#role-ae-replica">&AElig; Replica</a></li>
       <li><a href="#role-ae-provider">&AElig; Provider</a></li>
+      <li><a href="#role-ae-login-proxy">&AElig; Login Proxy</a></li>
     </ol>
   </li>
   <li>
@@ -414,6 +415,19 @@
   group <em>ae-providers</em>.
 </p>
 
+<h2 id="role-ae-login-proxy">&AElig; Login Proxy</h2>
+<p>
+  The system role <em>&AElig; login proxy</em> can read all attributes in
+  user, group, service group and service group member entries needed for
+  determining user role relationship.
+</p>
+<p>
+  The role is typically assigned solely to central service accounts (<a
+  href="#schema-oc-aeService">aeService</a>) in zone <a href="#dit-zone-ae">ae</a>
+  by adding them to user group <em>ae-login-proxies</em>.
+</p>
+
+
 <h1 id="dit">Directory Information Tree (DIT)</h1>
 
 <h2 id="dit-ae-dir">ou=ae-dir</h2>
@@ -506,7 +520,7 @@
     <td>
       Members are central login (proxy) components which are allowed to see
       all users/groups and must determine login user/target relation themselves
-      (see also role <a href="#"></a>)
+      (see also role <a href="#role-ae-login-proxy">&AElig; Login Proxy</a>)
     </td>
     <td><a href="#schema-oc-aeGroup">aeGroup</a></td>
   </tr>
@@ -517,7 +531,10 @@
   </tr>
   <tr>
     <td>cn=ae-providers</td>
-    <td>Members of this group are AE-DIR provider replicas (see also role <a href="#role-ae-provider">&AElig; Provider</a>)</td>
+    <td>
+      Members of this group are AE-DIR provider replicas
+      (see also role <a href="#role-ae-provider">&AElig; Provider</a>)
+    </td>
     <td><a href="#schema-oc-aeGroup">aeGroup</a></td>
   </tr>
   <tr>
@@ -562,7 +579,10 @@
   </tr>
   <tr>
     <td>cn=ppolicy-sasl-external</td>
-    <td>Password policy for services which must use SASL/EXTERNAL</td>
+    <td>
+      Password policy for services which must use SASL/EXTERNAL
+      (mainly disallows using simple bind with password)
+    </td>
     <td>namedPolicy</td>
   </tr>
   <tr>
