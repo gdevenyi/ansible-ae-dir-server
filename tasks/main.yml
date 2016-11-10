@@ -18,5 +18,18 @@
 - name: "Configure OpenLDAP slapd for AE-DIR"
   include: system_accounts.yml
 
-- name: "Specific tasks on OpenLDAP {{ openldap_role }}"
-  include: "{{ openldap_role }}.yml"
+- name: "Configure OpenLDAP slapd for AE-DIR"
+  include: system_accounts.yml
+
+- name: "Install various AE-DIR tools"
+  include: aedir_tools.yml
+
+- name: "Specific AE-DIR tool tasks on {{ ansible_lsb.id }}"
+  include: "aedir_tools_{{ ansible_lsb.id }}.yml"
+
+- name: "Specific AE-DIR tool tasks on {{ openldap_role }}"
+  include: "aedir_tools_{{ openldap_role }}.yml"
+
+- name: "Configure web2ldap for AE-DIR on {{ openldap_role }}"
+  include: configure_web2ldap.yml
+  when: openldap_role=="provider"

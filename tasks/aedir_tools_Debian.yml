@@ -12,18 +12,6 @@
     - python
     - python-paramiko
     - python-webpy
-
-- name: "PIP installation packages on {{ ansible_lsb.id }}"
-  apt:
-    name: "{{ item }}"
-    state: installed
-    update_cache: yes
-    install_recommends: no
-    dpkg_options: 'force-confold,force-confdef'
-  when: ansible_lsb.id == 'Debian'
-  notify:
-    - "restart {{ web_server }}"
-  with_items:
     - tar
     - gzip
     - gcc
@@ -36,7 +24,33 @@
     - python-virtualenv
     - python-pip
 
-- name: "Additional PIP packages in virtualenv {{ aedir_prefix }}"
+- name: "PIP module installation in virtualenv {{ aedir_prefix }}"
+  pip:
+    name: "{{ item }}"
+    state: latest
+    virtualenv: "{{ aedir_prefix }}"
+    virtualenv_site_packages: yes
+    extra_args: "--upgrade"
+  with_items:
+    - python-ldap
+    - pyasn1
+    - pyasn1_modules
+    - aedir
+    - slapdsock
+
+- name: "Install additional base packages for web applications on {{ ansible_lsb.id }}"
+  apt:
+    name: "{{ item }}"
+    state: installed
+    update_cache: yes
+    install_recommends: no
+    dpkg_options: 'force-confold,force-confdef'
+  with_items:
+    - python-paramiko
+    - python-webpy
+  when: openldap_role=="provider"
+
+- name: "PIP module installation in virtualenv for web applications on {{ ansible_lsb.id }}"
   pip:
     name: "{{ item }}"
     state: latest
@@ -45,7 +59,4 @@
     extra_args: "--upgrade"
   with_items:
     - mailutil
-    - python-ldap
-    - pyasn1
-    - pyasn1_modules
-    - aedir
+  when: openldap_role=="provider"

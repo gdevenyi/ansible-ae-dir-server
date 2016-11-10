@@ -1,6 +1,33 @@
 ---
 
-- name: "Install additional base packages on {{ ansible_lsb.id }}"
+- name: "add zypper repository devel_languages_python"
+  zypper_repository:
+    name: devel_languages_python
+    description: "Python modules"
+    state: present
+    enabled: yes
+    auto_import_keys: yes
+    autorefresh: yes
+    disable_gpg_check: no
+    overwrite_multiple: yes
+    repo: "http://download.opensuse.org/repositories/devel:/languages:/python/openSUSE_Tumbleweed/"
+
+- name: "Install base packages on {{ ansible_lsb.id }}"
+  zypper:
+    name: "{{ item }}"
+    state: present
+    disable_recommends: yes
+    type: package
+  with_items:
+    - cron
+    - python
+    - python-aedir
+    - python-ldap
+    - python-pyasn1
+    - python-pyasn1-modules
+    - python-slapdsock
+
+- name: "Install additional base packages for web applications on {{ ansible_lsb.id }}"
   zypper:
     name: "{{ item }}"
     state: present
@@ -10,12 +37,7 @@
     - "restart {{ web_server }}"
     - restart web2ldap
   with_items:
-    - cron
-    - python
-    - python-aedir
     - python-paramiko
-    - python-ldap
     - python-mailutil
-    - python-pyasn1
-    - python-pyasn1-modules
     - python-web.py
+  when: openldap_role=="provider"

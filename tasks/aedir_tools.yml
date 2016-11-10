@@ -1,7 +1,7 @@
 ---
 # Install some AE-DIR script tools and documentation files
 
-- name: "Create directories for AE-DIR tools"
+- name: "Create directory structure {{ aedir_prefix }}"
   file:
     path: "{{ item }}"
     state: directory
@@ -11,8 +11,6 @@
   with_items:
     - "{{ aedir_prefix }}"
     - "{{ aedir_etc }}"
-    - "{{ aedir_prefix }}/htdocs"
-    - "{{ aedir_prefix }}/htdocs/reporting"
     - "{{ aedir_bin }}"
     - "{{ aedir_sbin }}"
     - "{{ aedir_rundir }}"
@@ -44,104 +42,3 @@
     group: root
     mode: u=rw,g=r,o=r
     directory_mode: u=rwx,g=rx,o=rx
-
-- name: "copy AE-DIR HTML docs to {{ aedir_prefix }}/htdocs/"
-  copy:
-    src: "ae-dir-htdocs/"
-    dest: "{{ aedir_prefix }}/htdocs/"
-    follow: no
-    owner: root
-    group: root
-    mode: u=rw,g=r,o=r
-    directory_mode: u=rwx,g=rx,o=rx
-
-- name: "Create ae-dir-base.ldif"
-  template:
-    src: "ae-dir-base.ldif.j2"
-    dest: "{{ aedir_etc }}/ae-dir-base.ldif"
-    owner: root
-    group: ldap
-    mode: 0644
-  when: aedir_init == "1"
-
-- name: "Specific installation for {{ ansible_lsb.id }}"
-  include: "aedir_tools_{{ ansible_lsb.id }}.yml"
-
-- name: "Install tool scripts"
-  template:
-    src: "scripts/{{ item }}.j2"
-    dest: "{{ aedir_bin }}/{{ item }}"
-    owner: root
-    group: root
-    mode: 0755
-  with_items:
-    - ae-add-zone.py
-    - ae-passwd.py
-    - ae-person-report.py
-    - ae-set-next-gid.py
-    - ae-user-report.py
-
-- name: "Install various CRON scripts"
-  copy:
-    src: "scripts/{{ item }}"
-    dest: "{{ aedir_sbin }}/{{ item }}"
-    owner: root
-    group: root
-    mode: 0750
-  with_items:
-    - aeperson2aeuser.py
-    - aedir_update_groups.py
-    - aedir_fix_groups.py
-
-- name: "Install backup script from template"
-  template:
-    src: "scripts/ae-dir-slapcat.sh.j2"
-    dest: "{{ aedir_sbin }}/ae-dir-slapcat.sh"
-    owner: root
-    group: root
-    mode: 0750
-
-- name: "set env var HOME={{ aedir_rundir }} in /etc/cron.d/aedir_tools"
-  cron:
-    env: yes
-    name: "HOME"
-    value: "{{ aedir_rundir }}"
-    state: present
-    user: root
-    cron_file: aedir_tools
-
-- name: Run aedir_update_groups.py as CRON job
-  cron:
-    name: "aedir_update_groups"
-    state: present
-    user: root
-    cron_file: aedir_tools
-    minute: "*/3"
-    job: "{{ aedir_python }} {{ aedir_sbin }}/aedir_update_groups.py {{ openldap_ldapi_uri|replace('%', '\\%') }}/{{ aedir_suffix }}"
-
-- name: Run aeperson2aeuser.py as CRON job
-  cron:
-    name: "aeperson2aeuser"
-    state: present
-    user: root
-    cron_file: aedir_tools
-    minute: "*/2"
-    job: "{{ aedir_python }} {{ aedir_sbin }}/aeperson2aeuser.py {{ openldap_ldapi_uri|replace('%', '\\%') }}/{{ aedir_suffix }}????trace=0,x-saslmech=EXTERNAL {{ aedir_rundir }}/aeperson2aeuser.state"
-
-- name: Reset aeperson2aeuser.py as CRON job
-  cron:
-    name: "aeperson2aeuser_reset"
-    state: present
-    user: root
-    cron_file: aedir_tools
-    hour: "*/12"
-    job: "rm {{ aedir_rundir }}/aeperson2aeuser.state > /dev/null 2>&1 || exit 0"
-
-- name: "Install AE-DIR password service (aedirpwd)"
-  include: "aedirpwd.yml"
-
-- name: "ensure cron service is running"
-  service:
-    name: "cron"
-    state: started
-    enabled: yes
