@@ -1,7 +1,7 @@
 ---
 # Add system accounts
 
-- name: "Add local system account groups for services running accessing AE-DIR providers via LDAPI"
+- name: "Add local system groups for services running accessing AE-DIR providers via LDAPI"
   group:
     name: "{{ item.key }}"
     gid: "{{ item.value.gid_number }}"
@@ -9,7 +9,6 @@
     system: yes
   with_dict:
     "{{ aedir_ldapi_services }}"
-  when: openldap_role == 'provider'
 
 - name: "Add local system accounts for services running accessing AE-DIR providers via LDAPI"
   user:
@@ -21,7 +20,5 @@
     state: present
     system: yes
     createhome: no
-  with_items:
+  with_dict:
     "{{ aedir_ldapi_services }}"
-  when: openldap_role == 'provider'
-

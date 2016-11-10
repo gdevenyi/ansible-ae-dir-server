@@ -17,6 +17,7 @@
 
 - name: "Configure OpenLDAP slapd for AE-DIR"
   include: system_accounts.yml
+  when: openldap_role == 'provider'
 
 - name: "Configure OpenLDAP slapd for AE-DIR"
   include: system_accounts.yml
