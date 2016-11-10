@@ -26,8 +26,9 @@
     - python-pyasn1
     - python-pyasn1-modules
     - python-slapdsock
+    - python-netaddr
 
-- name: "Install additional base packages for web applications on {{ ansible_lsb.id }}"
+- name: "Install additional base packages on {{ openldap_role }} on {{ ansible_lsb.id }}"
   zypper:
     name: "{{ item }}"
     state: present
@@ -40,4 +41,6 @@
     - python-paramiko
     - python-mailutil
     - python-web.py
+    - python-oath
+    - python-passlib
   when: openldap_role=="provider"

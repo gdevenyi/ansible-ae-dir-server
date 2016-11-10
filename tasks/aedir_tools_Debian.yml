@@ -24,7 +24,7 @@
     - python-virtualenv
     - python-pip
 
-- name: "PIP module installation in virtualenv {{ aedir_prefix }}"
+- name: "PIP install modules in virtualenv {{ aedir_prefix }}"
   pip:
     name: "{{ item }}"
     state: latest
@@ -37,8 +37,9 @@
     - pyasn1_modules
     - aedir
     - slapdsock
+    - netaddr
 
-- name: "Install additional base packages for web applications on {{ ansible_lsb.id }}"
+- name: "Install additional base packages on {{ openldap_role }} on {{ ansible_lsb.id }}"
   apt:
     name: "{{ item }}"
     state: installed
@@ -50,7 +51,7 @@
     - python-webpy
   when: openldap_role=="provider"
 
-- name: "PIP module installation in virtualenv for web applications on {{ ansible_lsb.id }}"
+- name: "PIP install additional modules on {{ openldap_role }} on {{ ansible_lsb.id }}"
   pip:
     name: "{{ item }}"
     state: latest
@@ -59,4 +60,6 @@
     extra_args: "--upgrade"
   with_items:
     - mailutil
+    - oath
+    - passlib
   when: openldap_role=="provider"

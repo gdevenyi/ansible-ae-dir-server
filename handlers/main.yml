@@ -9,3 +9,9 @@
 
 - name: restart aedirpwd
   service: name=aedirpwd state=restarted
+
+- name: restart hotp_validator
+  service: name=hotp_validator state=restarted
+
+- name: restart bind_proxy
+  service: name=bind_proxy state=restarted

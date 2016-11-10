@@ -1,0 +1,47 @@
+---
+# OATH-LDAP tasks
+
+- name: "Create master key directory {{ aedir_etc }}/oath-master-keys"
+  file:
+    path: "{{ aedir_etc }}/oath-master-keys"
+    state: directory
+    owner: root
+    group: "{{ oath_listener_user }}"
+    mode: u=rwx,g=rx,o=
+  when: openldap_role=="provider"
+
+- name: "Create socket directory {{ oath_ldap_socket_dir }}"
+  file:
+    path: "{{ oath_ldap_socket_dir }}"
+    state: directory
+    owner: "{{ oath_listener_user }}"
+    group: root
+    mode: u=rwx,g=rx,o=rx
+
+- name: "Install {{ oath_bind_listener }}.py"
+  copy:
+    src: "oath-ldap/{{ oath_bind_listener }}.py"
+    dest: "{{ aedir_sbin }}/{{ oath_bind_listener }}.py"
+    owner: root
+    group: "{{ oath_listener_user }}"
+    mode: 0750
+  notify:
+    - "restart {{ oath_bind_listener }}"
+
+- name: Install systemd files from templates
+  template:
+    src: "oath-ldap/{{ oath_bind_listener }}.service.j2"
+    dest: "{{ aedir_systemd_dir[ansible_lsb.id] }}/{{ oath_bind_listener }}.service"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - reload systemd
+    - "restart {{ oath_bind_listener }}"
+  when: ansible_service_mgr=="systemd"
+
+- name: "ensure {{ oath_bind_listener }} is running"
+  service:
+    name: "{{ oath_bind_listener }}"
+    state: started
+    enabled: yes

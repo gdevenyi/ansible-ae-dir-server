@@ -33,3 +33,6 @@
 - name: "Configure web2ldap for AE-DIR on {{ openldap_role }}"
   include: configure_web2ldap.yml
   when: openldap_role=="provider"
+
+- name: "OATH-LDAP tasks on {{ openldap_role }}"
+  include: "oath_ldap.yml"
