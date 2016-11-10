@@ -607,16 +607,16 @@ objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
 
-{% for s in aedir_ldapi_services %}
-dn: uid={{ s.uid }},cn=ae,{{ aedir_suffix }}
+{% for uid, s in aedir_ldapi_services.items() %}
+dn: uid={{ uid }},cn=ae,{{ aedir_suffix }}
 aeStatus: 0
 aeTag: ae-tag-init
-uid: {{ s.uid }}
+uid: {{ uid }}
 cn: {{ s.cn }}
 description: {{ s.cn }}
 uidNumber: {{ s.uid_number }}
 gidNumber: {{ s.gid_number }}
-homeDirectory: /home/{{ s.uid }}
+homeDirectory: /home/{{ uid }}
 loginShell: /bin/true
 objectClass: account
 objectClass: aeObject
