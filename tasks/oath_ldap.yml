@@ -1,6 +1,24 @@
 ---
 # OATH-LDAP tasks
 
+- name: "Add local system group for external bind listener"
+  group:
+    name: "{{ oath_listener_user }}"
+    gid: "{{ aedir_ldapi_services[oath_listener_user].gid_number }}"
+    state: present
+    system: yes
+
+- name: "Add local system account for external bind listener"
+  user:
+    name: "{{ oath_listener_user }}"
+    comment: "{{ aedir_ldapi_services[oath_listener_user].description }}"
+    uid: "{{ aedir_ldapi_services[oath_listener_user].uid_number }}"
+    group: "{{ aedir_ldapi_services[oath_listener_user].gid_number }}"
+    shell: "/bin/true"
+    state: present
+    system: yes
+    createhome: no
+
 - name: "Create master key directory {{ aedir_etc }}/oath-master-keys"
   file:
     path: "{{ aedir_etc }}/oath-master-keys"
