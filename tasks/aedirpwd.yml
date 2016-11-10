@@ -56,7 +56,7 @@
   notify:
     - "restart aedirpwd"
 
-- name: "Install password service web application from template"
+- name: "Install password service web application"
   copy:
     src: "aedirpwd/{{ item }}"
     dest: "{{ aedir_sbin }}/{{ item }}"
