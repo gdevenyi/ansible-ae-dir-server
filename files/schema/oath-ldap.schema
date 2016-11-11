@@ -1,6 +1,6 @@
 ############################################################################
 # Schema for OATH-LDAP
-# $Revision: 1.5 $
+# Revision: 1.6
 #
 # Author: Michael Ströder <michael@stroeder.com>
 #
@@ -40,12 +40,12 @@ objectidentifier oath-ldap-oc oath-ldap:6
 
 attributetype ( oath-ldap-at:1
   NAME 'oathSecret'
-  DESC 'OATH-LDAP: Shared Secret'
+  DESC 'OATH-LDAP: Shared Secret (possibly encrypted with oathPubEncKey)'
   X-ORIGIN 'OATH-LDAP'
   SINGLE-VALUE
   EQUALITY octetStringMatch
   SUBSTR octetStringSubstringsMatch
-  SYNTAX 1.3.6.1.4.1.1466.115.121.1.40{256} )
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.40{2000} )
 
 attributetype ( oath-ldap-at:2
   NAME 'oathTokenSerialNumber'
@@ -171,6 +171,24 @@ attributetype ( oath-ldap-at:10.5
   SINGLE-VALUE
   SUP oathCounter )
 
+attributetype ( oath-ldap-at:12
+  NAME 'oathPubEncKey'
+  DESC 'OATH-LDAP: Public Key used for encrypting the shared secret'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  EQUALITY octetStringMatch
+  SUBSTR octetStringSubstringsMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.40{2000} )
+
+attributetype ( oath-ldap-at:14
+  NAME 'oathTokenPIN'
+  DESC 'OATH-LDAP: Configuration PIN (possibly encrypted with oathPubEncKey)'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  EQUALITY octetStringMatch
+  SUBSTR octetStringSubstringsMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.40{2000} )
+
 # Object classes
 #---------------
 
@@ -189,7 +207,7 @@ objectclass ( oath-ldap-oc:2
   ABSTRACT
   MUST ( oathOTPLength $ oathHMACAlgorithm )
   MAY ( oathSecretMaxAge $ oathSecretLength $
-        oathMaxUsageCount $ oathThrottleLimit ) )
+        oathMaxUsageCount $ oathThrottleLimit $ oathPubEncKey ) )
 
 objectclass ( oath-ldap-oc:3
   NAME 'oathToken'
@@ -198,7 +216,7 @@ objectclass ( oath-ldap-oc:3
   ABSTRACT
   MAY ( oathSecret $ oathSecretTime $
         oathLastLogin $ oathFailureCount $ oathLastFailure $
-        oathTokenSerialNumber $ oathTokenIdentifier ) )
+        oathTokenSerialNumber $ oathTokenIdentifier $ oathTokenPIN ) )
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # HOTP (see RFC 4226)
