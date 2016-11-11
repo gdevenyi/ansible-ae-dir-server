@@ -27,6 +27,7 @@
     - python-pyasn1-modules
     - python-slapdsock
     - python-netaddr
+    - python-jwcrypto
 
 - name: "Install additional base packages on {{ openldap_role }} on {{ ansible_lsb.id }}"
   zypper:

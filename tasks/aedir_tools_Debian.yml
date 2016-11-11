@@ -38,6 +38,7 @@
     - aedir
     - slapdsock
     - netaddr
+    - jwcrypto
 
 - name: "Install additional base packages on {{ openldap_role }} on {{ ansible_lsb.id }}"
   apt:
