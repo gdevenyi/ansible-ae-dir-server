@@ -360,6 +360,10 @@ ae_dir_config = Web2LDAPConfig(
       <var>%(entryDN)s</var><br>
       Service account %(uid)s:<br>
       %(description)s
+      <dl>
+        <dt>Member of:</dt>
+        <dd>%(memberOf)s</dd>
+      </dl>
     </div>
     """,
     'aeHost':r"""
