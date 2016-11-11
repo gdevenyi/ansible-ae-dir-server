@@ -39,7 +39,7 @@ aedir_systemd_dir: "/etc/systemd/system"
 aedir_platform_python:
   Debian: "{{ aedir_bin }}/python"
   openSUSE: "/usr/bin/python"
-aedir_python: "{{ aedir_platform_python[ansible_lsb.id] }}"
+aedir_python: "{{ aedir_platform_python[ansible_lsb.id] }} -ROO"
 
 # regex patterns for enforcing naming conventions (substring match!)
 # Important notes:
