@@ -653,7 +653,7 @@ memberof-refint true
 # (after bind-DN rewriting with slapo-rwm)
 overlay lastbind
 
-{% if oath_ldap_enabled==1 %}
+{% if oath_ldap_enabled=="1" %}
 # pass bind requests to external listener process receiving the requests
 # on Unix Domain socket path {{ oath_ldap_socket_path }}
 overlay sock
