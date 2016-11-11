@@ -1,12 +1,6 @@
 ---
 # tasks file for roles/ae-dir-server
 
-- debug:
-    msg: "oath_ldap_enabled={{ oath_ldap_enabled }}"
-
-- debug:
-    msg: "oath_ldap_enabled boolean {{ oath_ldap_enabled=='1' }}"
-
 - name: "OS base configuration"
   include: "baseos_{{ ansible_lsb.id }}.yml"
 
