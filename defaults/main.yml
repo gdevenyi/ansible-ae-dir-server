@@ -112,7 +112,7 @@ aedir_ldapi_services:
     description: The system user allowed to read shared secrets (OATH-LDAP)
   # system user for bind proxy listener
   ae-dir-bind-proxy:
-    cn: OATH-LDAP validator demon
+    cn: OATH-LDAP bind proxy
     uid_number: 995
     gid_number: 995
     description: The system user used for simple bind proxy
