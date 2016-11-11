@@ -66,7 +66,7 @@ LDAP_TIMEOUT = 3.0
 # used for decrypting the shared secrets
 # Setting this to None disables it and 'oathSecret'
 # is always assumed to contain the raw shared secret bytes
-#JWK_KEY_FILES = 'keys/*.priv'
+#JWK_KEY_FILES = '/opt/ae-dir/etc/oath-master-keys/*.priv'
 JWK_KEY_FILES = None
 
 # Timeout in seconds for the server (Unix domain) socket
