@@ -34,10 +34,7 @@ aedir_etc: "{{ aedir_prefix }}/etc"
 aedir_rundir: "{{ aedir_prefix }}/run"
 
 # where to install systemd files
-aedir_systemd_dir:
-  Debian: "/lib/systemd/system"
-  openSUSE: "/usr/lib/systemd/system"
-  CentOS: "/usr/lib/systemd/system"
+aedir_systemd_dir: "/etc/systemd/system"
 
 aedir_platform_python:
   Debian: "{{ aedir_bin }}/python"

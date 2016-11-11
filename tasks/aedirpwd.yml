@@ -78,10 +78,10 @@
   with_items:
     - aedirpwd_cron.py
 
-- name: Install systemd files from templates
+- name: Install systemd unit file from template
   template:
     src: "aedirpwd/aedirpwd.service.j2"
-    dest: "{{ aedir_systemd_dir[ansible_lsb.id] }}/aedirpwd.service"
+    dest: "{{ aedir_systemd_dir }}/aedirpwd.service"
     owner: root
     group: root
     mode: 0644

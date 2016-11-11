@@ -46,10 +46,10 @@
   notify:
     - "restart {{ oath_bind_listener }}"
 
-- name: Install systemd files from templates
+- name: Install systemd unit file from template
   template:
     src: "oath-ldap/{{ oath_bind_listener }}.service.j2"
-    dest: "{{ aedir_systemd_dir[ansible_lsb.id] }}/{{ oath_bind_listener }}.service"
+    dest: "{{ aedir_systemd_dir }}/{{ oath_bind_listener }}.service"
     owner: root
     group: root
     mode: 0644
