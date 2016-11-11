@@ -307,6 +307,9 @@ openldap_noopsrch_enabled: False
 # OATH-LDAP parameters
 #---------------------------------------------------------------------------
 
+# enable OATH-LDAP (with external bind listeners in slapd.conf)
+oath_ldap_enabled: 0
+
 # map slapd role to bind listener parameters
 oath_dict:
   provider:

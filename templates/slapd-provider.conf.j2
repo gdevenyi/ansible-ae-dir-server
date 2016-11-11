@@ -1566,7 +1566,7 @@ ppolicy_default cn=ppolicy-default,cn=ae,{{ aedir_suffix }}
 ppolicy_hash_cleartext
 ppolicy_use_lockout
 
-{% if oath_ldap_socket_path %}
+{% if oath_ldap_enabled=="1" %}
 # pass bind requests to external listener process receiving the requests
 # on Unix Domain socket path {{ oath_ldap_socket_path }}
 overlay sock
