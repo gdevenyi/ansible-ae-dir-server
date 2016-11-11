@@ -1,14 +1,14 @@
 ---
 # OATH-LDAP tasks
 
-- name: "Add local system group for external bind listener"
+- name: "Add local system group {{ oath_listener_user }} for external bind listener"
   group:
     name: "{{ oath_listener_user }}"
     gid: "{{ aedir_ldapi_services[oath_listener_user].gid_number }}"
     state: present
     system: yes
 
-- name: "Add local system account for external bind listener"
+- name: "Add local system account {{ oath_listener_user }} for external bind listener"
   user:
     name: "{{ oath_listener_user }}"
     comment: "{{ aedir_ldapi_services[oath_listener_user].description }}"
@@ -46,7 +46,7 @@
   notify:
     - "restart {{ oath_bind_listener }}"
 
-- name: Install systemd unit file from template
+- name: "Install systemd unit file for {{ oath_bind_listener }}"
   template:
     src: "oath-ldap/{{ oath_bind_listener }}.service.j2"
     dest: "{{ aedir_systemd_dir }}/{{ oath_bind_listener }}.service"
@@ -58,7 +58,7 @@
     - "restart {{ oath_bind_listener }}"
   when: ansible_service_mgr=="systemd"
 
-- name: "ensure {{ oath_bind_listener }} is running"
+- name: "Enable and start service {{ oath_bind_listener }}"
   service:
     name: "{{ oath_bind_listener }}"
     state: started

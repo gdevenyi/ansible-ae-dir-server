@@ -15,12 +15,9 @@
 - name: "Configure OpenLDAP slapd for AE-DIR"
   include: configure_slapd.yml
 
-- name: "Configure OpenLDAP slapd for AE-DIR"
+- name: "Add system accounts on {{ openldap_role }}"
   include: system_accounts.yml
   when: openldap_role == 'provider'
-
-- name: "Configure OpenLDAP slapd for AE-DIR"
-  include: system_accounts.yml
 
 - name: "Install various AE-DIR tools"
   include: aedir_tools.yml
@@ -37,4 +34,4 @@
 
 - name: "OATH-LDAP tasks on {{ openldap_role }}"
   include: "oath_ldap.yml"
-  when: oath_ldap_enabled=="1"
+  when: oath_ldap_enabled==1
