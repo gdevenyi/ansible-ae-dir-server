@@ -470,7 +470,7 @@ objectclass ( ae-dir-oc:6
   STRUCTURAL
   SUP ( device $ aeObject )
   MUST ( aeStatus )
-  MAY ( displayName $ aeStockId $ aeHwSerialNumber ) )
+  MAY ( displayName $ aeStockId $ aeHwSerialNumber $ aePerson ) )
 
 # Object class for servers
 objectclass ( ae-dir-oc:6.1
