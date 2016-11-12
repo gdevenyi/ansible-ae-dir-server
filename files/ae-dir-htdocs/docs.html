@@ -957,6 +957,20 @@
     </td>
   </tr>
   <tr>
+    <th><a href="#schema-oc-aeAuthcToken">aeAuthcToken</a></th>
+    <td>cn</td>
+    <td>Authentication token device</td>
+    <td><a href="#schema-oc-aeDevice">aeDevice</a></td>
+    <td>
+      <ul>
+        <li>oathHOTPToken</li>
+        <li>oathTOTPToken</li>
+        <li>ldapPublicKey</li>
+        <li>pkiUser</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
     <th><a href="#schema-oc-aeNwDevice">aeNwDevice</a></th>
     <td>cn</td>
     <td>Network device information</td>
@@ -1562,6 +1576,33 @@
   <dt>aeRemoteHost</dt>
   <dd>
     remote host (client IP or FQDN) used during login
+  </dd>
+  <dt>meta attributes</dt>
+  <dd>see <a href="#schema-oc-aeObject-attributes">aeObject</a></dd>
+</dl>
+
+<h3 id="schema-oc-aeAuthcToken">aeAuthcToken</h3>
+<p>
+  Object class <var>aeAuthcToken</var> is used to add entries for personal
+  authentication (OTP) token devices (e.g. yubikey).
+</p>
+<dl id="schema-oc-aeAuthcToken-attributes">
+  <dt>cn</dt>
+  <dd>
+    Device name
+  </dd>
+  <dt>serialNumber</dt>
+  <dd>
+    unique serial number
+    (most times <var>aeHwSerialNumber</var> with prefix)
+  </dd>
+  <dt>aeHwSerialNumber</dt>
+  <dd>
+    vendor-specific serial number (not necessarily unique)
+  </dd>
+  <dt>aeStockId</dt>
+  <dd>
+    inventory number used for warehousing
   </dd>
   <dt>meta attributes</dt>
   <dd>see <a href="#schema-oc-aeObject-attributes">aeObject</a></dd>

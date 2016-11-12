@@ -1,0 +1,41 @@
+<h1>Authentication Token</h1>
+
+<fieldset>
+  <legend>Required input</legend>
+  <table>
+    <tr>
+      <td>Hardware serial number (aeHwSerialNumber):</td>
+      <td>%(aeHwSerialNumber)s</td>
+    </tr>
+    <tr>
+      <td>Base IMS person:</td>
+      <td>%(aeIMSUserDN)s</td>
+    </tr>
+    <tr>
+      <td>Status (aeOrgStatus):</td>
+      <td>%(aeOrgStatus)s</td>
+    </tr>
+  </table>
+</fieldset>
+
+<fieldset>
+  <legend>Optional input</legend>
+  <table>
+    <tr>
+      <td>Intended purpose (description):</td>
+      <td>%(description)s</td>
+    </tr>
+    <tr>
+      <td>Jira ticket for last change (aeTicketId):</td>
+      <td>%(aeLastTicket)s</td>
+    </tr>
+    <tr>
+      <td>Validity period (aeNotBefore..aeNotAfter):</td>
+      <td>from %(aeNotBefore)s until %(aeNotAfter)s</td>
+    </tr>
+  </table>
+</fieldset>
+
+%(serialNumber)s
+%(cn)s
+%(displayName)s

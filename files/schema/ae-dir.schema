@@ -540,3 +540,19 @@ ditcontentrule ( ae-dir-oc:4
         oathHOTPUser $ oathTOTPUser )
   NOT ( host $ l $ o $ ou ) )
 
+# Authentication tokens (yubikey etc.)
+#-----------------------------------------------------------------------
+
+objectclass ( ae-dir-oc:25
+  NAME 'aeAuthcToken'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Authentication token device (e.g. yubikey)'
+  STRUCTURAL
+  SUP aeDevice
+  MUST ( aeHwSerialNumber $ serialNumber $ aePerson $ displayName )
+  MAY ( userPassword ) )
+
+ditcontentrule ( ae-dir-oc:25
+  NAME 'aeAuthcToken-dcr'
+  AUX ( oathHOTPToken $ oathTOTPToken $ ldapPublicKey $ pkiUser )
+  NOT ( l $ o $ ou $ owner $ seeAlso ) )

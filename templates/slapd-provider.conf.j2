@@ -498,7 +498,7 @@ access to
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =szm
     by * none
 
-# oathSecret of  may be
+# oathSecret may be
 # 1. read by OTP validator if token has initialized counter
 # 2. searched and written but not read(!) by AE-DIR admins
 # 3. deleted but not read(!) by enrollment service
@@ -1444,7 +1444,7 @@ constraint_attribute memberUID,member
 # the Yubikey serial number must be the same in various attributes
 # Example:
 # cn: yubikey-1543514
-# displayName: Yubikey NEO 1543514
+# displayName: yubikey neo #1543514
 # oathTokenIdentifier: ubhe01543514
 # oathTokenSerialNumber: 1543514
 # serialNumber: yubikey-1543514
@@ -1474,15 +1474,30 @@ constraint_attribute
 #  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=oathHOTPToken)"
 
 # standard constraints for OATH-LDAP
-#constraint_attribute
-#  oathHOTPToken
-#  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(objectClass=oathHOTPToken)"
-#  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=oathHOTPUser)"
+constraint_attribute
+  oathHOTPToken
+  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(objectClass=oathHOTPToken)"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=oathHOTPUser)"
 constraint_attribute
   oathHOTPParams
   uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(objectClass=oathHOTPParams)"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=oathHOTPToken)"
+constraint_attribute
+  oathTOTPToken
+  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(objectClass=oathTOTPToken)"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=oathTOTPUser)"
+constraint_attribute
+  oathTOTPParams
+  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(objectClass=oathTOTPParams)"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=oathTOTPToken)"
 
+# aeUser and aeAuthcToken entries must reference same aePerson entry
+constraint_attribute oathHOTPToken set
+  "this/oathHOTPToken/aePerson & this/aePerson"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=oathHOTPUser)"
+constraint_attribute oathTOTPToken set
+  "this/oathTOTPToken/aePerson & this/aePerson"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=oathTOTPUser)"
 
 # Constraints on applicable password policy for certain object classes in certain zone
 constraint_attribute pwdPolicySubentry
