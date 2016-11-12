@@ -41,11 +41,14 @@ nameForms: ( 1.3.6.1.4.1.5427.1.389.42.15.11 NAME 'aePerson-aeZone-NF-employeeNu
 dITStructureRules: ( 12 NAME 'aePerson-aeZone-SR-2' FORM aePerson-aeZone-NF-uniqueIdentifier SUP ( 2 ) )
 nameForms: ( 1.3.6.1.4.1.5427.1.389.42.15.12 NAME 'aePerson-aeZone-NF-uniqueIdentifier' OC aePerson MUST ( uniqueIdentifier ) )
 # aeTag
-dITStructureRules: ( 13 NAME 'aeTag-aeZone-SR-2' FORM aeTag-aeZone-NF-cn SUP ( 2 ) )
+dITStructureRules: ( 13 NAME 'aeTag-aeZone-SR-1' FORM aeTag-aeZone-NF-cn SUP ( 2 ) )
 nameForms: ( 1.3.6.1.4.1.5427.1.389.42.15.13 NAME 'aeTag-aeZone-NF-cn' OC aeTag MUST ( cn ) )
 # aeDept
-dITStructureRules: ( 14 NAME 'aeDept-aeZone-SR-2' FORM aeDept-aeZone-NF-cn SUP ( 2 ) )
+dITStructureRules: ( 14 NAME 'aeDept-aeZone-SR-1' FORM aeDept-aeZone-NF-cn SUP ( 2 ) )
 nameForms: ( 1.3.6.1.4.1.5427.1.389.42.15.14 NAME 'aeDept-aeZone-NF-cn' OC aeDept MUST ( departmentNumber ) )
+# aeAuthcDevice
+dITStructureRules: ( 13 NAME 'aeAuthcDevice-aeZone-SR-1' FORM aeAuthcDevice-aeZone-NF-cn SUP ( 2 ) )
+nameForms: ( 1.3.6.1.4.1.5427.1.389.42.15.15 NAME 'aeAuthcDevice-aeZone-NF-cn' OC aeAuthcDevice MUST ( cn ) )
 #
 # aeService can be subordinate of aeZone or aeSrvGroup
 #
