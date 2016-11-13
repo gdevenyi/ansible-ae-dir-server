@@ -1,0 +1,36 @@
+Dear user,
+
+an enrollment password for your Yubikey token was requested by the
+2FA admin %(admin)s and the Yubikey token entry was reset!
+
+Responsible 2FA admin:
+
+  %(admin)s
+
+Serial no. of the affected OATH Token:
+
+  %(serial)s
+
+Temporary enrollment password part #1:
+
+  %(enrollpw1)s
+
+For (re)initializing your OATH Token at an enrollment workstation
+you will need a 2nd part of your enrollment password. This will be given
+to you by the 2FA admin who handed you the Yubikey and the enrollment
+workstation.
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Important notes:
+* If you react too late to this e-mail the password will be expired and
+  the 2FA admin has to restart this process again.
+* If someone falsely reset your token then please contact the 2FA admin
+  immediately for getting help as the token will no longer work!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+Have fun!
+
+Your OTP admins.
+
+IP address from which enrollment was invoked:
+%(remote_ip)s

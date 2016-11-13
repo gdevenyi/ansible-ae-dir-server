@@ -331,6 +331,14 @@ oath_ldap_socket_dir: "{{ aedir_rundir }}/{{ oath_bind_listener }}"
 # (set this to empty string for disabling the external bind listeners completely)
 oath_ldap_socket_path: "{{ oath_ldap_socket_dir }}/socket"
 
+# jinja template to use for oathenroll_cnf.py
+oath_ldap_oathenroll_cnf_template: "oath-ldap/oathenroll_cnf.py.j2"
+
+# user/group to run password self-service web application
+# must be in {{ aedir_ldapi_services }}
+oath_ldap_oathenroll_web_user: ae-dir-otpenroll
+oath_ldap_oathenroll_web_group: ae-dir-otpenroll
+
 #---------------------------------------------------------------------------
 # web2ldap parameters
 #---------------------------------------------------------------------------

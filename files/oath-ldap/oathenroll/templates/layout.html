@@ -3,8 +3,8 @@ $def with (content)
 <html>
 
   <head>
-    <title>&AElig;-DIR - $content.title</title>
-    <meta name="generator" content="aedirpwd_web">
+    <title>$content.title</title>
+    <meta name="generator" content="oathenroll">
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <base target="_top">
     <meta name="robots" content="noindex,nofollow">
@@ -13,7 +13,7 @@ $def with (content)
     <meta http-equiv="x-frame-options" content="deny">
     <meta name="Cache-Control" content="private">
     <link href="/css/ae-dir.css" rel="stylesheet" type="text/css" />
-    <link href="/aedirpwd-static/aedirpwd.css" rel="stylesheet" type="text/css" />
+    <link href="/oathenroll-static/style.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript">
       <!--
        if(top.frames.length > 0)
@@ -25,10 +25,9 @@ $def with (content)
   <body>
 
     <div id="navigation">
-      <a title="Overview of &AElig;-DIR password self-service" href=".">&AElig;-DIR PwS</a> /
-      <a title="Change own password" href="changepw">Change</a> /
-      <a title="Check own password" href="checkpw">Check</a> /
-      <a title="Request password reset" href="requestpw">Reset</a>
+      <a title="Overview of OATH-LDAP Token Enrollment Service" href=".">OATH-LDAP</a> /
+      <!--a title="Register OATH token for a person" href="register">Register</a-->
+      <a title="Reset OATH token and request enrollment password" href="reset">Reset</a>
     </div>
 
     $:content
@@ -38,12 +37,12 @@ $def with (content)
       <a href="mailto:ae-dir-admins@example.com?SUBJECT=[&AElig;-DIR]%20Issue%20using%20Password%20Self-Service"
          title="Send e-mail to ae-admins@example.com">Contact &AElig; admins</a> //
       -->
-      <a href="/pwd.html"
-         title="Read user guide for &AElig;-DIR Password Self-Service">User guide</a> //
+      <a href="/oath.html"
+         title="Read user guide for OATH-LDAP Token Enrollment Service">User guide</a> //
       <a href="/web2ldap"
          title="Access to web2ldap application">web2ldap</a>
       <a href="/pwd/"
-         title="Access to OATH-LDAP Token Enrollment Service">OATH enrollment</a>
+         title="Access to &AElig;-DIR password self-service">Password self-service</a>
     </p>
 
   </body>

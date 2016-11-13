@@ -33,5 +33,5 @@
   when: openldap_role=="provider"
 
 - name: "OATH-LDAP tasks on {{ openldap_role }}"
-  include: "oath_ldap.yml"
+  include: "oath-ldap.yml"
   when: oath_ldap_enabled == "1"

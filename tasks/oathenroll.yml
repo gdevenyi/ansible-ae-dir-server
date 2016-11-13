@@ -1,0 +1,82 @@
+---
+# Install AE-DIR password service (oathenroll)
+
+- name: "Create directories for oathenroll"
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: u=rwx,g=rx,o=rx
+  with_items:
+    - "{{ aedir_etc }}/oathenroll"
+    - "{{ aedir_etc }}/oathenroll/templates"
+
+- name: "Apache reverse proxy configuration"
+  template:
+    src: "apache2/vhost/oathenroll.conf.j2"
+    dest: "{{ web2ldap_prefix }}/etc/{{ web_server }}/vhost/oathenroll.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - "restart {{ web_server }}"
+
+- name: "copy oathenroll HTML templates to {{ aedir_etc }}/oathenroll/templates"
+  copy:
+    src: "oath-ldap/oathenroll/templates/"
+    dest: "{{ aedir_etc }}/oathenroll/templates"
+    follow: no
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+    directory_mode: u=rwx,g=rx,o=rx
+
+- name: "copy oathenroll static files {{ aedir_prefix }}/htdocs/"
+  copy:
+    src: "oath-ldap/oathenroll/static/"
+    dest: "{{ aedir_prefix }}/htdocs/oathenroll-static"
+    follow: no
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+    directory_mode: u=rwx,g=rx,o=rx
+
+- name: "Create oathenroll_cnf.py"
+  template:
+    src: "{{ oath_ldap_oathenroll_cnf_template }}"
+    dest: "{{ aedir_etc }}/oathenroll/oathenroll_cnf.py"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - "restart oathenroll"
+
+- name: "Install OATH enrollment web application"
+  copy:
+    src: "oath-ldap/oathenroll/oathenroll.py"
+    dest: "{{ aedir_sbin }}/oathenroll.py"
+    owner: root
+    group: "{{ oath_ldap_oathenroll_web_group }}"
+    mode: 0750
+  notify:
+    - "restart oathenroll"
+
+- name: Install systemd unit file from template
+  template:
+    src: "oath-ldap/oathenroll.service.j2"
+    dest: "{{ aedir_systemd_dir }}/oathenroll.service"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - reload systemd
+    - "restart oathenroll"
+  when: ansible_service_mgr=="systemd"
+
+- name: "ensure oathenroll is running"
+  service:
+    name: "oathenroll"
+    state: started
+    enabled: yes
+

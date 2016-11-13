@@ -1,0 +1,108 @@
+# -*- coding: utf-8 -*-
+"""
+Configuration module for oathenroll
+"""
+
+import os.path
+
+# Trace level for python-ldap logs
+PYLDAP_TRACELEVEL = 0
+
+# LDAP-URL describing the connection parameters and bind information
+PWD_LDAP_URL = r'{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub??trace=0,x-saslmech=EXTERNAL'
+
+# SASL authz-ID to be sent along with SASL/EXTERNAL bind
+LDAPI_AUTHZ_ID = 'dn:uid=ae-dir-otpenroll,cn=ae,ou=ae-dir'
+
+# Filter string templates for the various use-cases
+# String-keyed dictionary with input field names used
+
+# Filter string template for finding an active admin entry during login
+# Notes:
+# - must require initialized 2FA user account with filter part (&(objectClass=oathUser)(oathHOTPToken=*))
+# - authorization is enforced via filter part (|(memberOf=cn=otp-zone-admins,cn=otp,ou=ae-dir)(memberOf=cn=ae-admins,cn=ae,ou=ae-dir))
+FILTERSTR_ADMIN_LOGIN = (
+    ur'(&(objectClass=aeUser)(uid={uid})'
+        '(objectClass=oathUser)(oathHOTPToken=*)'          # enforces 2FA user account
+        '(|(memberOf=cn=otp-zone-admins,cn=otp,ou=ae-dir)' # is OTP zone admin
+          '(memberOf=cn=ae-admins,cn=ae,ou=ae-dir)))'      # is AE admin
+)
+
+# Filter string template for finding an active owner entry during token registration
+#FILTERSTR_OWNER_SEARCH = ur'(&(objectClass=aePerson)(|(cn={personid})(employeeNumber={personid})(uniqueIdentifier={personid})(mail={personid})))'
+
+# Filter string template for reading a particular active owner entry
+# (require initialized 2FA user account herein)
+FILTERSTR_OWNER_READ = ur'(objectClass=aePerson)'
+
+# Filter string template for finding an active token entry
+FILTERSTR_TOKEN_SEARCH = ur'(&(objectClass=aeDevice)(objectClass=oathToken)(serialNumber=yubikey-{serial})(aeHwSerialNumber={serial})(oathTokenSerialNumber={serial}))'
+
+# Name of directory containing all the template files
+TEMPLATES_DIRNAME = '{{ aedir_etc }}/oathenroll/templates/'
+
+# Name of layout template (without the file suffix .html)
+LAYOUT = 'layout'
+
+# This constants specifies whether send exceptions to the browser or not
+WEB_CONFIG_DEBUG = False
+WEB_ERROR = None
+
+# Format string for displaying date and time
+TIME_DISPLAY_FORMAT = '%d.%m.%Y %H:%M:%S'
+
+# Length of generated temporary passwords
+PWD_LENGTH = 12
+
+# Number of chars of generated temporary passwords to be displayed to 2FA admin
+PWD_ADMIN_LEN = 6
+
+# Characters used for the temporary passwords
+PWD_TMP_CHARS = u'abcdefghijkmnopqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ23456789'
+
+# Filename of template for sending e-mail message to user
+EMAIL_SUBJECT = u'Your temporary enrollment password for Yubikey #%(serial)s'
+EMAIL_TEMPLATE = TEMPLATES_DIRNAME+'reset.txt'
+
+# SMTP server used as smart host (SMTP relay)
+# query string of URL may contain two more parameters:
+# STARTTLS: Send STARTTLS (see also config parameter SMTP_TLSARGS)
+# VIA: Use this hostname or IP address for connection
+#SMTP_URL = 'smtp://user:password@mail-relay.example.com/?STARTTLS&VIA=mail-relay-othername.example.com'
+#SMTP_URL = 'smtp://127.0.0.1'
+SMTP_URL = 'smtp://smtp.example.com:587/?STARTTLS'
+
+# Debug level for SMTP messages sent to stderr
+SMTP_DEBUGLEVEL = 0
+
+# Hostname to be sent in EHLO request,
+# set to None for automatically using the local hostname
+SMTP_LOCALHOSTNAME = '{{ ansible_fqdn }}'
+
+# Dictionary for key-word arguments to be used for function ssl.wrap_socket()
+# See https://docs.python.org/2/library/ssl.html#ssl.wrap_socket
+import ssl
+SMTP_TLSARGS = {
+#  'keyfile':None,
+#  'certfile':None,
+  'cert_reqs':ssl.CERT_REQUIRED,
+  'ssl_version':ssl.PROTOCOL_TLSv1_2,
+  'ca_certs':'{{ smtp_cacert_pathname }}',
+  'expected_fingerprints':None,
+  # ciphers only supported with Python 2.7+
+  'ciphers': "HIGH:!aNULL:!eNULL",
+}
+
+# From address in sent e-mail
+SMTP_FROM = 'ae-dir-pwd@{{ openldap_service_fqdn }}'
+
+# URL path prefix used when generating URLs in e-mails
+# handy for reverse proxy setups
+APP_PATH_PREFIX = '/oath'
+
+# Mapping of request URL path to Python handler class
+URL2CLASS_MAPPING = (
+  '/','Default',
+#  '/register', 'RegisterToken',
+  '/reset', 'ResetToken',
+)

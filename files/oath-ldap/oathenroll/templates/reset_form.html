@@ -1,0 +1,136 @@
+$def with (message, admin='', serial='', token='', owner='', email='', accounts=None, confirm='')
+$var title: Initialize OATH Token
+
+<div class="content">
+
+    <h1>Initialize OATH Token</h1>
+
+    $if message:
+        <p class="message">
+            $message
+        </p>
+
+    <form
+      method="POST"
+      action="reset"
+      enctype="application/x-www-form-urlencoded"
+      accept-charset="utf-8"
+    >
+
+      $if token:
+          <input type="hidden" name="serial" value="$serial">
+
+      <input type="hidden" name="confirm" value="$confirm">
+
+      <fieldset>
+
+        <legend>Token</legend>
+
+        <table>
+
+        $if token:
+            <tr>
+                <th>Token:</th>
+                <td>$token</td>
+            </tr>
+            <tr>
+                <th>Token owner:</th>
+                <td>
+                  <a href="mailto:$email">$owner</a>
+                </td>
+            </tr>
+
+        $else:
+            <tr>
+                <th>Token serial no.:</th>
+                <td>
+                    <input name="serial" value="$serial" size="8">
+                </td>
+            </tr>
+
+        </table>
+
+      </fieldset>
+
+      $if accounts:
+          <fieldset>
+            <legend>Affected accounts</legend>
+            <table>
+                $for uname, udesc in accounts:
+                    <tr>
+                        <th>$uname:</th>
+                        <td>$udesc</td>
+                    </tr>
+            </table>
+          </fieldset>
+
+      <fieldset>
+        <legend>2FA admin login</legend>
+        <table>
+          <tr>
+            <th>User name:</th>
+            <td>
+              <input name="admin" value="$admin" size="10">
+            </td>
+          </tr>
+          <tr>
+            <th>Password + OTP:</th>
+            <td>
+              <input type="password" name="password" value="" size="40">
+            </td>
+          </tr>
+        </table>
+      </fieldset>
+
+    $if confirm:
+        <input type="submit" class="submit" name="submit" value="Generate enroll password">
+    $else:
+        <input type="submit" class="submit" name="submit" value="Get token info">
+
+    </form>
+
+    <ul class="tip">
+      <li>
+        Don't know what the above means?<br>
+        <strong>
+          Then don't do anything here now!
+        </strong><br>
+        Please consult the
+        <a href="https://wiki.example.com/oathenroll">
+        Wiki pages</a> first.
+      </li>
+      <li>
+        Are you too tired?<br>
+        Then get another morning coffee first!
+      </li>
+      <li>
+        You will effectively make it impossible to use the above mentioned user accounts!<br>
+        <strong>
+          If unsure contact the owner now.
+        </strong>
+      </li>
+      <li>
+        You must confirm this action with another re-login
+        (username and password+OTP).
+      </li>
+      <li>
+        Make sure the token owner has access to a working enrollment
+        device (special notebook).
+      </li>
+      <li>
+        The 1st part of the temporary initialization password will be
+        displayed to you here. <br>
+        Please hand over this to the token owner
+        over a <strong>secure out-of-band channel</strong>.
+      </li>
+      <li>
+        The token owner will be sent the 2nd part of the temporary
+        password via e-mail.
+      </li>
+      <li>
+        Please advice the token owner that the temporary password will be
+        <strong>only valid for 10 minutes</strong>.
+      </li>
+    </ul>
+
+</div>
