@@ -1,61 +1,61 @@
 $def with (message, serial='', token='', owner='', email='', enrollpw2='')
 $var title: Initialize OATH Token
 
-<div class="content">
+<div id="content">
 
-    <h1>Initialize OATH Token</h1>
+  <h1>Initialize OATH Token</h1>
+
+  <p>
 
     <p>
-
-      <p>
-        A temporary password for token entry <strong>$serial</strong>
-        was successfully set and sent to the owner via e-mail.
-      </p>
-
-      <p>
-        Temporary enrollment password part #2:
-      </p>
-
-      <p>
-        <strong>$enrollpw2</strong>
-      </p>
-
-      <table>
-        <tr>
-          <td>Token:</td>
-          <td>$token</td>
-        </tr>
-        <tr>
-          <td>Owner:</td>
-          <td><a href="mailto:$email">$owner</a></td>
-        </tr>
-        <tr>
-          <td>Owner's mail address:</td>
-          <td><a href="mailto:$email">$email</a></td>
-        </tr>
-      </table>
+      A temporary password for token entry <strong>$serial</strong>
+      was successfully set and sent to the owner via e-mail.
     </p>
 
-    <ul class="tip">
-      <li>
-        Make sure the token owner has access to a properly functioning
-        enrollment device (special notebook).
-      </li>
-      <li>
-        Please hand over 1st part of the temporary initialization
-        password displayed above to the token owner over a
-        <strong>secure out-of-band channel</strong>.
-      </li>
-      <li>
-        The 2nd part of the temporary password was sent to the token 
-        owner via e-mail to <a href="mailto:$email">$email</a>.
-      </li>
-      <li>
-        Please advice the token owner that the temporary password will 
-        be valid only for 10 minutes. If password expires you can 
-        simply request <a href="reset?serial=$serial">token reinitialization</a>
-        again.
-      </li>
-    </ul>
+    <p>
+      Temporary enrollment password part #2:
+    </p>
+
+    <p>
+      <strong>$enrollpw2</strong>
+    </p>
+
+    <table>
+      <tr>
+        <td>Token:</td>
+        <td>$token</td>
+      </tr>
+      <tr>
+        <td>Owner:</td>
+        <td><a href="mailto:$email">$owner</a></td>
+      </tr>
+      <tr>
+        <td>Owner's mail address:</td>
+        <td><a href="mailto:$email">$email</a></td>
+      </tr>
+    </table>
+  </p>
+
+  <ul class="tip">
+    <li>
+      Make sure the token owner has access to a properly functioning
+      enrollment device (special notebook).
+    </li>
+    <li>
+      Please hand over 1st part of the temporary initialization
+      password displayed above to the token owner over a
+      <strong>secure out-of-band channel</strong>.
+    </li>
+    <li>
+      The 2nd part of the temporary password was sent to the token 
+      owner via e-mail to <a href="mailto:$email">$email</a>.
+    </li>
+    <li>
+      Please advice the token owner that the temporary password will 
+      be valid only for 10 minutes. If password expires you can 
+      simply request <a href="reset?serial=$serial">token reinitialization</a>
+      again.
+    </li>
+  </ul>
 
 </div>
