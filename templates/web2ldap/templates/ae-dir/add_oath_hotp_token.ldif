@@ -1,0 +1,15 @@
+dn: serialNumber=,cn=otp,{{ aedir_suffix }}
+objectClass: device
+objectClass: aeDevice
+objectClass: aeAuthcToken
+objectClass: oathToken
+objectClass: oathHOTPToken
+serialNumber: yubikey-
+cn: yubikey-
+aeStatus: 0
+displayName: Yubikey NEO #
+oathFailureCount: 0
+oathHOTPCounter: 0
+oathHOTPParams: cn=oath-policy-yubikey-users,cn=ae,{{ aedir_suffix }}
+oathTokenIdentifier: ubhe
+
