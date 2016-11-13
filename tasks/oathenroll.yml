@@ -31,6 +31,8 @@
     group: root
     mode: u=rw,g=r,o=r
     directory_mode: u=rwx,g=rx,o=rx
+  notify:
+    - "restart oathenroll"
 
 - name: "copy oathenroll static files {{ aedir_prefix }}/htdocs/"
   copy:
