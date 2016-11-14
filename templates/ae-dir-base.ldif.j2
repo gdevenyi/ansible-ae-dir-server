@@ -358,7 +358,9 @@ uid: bad
 dn: cn=ppolicy-default,cn=ae,{{ aedir_suffix }}
 cn: ppolicy-default
 description: Unusable default password policy
+objectClass: aeObject
 objectClass: namedPolicy
+objectClass: aePolicy
 objectClass: pwdPolicy
 pwdAllowUserChange: FALSE
 pwdAttribute: userPassword
@@ -373,7 +375,9 @@ pwdMaxAge: 1
 dn: cn=ppolicy-sasl-external,cn=ae,{{ aedir_suffix }}
 cn: ppolicy-sasl-external
 description: Password policy for services which must use SASL/EXTERNAL
+objectClass: aeObject
 objectClass: namedPolicy
+objectClass: aePolicy
 objectClass: pwdPolicy
 pwdAllowUserChange: FALSE
 pwdAttribute: userPassword
@@ -388,7 +392,9 @@ pwdMaxAge: 1
 dn: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
 cn: ppolicy-systems
 description: Password policy for hosts and system/service accounts (aeHost and aeService)
+objectClass: aeObject
 objectClass: namedPolicy
+objectClass: aePolicy
 objectClass: pwdPolicy
 pwdAllowUserChange: FALSE
 pwdAttribute: userPassword
@@ -402,7 +408,9 @@ pwdMustChange: FALSE
 dn: cn=ppolicy-users,cn=ae,{{ aedir_suffix }}
 cn: ppolicy-users
 description: Password policy for personal user accounts (aeUser)
+objectClass: aeObject
 objectClass: namedPolicy
+objectClass: aePolicy
 objectClass: pwdPolicy
 pwdAllowUserChange: TRUE
 pwdAttribute: userPassword
@@ -424,7 +432,9 @@ pwdSafeModify: FALSE
 dn: cn=ppolicy-base-users,cn=ae,{{ aedir_suffix }}
 cn: ppolicy-base-users
 description: Password policy for primary personal user accounts (aeUser) in zone base
+objectClass: aeObject
 objectClass: namedPolicy
+objectClass: aePolicy
 objectClass: pwdPolicy
 pwdAllowUserChange: TRUE
 pwdAttribute: userPassword
@@ -446,7 +456,9 @@ pwdSafeModify: FALSE
 dn: cn=ppolicy-otptokens,cn=ae,{{ aedir_suffix }}
 cn: ppolicy-otptokens
 description: Password policy for OTP enrollment
+objectClass: aeObject
 objectClass: namedPolicy
+objectClass: aePolicy
 objectClass: pwdPolicy
 pwdAllowUserChange: FALSE
 pwdAttribute: userPassword
@@ -470,7 +482,9 @@ pwdSafeModify: FALSE
 #
 dn: cn=oath-policy-hotp-users,cn=ae,{{ aedir_suffix }}
 objectClass: namedObject
+objectClass: aeObject
 objectClass: namedPolicy
+objectClass: aePolicy
 objectClass: oathParams
 objectClass: oathHOTPParams
 cn: oath-policy-hotp-users
@@ -482,7 +496,9 @@ oathOTPLength: 8
 dn: cn=oath-policy-resync-hotp-users,cn=ae,{{ aedir_suffix }}
 cn: oath-policy-resync-hotp-users
 objectClass: namedObject
+objectClass: aeObject
 objectClass: namedPolicy
+objectClass: aePolicy
 objectClass: oathParams
 objectClass: oathHOTPParams
 description: OATH/HOTP policy parameters for counter resync
@@ -710,7 +726,7 @@ cn: {{ host.split('.')[0] }}
 aeTicketId: {{ aedir_init_ticket_id }}
 description: AE-DIR provider replica host for {{ service_fqdn }}
 
-{% for interface in hostvars[host]['ansible_interfaces'] if interface != "lo" %}
+{% for interface in hostvars[host]['ansible_interfaces'] if interface not in ( "lo", "tunl0") %}
 {% set interface_fact = "ansible_{}".format(interface) -%}
 dn: cn={{ interface }},host={{ host }},cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir_suffix }}
 aeStatus: 0
