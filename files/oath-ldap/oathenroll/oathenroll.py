@@ -243,6 +243,7 @@ class BaseApp(Default):
             self.ldap_url.dn,
             scope=self.ldap_url.scope,
             filterstr=FILTERSTR_TOKEN_SEARCH.format(
+                owner_attr=ATTR_OWNER_DN,
                 serial=token_serial.encode('utf-8'),
             ),
             attrlist=[
@@ -256,7 +257,7 @@ class BaseApp(Default):
                 'oathSecretTime',
                 'oathTokenIdentifier',
                 'oathTokenSerialNumber',
-                'uiIMSUserDN',
+                ATTR_OWNER_DN,
             ],
         )
         token_displayname = token_entry['displayName'][0].decode('utf-8')
@@ -508,7 +509,7 @@ class ResetToken(BaseApp):
             token_displayname, token_dn, token_entry = self.search_token(
                 token_serial
             )
-            owner_dn = token_entry['aePerson'][0]
+            owner_dn = token_entry[ATTR_OWNER_DN][0]
             owner_entry = self.read_owner(owner_dn)
             accounts = self.search_accounts(token_dn)
             confirm_hash = hashlib.sha256(

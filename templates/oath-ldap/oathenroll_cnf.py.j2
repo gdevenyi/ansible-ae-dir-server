@@ -28,12 +28,14 @@ FILTERSTR_ADMIN_LOGIN = (
           '(memberOf=cn=ae-admins,cn=ae,ou=ae-dir)))'      # is AE admin
 )
 
+ATTR_OWNER_DN = 'aePerson'
+
 # Filter string template for reading a particular active owner entry
 # (require initialized 2FA user account herein)
 FILTERSTR_OWNER_READ = ur'(&(objectClass=aePerson)(aeStatus=0))'
 
 # Filter string template for finding an active token entry
-FILTERSTR_TOKEN_SEARCH = ur'(&(objectClass=aeAuthcToken)(aeStatus=0)(aePerson=*)(objectClass=oathToken)(serialNumber=yubikey-{serial})(aeHwSerialNumber={serial})(oathTokenSerialNumber={serial}))'
+FILTERSTR_TOKEN_SEARCH = ur'(&(objectClass=aeAuthcToken)(aeStatus=0)({owner_attr}=*)(objectClass=oathToken)(serialNumber=yubikey-{serial})(aeHwSerialNumber={serial})(oathTokenSerialNumber={serial}))'
 
 # Name of directory containing all the template files
 TEMPLATES_DIRNAME = '{{ aedir_etc }}/oathenroll/templates/'
