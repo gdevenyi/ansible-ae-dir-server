@@ -446,8 +446,8 @@ access to
   dn.subtree="{{ aedir_suffix }}"
   attrs=userPassword
   filter="(&(objectClass=oathToken)(aeStatus=0)(pwdPolicySubentry=cn=ppolicy-otptokens,cn=ae,{{ aedir_suffix }}))"
-    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =s
     by dn.base="uid=ae-dir-otpenroll,cn=ae,{{ aedir_suffix }}" =w
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =s
     by self =z
     by * auth
 
