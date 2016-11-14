@@ -15,6 +15,7 @@
     - tar
     - gzip
     - gcc
+    - libssl-dev
     - libsasl2-dev
     - libldap-dev
     - python-dev
@@ -23,6 +24,8 @@
     - virtualenv
     - python-virtualenv
     - python-pip
+    - libffi-dev
+    - python-cffi
 
 - name: "PIP install modules in virtualenv {{ aedir_prefix }}"
   pip:
@@ -38,6 +41,7 @@
     - aedir
     - slapdsock
     - netaddr
+    - cryptography
     - jwcrypto
 
 - name: "Install additional base packages on {{ openldap_role }} on {{ ansible_lsb.id }}"
