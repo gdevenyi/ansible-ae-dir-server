@@ -465,6 +465,32 @@ pwdMustChange: FALSE
 pwdSafeModify: FALSE
 
 #---------------------------------------------------------------------------
+# OATH-LDAP policy parameter entries
+#---------------------------------------------------------------------------
+#
+dn: cn=oath-policy-hotp-users,cn=ae,{{ aedir_suffix }}
+objectClass: namedObject
+objectClass: namedPolicy
+objectClass: oathParams
+objectClass: oathHOTPParams
+cn: oath-policy-hotp-users
+description: OATH/HOTP policy parameters for normal use
+oathHMACAlgorithm: 1.2.840.113549.2.7
+oathHOTPLookAhead: 15
+oathOTPLength: 8
+
+dn: cn=oath-policy-resync-hotp-users,cn=ae,{{ aedir_suffix }}
+cn: oath-policy-resync-hotp-users
+objectClass: namedObject
+objectClass: namedPolicy
+objectClass: oathParams
+objectClass: oathHOTPParams
+description: OATH/HOTP policy parameters for counter resync
+oathHMACAlgorithm: 1.2.840.113549.2.7
+oathHOTPLookAhead: 100
+oathOTPLength: 8
+
+#---------------------------------------------------------------------------
 # aePerson and aeUser entries for initial AE admin(s)
 #---------------------------------------------------------------------------
 #
@@ -505,7 +531,7 @@ aePerson: uniqueIdentifier={{ ae_user.unique_identifier }},cn={{ aedir_org_zone 
 description: {{ ae_user.description }}
 homeDirectory: /home/{{ ae_user.uid }}
 loginShell: /bin/bash
-pwdPolicySubentry: cn=ppolicy-users,cn=ae,ou=ae-dir
+pwdPolicySubentry: cn=ppolicy-users,cn=ae,{{ aedir_suffix }}
 cn: {{ aedir_init_aepersons[ae_user.unique_identifier].given_name }} {{ aedir_init_aepersons[ae_user.unique_identifier].sur_name }}
 displayName: {{ aedir_init_aepersons[ae_user.unique_identifier].given_name }}
   {{ aedir_init_aepersons[ae_user.unique_identifier].sur_name }}
@@ -593,6 +619,14 @@ objectClass: groupOfEntries
 objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
+{% if oath_ldap_enabled=="1" %}
+member: uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}
+member: uid=ae-dir-bind-proxy,cn=ae,{{ aedir_suffix }}
+member: uid={{ oath_ldap_oathenroll_web_user }},cn=ae,{{ aedir_suffix }}
+memberUid: ae-dir-otpverify
+memberUid: ae-dir-bind-proxy
+memberUid: {{ oath_ldap_oathenroll_web_user }}
+{% endif %}
 
 dn: cn=ae-sys-admins,cn=ae,{{ aedir_suffix }}
 aeStatus: 0
