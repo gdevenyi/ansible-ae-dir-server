@@ -362,6 +362,7 @@ objectClass: aeObject
 objectClass: namedPolicy
 objectClass: aePolicy
 objectClass: pwdPolicy
+aeStatus: 0
 pwdAllowUserChange: FALSE
 pwdAttribute: userPassword
 pwdCheckQuality: 2
@@ -379,6 +380,7 @@ objectClass: aeObject
 objectClass: namedPolicy
 objectClass: aePolicy
 objectClass: pwdPolicy
+aeStatus: 0
 pwdAllowUserChange: FALSE
 pwdAttribute: userPassword
 pwdCheckQuality: 2
@@ -396,6 +398,7 @@ objectClass: aeObject
 objectClass: namedPolicy
 objectClass: aePolicy
 objectClass: pwdPolicy
+aeStatus: 0
 pwdAllowUserChange: FALSE
 pwdAttribute: userPassword
 pwdCheckQuality: 2
@@ -412,6 +415,7 @@ objectClass: aeObject
 objectClass: namedPolicy
 objectClass: aePolicy
 objectClass: pwdPolicy
+aeStatus: 0
 pwdAllowUserChange: TRUE
 pwdAttribute: userPassword
 pwdCheckQuality: 2
@@ -436,6 +440,7 @@ objectClass: aeObject
 objectClass: namedPolicy
 objectClass: aePolicy
 objectClass: pwdPolicy
+aeStatus: 0
 pwdAllowUserChange: TRUE
 pwdAttribute: userPassword
 pwdCheckQuality: 2
@@ -460,6 +465,7 @@ objectClass: aeObject
 objectClass: namedPolicy
 objectClass: aePolicy
 objectClass: pwdPolicy
+aeStatus: 0
 pwdAllowUserChange: FALSE
 pwdAttribute: userPassword
 pwdCheckQuality: 1
@@ -481,13 +487,14 @@ pwdSafeModify: FALSE
 #---------------------------------------------------------------------------
 #
 dn: cn=oath-policy-hotp-users,cn=ae,{{ aedir_suffix }}
+cn: oath-policy-hotp-users
 objectClass: namedObject
 objectClass: aeObject
 objectClass: namedPolicy
 objectClass: aePolicy
 objectClass: oathParams
 objectClass: oathHOTPParams
-cn: oath-policy-hotp-users
+aeStatus: 0
 description: OATH/HOTP policy parameters for normal use
 oathHMACAlgorithm: 1.2.840.113549.2.7
 oathHOTPLookAhead: 15
@@ -501,6 +508,7 @@ objectClass: namedPolicy
 objectClass: aePolicy
 objectClass: oathParams
 objectClass: oathHOTPParams
+aeStatus: 0
 description: OATH/HOTP policy parameters for counter resync
 oathHMACAlgorithm: 1.2.840.113549.2.7
 oathHOTPLookAhead: 100
