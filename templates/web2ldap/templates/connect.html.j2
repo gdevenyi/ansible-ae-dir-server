@@ -19,6 +19,11 @@
   <li>
     <a href="/pwd">Password Self-Service</a>
   </li>
+{% if oath_ldap_enabled=="1" %}
+  <li>
+    <a href="/oath">OATH-LDAP Token Enrollment Service</a>
+  </li>
+{% endif %}
 </ul>
 
 <h2>For admins and auditors</h2>
