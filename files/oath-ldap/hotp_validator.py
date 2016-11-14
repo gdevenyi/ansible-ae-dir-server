@@ -7,7 +7,7 @@ HOTP validation on intercepted BIND requests
 
 import os, logging, re
 
-__version__ = '0.5.3'
+__version__ = '0.5.4'
 __author__ = u'Michael Ströder <michael@stroeder.com>'
 
 #-----------------------------------------------------------------------
@@ -238,11 +238,18 @@ class HOTPValidationServer(SlapdSockServer):
             privkey_json = open(private_key_filename, 'rb').read()
             private_key = JWK(**json.loads(privkey_json))
             self.master_keys[private_key.key_id] = private_key
-        self.logger.info(
-            'Read %d JWK files, key IDs: %s',
-            len(self.master_keys),
-            ' '.join(self.master_keys.keys()),
-        )
+        if self.master_keys:
+            self.logger.info(
+                'Read %d JWK files with pattern %r, key IDs: %r',
+                len(self.master_keys),
+                jwk_key_files,
+                ' '.join(self.master_keys.keys()),
+            )
+        else:
+            self.logger.error(
+                'No JWK files found with pattern %r => expect failures!',
+                jwk_key_files,
+            )
         return # end of _load_keys()
 
     def monitor_entry(self):
@@ -278,7 +285,7 @@ class HOTPValidationHandler(SlapdSockHandler):
         :oath_token_entry:
         """
         oath_secret = token_entry['oathSecret'][0]
-        if not JWE or not self.server.master_keys:
+        if self.server.jwk_key_files is None:
             self._log(
                 logging.DEBUG,
                 'no JWK keys configured => return raw oathSecret value',
