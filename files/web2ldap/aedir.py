@@ -52,6 +52,8 @@ AE_SERVICE_OID = AE_OID_PREFIX+'.6.4'
 AE_ZONE_OID = AE_OID_PREFIX+'.6.20'
 AE_PERSON_OID = AE_OID_PREFIX+'.6.8'
 AE_TAG_OID = AE_OID_PREFIX+'.6.24'
+AE_POLICY_OID = AE_OID_PREFIX+'.6.26'
+AE_AUTHCTOKEN_OID = AE_OID_PREFIX+'.6.25'
 AE_DEPT_OID = AE_OID_PREFIX+'.6.29'
 
 
@@ -1696,6 +1698,43 @@ syntax_registry.registerAttrType(
   structural_oc_oids=[
     AE_SERVICE_OID, # aeService
   ]
+)
+
+
+class AEEntryDNAEAuthcToken(DistinguishedName):
+  oid = 'AEEntryDNAEAuthcToken-oid'
+  desc = 'AE-DIR: entryDN of aeAuthcToken entry'
+  ref_attrs = (
+    ('oathToken',u'Users',None,'aeUser',u'Search all personal user accounts using this OATH token.'),
+  )
+
+syntax_registry.registerAttrType(
+  AEEntryDNAEAuthcToken.oid,[
+    '1.3.6.1.1.20', # entryDN
+  ],
+  structural_oc_oids=[
+    AE_AUTHCTOKEN_OID, # aeAuthcToken
+  ],
+)
+
+
+class AEEntryDNAEPolicy(DistinguishedName):
+  oid = 'AEEntryDNAEPolicy-oid'
+  desc = 'AE-DIR: entryDN of aePolicy entry'
+  ref_attrs = (
+    ('pwdPolicySubentry',u'Users',None,'aeUser',u'Search all personal user accounts restricted by this password policy.'),
+    ('pwdPolicySubentry',u'Services',None,'aeService',u'Search all service accounts restricted by this password policy.'),
+    ('oathHOTPParams',u'HOTP Tokens',None,'oathHOTPToken',u'Search all HOTP tokens affected by this HOTP parameters.'),
+    ('oathTOTPParams',u'TOTP Tokens',None,'oathTOTPToken',u'Search all TOTP tokens affected by this TOTP parameters.'),
+  )
+
+syntax_registry.registerAttrType(
+  AEEntryDNAEPolicy.oid,[
+    '1.3.6.1.1.20', # entryDN
+  ],
+  structural_oc_oids=[
+    AE_POLICY_OID, # aePolicy
+  ],
 )
 
 
