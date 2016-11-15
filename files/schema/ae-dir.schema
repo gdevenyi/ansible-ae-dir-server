@@ -198,6 +198,7 @@ objectclass ( ae-dir-oc:26
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: policy entry'
   SUP ( namedPolicy $ aeObject )
+  MUST ( description )
   MAY ( aeApplicableSOC ) )
 
 ditcontentrule ( ae-dir-oc:26
