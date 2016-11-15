@@ -1,7 +1,25 @@
-<!--#set var="head_title" value="Next steps" -->
+<!--#set var="head_title" value="Next steps / to-do list" -->
 <!--#set var="head_pagedescription" value="To-do items, ideas, next steps" -->
 <!--#set var="base_path" value="" -->
 <!--#include file="ssi/head.shtml" -->
+
+<h1 id="done">Done</h1>
+
+<dl>
+
+  <dt id="mfa-authc">Multi-factor authc</dt>
+  <dd>
+    <ul>
+      <li>
+        integrate <a href="https://www.stroeder.com/oath-ldap.html">OATH-LDAP</a>
+        (with <a href="https://www.stroeder.com/slapdsock.html">slapd-sock listener</a>)
+      </li>
+    </ul>
+  </dd>
+
+</dl>
+
+<h1 id="open">Open</h1>
 
 <p>
   In no particular order:
@@ -14,16 +32,6 @@
     <ul>
       <li>
         monitor whether PAM/NSS client still has valid configuration
-      </li>
-    </ul>
-  </dd>
-
-  <dt id="mfa-authc">Multi-factor authc</dt>
-  <dd>
-    <ul>
-      <li>
-        integrate <a href="http://ldapcon.org/2015/?page_id=185">OATH-LDAP</a>
-        (with <a href="https://www.stroeder.com/slapdsock.html">slapd-sock listener</a>)
       </li>
     </ul>
   </dd>
