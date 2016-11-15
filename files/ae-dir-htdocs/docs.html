@@ -823,6 +823,19 @@
     <td><a href="#schema-oc-aePosixIdRanges">aePosixIdRanges</a></td>
   </tr>
   <tr>
+    <th><a href="#schema-oc-aePolicy">aePolicy</a></th>
+    <td>cn</td>
+    <td>Policy information</td>
+    <td><a href="#schema-oc-aeDevice">namedPolicy</a></td>
+    <td>
+      <ul>
+        <li>pwdPolicy</li>
+        <li>oathHOTPParams</li>
+        <li>oathTOTPParams</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
     <th><a href="#schema-oc-aeDept">aeDept</a></th>
     <td>departmentNumber</td>
     <td>department / organization unit</td>
@@ -1166,6 +1179,29 @@
   <dd>
     usually set to <em>ae-dir</em>
     resulting in naming context / search root <var>ou=ae-dir</var>
+  </dd>
+  <dt>meta attributes</dt>
+  <dd>see <a href="#schema-oc-aeObject-attributes">aeObject</a></dd>
+</dl>
+
+<h3 id="schema-oc-aePolicy">aePolicy</h3>
+<p>
+  The object class <var>aePolicy</var> is used for policy / security
+  parameter entries. The real effective policy parameters are supposed to
+  be attributes of AUXILIARY object classes added to the entry.
+</p>
+<dl id="schema-oc-aeRoot-attributes">
+  <dt>
+    cn
+  </dt>
+  <dd>
+    common name of policy
+  </dd>
+  <dt>
+    description
+  </dt>
+  <dd>
+    Must contain short description of the purpose / meaning / scope of the policy
   </dd>
   <dt>meta attributes</dt>
   <dd>see <a href="#schema-oc-aeObject-attributes">aeObject</a></dd>
