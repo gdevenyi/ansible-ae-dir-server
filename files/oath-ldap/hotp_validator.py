@@ -246,7 +246,7 @@ class HOTPValidationServer(SlapdSockServer):
                 ' '.join(self.master_keys.keys()),
             )
         else:
-            self.logger.error(
+            self.logger.critical(
                 'No JWK files found with pattern %r => expect failures!',
                 jwk_key_files,
             )
@@ -809,7 +809,7 @@ def run_this():
     )
 
     if __debug__:
-        my_logger.error(
+        my_logger.critical(
             '!!! Running in debug mode (log level %d)! Secret data will be logged! Don\'t do that!!!',
             my_logger.level
         )
