@@ -22,7 +22,7 @@
     src: "{{ ansible_lsb.id }}/sysconfig_openldap.j2"
     dest: "/etc/sysconfig/openldap"
     owner: root
-    group: ldap
+    group: root
     mode: 0644
   notify:
   - restart slapd
