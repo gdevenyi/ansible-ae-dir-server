@@ -1590,6 +1590,24 @@ syntax_registry.registerAttrType(
 )
 
 
+class AEApplicableSOC(SelectList):
+  oid = 'AEApplicableSOC-oid'
+  desc = 'AE-DIR: Applicable structural object classes'
+  attr_value_dict = {
+    u'':              u'-/-',
+    AE_USER_OID:      u'aeUser',
+    AE_SERVICE_OID:   u'aeService',
+    AE_AUTHCTOKEN_OID:u'aeAuthcToken',
+    AE_HOST_OID:      u'aeHost',
+  }
+
+syntax_registry.registerAttrType(
+  AEApplicableSOC.oid,[
+    AE_OID_PREFIX+'.4.18', # aeApplicableSOC
+  ]
+)
+
+
 class AEStatus(SelectList,IntegerRange):
   oid = 'AEStatus-oid'
   desc = 'AE-DIR: Status of object'
