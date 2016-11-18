@@ -518,6 +518,16 @@ oathOTPLength: 8
 # aePerson and aeUser entries for initial AE admin(s)
 #---------------------------------------------------------------------------
 #
+# dummy department entry
+dn: departmentNumber=0,cn=people,ou=ae-dir
+aeStatus: 0
+departmentNumber: 0
+displayName: - (0)
+objectClass: organizationalUnit
+objectClass: aeDept
+objectClass: aeObject
+ou: -
+
 {% for unique_identifier, person_attrs in aedir_init_aepersons.iteritems() %}
 dn: uniqueIdentifier={{ unique_identifier }},cn={{ aedir_org_zone }},{{ aedir_suffix }}
 uniqueIdentifier: {{ unique_identifier }}
@@ -527,6 +537,7 @@ objectClass: inetOrgPerson
 objectClass: aePerson
 objectClass: aeObject
 aeStatus: 0
+aeDept: departmentNumber=0,cn=people,ou=ae-dir
 aeTag: ae-tag-init
 cn: {{ person_attrs.given_name }} {{ person_attrs.sur_name }}
 displayName: {{ person_attrs.given_name }} {{ person_attrs.sur_name }} ({{ unique_identifier }})
