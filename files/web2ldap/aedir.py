@@ -26,7 +26,7 @@ from w2lapp.schema.syntaxes import \
   DirectoryString,DistinguishedName,SelectList,GeneralizedTime, \
   DynamicValueSelectList,IA5String,DNSDomain,NumericString, \
   DynamicDNSelectList,RFC822Address,IntegerRange,ComposedAttribute, \
-  NotBefore,NotAfter,syntax_registry
+  NotBefore,NotAfter,OID,syntax_registry
 
 from w2lapp.schema.plugins.nis import UidNumber,GidNumber,MemberUID
 from w2lapp.schema.plugins.ppolicy import PwdExpireWarning,PwdMaxAge
@@ -1590,7 +1590,7 @@ syntax_registry.registerAttrType(
 )
 
 
-class AEApplicableSOC(SelectList):
+class AEApplicableSOC(SelectList,OID):
   oid = 'AEApplicableSOC-oid'
   desc = 'AE-DIR: Applicable structural object classes'
   attr_value_dict = {
@@ -1600,6 +1600,14 @@ class AEApplicableSOC(SelectList):
     AE_AUTHCTOKEN_OID:u'aeAuthcToken',
     AE_HOST_OID:      u'aeHost',
   }
+
+  def displayValue(self,valueindex=0,commandbutton=0):
+    return '{0}: {1}'.format(
+      self.attr_value_dict.get(self.attrValue.decode('utf-8'),'-'),
+      w2lapp.gui.SchemaElementName(
+        self._sid,self._form,self._dn,self._schema,self.attrValue,ldap.schema.ObjectClass,
+      ),
+    )
 
 syntax_registry.registerAttrType(
   AEApplicableSOC.oid,[
