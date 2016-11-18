@@ -45,3 +45,51 @@ objectclass ( stroeder-com-pub-ldap-oc:330
       MUST ( msPwdResetPasswordHash $ msPwdResetTimestamp $
              msPwdResetExpirationTime $ msPwdResetEnabled )
       MAY  ( msPwdResetAdminPw ) )
+
+#-----------------------------------------------------------------------
+# password reset policy entries
+#-----------------------------------------------------------------------
+
+attributetype ( stroeder-com-pub-ldap-at:335
+      NAME 'msPwdResetMaxAge'
+      DESC 'Time span (secs) after which the temporary password will be invalid.'
+      EQUALITY integerMatch
+      ORDERING integerOrderingMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+      SINGLE-VALUE )
+
+# OID of hash algorithm used to store the random reset passwords
+# https://www.iana.org/assignments/hash-function-text-names/hash-function-text-names.xhtml
+# "sha-1"            1.3.14.3.2.26
+# "sha-256"          2.16.840.1.101.3.4.2.1
+# "sha-384"          2.16.840.1.101.3.4.2.2
+# "sha-512"          2.16.840.1.101.3.4.2.3
+attributetype ( stroeder-com-pub-ldap-at:336
+      NAME 'msPwdResetHashAlgo'
+      DESC 'Hash algorithm used for the temporary passwords'
+      SINGLE-VALUE
+      EQUALITY objectIdentifierMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.38 )
+
+attributetype ( stroeder-com-pub-ldap-at:337
+      NAME 'msPwdResetPwLen'
+      DESC 'Length of generated reset password'
+      EQUALITY integerMatch
+      ORDERING integerOrderingMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+      SINGLE-VALUE )
+
+attributetype ( stroeder-com-pub-ldap-at:338
+      NAME 'msPwdResetAdminPwLen'
+      DESC 'Length of admin password part of generated reset password (must be lesser than msPwdResetPwLen)'
+      EQUALITY integerMatch
+      ORDERING integerOrderingMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+      SINGLE-VALUE )
+
+objectclass ( stroeder-com-pub-ldap-oc:331
+      NAME 'msPwdResetPolicy'
+      DESC 'Entry defining the password reset policy'
+      AUXILIARY
+      MUST ( msPwdResetMaxAge $ msPwdResetEnabled $ msPwdResetHashAlgo $
+             msPwdResetPwLen $ msPwdResetAdminPwLen ) )

@@ -203,7 +203,7 @@ objectclass ( ae-dir-oc:26
 
 ditcontentrule ( ae-dir-oc:26
   NAME 'aePolicy-dcr'
-  AUX ( pwdPolicy $ oathHOTPParams $ oathTOTPParams ) )
+  AUX ( pwdPolicy $ oathHOTPParams $ oathTOTPParams $ msPwdResetPolicy ) )
 
 # search root entry
 #-----------------------------------------------------------------------
