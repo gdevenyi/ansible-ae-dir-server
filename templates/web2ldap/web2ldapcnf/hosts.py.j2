@@ -414,10 +414,17 @@ ae_dir_config = Web2LDAPConfig(
       Authentication token %(displayName)s
     </div>
     """,
+    'aePolicy':r"""
+    <div class="aestatus%(aeStatus)s">
+      <var>%(entryDN)s</var><br>
+      Policy %(cn)s: %(description)s
+    </div>
+    """,
   },
   read_template={
     'msPwdResetObject':os.path.join(web2ldapcnf.templates_dir,'ae-dir','read_msPwdResetObject.html'),
     'posixAccount':os.path.join(web2ldapcnf.templates_dir,'read_posixAccount.html'),
+    'aePolicy':os.path.join(web2ldapcnf.templates_dir,'ae-dir','read_aePolicy.html'),
     'pwdPolicy':os.path.join(web2ldapcnf.templates_dir,'ae-dir','read_pwdPolicy.html'),
     'aeRoot':os.path.join(web2ldapcnf.templates_dir,'ae-dir','read_aeRoot.html'),
     'aeGroup':os.path.join(web2ldapcnf.templates_dir,'ae-dir','read_aeGroup.html'),
@@ -447,6 +454,7 @@ ae_dir_config = Web2LDAPConfig(
   input_template={
     'msPwdResetObject':os.path.join(web2ldapcnf.templates_dir,'ae-dir','inputform_msPwdResetObject.html'),
     'posixAccount':os.path.join(web2ldapcnf.templates_dir,'inputform_posixAccount.html'),
+    'aePolicy':os.path.join(web2ldapcnf.templates_dir,'ae-dir','inputform_aePolicy.html'),
     'pwdPolicy':os.path.join(web2ldapcnf.templates_dir,'inputform_pwdPolicy.html'),
     'aeDept':os.path.join(web2ldapcnf.templates_dir,'ae-dir','inputform_aeDept.html'),
     'aeGroup':os.path.join(web2ldapcnf.templates_dir,'ae-dir','inputform_aeGroup.html'),
