@@ -11,7 +11,7 @@ web.py 0.37+ (see http://webpy.org/)
 python-ldap 2.4.27+ (see http://www.python-ldap.org/)
 """
 
-__version__ = '0.3.0'
+__version__ = '0.4.0'
 
 # from Python's standard lib
 import string
@@ -58,6 +58,14 @@ PWDPOLICY_EXPIRY_ATTRS = [
     'pwdExpireWarning',
 ]
 
+MSPWDRESETPOLICY_ATTRS = [
+    'msPwdResetAdminPwLen',
+    'msPwdResetEnabled',
+    'msPwdResetHashAlgorithm',
+    'msPwdResetMaxAge',
+    'msPwdResetPwLen',
+]
+
 # request control for dereferencing password policy entry's attributes
 PWDPOLICY_DEREF_CONTROL = DereferenceControl(
     True,
@@ -67,7 +75,7 @@ PWDPOLICY_DEREF_CONTROL = DereferenceControl(
             'pwdAttribute',
             'pwdMinAge',
             'pwdMinLength',
-        ]+PWDPOLICY_EXPIRY_ATTRS,
+        ]+PWDPOLICY_EXPIRY_ATTRS+MSPWDRESETPOLICY_ATTRS,
     }
 )
 
@@ -75,12 +83,20 @@ PWDPOLICY_DEREF_CONTROL = DereferenceControl(
 # utility functions
 #-----------------------------------------------------------------------
 
+HASH_OID2NAME = {
+    '1.2.840.113549.2.5':'md5',        # [RFC3279]
+    '1.3.14.3.2.26':'sha1',            # [RFC3279]
+    '2.16.840.1.101.3.4.2.4':'sha224', # [RFC4055]
+    '2.16.840.1.101.3.4.2.1':'sha256', # [RFC4055]
+    '2.16.840.1.101.3.4.2.2':'sha384', # [RFC4055]
+    '2.16.840.1.101.3.4.2.3':'sha512', # [RFC4055]
+}
 
-def pwd_hash(pw_clear):
+def pwd_hash(pw_clear, hash_algo_oid):
     """
     Generate un-salted hash as hex-digest
     """
-    return hashlib.new(PWD_TMP_HASH_ALGO, pw_clear).hexdigest()
+    return hashlib.new(HASH_OID2NAME[hash_algo_oid], pw_clear).hexdigest()
 
 
 def read_template_file(filename):
@@ -282,7 +298,7 @@ class BaseApp(Default):
         filterstr_inputs_dict['currenttime'] = escape_filter_chars(
             ldap.strf_secs(time.time())
         )
-        filterstr=(
+        filterstr = (
             self.filterstr_template % filterstr_inputs_dict
         ).encode('utf-8')
         msg_id = self.ldap_conn.search_ext(
@@ -308,7 +324,7 @@ class BaseApp(Default):
         )[1]
         if not resp_data or len(resp_data) != 1:
             raise ldap.NO_UNIQUE_ENTRY('No or non-unique search result for %s' % (repr(filterstr)))
-        user_dn, user_entry, user_controls  = resp_data[0]
+        user_dn, user_entry, user_controls = resp_data[0]
         if user_controls:
             deref_control = user_controls[0]
             deref_dn, deref_entry = deref_control.derefRes['pwdPolicySubentry'][0]
@@ -544,7 +560,9 @@ class ChangePassword(BaseApp):
             pwd_min_age = int(user_entry['pwdMinAge'][0])
             next_pwd_change_timespan = pwd_changed_timestamp + pwd_min_age - time.time()
             if next_pwd_change_timespan > 0:
-                return u'Password is too young to change! You can try again after %d secs.' % (next_pwd_change_timespan)
+                return u'Password is too young to change! You can try again after %d secs.' % (
+                    next_pwd_change_timespan
+                )
         return None # end of _check_pw_input()
 
     def handle_user_request(self, user_dn, user_entry):
@@ -643,14 +661,15 @@ class RequestPasswordReset(BaseApp):
             ('Date', email.utils.formatdate(time.time(), True)),
         )
         #-----------------------------------------------------------------------
-        # First send notification to admin if PWD_ADMIN_LEN is non-zero
+        # First send notification to admin if pwd_admin_len is non-zero
         #-----------------------------------------------------------------------
-        if PWD_ADMIN_LEN:
+        pwd_admin_len = int(user_entry.get('msPwdResetAdminPwLen', [str(PWD_ADMIN_LEN)])[0])
+        if pwd_admin_len:
             smtp_message_tmpl = read_template_file(EMAIL_TEMPLATE_ADMIN)
             user_data_admin = {
                 'username':username,
                 'temppassword2':temp_pwd_clear[
-                    len(temp_pwd_clear)-PWD_ADMIN_LEN:
+                    len(temp_pwd_clear)-pwd_admin_len:
                 ],
                 'remote_ip':self.remote_ip,
                 'fromaddr':SMTP_FROM,
@@ -682,7 +701,7 @@ class RequestPasswordReset(BaseApp):
         smtp_message_tmpl = read_template_file(EMAIL_TEMPLATE_PERSONAL)
         user_data_user = {
             'username':username,
-            'temppassword1':temp_pwd_clear[:len(temp_pwd_clear)-PWD_ADMIN_LEN],
+            'temppassword1':temp_pwd_clear[:len(temp_pwd_clear)-pwd_admin_len],
             'remote_ip':self.remote_ip,
             'fromaddr':SMTP_FROM,
             'userdn':user_dn.decode('utf-8'),
@@ -712,8 +731,22 @@ class RequestPasswordReset(BaseApp):
         to user's entry and send e-mails
         """
         current_time = time.time()
-        temp_pwd_clear = aedir.random_string(PWD_TMP_CHARS, PWD_LENGTH)
-        temp_pwd_hash = pwd_hash(temp_pwd_clear)
+        temp_pwd_len = int(user_entry.get('msPwdResetPwLen', [str(PWD_LENGTH)])[0])
+        pwd_admin_len = int(user_entry.get('msPwdResetAdminPwLen', [str(PWD_ADMIN_LEN)])[0])
+        temp_pwd_clear = aedir.random_string(PWD_TMP_CHARS, temp_pwd_len)
+        temp_pwd_hash = pwd_hash(
+            temp_pwd_clear,
+            user_entry.get(
+                'msPwdResetHashAlgorithm',
+                [PWD_TMP_HASH_ALGO]
+            )[0],
+        )
+        pwd_expire_timespan = int(
+            user_entry.get(
+                'msPwdResetMaxAge',
+                [str(PWD_EXPIRETIMESPAN)]
+            )[0]
+        )
         ldap_mod_list = [
             (
                 ldap.MOD_REPLACE,
@@ -728,12 +761,12 @@ class RequestPasswordReset(BaseApp):
             (
                 ldap.MOD_REPLACE,
                 'msPwdResetExpirationTime',
-                [ldap.strf_secs(current_time+PWD_EXPIRETIMESPAN)]
+                [ldap.strf_secs(current_time+pwd_expire_timespan)]
             ),
             (
                 ldap.MOD_REPLACE,
                 'msPwdResetEnabled',
-                [PWD_RESET_ENABLED]
+                user_entry.get('msPwdResetEnabled', [PWD_RESET_ENABLED])
             ),
         ]
         old_objectclasses = [
@@ -744,12 +777,12 @@ class RequestPasswordReset(BaseApp):
             ldap_mod_list.append(
                 (ldap.MOD_ADD, 'objectClass', ['msPwdResetObject'])
             )
-        if PWD_ADMIN_LEN:
+        if pwd_admin_len:
             ldap_mod_list.append(
                 (
                     ldap.MOD_REPLACE,
                     'msPwdResetAdminPw',
-                    [temp_pwd_clear[-PWD_ADMIN_LEN:].encode('utf-8')]
+                    [temp_pwd_clear[-pwd_admin_len:].encode('utf-8')]
                 ),
             )
         try:
@@ -814,15 +847,21 @@ class FinishPasswordReset(ChangePassword):
         except UnicodeError:
             return RENDER.resetpw_form(u'', u'', u'Invalid input')
         else:
+#            user_dn, user_entry = self.search_user_entry(self.form)
+#            temp_pwd_len = int(user_entry.get('msPwdResetPwLen', [str(PWD_LENGTH)])[0])
+#            pwd_admin_len = int(user_entry.get('msPwdResetAdminPwLen', [str(PWD_ADMIN_LEN)])[0])
+            temp_pwd_len = 30
+            pwd_admin_len = 16
             return RENDER.resetpw_form(
                 get_input.username,
-                PWD_LENGTH-PWD_ADMIN_LEN,
-                PWD_ADMIN_LEN,
+                temp_pwd_len-pwd_admin_len,
+                pwd_admin_len,
                 get_input.temppassword1,
                 message
             )
 
-    def _ldap_user_operations(self, user_dn, temp_pwd_hash, new_password_ldap):
+    def _ldap_user_operations(self, user_dn, user_entry, temp_pwd_hash, new_password_ldap):
+        pwd_admin_len = int(user_entry.get('msPwdResetAdminPwLen', [str(PWD_ADMIN_LEN)])[0])
         ldap_mod_list = [
             (ldap.MOD_DELETE, attr_type, attr_values)
             for attr_type, attr_values in (
@@ -833,7 +872,7 @@ class FinishPasswordReset(ChangePassword):
                 ('msPwdResetEnabled', None),
             )
         ]
-        if PWD_ADMIN_LEN:
+        if pwd_admin_len:
             ldap_mod_list.append(
                 (ldap.MOD_DELETE, 'msPwdResetAdminPw', None)
             )
@@ -856,13 +895,18 @@ class FinishPasswordReset(ChangePassword):
         """
         temppassword1 = self.form.d.temppassword1
         temppassword2 = self.form.d.temppassword2
-        if len(temppassword1)+len(temppassword2) != PWD_LENGTH:
+        temp_pwd_len = int(user_entry.get('msPwdResetPwLen', [str(PWD_LENGTH)])[0])
+        if len(temppassword1)+len(temppassword2) != temp_pwd_len:
             return self.GET(message=u'Temporary password parts wrong!')
         temp_pwd_hash = pwd_hash(
             u''.join((
                 self.form.d.temppassword1,
                 self.form.d.temppassword2,
-            )).encode('utf-8')
+            )).encode('utf-8'),
+            user_entry.get(
+                'msPwdResetHashAlgorithm',
+                [PWD_TMP_HASH_ALGO]
+            )[0],
         )
         pw_input_check_msg = self._check_pw_input(user_entry)
         if not pw_input_check_msg is None:
@@ -871,6 +915,7 @@ class FinishPasswordReset(ChangePassword):
         try:
             self._ldap_user_operations(
                 user_dn,
+                user_entry,
                 temp_pwd_hash,
                 new_password_ldap
             )
@@ -881,8 +926,8 @@ class FinishPasswordReset(ChangePassword):
                 message=(
                     u'Constraint violation (password rules): {0}'
                     u' / You have to request password reset again!'
-                 ).format(unicode(ldap_error.args[0]['info']))
-           )
+                ).format(unicode(ldap_error.args[0]['info']))
+            )
         except ldap.LDAPError:
             res = self.GET(message=u'Internal error!')
         else:
