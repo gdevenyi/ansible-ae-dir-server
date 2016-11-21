@@ -189,6 +189,15 @@ attributetype ( oath-ldap-at:14
   SUBSTR octetStringSubstringsMatch
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.40{2000} )
 
+attributetype ( oath-ldap-at:15
+  NAME 'oathConsecutive'
+  DESC 'OATH-LDAP: number of consecutive OTP values expected during validation (default=1)'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  EQUALITY integerMatch
+  ORDERING integerOrderingMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 )
+
 # Object classes
 #---------------
 
@@ -206,7 +215,7 @@ objectclass ( oath-ldap-oc:2
   X-ORIGIN 'OATH-LDAP'
   ABSTRACT
   MUST ( oathOTPLength $ oathHMACAlgorithm )
-  MAY ( oathSecretMaxAge $ oathSecretLength $
+  MAY ( oathConsecutive $ oathSecretMaxAge $ oathSecretLength $
         oathMaxUsageCount $ oathThrottleLimit $ oathPubEncKey ) )
 
 objectclass ( oath-ldap-oc:3
