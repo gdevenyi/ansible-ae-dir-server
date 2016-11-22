@@ -1,4 +1,4 @@
-<h1>%(ou)s - %(departmentNumber)s</h1>
+<h1>&AElig;-DIR department <em>%(displayName)s</em></h1>
 
 <p class="EntryDN">%(entryDN)s</p>
 <p>%(structuralObjectClass)s</p>
@@ -7,20 +7,40 @@
 
 <table summary="organization: Organizational information">
   <tr>
-    <td>Organizational unit name:</td>
-    <td>%(ou)s</td>
-  </tr>
-  <tr>
     <td>Department number:</td>
     <td>%(departmentNumber)s</td>
   </tr>
   <tr>
-    <td>Description:</td>
-    <td>%(description)s</td>
+    <td>Organizational unit name:</td>
+    <td>%(ou)s</td>
   </tr>
   <tr>
     <td>Manager:</td>
     <td>%(Manager)s</td>
+  </tr>
+</table>
+
+<h2>Meta</h2>
+<table>
+  <tr>
+    <td>Status (aeStatus):</td>
+    <td>%(aeStatus)s</td>
+  </tr>
+  <tr>
+    <td>Intended purpose (description):</td>
+    <td>%(description)s</td>
+  </tr>
+  <tr>
+    <td>Ticket no. last change (aeTicketId):</td>
+    <td>%(aeTicketId)s</td>
+  </tr>
+  <tr>
+    <td>Validity period (aeNotBefore..aeNotAfter):</td>
+    <td>from %(aeNotBefore)s until %(aeNotAfter)s</td>
+  </tr>
+  <tr>
+    <td>Tag(s) (aeTag):</td>
+    <td>%(aeTag)s</td>
   </tr>
 </table>
 
