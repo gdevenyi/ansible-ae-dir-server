@@ -28,11 +28,34 @@ class Web2LDAPConfig:
 # with the host set as default.
 ########################################################################
 
-ldap_uri_list = []
+ldap_uri_list = [
+  (
+    '{{ openldap_ldapi_uri }}',
+    u'Local access (LDAPI)',
+  ),
+{% for role in ['provider', 'consumer'] %}
+{% for host in aedir_hosts[role] %}
+{% set replica = hostvars[host].get('openldap_service_fqdn',host) -%}
+{% set server_id = hostvars[host].get('openldap_server_id','') -%}
+  (
+    'ldaps://{{ replica }}/{{ aedir_suffix }}????bindname=',
+    (
+      u'{{ replica }}'
+{% if server_id!="" %}
+      u' #{{ server_id }}'
+{% endif %}
+{% if replica!=host %}
+      u' on {{ host }}'
+{% endif %}
+    ),
+  ),
+{% endfor %}
+{% endfor %}
+]
 
 # Set to True (or 1) if LDAP access should be restricted to the LDAP servers
 # defined in ldap_uri_list (default if absent is 0 - restriction disabled)
-restricted_ldap_uri_list = 0
+restricted_ldap_uri_list = 1
 
 ########################################################################
 # Init some re-usable preset configuration instances
