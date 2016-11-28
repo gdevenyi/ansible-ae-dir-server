@@ -1499,19 +1499,10 @@ constraint_attribute oathTOTPToken set
   "this/oathTOTPToken/aePerson & this/aePerson"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=oathTOTPUser)"
 
-# Constraints on applicable password policy for certain object classes in certain zone
-constraint_attribute pwdPolicySubentry
-  uri "ldap:///cn=ppolicy-users,cn=ae,{{ aedir_suffix }}?entryDN?base?(objectClass=pwdPolicy)"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(&(objectClass=aeUser)(!(entryDN:dnSubtreeMatch:=cn={{ aedir_base_zone }},{{ aedir_suffix }})))"
-constraint_attribute pwdPolicySubentry
-  uri "ldap:///cn=ppolicy-base-users,cn=ae,{{ aedir_suffix }}?entryDN?base?(objectClass=pwdPolicy)"
-  restrict="ldap:///cn={{ aedir_base_zone }},{{ aedir_suffix }}??sub?(objectClass=aeUser)"
-constraint_attribute pwdPolicySubentry
-  uri "ldap:///cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}?entryDN?base?(objectClass=pwdPolicy)"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(|(objectClass=aeHost)(objectClass=aeService))"
-constraint_attribute pwdPolicySubentry
-  uri "ldap:///cn=ppolicy-otptokens,cn=ae,{{ aedir_suffix }}?entryDN?base?(objectClass=pwdPolicy)"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=oathToken)"
+# check whether appropriate password policy is assigned
+# FIX ME! This does not work as expected yet!
+constraint_attribute structuralObjectClass,pwdPolicySubentry
+  set "this/structuralObjectClass & this/pwdPolicySubentry/aeApplicableSOC"
 
 # restrict references from aeHost/aeService to active aeSrvGroup entries
 constraint_attribute
