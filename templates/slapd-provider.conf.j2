@@ -1505,8 +1505,10 @@ constraint_attribute
 
 # check whether appropriate password policy is assigned
 # FIX ME! This does not work as expected yet!
-constraint_attribute pwdPolicySubentry
-  set "this/pwdPolicySubentry & ([ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aePolicy)(aeStatus=0)(aeApplicableSOC=] + this/structuralObjectClass + [))]/entryDN)"
+#constraint_attribute pwdPolicySubentry
+#  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=pwdPolicy)(aeStatus=0))"
+#constraint_attribute pwdPolicySubentry
+#  set "this/pwdPolicySubentry & ([ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aePolicy)(aeStatus=0)(aeApplicableSOC=] + this/structuralObjectClass + [))])/entryDN"
 
 # restrict references from aeHost/aeService to active aeSrvGroup entries
 constraint_attribute
