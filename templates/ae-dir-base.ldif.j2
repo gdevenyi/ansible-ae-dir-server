@@ -381,8 +381,6 @@ objectClass: namedPolicy
 objectClass: aePolicy
 objectClass: pwdPolicy
 aeStatus: 0
-aeApplicableSOC: aeHost
-aeApplicableSOC: aeService
 pwdAllowUserChange: FALSE
 pwdAttribute: userPassword
 pwdCheckQuality: 2
@@ -401,8 +399,6 @@ objectClass: namedPolicy
 objectClass: aePolicy
 objectClass: pwdPolicy
 aeStatus: 0
-aeApplicableSOC: aeHost
-aeApplicableSOC: aeService
 pwdAllowUserChange: FALSE
 pwdAttribute: userPassword
 pwdCheckQuality: 2
@@ -420,7 +416,6 @@ objectClass: namedPolicy
 objectClass: aePolicy
 objectClass: pwdPolicy
 aeStatus: 0
-aeApplicableSOC: aeUser
 pwdAllowUserChange: TRUE
 pwdAttribute: userPassword
 pwdCheckQuality: 2
@@ -446,7 +441,6 @@ objectClass: namedPolicy
 objectClass: aePolicy
 objectClass: pwdPolicy
 aeStatus: 0
-aeApplicableSOC: aeUser
 pwdAllowUserChange: TRUE
 pwdAttribute: userPassword
 pwdCheckQuality: 2
@@ -472,7 +466,6 @@ objectClass: namedPolicy
 objectClass: aePolicy
 objectClass: pwdPolicy
 aeStatus: 0
-aeApplicableSOC: aeAuthcToken
 pwdAllowUserChange: FALSE
 pwdAttribute: userPassword
 pwdCheckQuality: 1
@@ -502,7 +495,6 @@ objectClass: aePolicy
 objectClass: oathParams
 objectClass: oathHOTPParams
 aeStatus: 0
-aeApplicableSOC: aeAuthcToken
 description: OATH/HOTP policy parameters for normal use
 oathHMACAlgorithm: 1.2.840.113549.2.7
 oathHOTPLookAhead: 15
@@ -517,7 +509,6 @@ objectClass: aePolicy
 objectClass: oathParams
 objectClass: oathHOTPParams
 aeStatus: 0
-aeApplicableSOC: aeAuthcToken
 description: OATH/HOTP policy parameters for counter resync
 oathHMACAlgorithm: 1.2.840.113549.2.7
 oathHOTPLookAhead: 100

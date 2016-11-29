@@ -186,21 +186,12 @@ objectclass ( ae-dir-oc:23
 # policy entries
 #-----------------------------------------------------------------------
 
-attributetype ( ae-dir-at:18
-  NAME 'aeApplicableSOC'
-  X-ORIGIN 'AE-DIR'
-  DESC 'AE-DIR: structural object classes for which policy is applicable'
-  EQUALITY caseIgnoreIA5Match
-  SUBSTR caseIgnoreIA5SubstringsMatch
-  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
-
 objectclass ( ae-dir-oc:26
   NAME 'aePolicy'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: policy entry'
   SUP ( namedPolicy $ aeObject )
-  MUST ( description )
-  MAY ( aeApplicableSOC ) )
+  MUST ( description ) )
 
 ditcontentrule ( ae-dir-oc:26
   NAME 'aePolicy-dcr'
