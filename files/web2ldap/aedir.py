@@ -1590,24 +1590,16 @@ syntax_registry.registerAttrType(
 )
 
 
-class AEApplicableSOC(SelectList,OID):
+class AEApplicableSOC(SelectList):
   oid = 'AEApplicableSOC-oid'
   desc = 'AE-DIR: Applicable structural object classes'
   attr_value_dict = {
-    u'':              u'-/-',
-    AE_USER_OID:      u'aeUser',
-    AE_SERVICE_OID:   u'aeService',
-    AE_AUTHCTOKEN_OID:u'aeAuthcToken',
-    AE_HOST_OID:      u'aeHost',
+    u'':u'-/-',
+    u'aeUser':u'Æ-DIR personal account',
+    u'aeService':u'Æ-DIR service/tool account',
+    u'aeAuthcToken':u'Æ-DIR authc. token',
+    u'aeHost':u'Æ-DIR host',
   }
-
-  def displayValue(self,valueindex=0,commandbutton=0):
-    return '{0}: {1}'.format(
-      self.attr_value_dict.get(self.attrValue.decode('utf-8'),'-'),
-      w2lapp.gui.SchemaElementName(
-        self._sid,self._form,self._dn,self._schema,self.attrValue,ldap.schema.ObjectClass,
-      ),
-    )
 
 syntax_registry.registerAttrType(
   AEApplicableSOC.oid,[
