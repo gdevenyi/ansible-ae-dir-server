@@ -21,6 +21,9 @@
     <link rel="contents" title="Inhaltsverzeichnis" href="sitemap.html">
     <link rel="index" title="Inhaltsverzeichnis" href="sitemap.html">
 
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
     <script type="text/javascript">
       <!--
        if(top.frames.length > 0)
