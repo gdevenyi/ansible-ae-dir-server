@@ -293,6 +293,7 @@ objectclass ( ae-dir-oc:1
 
 ditcontentrule ( ae-dir-oc:1
   NAME 'aeGroup-dcr'
+  AUX ( mailboxRelatedObject )
   NOT ( businessCategory $ o $ ou $ owner $ seeAlso $ userPassword ) )
 
 
@@ -415,7 +416,7 @@ objectclass ( ae-dir-oc:5
 
 ditcontentrule ( ae-dir-oc:5
   NAME 'aeMailbox-dcr'
-  AUX ( inetLocalMailRecipient )
+  AUX ( inetLocalMailRecipient $ mailboxRelatedObject )
   NOT ( l $ ou $ seeAlso ) )
 
 # Server and network device entries
