@@ -1,0 +1,33 @@
+#=======================================================================
+# Schema for Æ-DIR -- Yet another LDAP user and systems management
+# PKIX entities (see RFC 5820)
+#=======================================================================
+
+objectidentifier ae-dir-pkix-at stroeder-com-pub-ae-dir:5280.4
+objectidentifier ae-dir-pkix-oc stroeder-com-pub-ae-dir:5280.6
+
+attributetype ( ae-dir-pkix-at:35
+  NAME 'aeCrtEntityName'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: distinguished name of PKI entity'
+  SUP distinguishedName )
+
+attributetype ( ae-dir-pkix-at:35.1
+  NAME 'aeCrtSubject'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: subject name of PKI entity'
+  SUP aeCrtEntityName )
+
+attributetype ( ae-dir-pkix-at:35.2
+  NAME 'aeCrtIssuer'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: issuer name of PKI entity'
+  SUP aeCrtEntityName )
+
+objectclass ( ae-dir-pkix-oc:27
+  NAME 'aeCrtEntity'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: PKI (end) entity / subscriber'
+  AUXILIARY
+  SUP pkiUser
+  MAY ( aeCrtSubject $ aeCrtIssuer ) )
