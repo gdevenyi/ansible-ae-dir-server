@@ -24,13 +24,6 @@
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
-    <script type="text/javascript">
-      <!--
-       if(top.frames.length > 0)
-        top.location.href=self.location;
-      //-->
-    </script>
-
   </head>
 
 <body lang="en">
