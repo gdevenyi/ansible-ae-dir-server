@@ -109,7 +109,7 @@ ldap_conn.add_s(
         ('description', [
             "Group members are zone admins who can manage zone '{zone_cn}'".format(**vars())
         ]),
-        ('gidNumber', [str(ldap_conn.get_next_id(id_pool_dn=aedir_searchbase, id_pool_attr='aeGidNumberNext'))]),
+        ('gidNumber', [str(ldap_conn.get_next_id(id_pool_dn=aedir_searchbase, id_pool_attr='gidNumber'))]),
     ]
 )
 logger.info('Added %r', zone_admins_dn)
@@ -133,7 +133,7 @@ ldap_conn.add_s(
         ('cn', [zone_cn+'-zone-auditors']),
         ('aeTicketId', [ticket_id]),
         ('description', ["Group members are zone auditors who can read zone '{zone_cn}'".format(**vars())]),
-        ('gidNumber', [str(ldap_conn.get_next_id(id_pool_dn=aedir_searchbase, id_pool_attr='aeGidNumberNext'))]),
+        ('gidNumber', [str(ldap_conn.get_next_id(id_pool_dn=aedir_searchbase, id_pool_attr='gidNumber'))]),
     ]
 )
 logger.info('Added %r', zone_auditors_dn)

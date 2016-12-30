@@ -149,6 +149,7 @@ attributetype ( ae-dir-at:17.2
 
 attributetype ( ae-dir-at:17.3
   NAME 'aeUidNumberNext'
+  OBSOLETE
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: next uidNumber value'
   SUP aePosixId
@@ -170,6 +171,7 @@ attributetype ( ae-dir-at:17.5
 
 attributetype ( ae-dir-at:17.6
   NAME 'aeGidNumberNext'
+  OBSOLETE
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: next gidNumber value'
   SUP aePosixId
@@ -180,8 +182,8 @@ objectclass ( ae-dir-oc:23
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: POSIX UID/GID pool'
   AUXILIARY
-  MAY ( aeUidNumberMin $ aeUidNumberMax $ aeUidNumberNext $
-        aeGidNumberMin $ aeGidNumberMax $ aeGidNumberNext ) )
+  MAY ( aeUidNumberMin $ aeUidNumberMax $ uidNumber $
+        aeGidNumberMin $ aeGidNumberMax $ gidNumber ) )
 
 # policy entries
 #-----------------------------------------------------------------------

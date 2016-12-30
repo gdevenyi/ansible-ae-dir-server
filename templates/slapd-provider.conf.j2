@@ -1086,10 +1086,10 @@ access to
 # ID pool attributes
 #------------------------------------------------------------------
 
-# write access to next GID counter for all zone admins
+# write access to next UID/GID counter for all zone admins
 access to
   dn.base="{{ aedir_suffix }}"
-  attrs=aeGidNumberNext
+  attrs=uidNumber,gidNumber
     by set="user & ([ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(member=] + user + [))])/member" write
     by * none
 
@@ -1227,21 +1227,12 @@ constraint_attribute
 # check whether uidNumber is within valid range (see aeRoot)
 constraint_attribute uidNumber set
   "([{{ aedir_suffix }}] & ([ldap:///{{ aedir_suffix }}?entryDN?base?(&(objectClass=aeRoot)(aeUidNumberMin<=]+this/uidNumber+[)(aeUidNumberMax>=]+this/uidNumber+[))])/entryDN)"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(!(entryDN:dnOneLevelMatch:=cn=ae,{{ aedir_suffix }}))"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(!(&(objectClass=aeService)(entryDN:dnOneLevelMatch:=cn=ae,{{ aedir_suffix }})))"
 
 # check whether gidNumber is within valid range (see aeRoot)
 constraint_attribute gidNumber set
-  "([{{ aedir_suffix }}] & ([ldap:///{{ aedir_suffix }}?entryDN?base?(&(objectClass=aeRoot)(aeGidNumberMin<=]+this/gidNumber+[)(aeGidNumberMax>=]+this/gidNumber+[)(aeGidNumberNext>=]+this/gidNumber+[)(!(aeGidNumberNext<=]+this/gidNumber+[)))])/entryDN)"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(!(entryDN:dnOneLevelMatch:=cn=ae,{{ aedir_suffix }}))"
-
-# enforce aeGidNumberMin <= aeGidNumberNext <= aeGidNumberMax
-constraint_attribute aeGidNumberMin,aeGidNumberNext,aeGidNumberMax set
-  "this & ([ldap:///] + this + [?entryDN?base?(&(aeGidNumberMin<=] + this/aeGidNumberNext + [)(aeGidNumberMax>=] + this/aeGidNumberNext + [))])/entryDN"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aePosixIdRanges)"
-# FIX ME: aeGidNumberNext must only be incremented
-#constraint_attribute aeGidNumberNext set
-#  "this & ([ldap:///] + this + [?entryDN?base?(|(!(aeGidNumberNext=*))(aeGidNumberNext<=] + this/aeGidNumberNext + [)]))/entryDN"
-#  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aePosixIdRanges)"
+  "([{{ aedir_suffix }}] & ([ldap:///{{ aedir_suffix }}?entryDN?base?(&(objectClass=aeRoot)(aeGidNumberMin<=]+this/gidNumber+[)(aeGidNumberMax>=]+this/gidNumber+[))])/entryDN)"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(!(&(objectClass=aeService)(entryDN:dnOneLevelMatch:=cn=ae,{{ aedir_suffix }})))"
 
 # uidNumber and gidNumber in posixAccount entries must be the same value
 constraint_attribute uidNumber,gidNumber

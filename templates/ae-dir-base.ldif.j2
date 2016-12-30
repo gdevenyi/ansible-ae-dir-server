@@ -27,7 +27,6 @@ aeUidNumberMin: {{ aedir_min_uid }}
 aeUidNumberMax: {{ aedir_max_uid }}
 aeGidNumberMin: {{ aedir_min_gid }}
 aeGidNumberMax: {{ aedir_max_gid }}
-aeGidNumberNext: {{ aedir_min_gid + 8 + aedir_hosts['provider']|length + aedir_hosts['consumer']|length + aedir_init_aeadmins|length + aedir_init_aezones|length + aedir_init_aezones|length + 1 }}
 
 dn: cn=ae,{{ aedir_suffix }}
 aeStatus: 0

@@ -177,7 +177,7 @@ class AEGIDNumber(GidNumber):
       pre-read entry control
       """
       id_pool_dn = self._ls.getSearchRoot(self._dn)
-      id_pool_attr = 'aeGidNumberNext'
+      id_pool_attr = 'gidNumber'
       prc = PreReadControl(criticality=True, attrList=[id_pool_attr])
       msg_id = self._ls.l.modify_ext(
           id_pool_dn,
