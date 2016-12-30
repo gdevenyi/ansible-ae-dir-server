@@ -95,9 +95,22 @@
     <pre>ANSIBLE_HOSTS=hosts ansible-playbook ae-dir-servers.yml --become -K --become-method=su --extra-vars="aedir_init=1"</pre>
   </li>
   <li>
-    Log into the system become user <em>root</em> and add
-    the basic &AElig;-DIR entries with OpenLDAP command-line tools:
-    <pre>ldapadd -f /opt/ae-dir/etc/ae-dir-base.ldif</pre>
+    Log into one provider system become user <em>root</em> and run the
+    following commands to fully initialize your directory:
+    <ol>
+      <li>
+        Add the basic &AElig;-DIR entries with OpenLDAP command-line tool:
+        <pre>ldapadd -f /opt/ae-dir/etc/ae-dir-base.ldif</pre>
+      </li>
+      <li>
+        Set next GID number attribute to be used:
+        <pre>/opt/ae-dir/bin/ae-set-next-gid.py</pre>
+      </li>
+      <li>
+        Set the user password of an initial Æ admin (here _msin_):
+        <pre>/opt/ae-dir/bin/ae-passwd.py msin</pre>
+      </li>
+    </ol>
   </li>
 </ol>
 
