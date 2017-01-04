@@ -25,7 +25,7 @@ import w2lapp.searchform,w2lapp.schema.plugins.inetorgperson,w2lapp.schema.plugi
 from w2lapp.schema.syntaxes import \
   DirectoryString,DistinguishedName,SelectList,GeneralizedTime, \
   DynamicValueSelectList,IA5String,DNSDomain,NumericString, \
-  DynamicDNSelectList,RFC822Address,IntegerRange,ComposedAttribute, \
+  DynamicDNSelectList,RFC822Address,Integer,ComposedAttribute, \
   NotBefore,NotAfter,OID,syntax_registry
 
 from w2lapp.schema.plugins.nis import UidNumber,GidNumber,MemberUID
@@ -212,24 +212,14 @@ class AEGIDNumber(GidNumber):
     else:
       if ldap_result:
         return ldap_result[0][1][self.attrType]
-    # consume next ID from pool entry
-    try:
-      next_gid = self._get_next_gid()
-    except (
-      ldap.NO_SUCH_OBJECT,
-      ldap.INSUFFICIENT_ACCESS,
-    ):
-      # search failed => no value suggested
-      return ['']
-    else:
-      result = [str(next_gid)]
-    return result # formValue()
+    # return next ID from pool entry
+    return [str(self._get_next_gid())] # formValue()
 
   def formValue(self):
-    return IntegerRange.formValue(self)
+    return Integer.formValue(self)
 
   def formField(self):
-    return IntegerRange.formField(self)
+    return Integer.formField(self)
 
 syntax_registry.registerAttrType(
   AEGIDNumber.oid,[
@@ -1595,7 +1585,7 @@ syntax_registry.registerAttrType(
 )
 
 
-class AEStatus(SelectList,IntegerRange):
+class AEStatus(SelectList,Integer):
   oid = 'AEStatus-oid'
   desc = 'AE-DIR: Status of object'
   attr_value_dict = {
@@ -1650,7 +1640,7 @@ class AEStatus(SelectList,IntegerRange):
 
   def displayValue(self,valueindex=0,commandbutton=0):
     if not commandbutton:
-      return IntegerRange.displayValue(self,valueindex)
+      return Integer.displayValue(self,valueindex)
     else:
       return SelectList.displayValue(self,valueindex,commandbutton)
 
