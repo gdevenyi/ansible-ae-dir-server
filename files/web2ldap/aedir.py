@@ -170,22 +170,27 @@ class AEGIDNumber(GidNumber):
   desc = 'numeric Unix-GID'
   minNewValue = 30000L
   maxNewValue = 49999L
+  id_pool_dn = None
+
+  def _get_id_pool_dn(self):
+    """
+    determine which ID pool entry to use
+    """
+    return self.id_pool_dn or self._ls.getSearchRoot(self._dn)
 
   def _get_next_gid(self):
-      """
-      consumes next ID by sending MOD_INCREMENT modify operation with
-      pre-read entry control
-      """
-      id_pool_dn = self._ls.getSearchRoot(self._dn)
-      id_pool_attr = 'gidNumber'
-      prc = PreReadControl(criticality=True, attrList=[id_pool_attr])
-      msg_id = self._ls.l.modify_ext(
-          id_pool_dn,
-          [(ldap.MOD_INCREMENT, id_pool_attr, '1')],
-          serverctrls=[prc],
-      )
-      _, _, _, resp_ctrls = self._ls.l.result3(msg_id)
-      return int(resp_ctrls[0].entry[id_pool_attr][0])
+    """
+    consumes next ID by sending MOD_INCREMENT modify operation with
+    pre-read entry control
+    """
+    prc = PreReadControl(criticality=True, attrList=[self.attrType])
+    msg_id = self._ls.l.modify_ext(
+        self._get_id_pool_dn(),
+        [(ldap.MOD_INCREMENT, self.attrType, '1')],
+        serverctrls=[prc],
+    )
+    _, _, _, resp_ctrls = self._ls.l.result3(msg_id)
+    return int(resp_ctrls[0].entry[self.attrType][0])
 
   def transmute(self,attrValues):
     attrValues = GidNumber.transmute(self,attrValues)
@@ -195,8 +200,8 @@ class AEGIDNumber(GidNumber):
     try:
       ldap_result = self._ls.readEntry(
         self._dn,
-        attrtype_list=['gidNumber'],
-        search_filter='(gidNumber=*)',
+        attrtype_list=[self.attrType],
+        search_filter='({0}=*)'.format(self.attrType),
       )
     except (
       ldap.NO_SUCH_OBJECT,
@@ -206,7 +211,7 @@ class AEGIDNumber(GidNumber):
       pass
     else:
       if ldap_result:
-        return ldap_result[0][1]['gidNumber']
+        return ldap_result[0][1][self.attrType]
     # consume next ID from pool entry
     try:
       next_gid = self._get_next_gid()
