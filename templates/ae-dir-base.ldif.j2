@@ -17,7 +17,9 @@ version: 1
 #---------------------------------------------------------------------------
 #
 dn: {{ aedir_suffix }}
+changetype: add
 aeStatus: 0
+aeTicketId: {{ aedir_init_ticket_id }}
 description:: w4YtRElSIC0gQXV0aG9yaXplZCBFbnRpdGllcyBEaXJlY3Rvcnk=
 objectClass: organizationalUnit
 objectClass: aeRoot
@@ -29,7 +31,9 @@ aeGidNumberMin: {{ aedir_min_gid }}
 aeGidNumberMax: {{ aedir_max_gid }}
 
 dn: cn=ae,{{ aedir_suffix }}
+changetype: add
 aeStatus: 0
+aeTicketId: {{ aedir_init_ticket_id }}
 cn: ae
 description:: w4YtRElSIG1hbmFnZW1lbnQ=
 objectClass: namedObject
@@ -37,6 +41,7 @@ objectClass: aeObject
 objectClass: aeZone
 
 dn: cn=ae-tag-init,cn=ae,{{ aedir_suffix }}
+changetype: add
 aeStatus: 0
 cn: ae-tag-init
 description: tag for all entries created during initial load
@@ -49,6 +54,7 @@ objectClass: aeTag
 #
 {% for zone_cn, zone_attrs in aedir_init_aezones.iteritems() %}
 dn: cn={{ zone_cn }},{{ aedir_suffix }}
+changetype: add
 aeStatus: 0
 aeTag: ae-tag-init
 cn: {{ zone_cn }}
@@ -65,7 +71,9 @@ objectClass: aeZone
 #
 # tag for initial loading of this LDIF file
 dn: cn=pub,{{ aedir_suffix }}
+changetype: add
 aeStatus: 0
+aeTicketId: {{ aedir_init_ticket_id }}
 aeTag: ae-tag-init
 cn: pub
 description: Public default entries
@@ -75,6 +83,7 @@ objectClass: aeZone
 
 # sudoers defaults
 dn: cn=sudo-defaults,cn=pub,{{ aedir_suffix }}
+changetype: add
 objectClass: top
 objectClass: sudoRole
 cn: sudo-defaults
@@ -85,6 +94,7 @@ sudoUser: ALL
 
 # DUA configuration profile for Solaris, HP-UX etc.
 dn: cn=dua-profile,cn=pub,{{ aedir_suffix }}
+changetype: add
 cn: dua-profile
 objectClass: top
 objectClass: DUAConfigProfile
@@ -107,6 +117,7 @@ serviceSearchDescriptor: audit_user:{{ aedir_suffix }}?sub
 serviceSearchDescriptor: group:{{ aedir_suffix }}?sub
 
 dn: cn=pub-tag-no-welcome-yet,cn=pub,{{ aedir_suffix }}
+changetype: add
 aeStatus: 0
 cn: pub-tag-no-welcome-yet
 description: tag indicates that welcome e-mail was not sent to user yet
@@ -118,6 +129,7 @@ objectClass: aeTag
 #---------------------------------------------------------------------------
 #
 dn: cn=ae-uid-blacklist,cn=ae,{{ aedir_suffix }}
+changetype: add
 description: This entry contains a blacklist for 'uid' values
 cn: ae-uid-blacklist
 objectClass: namedObject
@@ -341,6 +353,7 @@ uid: zcmp
 
 # You might fill this entry yourself later
 dn: cn=ae-uid-badwords,cn=ae,{{ aedir_suffix }}
+changetype: add
 cn: ae-uid-badwords
 labeledURI: https://github.com/mozilla/kitsune/blob/master/kitsune/configs/username-blacklist.txt bad word lists
 objectClass: namedObject
@@ -355,6 +368,7 @@ uid: bad
 #
 # unusable default policy with password expiry after one second!
 dn: cn=ppolicy-default,cn=ae,{{ aedir_suffix }}
+changetype: add
 cn: ppolicy-default
 description: Unusable default password policy
 objectClass: aeObject
@@ -362,6 +376,7 @@ objectClass: namedPolicy
 objectClass: aePolicy
 objectClass: pwdPolicy
 aeStatus: 0
+aeTicketId: {{ aedir_init_ticket_id }}
 pwdAllowUserChange: FALSE
 pwdAttribute: userPassword
 pwdCheckQuality: 2
@@ -373,6 +388,7 @@ pwdMaxAge: 1
 
 # SASL/EXTERNAL policy with password expiry after one second!
 dn: cn=ppolicy-sasl-external,cn=ae,{{ aedir_suffix }}
+changetype: add
 cn: ppolicy-sasl-external
 description: Password policy for services which must use SASL/EXTERNAL
 objectClass: aeObject
@@ -380,6 +396,7 @@ objectClass: namedPolicy
 objectClass: aePolicy
 objectClass: pwdPolicy
 aeStatus: 0
+aeTicketId: {{ aedir_init_ticket_id }}
 pwdAllowUserChange: FALSE
 pwdAttribute: userPassword
 pwdCheckQuality: 2
@@ -391,6 +408,7 @@ pwdMaxAge: 1
 
 # policy for aeService and aeHost entries
 dn: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
+changetype: add
 cn: ppolicy-systems
 description: Password policy for hosts and system/service accounts (aeHost and aeService)
 objectClass: aeObject
@@ -398,6 +416,7 @@ objectClass: namedPolicy
 objectClass: aePolicy
 objectClass: pwdPolicy
 aeStatus: 0
+aeTicketId: {{ aedir_init_ticket_id }}
 pwdAllowUserChange: FALSE
 pwdAttribute: userPassword
 pwdCheckQuality: 2
@@ -408,6 +427,7 @@ pwdMustChange: FALSE
 
 # policy for aeUser entries
 dn: cn=ppolicy-users,cn=ae,{{ aedir_suffix }}
+changetype: add
 cn: ppolicy-users
 description: Password policy for personal user accounts (aeUser)
 objectClass: aeObject
@@ -415,6 +435,7 @@ objectClass: namedPolicy
 objectClass: aePolicy
 objectClass: pwdPolicy
 aeStatus: 0
+aeTicketId: {{ aedir_init_ticket_id }}
 pwdAllowUserChange: TRUE
 pwdAttribute: userPassword
 pwdCheckQuality: 2
@@ -433,6 +454,7 @@ pwdSafeModify: FALSE
 
 # policy for primary aeUser entries
 dn: cn=ppolicy-base-users,cn=ae,{{ aedir_suffix }}
+changetype: add
 cn: ppolicy-base-users
 description: Password policy for primary personal user accounts (aeUser) in zone base
 objectClass: aeObject
@@ -440,6 +462,7 @@ objectClass: namedPolicy
 objectClass: aePolicy
 objectClass: pwdPolicy
 aeStatus: 0
+aeTicketId: {{ aedir_init_ticket_id }}
 pwdAllowUserChange: TRUE
 pwdAttribute: userPassword
 pwdCheckQuality: 2
@@ -458,6 +481,7 @@ pwdSafeModify: FALSE
 
 # special policy for enrollment passwort of oathToken entries
 dn: cn=ppolicy-otptokens,cn=ae,{{ aedir_suffix }}
+changetype: add
 cn: ppolicy-otptokens
 description: Password policy for OTP enrollment
 objectClass: aeObject
@@ -465,6 +489,7 @@ objectClass: namedPolicy
 objectClass: aePolicy
 objectClass: pwdPolicy
 aeStatus: 0
+aeTicketId: {{ aedir_init_ticket_id }}
 pwdAllowUserChange: FALSE
 pwdAttribute: userPassword
 pwdCheckQuality: 1
@@ -486,6 +511,7 @@ pwdSafeModify: FALSE
 #---------------------------------------------------------------------------
 #
 dn: cn=oath-policy-hotp-users,cn=ae,{{ aedir_suffix }}
+changetype: add
 cn: oath-policy-hotp-users
 objectClass: namedObject
 objectClass: aeObject
@@ -494,12 +520,14 @@ objectClass: aePolicy
 objectClass: oathParams
 objectClass: oathHOTPParams
 aeStatus: 0
+aeTicketId: {{ aedir_init_ticket_id }}
 description: OATH/HOTP policy parameters for normal use
 oathHMACAlgorithm: 1.2.840.113549.2.7
 oathHOTPLookAhead: 15
 oathOTPLength: 8
 
 dn: cn=oath-policy-resync-hotp-users,cn=ae,{{ aedir_suffix }}
+changetype: add
 cn: oath-policy-resync-hotp-users
 objectClass: namedObject
 objectClass: aeObject
@@ -508,6 +536,7 @@ objectClass: aePolicy
 objectClass: oathParams
 objectClass: oathHOTPParams
 aeStatus: 0
+aeTicketId: {{ aedir_init_ticket_id }}
 description: OATH/HOTP policy parameters for counter resync
 oathHMACAlgorithm: 1.2.840.113549.2.7
 oathHOTPLookAhead: 100
@@ -519,7 +548,9 @@ oathOTPLength: 8
 #
 # dummy department entry
 dn: departmentNumber=0,cn=people,ou=ae-dir
+changetype: add
 aeStatus: 0
+aeTicketId: {{ aedir_init_ticket_id }}
 departmentNumber: 0
 displayName: - (0)
 objectClass: organizationalUnit
@@ -529,6 +560,7 @@ ou: -
 
 {% for unique_identifier, person_attrs in aedir_init_aepersons.iteritems() %}
 dn: uniqueIdentifier={{ unique_identifier }},cn={{ aedir_org_zone }},{{ aedir_suffix }}
+changetype: add
 uniqueIdentifier: {{ unique_identifier }}
 objectClass: person
 objectClass: organizationalPerson
@@ -536,6 +568,7 @@ objectClass: inetOrgPerson
 objectClass: aePerson
 objectClass: aeObject
 aeStatus: 0
+aeTicketId: {{ aedir_init_ticket_id }}
 aeDept: departmentNumber=0,cn=people,ou=ae-dir
 aeTag: ae-tag-init
 cn: {{ person_attrs.given_name }} {{ person_attrs.sur_name }}
@@ -547,6 +580,7 @@ mail: {{ person_attrs.mail }}
 {% endfor %}
 {% for ae_user in aedir_init_aeadmins %}
 dn: uid={{ ae_user.uid }},cn=ae,{{ aedir_suffix }}
+changetype: add
 uid: {{ ae_user.uid }}
 uidNumber: {{ gid_number + loop.index }}
 gidNumber: {{ gid_number + loop.index }}
@@ -559,6 +593,7 @@ objectClass: aeUser
 objectClass: posixAccount
 objectClass: ldapPublicKey
 aeStatus: 0
+aeTicketId: {{ aedir_init_ticket_id }}
 aeTag: ae-tag-init
 aeTag: pub-tag-no-welcome-yet
 aePerson: uniqueIdentifier={{ ae_user.unique_identifier }},cn={{ aedir_org_zone }},{{ aedir_suffix }}
@@ -582,7 +617,9 @@ mail: {{ aedir_init_aepersons[ae_user.unique_identifier].mail }}
 #---------------------------------------------------------------------------
 #
 dn: cn=ae-admins,cn=ae,{{ aedir_suffix }}
+changetype: add
 aeStatus: 0
+aeTicketId: {{ aedir_init_ticket_id }}
 aeTag: ae-tag-init
 cn: ae-admins
 description:: R3JvdXAgbWVtYmVycyBjYW4gbWFuYWdlIGFsbCDDhi1ESVIgZW50cmllcw==
@@ -599,7 +636,9 @@ memberUID: {{ ae_user.uid }}
 {% endfor %}
 
 dn: cn=ae-auditors,cn=ae,{{ aedir_suffix }}
+changetype: add
 aeStatus: 0
+aeTicketId: {{ aedir_init_ticket_id }}
 aeTag: ae-tag-init
 cn: ae-auditors
 description:: R3JvdXAgbWVtYmVycyBjYW4gcmVhZCBhbGwgw4YtRElSIGVudHJpZXM=
@@ -612,6 +651,7 @@ objectClass: aeObject
 objectClass: aeGroup
 
 dn: cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}
+changetype: add
 cn: ae-all-zone-admins
 description: This group is updated to contain all zone admins
 gidNumber: {{ gid_number }}
@@ -624,9 +664,11 @@ objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
 aeStatus: 0
+aeTicketId: {{ aedir_init_ticket_id }}
 aeTag: ae-tag-init
 
 dn: cn=ae-all-zone-auditors,cn=ae,{{ aedir_suffix }}
+changetype: add
 cn: ae-all-zone-auditors
 description: This group is updated to contain all zone auditors
 gidNumber: {{ gid_number }}
@@ -639,10 +681,13 @@ objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
 aeStatus: 0
+aeTicketId: {{ aedir_init_ticket_id }}
 aeTag: ae-tag-init
 
 dn: cn=ae-sys-admins,cn=ae,{{ aedir_suffix }}
+changetype: add
 aeStatus: 0
+aeTicketId: {{ aedir_init_ticket_id }}
 aeTag: ae-tag-init
 cn: ae-sys-admins
 description: Members are system admins for AE-DIR servers
@@ -656,7 +701,9 @@ objectClass: aeGroup
 
 {% for uid, s in aedir_ldapi_services.items() %}
 dn: uid={{ uid }},cn=ae,{{ aedir_suffix }}
+changetype: add
 aeStatus: 0
+aeTicketId: {{ aedir_init_ticket_id }}
 aeTag: ae-tag-init
 uid: {{ uid }}
 cn: {{ s.cn }}
@@ -674,7 +721,9 @@ pwdPolicySubentry: cn=ppolicy-sasl-external,cn=ae,{{ aedir_suffix }}
 
 {% endfor %}
 dn: cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}
+changetype: add
 aeStatus: 0
+aeTicketId: {{ aedir_init_ticket_id }}
 aeTag: ae-tag-init
 cn: ae-login-proxies
 description: Members are central login components which are allowed to see all users/groups and must determine login user/target relation themselves
@@ -695,6 +744,7 @@ memberUid: {{ oath_ldap_oathenroll_web_user }}
 {% endif %}
 
 dn: cn=ae-sudo-sys-admins,cn=ae,{{ aedir_suffix }}
+changetype: add
 cn: ae-sudo-sys-admins
 objectClass: top
 objectClass: sudoRole
@@ -703,6 +753,7 @@ objectClass: aeSudoRule
 description: su - root for AE-DIR system admins
 sudoRunAsUser: ALL
 aeStatus: 0
+aeTicketId: {{ aedir_init_ticket_id }}
 aeTag: ae-tag-init
 sudoCommand: ALL
 sudoHost: ALL
@@ -715,7 +766,9 @@ sudoUser: %ae-sys-admins
 {% for role in ['provider', 'consumer'] %}
 {% set srvgrp_dn = "cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir_suffix }}" -%}
 dn: cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir_suffix }}
+changetype: add
 aeStatus: 0
+aeTicketId: {{ aedir_init_ticket_id }}
 aeTag: ae-tag-init
 description: AE-DIR {{ role }} hosts
 objectClass: aeObject
@@ -731,8 +784,10 @@ aeVisibleSudoers: cn=ae-sudo-sys-admins,cn=ae,{{ aedir_suffix }}
 {% set service_fqdn = hostvars[host]['openldap_service_fqdn'] -%}
 {% set service_hostname = service_fqdn.split('.')[0] -%}
 dn: host={{ host }},cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir_suffix }}
+changetype: add
 host: {{ host }}
 aeStatus: 0
+aeTicketId: {{ aedir_init_ticket_id }}
 aeTag: ae-tag-init
 objectClass: device
 objectClass: aeDevice
@@ -741,15 +796,15 @@ objectClass: aeHost
 objectClass: ldapPublicKey
 pwdPolicySubentry: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
 cn: {{ host.split('.')[0] }}
-aeTicketId: {{ aedir_init_ticket_id }}
 description: AE-DIR provider replica host for {{ service_fqdn }}
 
 {% for interface in hostvars[host]['ansible_interfaces'] if interface not in ( "lo", "tunl0") %}
 {% set interface_fact = "ansible_{}".format(interface) -%}
 dn: cn={{ interface }},host={{ host }},cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir_suffix }}
+changetype: add
 aeStatus: 0
-aeTag: ae-tag-init
 aeTicketId: {{ aedir_init_ticket_id }}
+aeTag: ae-tag-init
 cn: {{ interface }}
 {% if hostvars[host][interface_fact].has_key("ipv4") %}
 {% set interface_ipv4 = hostvars[host][interface_fact]["ipv4"]["address"] -%}
@@ -769,6 +824,7 @@ objectClass: ipHost
 
 {% endfor %}
 dn: uid=ae-dir-slapd_{{ service_hostname }},cn=ae,{{ aedir_suffix }}
+changetype: add
 uid: ae-dir-slapd_{{ service_hostname }}
 pwdPolicySubentry: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
 objectClass: account
@@ -777,6 +833,7 @@ objectClass: aeService
 objectClass: pkiUser
 objectClass: posixAccount
 aeStatus: 0
+aeTicketId: {{ aedir_init_ticket_id }}
 aeTag: ae-tag-init
 description: AE-DIR slapd provider {{ service_fqdn }} running on {{ host }}
 homeDirectory: /home/ae-dir-slapd_{{ service_hostname }}
@@ -796,7 +853,9 @@ aeHost: host={{ host }},cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir_suffix }}
 #---------------------------------------------------------------------------
 #
 dn: cn=ae-replicas,cn=ae,{{ aedir_suffix }}
+changetype: add
 aeStatus: 0
+aeTicketId: {{ aedir_init_ticket_id }}
 aeTag: ae-tag-init
 cn: ae-replicas
 description: Members of this group are AE-DIR replicas (providers and consumers)
@@ -819,7 +878,9 @@ memberUID: ae-dir-slapd_{{ replica.split('.')[0] }}
 {% endfor %}
 
 dn: cn=ae-providers,cn=ae,{{ aedir_suffix }}
+changetype: add
 aeStatus: 0
+aeTicketId: {{ aedir_init_ticket_id }}
 aeTag: ae-tag-init
 cn: ae-providers
 description: Members of this group are AE-DIR provider replicas
@@ -841,6 +902,7 @@ memberUID: ae-dir-slapd_{{ replica.split('.')[0] }}
 #---------------------------------------------------------------------------
 {% for zone_cn, zone_attrs in aedir_init_aezones.iteritems() %}
 dn: cn={{ zone_cn }}-zone-admins,cn={{ zone_cn }},{{ aedir_suffix }}
+changetype: add
 aeStatus: 0
 aeTag: ae-tag-init
 cn: {{ zone_cn }}-zone-admins
@@ -855,6 +917,7 @@ objectClass: aeObject
 objectClass: aeGroup
 
 dn: cn={{ zone_cn }}-zone-auditors,cn={{ zone_cn }},{{ aedir_suffix }}
+changetype: add
 aeStatus: 0
 aeTag: ae-tag-init
 cn: {{ zone_cn }}-zone-auditors
@@ -867,5 +930,14 @@ objectClass: groupOfEntries
 objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
+
+dn: cn={{ zone_cn }},{{ aedir_suffix }}
+changetype: modify
+add: aeZoneAdmins
+aeZoneAdmins: cn={{ zone_cn }}-zone-admins,cn={{ zone_cn }},{{ aedir_suffix }}
+-
+add: aeZoneAuditors
+aeZoneAuditors: cn={{ zone_cn }}-zone-auditors,cn={{ zone_cn }},{{ aedir_suffix }}
+-
 
 {% endfor %}
