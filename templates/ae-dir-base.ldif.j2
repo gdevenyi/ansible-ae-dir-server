@@ -941,3 +941,17 @@ aeZoneAuditors: cn={{ zone_cn }}-zone-auditors,cn={{ zone_cn }},{{ aedir_suffix 
 -
 
 {% endfor %}
+{% set gid_number = gid_number + 2 * aedir_init_aezones|length -%}
+#
+#---------------------------------------------------------------------------
+# update next UID/GID values in root suffix entry
+#---------------------------------------------------------------------------
+dn: {{ aedir_suffix }}
+changetype: modify
+add: gidNumber
+gidNumber: {{ gid_number }}
+-
+add: uidNumber
+uidNumber: {{ gid_number }}
+-
+
