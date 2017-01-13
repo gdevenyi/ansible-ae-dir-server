@@ -132,7 +132,7 @@ class AEGroupFixer(object):
                             )
                         )
 
-        return # end of update_memberurl_groups()
+        return # end of fix_members()
 
     def run(self):
         """
