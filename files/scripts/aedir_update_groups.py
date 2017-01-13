@@ -64,6 +64,8 @@ class AEGroupUpdater(aedir.process.AEProcess):
     """
     Group update process class
     """
+    script_version = __version__
+    pyldap_tracelevel = PYLDAP_TRACELEVEL
 
     def remove_inactive_group_members(self):
         """
