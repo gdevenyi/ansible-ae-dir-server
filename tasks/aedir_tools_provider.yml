@@ -84,7 +84,7 @@
     user: root
     cron_file: aedir_tools
     minute: "*/3"
-    job: "{{ aedir_python }} {{ aedir_sbin }}/aedir_update_groups.py {{ openldap_ldapi_uri|replace('%', '\\%') }}/{{ aedir_suffix }}"
+    job: "{{ aedir_python }} {{ aedir_sbin }}/aedir_update_groups.py"
 
 - name: Run aeperson2aeuser.py as CRON job
   cron:
@@ -93,7 +93,7 @@
     user: root
     cron_file: aedir_tools
     minute: "*/2"
-    job: "{{ aedir_python }} {{ aedir_sbin }}/aeperson2aeuser.py {{ openldap_ldapi_uri|replace('%', '\\%') }}/{{ aedir_suffix }}????trace=0,x-saslmech=EXTERNAL {{ aedir_rundir }}/aeperson2aeuser.state"
+    job: "{{ aedir_python }} {{ aedir_sbin }}/aeperson2aeuser.py {{ aedir_rundir }}/aeperson2aeuser.state"
 
 - name: Reset aeperson2aeuser.py as CRON job
   cron:
