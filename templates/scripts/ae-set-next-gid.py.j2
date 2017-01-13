@@ -6,7 +6,7 @@ Sets next GID number to highest GID found + 1
 This script must run locally on a Æ-DIR provider
 """
 
-__version__ = '0.0.4'
+__version__ = '0.0.5'
 
 import sys
 import os
@@ -32,108 +32,125 @@ AE_LOGGER_QUALNAME = os.environ.get('AE_LOGGER_QUALNAME', 'aedir')
 # Classes and functions
 #---------------------------------------------------------------------------
 
-def search_highest_id(ldap_conn, id_attr):
+def max_id_searcher(ldap_conn, logger, aedir_searchbase):
     """
-    search the highest value of `id_attr' by using server-side (reverse) sorting
+    returns function closure for search highest ID
     """
-    # reverse sorting request control
-    sss_control = SSSRequestControl(criticality=True, ordering_rules=['-'+id_attr])
-    # send search request
-    msg_id = ldap_conn.search_ext(
+
+    def highest_id(id_attr):
+        """
+        search the highest value of `id_attr' by using server-side (reverse) sorting
+        """
+        # reverse sorting request control
+        sss_control = SSSRequestControl(criticality=True, ordering_rules=['-'+id_attr])
+        # send search request
+        msg_id = ldap_conn.search_ext(
+            aedir_searchbase,
+            ldap.SCOPE_SUBTREE,
+            '(&(!(objectClass=aePosixIdRanges))({0}=*))'.format(id_attr),
+            attrlist=[id_attr],
+            sizelimit=1,
+            serverctrls=[sss_control],
+        )
+        # collect result
+        ldap_result = []
+        try:
+            for _, res_data, _, res_controls in ldap_conn.allresults(
+                    msg_id,
+                    add_ctrls=0
+                ):
+                ldap_result.extend(res_data)
+        except ldap.SIZELIMIT_EXCEEDED:
+            pass
+
+        if not ldap_result:
+            logger.error('No entry with attribute %r found!', id_attr)
+            sys.exit(1)
+
+        highest_id_number = int(ldap_result[0][1][id_attr][0])
+        logger.debug('Highest %r value found: %d', id_attr, highest_id_number)
+        return highest_id_number
+
+    return highest_id # end of max_id_searcher()
+
+
+def main():
+    """
+    run the script
+    """
+
+    logger = aedir.init_logger(log_name=sys.argv[0])
+
+    logger.info('Starting %s %s', sys.argv[0], __version__)
+    logger.debug('Imported aedir %s', aedir.__version__)
+
+    ldap._trace_level = PYLDAP_TRACE_LEVEL
+
+    ldap_conn = aedir.AEDirObject(None, trace_level=PYLDAP_TRACE_LEVEL)
+    aedir_searchbase = ldap_conn.find_search_base()
+
+    search_highest_id = max_id_searcher(ldap_conn, logger, aedir_searchbase)
+
+    highest_gid_number = search_highest_id(GID_ATTR)
+
+    aeroot_entry = ldap_conn.read_s(
         aedir_searchbase,
-        ldap.SCOPE_SUBTREE,
-        '(&(!(objectClass=aePosixIdRanges))({0}=*))'.format(id_attr),
-        attrlist=[id_attr],
-        sizelimit=1,
-        serverctrls=[sss_control],
+        attrlist=[GID_ATTR, UID_ATTR]
     )
-    # collect result
-    ldap_result = []
+
     try:
-        for _, res_data, _, res_controls in ldap_conn.allresults(
-                msg_id,
-                add_ctrls=0
-            ):
-            ldap_result.extend(res_data)
-    except ldap.SIZELIMIT_EXCEEDED:
-        pass
+        current_next_gid = int(aeroot_entry[GID_ATTR][0])
+    except KeyError:
+        current_next_gid = None
+    logger.debug('Current %r value: %s', GID_ATTR, current_next_gid)
+    try:
+        current_next_uid = int(aeroot_entry[UID_ATTR][0])
+    except KeyError:
+        current_next_uid = None
+    logger.debug('Current %r value: %s', UID_ATTR, current_next_uid)
 
-    if not ldap_result:
-        logger.error('No entry with attribute %r found!', id_attr)
-        sys.exit(1)
+    modlist = []
 
-    highest_id_number = int(ldap_result[0][1][id_attr][0])
-    logger.debug('Highest %r value found: %d', id_attr, highest_id_number)
-    return highest_id_number
-
-#---------------------------------------------------------------------------
-# main()
-#---------------------------------------------------------------------------
-
-logger = aedir.init_logger(log_name=sys.argv[0])
-
-logger.info('Starting %s %s', sys.argv[0], __version__)
-logger.debug('Imported aedir %s', aedir.__version__)
-
-ldap._trace_level = PYLDAP_TRACE_LEVEL
-
-ldap_conn = aedir.AEDirObject(None, trace_level=PYLDAP_TRACE_LEVEL)
-aedir_searchbase = ldap_conn.find_search_base()
-
-highest_gid_number = search_highest_id(ldap_conn, GID_ATTR)
-
-aeroot_entry = ldap_conn.read_s(
-    aedir_searchbase,
-    attrlist=[GID_ATTR, UID_ATTR]
-)
-
-try:
-    current_next_gid = int(aeroot_entry[GID_ATTR][0])
-except KeyError:
-    current_next_gid = None
-logger.debug('Current %r value: %s', GID_ATTR, current_next_gid)
-try:
-    current_next_uid = int(aeroot_entry[UID_ATTR][0])
-except KeyError:
-    current_next_uid = None
-logger.debug('Current %r value: %s', UID_ATTR, current_next_uid)
-
-modlist = []
-
-# first add modifications for next GID attribute
-if current_next_gid != highest_gid_number+1:
-    modlist.append(
-        (ldap.MOD_ADD, GID_ATTR, [str(highest_gid_number+1)])
-    )
-    if current_next_gid is not None:
+    # first add modifications for next GID attribute
+    if current_next_gid != highest_gid_number+1:
         modlist.append(
-            (ldap.MOD_DELETE, GID_ATTR, [str(current_next_gid)])
+            (ldap.MOD_ADD, GID_ATTR, [str(highest_gid_number+1)])
         )
-else:
-    logger.debug('Current %r value %d seems ok => no change.', GID_ATTR, current_next_gid)
+        if current_next_gid is not None:
+            modlist.append(
+                (ldap.MOD_DELETE, GID_ATTR, [str(current_next_gid)])
+            )
+    else:
+        logger.debug('Current %r value %d seems ok => no change.', GID_ATTR, current_next_gid)
 
-if UID_GID_ALIGN:
-    highest_uid_number = highest_gid_number
-else:
-    highest_uid_number = search_highest_id(ldap_conn, UID_ATTR)
+    if UID_GID_ALIGN:
+        highest_uid_number = highest_gid_number
+    else:
+        highest_uid_number = search_highest_id(UID_ATTR)
 
-if current_next_uid != highest_uid_number+1:
-    modlist.append(
-        (ldap.MOD_ADD, UID_ATTR, [str(highest_uid_number+1)])
-    )
-    if current_next_uid is not None:
+    if current_next_uid != highest_uid_number+1:
         modlist.append(
-            (ldap.MOD_DELETE, UID_ATTR, [str(current_next_uid)])
+            (ldap.MOD_ADD, UID_ATTR, [str(highest_uid_number+1)])
         )
-else:
-    logger.debug('Current %r value %d seems ok => no change.', UID_ATTR, current_next_uid)
+        if current_next_uid is not None:
+            modlist.append(
+                (ldap.MOD_DELETE, UID_ATTR, [str(current_next_uid)])
+            )
+    else:
+        logger.debug('Current %r value %d seems ok => no change.', UID_ATTR, current_next_uid)
 
-if modlist:
-    ldap_conn.modify_s(aedir_searchbase, modlist)
-    logger.info(
-        'Updated entry %r with %r',
-        aedir_searchbase,
-        modlist,
-    )
-else:
-    logger.info('no modifications')
+    if modlist:
+        ldap_conn.modify_s(aedir_searchbase, modlist)
+        logger.info(
+            'Updated entry %r with %r',
+            aedir_searchbase,
+            modlist,
+        )
+    else:
+        logger.info('no modifications')
+
+    return # end of main()
+
+
+if __name__ == '__main__':
+    main()
