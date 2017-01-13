@@ -15,7 +15,7 @@ Requires:
 - python-aedir 0.0.10+
 """
 
-__version__ = '0.5.0'
+__version__ = '0.1.0'
 
 #-----------------------------------------------------------------------
 # Imports
@@ -29,6 +29,7 @@ os.environ['LDAPRC'] = '/opt/ae-dir/etc/ldap.conf'
 import ldap
 import ldapurl
 import aedir
+import aedir.process
 
 #-----------------------------------------------------------------------
 # Configuration constants
@@ -59,17 +60,14 @@ STALE_MEMBER_FILTER = (
 # Classes and functions
 #-----------------------------------------------------------------------
 
-class AEGroupUpdater(object):
+class AEGroupUpdater(aedir.process.AEProcess):
     """
     Group update process class
     """
 
-    def __init__(self):
-        self.ldap_conn = aedir.AEDirObject(None, trace_level=PYLDAP_TRACELEVEL)
-
     def remove_inactive_group_members(self):
         """
-        1. Removes inactive members from static group entries referenced by 'memberOf'.
+        1. Remove inactive members from static group entries referenced by 'memberOf'.
         """
         stale_members = self.ldap_conn.search_s(
             self.ldap_conn.find_search_base(),
@@ -77,6 +75,9 @@ class AEGroupUpdater(object):
             STALE_MEMBER_FILTER,
             attrlist=['memberOf'],
         )
+        if not stale_members:
+            self.logger.debug(u'No stale group members found')
+            return
         for member_dn, member_entry in stale_members:
             for group_dn in member_entry.get('memberOf', []):
                 try:
@@ -88,15 +89,22 @@ class AEGroupUpdater(object):
                         ]
                     )
                 except ldap.LDAPError, ldap_error:
-                    sys.stderr.write(u'LDAPError modifying group entry %r: %s\n' % (
+                    self.logger.error(
+                        u'LDAPError modifying group entry %r: %s',
                         group_dn,
                         ldap_error,
-                    ))
+                    )
+                else:
+                    self.logger.info(
+                        u'Removed %r from group entry %r',
+                        member_dn,
+                        group_dn,
+                    )
         return # end of remove_inactive_group_members()
 
     def update_memberurl_groups(self):
         """
-        2. Updates all static aeGroup entries which contain attribute 'memberURL'
+        2. Update all static aeGroup entries which contain attribute 'memberURL'
         """
         dynamic_groups = self.ldap_conn.search_s(
             self.ldap_conn.find_search_base(),
@@ -129,12 +137,11 @@ class AEGroupUpdater(object):
                         ]+(member_url_obj.attrs or []),
                     )
                 except ldap.LDAPError, ldap_error:
-                    sys.stderr.write(
-                        u'LDAPError searching members for %r with %r: %s\n' % (
-                            ldap_group_dn,
-                            member_url,
-                            ldap_error,
-                        )
+                    self.logger.error(
+                        u'LDAPError searching members for %r with %r: %s',
+                        ldap_group_dn,
+                        member_url,
+                        ldap_error,
                     )
                     continue
                 if member_url_obj.attrs is None:
@@ -164,38 +171,40 @@ class AEGroupUpdater(object):
                 ])
 
             if ldap_group_modlist:
-                sys.stdout.write(u'Update members of group entry %r: remove %d, add %d\n' % (
+                self.logger.debug(
+                    u'Update group entry %r: %r',
                     ldap_group_dn,
-                    len(remove_members),
-                    len(add_members)
-                ))
+                    ldap_group_modlist,
+                )
                 try:
                     self.ldap_conn.modify_s(ldap_group_dn, ldap_group_modlist)
                 except ldap.LDAPError, ldap_error:
-                    sys.stderr.write(
-                        u'LDAPError modifying %r: %s\nldap_group_modlist = %r\n' % (
-                            ldap_group_dn,
-                            ldap_error,
-                            ldap_group_modlist,
-                        )
+                    self.logger.error(
+                        u'LDAPError modifying %r: %s ldap_group_modlist = %r',
+                        ldap_group_dn,
+                        ldap_error,
+                        ldap_group_modlist,
                     )
+                else:
+                    self.logger.info(
+                        u'Updated members of group entry %r: removed %d, added %d',
+                        ldap_group_dn,
+                        len(remove_members),
+                        len(add_members),
+                    )
+            else:
+                self.logger.debug(u'Nothing to be done with %r', ldap_group_dn)
 
         return # end of update_memberurl_groups()
 
-    def run(self):
+    def run_worker(self):
         """
         the main program
         """
-        try:
-            self.remove_inactive_group_members()
-            self.update_memberurl_groups()
-        finally:
-            try:
-                self.ldap_conn.unbind_s()
-            except ldap.LDAPError:
-                pass
-        return # run()
+        self.remove_inactive_group_members()
+        self.update_memberurl_groups()
+        return # end of run_worker()
 
 
 if __name__ == '__main__':
-    AEGroupUpdater().run()
+    AEGroupUpdater(max_runs=1)

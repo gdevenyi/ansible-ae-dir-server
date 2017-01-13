@@ -11,7 +11,7 @@ It is designed to run as a CRON job rather rarely.
 Author: Michael Ströder <michael@stroeder.com>
 """
 
-__version__ = '0.0.1'
+__version__ = '0.1.0'
 
 #-----------------------------------------------------------------------
 # Imports
@@ -24,6 +24,7 @@ import os
 os.environ['LDAPRC'] = '/opt/ae-dir/etc/ldap.conf'
 import ldap
 import aedir
+import aedir.process
 from ldap.controls.deref import DereferenceControl
 
 #-----------------------------------------------------------------------
@@ -50,18 +51,17 @@ AEUSER_DEREF_CONTROL = DereferenceControl(
 # Classes and functions
 #-----------------------------------------------------------------------
 
-class AEGroupFixer(object):
+class AEGroupFixer(aedir.process.AEProcess):
     """
     Group update process class
     """
+    script_version = __version__
+    pyldap_tracelevel = PYLDAP_TRACELEVEL
 
-    def __init__(self):
-        self.ldap_conn = aedir.AEDirObject(None, trace_level=PYLDAP_TRACELEVEL)
-
-    def fix_members(self):
+    def run_worker(self):
         """
-        1. Removes obsolete 'member' and 'memberUID' values and adds
-           missing 'memberUID' values in all active aeGroup entries
+        Removes obsolete 'member' and 'memberUID' values and adds
+        missing 'memberUID' values in all active aeGroup entries
         """
         msg_id = self.ldap_conn.search_ext(
             self.ldap_conn.find_search_base(),
@@ -116,37 +116,33 @@ class AEGroupFixer(object):
                     )
 
                 if ldap_group_modlist:
-                    sys.stdout.write(u'Update members of group entry %r: remove %d, add %d\n' % (
-                        ldap_group_dn,
-                        len(remove_member_uids),
-                        len(add_member_uids)
-                    ))
                     try:
                         self.ldap_conn.modify_s(ldap_group_dn, ldap_group_modlist)
                     except ldap.LDAPError, ldap_error:
-                        sys.stderr.write(
-                            u'LDAPError modifying %r: %s\nldap_group_modlist = %r\n' % (
-                                ldap_group_dn,
-                                ldap_error,
-                                ldap_group_modlist,
-                            )
+                        self.logger.error(
+                            u'LDAPError modifying %r: %s ldap_group_modlist = %r',
+                            ldap_group_dn,
+                            ldap_error,
+                            ldap_group_modlist,
                         )
-
+                    else:
+                        self.logger.debug(
+                            u'Updated %r: ldap_group_modlist = %r',
+                            ldap_group_dn,
+                            ldap_group_modlist,
+                        )
+                        self.logger.info(
+                            u'Updated member values of group entry %r: removed %d member, removed %d memberUID, added %d memberUID',
+                            ldap_group_dn,
+                            len(remove_members),
+                            len(remove_member_uids),
+                            len(add_member_uids)
+                        )
+                else:
+                    self.logger.debug(u'Nothing to be done with %r', ldap_group_dn)
+                    
         return # end of fix_members()
-
-    def run(self):
-        """
-        the main program
-        """
-        try:
-            self.fix_members()
-        finally:
-            try:
-                self.ldap_conn.unbind_s()
-            except ldap.LDAPError:
-                pass
-        return # run()
 
 
 if __name__ == '__main__':
-    AEGroupFixer().run()
+    AEGroupFixer(max_runs=1)
