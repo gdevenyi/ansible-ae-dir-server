@@ -24,19 +24,16 @@ import ldap.modlist
 from ldap.filter import time_span_filter
 
 import aedir
+import aedir.process
 
 #-----------------------------------------------------------------------
 # Constants (configuration)
 #-----------------------------------------------------------------------
 
-__version__ = '0.0.4'
+__version__ = '0.1.0'
 
-# Trace level for python-ldap logs
-PYLDAP_TRACELEVEL = 0
-
-# Number of times connecting to LDAP is tried
-LDAP_MAXRETRYCOUNT = 3
-LDAP_RETRYDELAY = 10.0
+# python-ldap trace level
+PYLDAP_TRACELEVEL = int(os.environ.get('PYLDAP_TRACELEVEL', '0'))
 
 # List of attributes copied from aePerson to aeUser entries
 AEDIR_AEPERSON_ATTRS = [
@@ -55,24 +52,22 @@ CatchAllException = Exception
 #-----------------------------------------------------------------------
 
 
-class SyncProcess(object):
+class SyncProcess(aedir.process.AEProcess):
     """
     The sync process
     """
+    script_version = __version__
+    pyldap_tracelevel = PYLDAP_TRACELEVEL
 
-    def __init__(self, ldap_url):
-        self.script_name = os.path.basename(sys.argv[0])
-        self.logger = self.get_logger()
-        self.state_filename = sys.argv[2]
-        self.ldap_url = ldap_url
+    def __init__(self, state_filename, max_runs=1, run_sleep=60.0):
+        self.state_filename = state_filename
         self.aeperson_counter = 0
         self.modify_counter = 0
         self.error_counter = 0
         self.deactivate_counter = 0
         self.current_time = time.time()
-        self.ldap_conn = self.target_ldap_conn()
-        self.search_base = self.ldap_conn.ldap_url_obj.dn or \
-                           self.ldap_conn.find_search_base()
+        # must be called last since it also calls method _run()
+        aedir.process.AEProcess.__init__(self, max_runs=max_runs, run_sleep=run_sleep)
 
     def get_state(self):
         """
@@ -128,33 +123,7 @@ class SyncProcess(object):
             )
         return # set_state()
 
-    def get_logger(self):
-        """
-        Initialize the logger instance
-        """
-        logger = logging.getLogger(self.script_name)
-        my_syslog_formatter = logging.Formatter(
-            fmt=self.script_name+' %(levelname)s %(message)s'
-        )
-        my_syslog_handler = logging.handlers.SysLogHandler(
-            address='/dev/log',
-            facility=SysLogHandler.LOG_CRON,
-        )
-        my_syslog_handler.setFormatter(my_syslog_formatter)
-        if os.environ.get('DEBUG', 'no').lower() == 'yes':
-            my_stream_handler = logging.StreamHandler()
-            my_stream_formatter = logging.Formatter(
-                fmt='%(asctime)s %(levelname)s %(message)s'
-            )
-            my_stream_handler.setFormatter(my_stream_formatter)
-            logger.addHandler(my_stream_handler)
-            logger.setLevel(logging.DEBUG)
-        else:
-            logger.setLevel(logging.INFO)
-        logger.addHandler(my_syslog_handler)
-        return logger
-
-    def log_summary(self):
+    def exit(self):
         """
         Log a summary of actions and errors, mainly counters
         """
@@ -167,24 +136,10 @@ class SyncProcess(object):
             )
         else:
             self.logger.debug('No modifications.')
-
         if self.error_counter:
             self.logger.error('%d errors.', self.error_counter)
 
-    def target_ldap_conn(self):
-        """
-        Connect and bind to local AE-DIR
-        """
-        self.logger.debug('Connecting to %r...', self.ldap_url)
-        ldap_conn = aedir.AEDirObject(self.ldap_url)
-        self.logger.debug(
-            'Successfully connected to %r as %r',
-            self.ldap_url,
-            ldap_conn.whoami_s(),
-        )
-        return ldap_conn
-
-    def run(self):
+    def run_worker(self):
         """
         the main worker part
         """
@@ -210,11 +165,11 @@ class SyncProcess(object):
 
         self.logger.debug(
             'Searching in %r with filter %r',
-            self.search_base,
+            self.ldap_conn.find_search_base(),
             aeperson_filterstr,
         )
         msg_id = self.ldap_conn.search(
-            self.search_base,
+            self.ldap_conn.find_search_base(),
             ldap.SCOPE_SUBTREE,
             aeperson_filterstr,
             attrlist=AEDIR_AEPERSON_ATTRS,
@@ -227,7 +182,7 @@ class SyncProcess(object):
                 self.aeperson_counter += 1
 
                 aeuser_result = self.ldap_conn.search_s(
-                    self.search_base,
+                    self.ldap_conn.find_search_base(),
                     ldap.SCOPE_SUBTREE,
                     '(&(objectClass=aeUser)(aePerson=%s))' % (aeperson_dn),
                     attrlist=AEDIR_AEPERSON_ATTRS+['uid', 'uidNumber', 'displayName'],
@@ -290,24 +245,11 @@ class SyncProcess(object):
                             )
                             self.modify_counter += 1
 
-        # Close LDAP connection
-        try:
-            self.ldap_conn.unbind_s()
-        except CatchAllException, err:
-            self.logger.warn(
-                'Error while closing LDAP connection to %r: %s',
-                self.ldap_conn.ldap_url_obj.initializeUrl(),
-                err,
-            )
-
         # Write state
         self.set_state(self.current_time)
 
-        # Output summary
-        self.log_summary()
-
-        return # run()
+        return # end of run_worker()
 
 
 if __name__ == '__main__':
-    SyncProcess(sys.argv[1]).run()
+    SyncProcess(sys.argv[1], max_runs=1)
