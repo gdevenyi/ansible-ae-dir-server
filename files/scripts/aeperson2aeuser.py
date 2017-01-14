@@ -45,14 +45,14 @@ AEDIR_AEPERSON_ATTRS = [
 ]
 
 # Exception class used for catching all exceptions
-CatchAllException = Exception
+aedir.process.CatchAllException = Exception
 
 #-----------------------------------------------------------------------
 # Classes and functions
 #-----------------------------------------------------------------------
 
 
-class SyncProcess(aedir.process.AEProcess):
+class SyncProcess(aedir.process.TimestampStateMixin, aedir.process.AEProcess):
     """
     The sync process
     """
@@ -65,63 +65,8 @@ class SyncProcess(aedir.process.AEProcess):
         self.modify_counter = 0
         self.error_counter = 0
         self.deactivate_counter = 0
-        self.current_time = time.time()
         # must be called last since it also calls method _run()
         aedir.process.AEProcess.__init__(self, max_runs=max_runs, run_sleep=run_sleep)
-
-    def get_state(self):
-        """
-        Read the timestamp of last run from file `sync_state_filename'
-        """
-        try:
-            last_run_timestr = open(self.state_filename, 'rb').read().strip()
-        except CatchAllException, err:
-            self.logger.warn(
-                'Error reading file %r: %s',
-                self.state_filename,
-                err
-            )
-            last_run_timestr = None
-        else:
-            self.logger.debug(
-                'Read last run timestamp %r from file %r',
-                last_run_timestr,
-                self.state_filename,
-            )
-        last_run_timestr = last_run_timestr or None
-        last_run_time = 0
-        if last_run_timestr:
-            try:
-                last_run_time = ldap.strp_secs(last_run_timestr)
-            except ValueError, err:
-                self.logger.warn(
-                    'Error parsing timestamp %r: %s',
-                    last_run_timestr,
-                    err,
-                )
-        return last_run_time # get_state()
-
-    def set_state(self, current_time):
-        """
-        Write the current state
-        """
-        current_time_str = ldap.strf_secs(self.current_time)
-        try:
-            # Write the last run timestamp
-            open(self.state_filename, 'wb').write(current_time_str)
-        except CatchAllException, err:
-            self.logger.warn(
-                'Could not write %r: %s',
-                self.state_filename,
-                err,
-            )
-        else:
-            self.logger.debug(
-                'Wrote %r to %r',
-                current_time_str,
-                self.state_filename,
-            )
-        return # set_state()
 
     def exit(self):
         """
@@ -139,18 +84,15 @@ class SyncProcess(aedir.process.AEProcess):
         if self.error_counter:
             self.logger.error('%d errors.', self.error_counter)
 
-    def run_worker(self):
+    def run_worker(self, last_run_time):
         """
         the main worker part
         """
 
-        # Determine current state
-        #-----------------------------------------------------------------------
-
-        last_run_time = self.get_state()
+        current_time = time.time()
         self.logger.debug(
             'current_time=%r last_run_time=%r',
-            self.current_time,
+            current_time,
             last_run_time,
         )
 
@@ -160,7 +102,7 @@ class SyncProcess(aedir.process.AEProcess):
         aeperson_filterstr = time_span_filter(
             '(objectClass=aePerson)',
             last_run_time,
-            self.current_time
+            current_time
         )
 
         self.logger.debug(
@@ -245,10 +187,7 @@ class SyncProcess(aedir.process.AEProcess):
                             )
                             self.modify_counter += 1
 
-        # Write state
-        self.set_state(self.current_time)
-
-        return # end of run_worker()
+        return current_time # end of run_worker()
 
 
 if __name__ == '__main__':
