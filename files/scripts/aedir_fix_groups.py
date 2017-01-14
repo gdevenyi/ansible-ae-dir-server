@@ -58,7 +58,7 @@ class AEGroupFixer(aedir.process.AEProcess):
     script_version = __version__
     pyldap_tracelevel = PYLDAP_TRACELEVEL
 
-    def run_worker(self):
+    def run_worker(self, state):
         """
         Removes obsolete 'member' and 'memberUID' values and adds
         missing 'memberUID' values in all active aeGroup entries

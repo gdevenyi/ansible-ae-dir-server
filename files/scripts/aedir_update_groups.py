@@ -199,7 +199,7 @@ class AEGroupUpdater(aedir.process.AEProcess):
 
         return # end of update_memberurl_groups()
 
-    def run_worker(self):
+    def run_worker(self, state):
         """
         the main program
         """
