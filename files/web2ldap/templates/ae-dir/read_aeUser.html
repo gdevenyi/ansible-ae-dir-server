@@ -3,15 +3,14 @@
 <p class="EntryDN">%(entryDN)s</p>
 <p>%(structuralObjectClass)s</p>
 
-<p>
-  <a href="/pwd/changepw?username=%(uid)s">CHANGE</a> or
-  <a href="/pwd/requestpw?username=%(uid)s">RESET</a> password
-</p>
-
 <table>
   <tr>
     <td>&AElig;-DIR user name (uid):</td>
-    <td>%(uid)s</td>
+    <td>
+      %(uid)s /
+      <a href="/pwd/changepw?username=%(uid)s">CHANGE</a> or
+      <a href="/pwd/requestpw?username=%(uid)s">RESET</a> password
+    </td>
   </tr>
   <tr>
     <td>Base person (aePerson):</td>
