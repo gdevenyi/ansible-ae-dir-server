@@ -6,7 +6,7 @@ Sets next GID number to highest GID found + 1
 This script must run locally on a Æ-DIR provider
 """
 
-__version__ = '0.0.5'
+__version__ = '0.0.6'
 
 import sys
 import os
@@ -123,21 +123,24 @@ def main():
     else:
         logger.debug('Current %r value %d seems ok => no change.', GID_ATTR, current_next_gid)
 
-    if UID_GID_ALIGN:
-        highest_uid_number = highest_gid_number
-    else:
-        highest_uid_number = search_highest_id(UID_ATTR)
 
-    if current_next_uid != highest_uid_number+1:
-        modlist.append(
-            (ldap.MOD_ADD, UID_ATTR, [str(highest_uid_number+1)])
-        )
-        if current_next_uid is not None:
+    if current_next_uid is not None:
+
+        if UID_GID_ALIGN:
+            highest_uid_number = highest_gid_number
+        else:
+            highest_uid_number = search_highest_id(UID_ATTR)
+
+        if current_next_uid != highest_uid_number+1:
             modlist.append(
-                (ldap.MOD_DELETE, UID_ATTR, [str(current_next_uid)])
+                (ldap.MOD_ADD, UID_ATTR, [str(highest_uid_number+1)])
             )
-    else:
-        logger.debug('Current %r value %d seems ok => no change.', UID_ATTR, current_next_uid)
+            if current_next_uid is not None:
+                modlist.append(
+                    (ldap.MOD_DELETE, UID_ATTR, [str(current_next_uid)])
+                )
+        else:
+            logger.debug('Current %r value %d seems ok => no change.', UID_ATTR, current_next_uid)
 
     if modlist:
         ldap_conn.modify_s(aedir_searchbase, modlist)
