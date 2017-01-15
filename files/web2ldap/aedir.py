@@ -244,11 +244,6 @@ class AEUserId(IA5String):
   maxCollisionChecks = 15
   UID_LETTERS = 'abcdefghijklmnopqrstuvwxyz'
   reobj = re.compile('^%s$' % (UID_LETTERS))
-  html_tmpl = (
-    '{av} / '
-    '<a title="Change password" href="/pwd/changepw?username={av}">Change Pw</a> / '
-    '<a title="Request password reset" href="/pwd/requestpw?username={av}">Request Pw</a>'
-  )
 
   def __init__(self,sid,form,ls,dn,schema,attrType,attrValue,entry=None):
     IA5String.__init__(self,sid,form,ls,dn,schema,attrType,attrValue,entry=entry)
