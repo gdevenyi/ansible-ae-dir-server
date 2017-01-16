@@ -132,7 +132,12 @@ class AEGroupFixer(aedir.process.AEProcess):
                             ldap_group_modlist,
                         )
                         self.logger.info(
-                            u'Updated member values of group entry %r: removed %d member, removed %d memberUID, added %d memberUID',
+                            (
+                                u'Updated member values of group entry %r: '
+                                u'remove_members=%d '
+                                u'remove_member_uids=%d '
+                                u'add_member_uids=%d'
+                            ),
                             ldap_group_dn,
                             len(remove_members),
                             len(remove_member_uids),
@@ -140,9 +145,10 @@ class AEGroupFixer(aedir.process.AEProcess):
                         )
                 else:
                     self.logger.debug(u'Nothing to be done with %r', ldap_group_dn)
-                    
+
         return # end of fix_members()
 
 
 if __name__ == '__main__':
-    AEGroupFixer(max_runs=1)
+    with AEGroupFixer() as ae_process:
+        ae_process.run(max_runs=1)

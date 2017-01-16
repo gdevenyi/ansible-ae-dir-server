@@ -30,10 +30,7 @@ import aedir.process
 # Constants (configuration)
 #-----------------------------------------------------------------------
 
-__version__ = '0.1.0'
-
-# python-ldap trace level
-PYLDAP_TRACELEVEL = int(os.environ.get('PYLDAP_TRACELEVEL', '0'))
+__version__ = '0.2.0'
 
 # List of attributes copied from aePerson to aeUser entries
 AEDIR_AEPERSON_ATTRS = [
@@ -57,16 +54,15 @@ class SyncProcess(aedir.process.TimestampStateMixin, aedir.process.AEProcess):
     The sync process
     """
     script_version = __version__
-    pyldap_tracelevel = PYLDAP_TRACELEVEL
+    pyldap_tracelevel = int(os.environ.get('PYLDAP_TRACELEVEL', '0'))
 
-    def __init__(self, state_filename, max_runs=1, run_sleep=60.0):
+    def __init__(self, state_filename):
+        aedir.process.AEProcess.__init__(self)
         self.state_filename = state_filename
         self.aeperson_counter = 0
         self.modify_counter = 0
         self.error_counter = 0
         self.deactivate_counter = 0
-        # must be called last since it also calls method _run()
-        aedir.process.AEProcess.__init__(self, max_runs=max_runs, run_sleep=run_sleep)
 
     def exit(self):
         """
@@ -84,25 +80,26 @@ class SyncProcess(aedir.process.TimestampStateMixin, aedir.process.AEProcess):
         if self.error_counter:
             self.logger.error('%d errors.', self.error_counter)
 
-    def run_worker(self, last_run_time):
+    def run_worker(self, last_run_timestr):
         """
         the main worker part
         """
 
-        current_time = time.time()
+        current_time_str = ldap.strf_secs(time.time())
         self.logger.debug(
-            'current_time=%r last_run_time=%r',
-            current_time,
-            last_run_time,
+            'current_time_str=%r last_run_timestr=%r',
+            current_time_str,
+            last_run_timestr,
         )
 
         # Update aeUser entries
         #-----------------------------------------------------------------------
 
-        aeperson_filterstr = time_span_filter(
-            '(objectClass=aePerson)',
-            last_run_time,
-            current_time
+        aeperson_filterstr = (
+            '(&(objectClass=aePerson)(modifyTimestamp>={0})(!(modifyTimestamp>={1})))'
+        ).format(
+            last_run_timestr,
+            current_time_str,
         )
 
         self.logger.debug(
@@ -187,8 +184,9 @@ class SyncProcess(aedir.process.TimestampStateMixin, aedir.process.AEProcess):
                             )
                             self.modify_counter += 1
 
-        return current_time # end of run_worker()
+        return current_time_str # end of run_worker()
 
 
 if __name__ == '__main__':
-    SyncProcess(sys.argv[1], max_runs=1)
+    with SyncProcess(sys.argv[1]) as ae_process:
+        ae_process.run(max_runs=1)

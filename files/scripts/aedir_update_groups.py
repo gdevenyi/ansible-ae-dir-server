@@ -15,7 +15,7 @@ Requires:
 - python-aedir 0.0.10+
 """
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 #-----------------------------------------------------------------------
 # Imports
@@ -209,4 +209,5 @@ class AEGroupUpdater(aedir.process.AEProcess):
 
 
 if __name__ == '__main__':
-    AEGroupUpdater(max_runs=1)
+    with AEGroupUpdater() as ae_process:
+        ae_process.run(max_runs=1)
