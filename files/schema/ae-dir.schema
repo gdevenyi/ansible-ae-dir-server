@@ -8,6 +8,19 @@ objectidentifier ae-dir-oc stroeder-com-pub-ae-dir:6
 # Allgemeine Attributtypen
 #-----------------------------------------------------------------------
 
+attributetype ( ae-dir-at:42
+  NAME 'aeRoot'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: DN of aeRoot entry (to be placed in rootDSE)'
+  SUP distinguishedName
+  SINGLE-VALUE )
+
+attributetype ( ae-dir-at:43
+  NAME 'defaultNamingContext'
+  DESC 'DN of default search base (to be placed in rootDSE)'
+  SUP distinguishedName
+  SINGLE-VALUE )
+
 attributetype ( ae-dir-at:1
   NAME 'aeOwnerGroup'
   X-ORIGIN 'AE-DIR'
