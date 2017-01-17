@@ -484,6 +484,7 @@ access to
   filter="(&(|(objectClass=aeHost)(objectClass=aeService))(aeStatus=0)(!(|(uidNumber<={{ aedir_min_uid-1 }})(gidNumber<={{ aedir_min_gid-1 }})(uidNumber>={{ aedir_max_uid+1 }})(gidNumber>={{ aedir_max_gid+1 }}))))"
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =w
     by set="user & this/-2/aeZoneAdmins/member" =w
+    by set="user & this/-1/aeZoneAdmins/member" =w
     by set="user & this/-1/aeSetupGroups/member" =w
     by * auth
 
