@@ -1121,10 +1121,11 @@ access to
 
 # Give read access to confidential HR attributes only to
 # personal user accounts referencing the person entry
+# (access for zone admins/auditors is granted above)
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=aePerson)"
-  attrs=employeeNumber,aeNotBefore,aeNotAfter
+  attrs={{ aedir_confidential_person_attrs|join(',') }}
     by set="user/aePerson & this" read
     by * none
 

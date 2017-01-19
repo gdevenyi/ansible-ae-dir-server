@@ -168,6 +168,12 @@ aedir_hosts:
 # main provider hostname (e.g. for HA setups)
 aedir_main_provider_hostname: "{{ groups['ae-dir-providers'][0] }}"
 
+# aePerson attributes only readable by zone admins/auditors of people zone
+aedir_confidential_person_attrs:
+  - employeeNumber
+  - aeNotBefore
+  - aeNotAfter
+
 #---------------------------------------------------------------------------
 # OpenLDAP parameters
 #---------------------------------------------------------------------------
