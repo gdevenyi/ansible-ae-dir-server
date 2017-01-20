@@ -56,7 +56,7 @@ web2ldapcnf.monitor.access_allowed = [
 
 import w2lapp.schema.plugins.aedir
 
-w2lapp.schema.plugins.aedir.AETicketId.reObj = re.compile('^[A-Z]+-[0-9]+$')
+w2lapp.schema.plugins.aedir.AETicketId.reObj = re.compile('^{{ aeticketid_regex }}$')
 w2lapp.schema.plugins.aedir.AETicketId.html_tmpl = '<a href="https://issues.example.com/browse/{av}">{av}</a>'
 
 w2lapp.schema.plugins.aedir.AEHostname.html_tmpl = """{av}
