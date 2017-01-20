@@ -422,8 +422,9 @@ access to
     by group/aeGroup/member="cn=ae-replicas,cn=ae,{{ aedir_suffix }}" none
     by * none break
 
+# department and person entries only required on providers
 access to
-  dn.subtree="cn={{ aedir_org_zone }},{{ aedir_suffix }}"
+  filter="(|(objectClass=aeDept)(objectClass=aePerson))"
     by group/aeGroup/member="cn=ae-providers,cn=ae,{{ aedir_suffix }}" read
     by group/aeGroup/member="cn=ae-replicas,cn=ae,{{ aedir_suffix }}" none
     by * none break
@@ -769,19 +770,19 @@ access to
     by set="user & this/-1/aeZoneAuditors/member" read
     by * none break
 
-# Zone cn={{ aedir_org_zone }}
+# Organizational entries (departments and persons)
 #------------------------------------------------------------------
 
-# administration of aePerson entries beneath zone cn={{ aedir_org_zone }}
+# administration of aePerson entries
 access to
-  dn.regex="^uniqueIdentifier=({{ aedir_aeperson_uniqueid_regex }}),cn={{ aedir_org_zone }},{{ aedir_suffix }}$"
+  dn.regex="^uniqueIdentifier=({{ aedir_aeperson_uniqueid_regex }}),cn={{ aedir_aezone_cn_regex }},{{ aedir_suffix }}$"
   filter="(objectClass=aePerson)"
     by set="user & this/-1/aeZoneAdmins/member" write
     by set="user & this/-1/aeZoneAuditors/member" read
     by * none break
-# administration and readability of aeDept entries beneath aeZone cn={{ aedir_org_zone }}
+# administration and readability of aeDept entries
 access to
-  dn.regex="^departmentNumber=({{ aedir_aedept_deptnumber_regex }}),cn={{ aedir_org_zone }},{{ aedir_suffix }}$"
+  dn.regex="^departmentNumber=({{ aedir_aedept_deptnumber_regex }}),cn={{ aedir_aezone_cn_regex }},{{ aedir_suffix }}$"
   filter="(objectClass=aeDept)"
     by set="user & this/-1/aeZoneAdmins/member" write
     by set="user & this/-1/aeZoneAuditors/member" read
@@ -1139,7 +1140,7 @@ access to
     by set="user & ([ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(member=] + user + [))])/member" read
     by * none break
 
-# restricted addressbook usage of zone cn={{ aedir_org_zone }} for normal users
+# restricted addressbook usage to person users for normal users
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=aePerson)"
@@ -1185,7 +1186,7 @@ unique_uri "ldap:///{{ aedir_suffix }}?uid,uidNumber?sub?(objectClass=*)"
 unique_uri "ldap:///{{ aedir_suffix }}?mailLocalAddress?sub?(objectClass=*)"
 unique_uri "ldap:///{{ aedir_suffix }}?seeAlso?sub?(objectClass=*)"
 unique_uri "ldap:///{{ aedir_suffix }}?ipHostNumber,host,aeFqdn,macAddress?sub?(objectClass=*)"
-unique_uri "ldap:///cn={{ aedir_org_zone }},{{ aedir_suffix }}?employeeNumber,uniqueIdentifier,displayName?sub"
+unique_uri "ldap:///{{ aedir_suffix }}?employeeNumber,uniqueIdentifier,displayName?sub"
 # only one primary aeUser entry per aePerson
 unique_uri "ldap:///cn={{ aedir_base_zone }},{{ aedir_suffix }}?aePerson?sub"
 # these two constraints are only possible with a negation filter
@@ -1333,7 +1334,7 @@ constraint_attribute
 # restrict references from personal user accounts to their person entries
 constraint_attribute
   aePerson
-  uri "ldap:///cn={{ aedir_org_zone }},{{ aedir_suffix }}?entryDN?sub?(objectClass=aePerson)"
+  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(objectClass=aePerson)"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeUser)"
 # if parent aeZone entry has aeDept set then it must match aeDept in aePerson
 constraint_attribute aePerson,entryDN set
