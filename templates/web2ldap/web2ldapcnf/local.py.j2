@@ -59,13 +59,6 @@ import w2lapp.schema.plugins.aedir
 w2lapp.schema.plugins.aedir.AETicketId.reObj = re.compile('^{{ aeticketid_regex }}$')
 w2lapp.schema.plugins.aedir.AETicketId.html_tmpl = '<a href="https://issues.example.com/browse/{av}">{av}</a>'
 
-w2lapp.schema.plugins.aedir.AEHostname.html_tmpl = """{av}
-  <a title="Lookup host {av} in foreman"
-     href="https://foreman.example.com/hosts/{av}">foreman</a>
-  <a title="Lookup host {av} in check_mk monitoring frontend"
-     href="http://monitoring.example.com/network/check_mk/index.py?start_url=%2Fnetwork%2Fcheck_mk%2Fview.py%3Fview_name%3Dhost%26host%3D{av}">check_mk</a>
-"""
-
 # Check hostname in DNS and reverse DNS
 w2lapp.schema.plugins.aedir.AEHostname.host_lookup=2
 
