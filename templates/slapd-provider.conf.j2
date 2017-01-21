@@ -851,7 +851,7 @@ access to
 # Allow read access on necessary attributes
 access to
   filter="(objectClass=aeUser)"
-  attrs=entry,uid,aeStatus,objectClass,mail,pwdPolicySubentry,pwdChangedTime,aeTag,cn,displayName,description,entryCSN,creatorsName,createTimestamp,modifiersName,modifyTimestamp,memberOf
+  attrs=entry,uid,aeStatus,objectClass,mail,pwdPolicySubentry,pwdChangedTime,aeTag,cn,displayName,description,entryCSN,creatorsName,createTimestamp,modifiersName,modifyTimestamp,memberOf,aeRemoteHost
     by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" read
     by * none break
 
@@ -1007,7 +1007,7 @@ access to
     by set="user/aeSrvGroup/aeProxyFor/aeVisibleGroups/member & this" read
     by * none break
 
-# Access to pwdChangedTime of referenced login user groups
+# Search access to pwdChangedTime for referenced login user groups
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=account)"
@@ -1017,6 +1017,18 @@ access to
     by set="user/-1/aeProxyFor/aeLoginGroups/member & this" search
     by set="user/aeSrvGroup/aeLoginGroups/member & this" search
     by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups/member & this" search
+    by * none break
+
+# Read access to aeRemoteHost of referenced login user groups
+access to
+  dn.subtree="ou=ae-dir"
+  filter="(objectClass=account)"
+  attrs=aeRemoteHost
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,ou=ae-dir" read
+    by set="user/-1/aeLoginGroups/member & this" read
+    by set="user/-1/aeProxyFor/aeLoginGroups/member & this" read
+    by set="user/aeSrvGroup/aeLoginGroups/member & this" read
+    by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups/member & this" read
     by * none break
 
 # Only on providers

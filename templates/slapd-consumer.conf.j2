@@ -581,7 +581,7 @@ access to
     by self read
     by * none break
 
-# Access to pwdChangedTime of referenced login user groups
+# Search access to pwdChangedTime for referenced login user groups
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=account)"
@@ -591,6 +591,18 @@ access to
     by set="user/-1/aeProxyFor/aeLoginGroups/member & this" search
     by set="user/aeSrvGroup/aeLoginGroups/member & this" search
     by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups/member & this" search
+    by * none break
+
+# Read access to aeRemoteHost for referenced login user groups
+access to
+  dn.subtree="ou=ae-dir"
+  filter="(objectClass=account)"
+  attrs=aeRemoteHost
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,ou=ae-dir" read
+    by set="user/-1/aeLoginGroups/member & this" read
+    by set="user/-1/aeProxyFor/aeLoginGroups/member & this" read
+    by set="user/aeSrvGroup/aeLoginGroups/member & this" read
+    by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups/member & this" read
     by * none break
 
 # Read access to specific memberOf *values* to all aeHost entries
