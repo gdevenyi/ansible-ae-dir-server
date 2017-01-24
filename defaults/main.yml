@@ -38,7 +38,7 @@ aedir_systemd_dir: "/etc/systemd/system"
 
 aedir_platform_python:
   Debian: "{{ aedir_bin }}/python"
-  openSUSE: "/usr/bin/python"
+  SUSE: "/usr/bin/python"
 aedir_python: "{{ aedir_platform_python[ansible_lsb.id] }} -ROO"
 
 # regex patterns for enforcing naming conventions (substring match!)
@@ -200,7 +200,7 @@ os_openldap_paths:
     openldap_conf_prefix: /usr/local/openldap/etc/openldap
     openldap_data: /usr/local/openldap/var/openldap-data
     openldap_rundir: /usr/local/openldap/var/run
-  openSUSE:
+  SUSE:
     # openSUSE packages
     openldap_prefix: /usr
     openldap_conf_prefix: /etc/openldap

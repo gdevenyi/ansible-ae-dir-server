@@ -1,17 +1,5 @@
 ---
 
-- name: "add zypper repository devel_languages_python"
-  zypper_repository:
-    name: devel_languages_python
-    description: "Python modules"
-    state: present
-    enabled: yes
-    auto_import_keys: yes
-    autorefresh: yes
-    disable_gpg_check: no
-    overwrite_multiple: yes
-    repo: "http://download.opensuse.org/repositories/devel:/languages:/python/openSUSE_Tumbleweed/"
-
 - name: "Install base packages on {{ ansible_lsb.id }}"
   zypper:
     name: "{{ item }}"
