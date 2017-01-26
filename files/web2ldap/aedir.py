@@ -402,7 +402,7 @@ class AEGroupMember(DynamicDNSelectList):
       elif len(aeperson_filters)==1:
         aeperson_filter = aeperson_filters[0]
     if aeperson_filter!=None:
-      filter_str = '(&(objectClass=aeUser)(aeStatus=0){0})'.format(
+      filter_str = '(&(aeStatus=0)(|(objectClass=aeService)(&(objectClass=aeUser){0})))'.format(
         aeperson_filter,
       )
     else:
