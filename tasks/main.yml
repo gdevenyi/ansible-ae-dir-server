@@ -2,10 +2,10 @@
 # tasks file for roles/ae-dir-server
 
 - name: "OS base configuration"
-  include: "baseos_{{ ansible_lsb.id }}.yml"
+  include: "baseos_{{ lsb_id }}.yml"
 
 - name: "Install OpenLDAP packages"
-  include: "install_openldap_{{ ansible_lsb.id }}.yml"
+  include: "install_openldap_{{ lsb_id }}.yml"
 
 - name: "TLS configuration for OpenLDAP slapd"
   include: tls_files.yml
@@ -22,8 +22,8 @@
 - name: "Install various AE-DIR tools"
   include: aedir_tools.yml
 
-- name: "Specific AE-DIR tool tasks on {{ ansible_lsb.id }}"
-  include: "aedir_tools_{{ ansible_lsb.id }}.yml"
+- name: "Specific AE-DIR tool tasks on {{ lsb_id }}"
+  include: "aedir_tools_{{ lsb_id }}.yml"
 
 - name: "Specific AE-DIR tool tasks on {{ openldap_role }}"
   include: "aedir_tools_{{ openldap_role }}.yml"

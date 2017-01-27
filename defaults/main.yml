@@ -5,6 +5,13 @@
 # AE-DIR parameters
 #---------------------------------------------------------------------------
 
+# map real LSB id to another LSB id to be used during plays
+lsb_id_map:
+  openSUSE: "SUSE"
+
+# LSB id to be used during plays
+lsb_id: "{{ lsb_id_map.get(ansible_lsb.id,ansible_lsb.id) }}"
+
 # whether to perform init tasks
 aedir_init: 0
 
@@ -39,7 +46,7 @@ aedir_systemd_dir: "/etc/systemd/system"
 aedir_platform_python:
   Debian: "{{ aedir_bin }}/python"
   SUSE: "/usr/bin/python"
-aedir_python: "{{ aedir_platform_python[ansible_lsb.id] }} -ROO"
+aedir_python: "{{ aedir_platform_python[lsb_id] }} -ROO"
 
 # regex patterns for enforcing naming conventions (substring match!)
 # Important notes:
@@ -186,8 +193,8 @@ ltb_openldap_repo:
   Debian:
     source: "deb http://ltb-project.org/debian/{{ ansible_distribution_release }} {{ ansible_distribution_release }} main"
     key: "http://ltb-project.org/wiki/lib/RPM-GPG-KEY-LTB-project"
-ltb_openldap_repo_source: "{{ ltb_openldap_repo[ansible_lsb.id].source }}"
-ltb_openldap_repo_key: "{{ ltb_openldap_repo[ansible_lsb.id].key }}"
+ltb_openldap_repo_source: "{{ ltb_openldap_repo[lsb_id].source }}"
+ltb_openldap_repo_key: "{{ ltb_openldap_repo[lsb_id].key }}"
 
 # default FQDN in LDAP service URL
 openldap_service_fqdn: "{{ inventory_hostname }}"
@@ -208,14 +215,14 @@ os_openldap_paths:
     openldap_rundir: /var/run/slapd
 
 # Some paths
-openldap_prefix: "{{ os_openldap_paths[ansible_lsb.id].openldap_prefix }}"
+openldap_prefix: "{{ os_openldap_paths[lsb_id].openldap_prefix }}"
 openldap_bin: "{{ openldap_prefix }}/bin"
-openldap_conf_prefix: "{{ os_openldap_paths[ansible_lsb.id].openldap_conf_prefix }}"
+openldap_conf_prefix: "{{ os_openldap_paths[lsb_id].openldap_conf_prefix }}"
 openldap_schema_prefix: "{{ openldap_conf_prefix }}/schema"
 openldap_sbin: "{{ openldap_prefix }}/sbin"
 openldap_defaults: "/etc/default/slapd"
-openldap_rundir: "{{ os_openldap_paths[ansible_lsb.id].openldap_rundir }}"
-openldap_data: "{{ os_openldap_paths[ansible_lsb.id].openldap_data }}"
+openldap_rundir: "{{ os_openldap_paths[lsb_id].openldap_rundir }}"
+openldap_data: "{{ os_openldap_paths[lsb_id].openldap_data }}"
 openldap_conf_file: "{{ openldap_conf_prefix }}/slapd.conf"
 openldap_ldapi_socket: "{{ openldap_rundir }}/ldapi"
 openldap_ldapi_uri: "ldapi://{{ openldap_ldapi_socket|urlencode|replace('/','%2F') }}"

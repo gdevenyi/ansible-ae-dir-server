@@ -1,6 +1,6 @@
 ---
 
-- name: "Install base packages on {{ ansible_lsb.id }}"
+- name: "Install base packages on {{ lsb_id }}"
   apt:
     name: "{{ item }}"
     state: installed
@@ -44,7 +44,7 @@
     - cryptography
     - jwcrypto
 
-- name: "Install additional base packages on {{ openldap_role }} on {{ ansible_lsb.id }}"
+- name: "Install additional base packages on {{ openldap_role }} on {{ lsb_id }}"
   apt:
     name: "{{ item }}"
     state: installed
@@ -56,7 +56,7 @@
     - python-webpy
   when: openldap_role=="provider"
 
-- name: "PIP install additional modules on {{ openldap_role }} on {{ ansible_lsb.id }}"
+- name: "PIP install additional modules on {{ openldap_role }} on {{ lsb_id }}"
   pip:
     name: "{{ item }}"
     state: latest
