@@ -6,6 +6,7 @@
 <h1 id="general">General</h1>
 
 <ol>
+
   <li id="complexity">
     <p class="faq_q">
       &AElig;-DIR seems complex.
@@ -22,6 +23,35 @@
       host/service and user groups and by moving hosts/services.
     </p>
   </li>
+
+</ol>
+
+<h1 id="general">Installation</h1>
+
+<ol>
+
+  <li id="openldap">
+    <p class="faq_q">
+      I prefer to install only packages shipped by my Linux 
+      (enterprise) distribution.
+      Why are OpenLDAP packages from different repositories installed?
+    </p>
+    <p class="faq_a">
+      &AElig;-DIR has quite a complex
+      <a href="docs.html#slapd.conf">OpenLDAP configuration</a>
+      which requires to have recent bug fix releases
+      (see also
+      <a href="http://www.openldap.org/faq/data/cache/1456.html"
+         title="">OpenLDAP FAQ-O-MATIC</a>).
+    </p>
+  </li>
+
+</ol>
+
+<h1 id="general">Client integration</h1>
+
+<ol>
+
   <li id="netgroup">
     <p class="faq_q">
       Is the <em>netgroup</em> map supported by &AElig;-DIR?
@@ -33,6 +63,7 @@
       <a href="docs.html#schema-oc-aeSrvGroup">host/service groups</a>.
     </p>
   </li>
+
   <li id="user_rights">
     <p class="faq_q">
       I'm too lazy to add groups etc.
@@ -46,6 +77,7 @@
       Think about it a few minutes. It makes sense!
     </p>
   </li>
+
 </ol>
 
 <!--#include file="ssi/footer.shtml" -->
