@@ -3,6 +3,13 @@
 <!--#set var="base_path" value="" -->
 <!--#include file="ssi/head.shtml" -->
 
+<ol>
+  <li><a href="#general">General</a></li>
+  <li><a href="#installation">Installation</a></li>
+  <li><a href="#maintenance">Maintenance</a></li>
+  <li><a href="#client-integration">Client integration</a></li>
+</ol>
+
 <h1 id="general">General</h1>
 
 <ol>
@@ -26,7 +33,7 @@
 
 </ol>
 
-<h1 id="general">Installation</h1>
+<h1 id="installation">Installation</h1>
 
 <ol>
 
@@ -42,13 +49,37 @@
       which requires to have recent bug fix releases
       (see also
       <a href="http://www.openldap.org/faq/data/cache/1456.html"
-         title="">OpenLDAP FAQ-O-MATIC</a>).
+         title="OpenLDAP Faq-O-Matic: Why is using the OpenLDAP server from a Linux distribution not recommended?">
+         OpenLDAP FAQ-O-MATIC</a>).
     </p>
   </li>
 
 </ol>
 
-<h1 id="general">Client integration</h1>
+<h1 id="maintenance">Maintenance</h1>
+
+<ol>
+
+  <li id="backup">
+    <p class="faq_q">
+      How to backup the data?
+    </p>
+    <p class="faq_a">
+      On each <a href="docs.html#sys-provider">&AElig;-DIR provider</a> a 
+      CRON job exports the databases to LDIF files with command-line tool 
+      <em>slapcat</em>.
+      (see also
+      <a href="http://www.openldap.org/doc/admin24/maintenance.html"
+         title="OpenLDAP Software 2.4 Administrator's Guide: Maintenance">
+         OpenLDAP Admin Guide</a>).
+      How often this happens and where the files are stored can be 
+      configured with ansible vars.
+    </p>
+  </li>
+
+</ol>
+
+<h1 id="client-integration">Client integration</h1>
 
 <ol>
 
