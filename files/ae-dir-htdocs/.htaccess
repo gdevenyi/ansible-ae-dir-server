@@ -1,4 +1,4 @@
-Options -Indexes +Includes
+Options -Indexes +IncludesNOEXEC
 
 DirectoryIndex ae-dir.html
 
