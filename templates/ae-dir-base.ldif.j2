@@ -100,7 +100,7 @@ objectClass: top
 objectClass: DUAConfigProfile
 profileTTL: 864000
 serviceAuthenticationMethod: pam_ldap:tls:simple
-defaultServerList:{% for host in aedir_hosts.consumer %} {{ hostvars[host]['openldap_service_fqdn'] }}{% endfor%}
+defaultServerList:{% for host in aedir_hosts.consumer %} {{ hostvars[host].get('openldap_service_fqdn',host) }}{% endfor%}
 
 defaultSearchBase: {{ aedir_suffix }}
 defaultSearchScope: sub
@@ -781,7 +781,7 @@ aeLogStoreGroups: cn=ae-sys-admins,cn=ae,{{ aedir_suffix }}
 aeVisibleSudoers: cn=ae-sudo-sys-admins,cn=ae,{{ aedir_suffix }}
 
 {% for host in aedir_hosts[role] %}
-{% set service_fqdn = hostvars[host]['openldap_service_fqdn'] -%}
+{% set service_fqdn = hostvars[host].get('openldap_service_fqdn',host) -%}
 {% set service_hostname = service_fqdn.split('.')[0] -%}
 dn: host={{ host }},cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir_suffix }}
 changetype: add
@@ -867,12 +867,12 @@ objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
 {% for host in aedir_hosts['provider'] %}
-{% set replica = hostvars[host]['openldap_service_fqdn'] -%}
+{% set replica = hostvars[host].get('openldap_service_fqdn',host) -%}
 member: uid=ae-dir-slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
 memberUID: ae-dir-slapd_{{ replica.split('.')[0] }}
 {% endfor %}
 {% for host in aedir_hosts['consumer'] %}
-{% set replica = hostvars[host]['openldap_service_fqdn'] -%}
+{% set replica = hostvars[host].get('openldap_service_fqdn',host) -%}
 member: uid=ae-dir-slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
 memberUID: ae-dir-slapd_{{ replica.split('.')[0] }}
 {% endfor %}
@@ -892,7 +892,7 @@ objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
 {% for host in aedir_hosts['provider'] %}
-{% set replica = hostvars[host]['openldap_service_fqdn'] -%}
+{% set replica = hostvars[host].get('openldap_service_fqdn',host) -%}
 member: uid=ae-dir-slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
 memberUID: ae-dir-slapd_{{ replica.split('.')[0] }}
 {% endfor %}

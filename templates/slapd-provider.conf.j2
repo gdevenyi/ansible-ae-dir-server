@@ -1599,9 +1599,9 @@ syncprov-sessionlog 1000
 syncprov-reloadhint TRUE
 
 {% if openldap_syncrepl_providers %}
-{% for provider_replica in openldap_syncrepl_providers if provider_replica!=openldap_service_fqdn %}
+{% for provider_replica in openldap_syncrepl_providers if provider_replica!=inventory_hostname %}
 syncrepl rid=0{{ loop.index }}
-  provider=ldaps://{{ provider_replica }}
+  provider=ldaps://{{ hostvars[provider_replica].get('openldap_service_fqdn',provider_replica) }}
   type=refreshAndPersist
   interval=00:00:01:00
   retry="30 +"

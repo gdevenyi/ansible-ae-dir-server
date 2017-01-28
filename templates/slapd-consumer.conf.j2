@@ -706,7 +706,7 @@ syncprov-reloadhint TRUE
 
 {% for provider_replica in openldap_syncrepl_providers %}
 syncrepl rid=0{{ loop.index }}
-  provider=ldaps://{{ provider_replica }}
+  provider=ldaps://{{ hostvars[provider_replica].get('openldap_service_fqdn',provider_replica) }}
   type=refreshAndPersist
   interval=00:00:01:00
   retry="30 +"

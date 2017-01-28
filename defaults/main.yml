@@ -310,7 +310,7 @@ openldap_db_accesslog_maxsize: 4000000
 openldap_db_um_maxsize: 4000000
 
 # list of syncrepl providers used on a certain replica
-openldap_syncrepl_providers: "{{ aedir_hosts['provider']|map('extract', hostvars, 'openldap_service_fqdn')|list }}"
+openldap_syncrepl_providers: "{{ aedir_hosts['provider'] }}"
 
 # Set to True if you are sure that your OpenLDAP installation has overlay
 # slapo-noopsrch available
