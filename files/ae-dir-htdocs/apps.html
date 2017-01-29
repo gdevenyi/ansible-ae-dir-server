@@ -26,6 +26,9 @@
         <ol>
           <li><a href="#pam-nss-sssd">sssd</a></li>
         </ol>
+        <ol>
+          <li><a href="#pam-nss-nslcd">nss-pam-ldapd (aka nslcd)</a></li>
+        </ol>
       </li>
       <li><a href="#pam-nss-smart">Smart PAM/NSS clients</a></li>
     </ol>
@@ -189,9 +192,8 @@
 
 <h3 id="pam-nss-sssd">sssd</h3>
 <p>
-  While
-  <a href="https://fedorahosted.org/sssd/">System Security Services Daemon (SSSD)</a>
-  itself is not a simple component the configuration of
+  While the <a href="https://fedorahosted.org/sssd/">System Security Services Daemon (SSSD)</a>
+  for Linux is not a simple component the configuration of
   <em>sssd-ldap(5)</em> for &AElig;-DIR does deliberately not leverage any
   of its special features.
 </p>
@@ -206,10 +208,13 @@
 <!--#include file="ssi/img.shtml" -->
 
 <p>
-  Example configuration files: <code>client-examples/sssd/</code>
+  Two example configuration files for simple bind and SASL/EXTERNAL bind
+  with TLS client certs:
+  <code>client-examples/sssd/</code>
 </p>
 <p>
   Example ansible role: <code>ansible/roles/ae-dir-linux-client/</code>
+  (set ansible variable <em>nsswitch_module</em> to "sss")
 </p>
 <p>
   See also:
@@ -225,6 +230,28 @@
   </li>
   <li>
     <a href="https://fedorahosted.org/sssd/wiki/InternalsDocs">SSSD Internals</a>
+  </li>
+</ul>
+
+<h3 id="pam-nss-nslcd">nss-pam-ldapd (aka nslcd)</h3>
+<p>
+  Arthur de Jong's <a href="https://arthurdejong.org/nss-pam-ldapd/">nss-pam-ldapd</a>
+  is also a demon providing NSS and PAM services and runs on various POSIX (non-Linux) platforms.
+</p>
+
+<p>
+  Example ansible role: <code>ansible/roles/ae-dir-linux-client/</code>
+  (set ansible variable <em>nsswitch_module</em> to "ldap")
+</p>
+<p>
+  See also:
+</p>
+<ul>
+  <li>
+    <a href="https://arthurdejong.org/nss-pam-ldapd/design">nss-pam-ldapd: Design documentation</a>
+  </li>
+  <li>
+    <a href="https://arthurdejong.org/nss-pam-ldapd/docs">nss-pam-ldapd: Documentation</a>
   </li>
 </ul>
 
