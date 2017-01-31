@@ -104,7 +104,25 @@
       Short answer: No!<br>
       Long answer:<br>
       &AElig;-DIR is designed to replace netgroups completely by leveraging
-      <a href="docs.html#schema-oc-aeSrvGroup">host/service groups</a>.
+      <a href="docs.html#schema-oc-aeSrvGroup">host/service groups</a>
+      referencing
+      <a href="docs.html#schema-oc-aeGroup">user groups</a>
+      as login groups (via attribute <em>aeLoginGroups</em>).
+    </p>
+  </li>
+
+  <li id="nested_groups">
+    <p class="faq_q">
+      Are nested groups supported by &AElig;-DIR?
+    </p>
+    <p class="faq_a">
+      No, because of bad performance. Furthermore you will loose
+      oversight over nested groups sooner or later.
+      Try understanding/leveraging the power
+      <a href="docs.html#schema-oc-aeSrvGroup">host/service groups</a>
+      referencing
+      <a href="docs.html#schema-oc-aeGroup">user groups</a>
+      which serves the same purpose in most practical cases.
     </p>
   </li>
 
