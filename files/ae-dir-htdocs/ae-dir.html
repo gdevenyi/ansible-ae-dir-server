@@ -13,18 +13,26 @@
 </p>
 
 <p>
-  Main design paradigms:
+  Project goals:
+</p>
+<ul>
+  <li>Strictly follow need-to-know-principle</li>
+  <li>Consequently delegate administration of manageable small areas</li>
+  <li>Provide meaningful audit trails</li>
+</ul>
+
+<p>
+  Technical design paradigms:
 </p>
 <ul>
   <li>Explicit is better than implicit</li>
-  <li>Individual authentication required, no anonymous access at all</li>
-  <li>Strictly follow need-to-know-principle with fine-grained authorization</li>
+  <li>Individual authentication required for secure authorization</li>
+  <li>No anonymous access at all</li>
   <li>Avoid all-mighty proxy accounts</li>
-  <li>Delegated administration of manageable small areas</li>
   <li>Do not assume hierarchical structure</li>
-  <li>A person is not an account</li>
+  <li>A person is not an user account</li>
   <li>Role separation with multiple user accounts per person</li>
-  <li>Persistent IDs (never re-used) for meaningful audit trail</li>
+  <li>Persistent IDs (never re-used) for decent audit trails</li>
   <li>Only encrypted network traffic</li>
   <li>Well-defined semantics for all object classes and attributes (better no data than bad data)</li>
 </ul>
