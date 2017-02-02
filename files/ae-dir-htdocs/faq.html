@@ -14,6 +14,19 @@
 
 <ol>
 
+  <li id="name">
+    <p class="faq_q">
+      What's the official name of the project and why I see those strange characters?
+    </p>
+    <p class="faq_a">
+      The official name is <strong>&AElig;-DIR</strong> to be
+      distinguishable from any other project (and to challenge Unicode
+      capabilities of software). <strong>AE-DIR</strong> is the official
+      pure-ASCII representation. Only capital letters are used in both
+      representations.
+    </p>
+  </li>
+
   <li id="complexity">
     <p class="faq_q">
       &AElig;-DIR seems complex.
@@ -64,6 +77,17 @@
       <a href="http://www.openldap.org/faq/data/cache/1456.html"
          title="OpenLDAP Faq-O-Matic: Why is using the OpenLDAP server from a Linux distribution not recommended?">
          OpenLDAP FAQ-O-MATIC</a>).
+    </p>
+  </li>
+
+  <li id="searchbase">
+    <p class="faq_q">
+      Can I use another search base than <em>ou=ae-dir</em>?
+    </p>
+    <p class="faq_a">
+      Yes. You can set ansible variable <em>aedir_suffix</em> which is used
+      in all ansible tasks. Note that currently this is not well tested.
+      Please provide feedback if you're using it.
     </p>
   </li>
 
