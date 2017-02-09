@@ -115,9 +115,10 @@
 
 - name: "Run pwd_expiry_check.py as CRON job"
   cron:
-    name: "pwd_expiry_check"
+    name: "aedir_pwd_expiry_warnings"
     state: present
     user: ae-dir-pwd
     cron_file: aedir_tools
-    hour: "*/12"
+    hour: "0"
+    minute: "0"
     job: "{{ aedir_python }} {{ aedir_sbin }}/pwd_expiry_check.py"
