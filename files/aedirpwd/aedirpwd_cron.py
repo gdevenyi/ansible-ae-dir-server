@@ -17,8 +17,6 @@ import time
 import smtplib
 import email.utils
 from socket import getfqdn
-import logging
-from logging.handlers import SysLogHandler
 
 # from python-ldap
 import ldap
@@ -295,16 +293,10 @@ class AEDIRPwdJob(aedir.process.AEProcess):
         """
         Run the job
         """
-        try:
-            last_run_timestr, current_run_timestr = self._get_time_strings()
-            self._expire_pwd_reset(last_run_timestr, current_run_timestr)
-            self._welcome_notifications(last_run_timestr, current_run_timestr)
-        except Exception:
-            self.logger.error(
-                'Unhandled exception:',
-                exc_info=True
-            )
-        return current_run_timestr # end of run_once()
+        last_run_timestr, current_run_timestr = self._get_time_strings()
+        self._expire_pwd_reset(last_run_timestr, current_run_timestr)
+        self._welcome_notifications(last_run_timestr, current_run_timestr)
+        return current_run_timestr # end of run_worker()
 
 
 if __name__ == '__main__':
