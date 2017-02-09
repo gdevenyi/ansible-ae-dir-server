@@ -9,7 +9,7 @@ user entries.
 Author: Michael Ströder <michael@stroeder.com>
 """
 
-__version__ = '0.0.3'
+__version__ = '0.0.4'
 
 import os,logging
 
@@ -43,7 +43,7 @@ NOTIFY_OLDEST_TIMESPAN = 3 * 86400.0
 
 # If non-zero this specifies to run step 2. only if the host's FQDN
 # is equal to this, else abort
-ENSURE_DNS_CNAME = '{{ groups['ae-dir-providers'][0] }}'
+MAIL_ENABLED = '{{ groups['ae-dir-providers'][0] }}'=='{{ ansible_fqdn }}'
 
 # Where to store the last run timestamp
 STATE_FILENAME = '{{ aedir_rundir }}/pwd_expiry_check.state'
@@ -203,11 +203,6 @@ host_fqdn = socket.getfqdn()
 
 my_logger.debug('Starting %s %s or %s',script_name,__version__,host_fqdn)
 
-if ENSURE_DNS_CNAME and \
-   socket.gethostbyname(ENSURE_DNS_CNAME)!=socket.gethostbyname(host_fqdn):
-  my_logger.info('%r is not %r => aborting',host_fqdn,ENSURE_DNS_CNAME)
-  sys.exit(0)
-
 # Determine oldest possible last timestamp (sounds strange, yeah!)
 current_time = time.time()
 current_time_str = generalized_time(current_time)
@@ -325,8 +320,13 @@ ldap_conn.unbind_s()
 
 my_logger.debug('pwd_expire_warning_list = %s',pwd_expire_warning_list)
 
-if pwd_expire_warning_list:
+if not MAIL_ENABLED:
+  my_logger.info('Sending e-mails is disabled => no notifications')
 
+elif not pwd_expire_warning_list:
+  my_logger.info('No results => no notifications')
+
+else:
   # Read mail template file
   smtp_message_tmpl = open(PWD_EXPIRYWARN_MAIL_TEMPLATE,'rb').read().decode('utf-8')
 
@@ -367,9 +367,6 @@ if pwd_expire_warning_list:
   my_logger.debug('Close SMTP connection to %r',SMTP_URL)
   smtp_conn.quit()
 
-else:
-
-  my_logger.info('No results => no notifications')
 
 # Write the last run timestamp
 try:
