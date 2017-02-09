@@ -1,0 +1,384 @@
+#!{{ aedir_python }}
+# -*- coding: utf-8 -*-
+"""
+This CRON script checks for soon to expire or already expired passwords.
+
+It reads the pwdPolicy entries and pwdChangedTime attributes from
+user entries.
+
+Author: Michael Ströder <michael@stroeder.com>
+"""
+
+__version__ = '0.0.2'
+
+import os,logging
+
+#-----------------------------------------------------------------------
+# Configuration constants
+#-----------------------------------------------------------------------
+
+# LDAP-URL describing the connection parameters and bind information
+PWD_LDAP_URL = r'{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub??trace=0'
+
+# Timeout in seconds when connecting to local and remote LDAP servers
+# used for ldap.OPT_NETWORK_TIMEOUT and ldap.OPT_TIMEOUT
+LDAP_TIMEOUT = 10.0
+
+# Number of times connecting to LDAP is tried
+LDAP_MAXRETRYCOUNT = 4
+
+# LDAP filter string to be used to search for pwdPolicy entries
+PWDPOLICY_FILTER = r'(&(objectClass=pwdPolicy)(&(pwdMaxAge=*)(!(pwdMaxAge=0)))(pwdExpireWarning=*)(!(pwdAllowUserChange=FALSE)))'
+
+# Filter string templates
+PWD_EXPIRYWARN_FILTER_TMPL = r'(&(objectClass=aeUser)(aeStatus=0)(uid=*)(displayName=*)(mail=*)(pwdPolicySubentry=%(pwdpolicy)s)(pwdChangedTime>=%(pwdchangedtime_ge)s)(pwdChangedTime<=%(pwdchangedtime_le)s))'
+PWD_EXPIRED_FILTER_TMPL = r'(&(objectClass=aeUser)(aeStatus=0)(uid=*)(displayName=*)(mail=*)(pwdPolicySubentry=%(pwdpolicy)s)(pwdChangedTime<=20140204162745Z))'
+
+# Filter string template for finding an active user entry
+# mainly used to inform about who did something and send e-mail to
+FILTERSTR_USER = ur'(&(objectClass=aeUser)(aeStatus=0)(displayName=*)(mail=*))'
+
+# Maximum timespan to search for password-less entries in the past
+NOTIFY_OLDEST_TIMESPAN = 3 * 86400.0
+
+# If non-zero this specifies to run step 2. only if the host's FQDN
+# is equal to this, else abort
+ENSURE_DNS_CNAME = '{{ aedir_main_provider_hostname }}'
+
+# Where to store the last run timestamp
+STATE_FILENAME = '{{ aedir_rundir }}/pwd_expiry_check.state'
+
+# E-Mail subject for notification message
+PWD_EXPIRYWARN_MAIL_SUBJECT = u'Password of Æ-DIR account "%(user_uid)s" will expire soon!'
+# E-Mail body template file for notification message
+PWD_EXPIRYWARN_MAIL_TEMPLATE = '{{ aedir_etc }}/aedirpwd/templates/en/pwd_expiry_warning.txt'
+
+# hostname and path prefix used in HTTP(S) URLs pointing to password self-service
+WEB_CTX_HOST = '{{ openldap_service_fqdn }}'
+WEB_PATH_PREFIX = u'/pwd'
+
+# Logging configuration
+#-----------------------------------------------------------------------
+
+# Logging level
+if os.environ.get('DEBUG','no')=='yes':
+  LOG_LEVEL = logging.DEBUG
+else:
+  LOG_LEVEL = logging.WARN
+
+# Logging format
+LOG_FORMAT = '%(asctime)s %(levelname)s %(message)s'
+
+# SMTP configuration
+#-----------------------------------------------------------------------
+
+# SMTP server used as smart host (SMTP relay)
+# query string of URL may contain two more parameters:
+# STARTTLS: Send STARTTLS (see also config parameter SMTP_TLSARGS)
+# VIA: Use this hostname or IP address for connection
+#SMTP_URL = 'smtp://user:password@mail-relay.example.com/?STARTTLS&VIA=mail-relay-othername.example.com'
+SMTP_URL = '{{ smtp_relay_url }}'
+
+# Debug level for SMTP messages sent to stderr
+SMTP_DEBUGLEVEL = 0
+
+# Proxy settings for socks module, set to None to disable proxy use
+#SMTP_PROXY = {
+#  'proxytype':2, # socks.PROXY_TYPE_SOCKS5
+#  'addr':'proxy.example.com',
+#  'port':1080,
+#  'rdns':True,
+#  'username':None,
+#  'password':None,
+#}
+SMTP_PROXY = None
+
+# Hostname to be sent in EHLO request, set to None for autmatically using the local hostname
+#SMTP_LOCALHOSTNAME = 'my-local-ehlo-hostname.example.com'
+SMTP_LOCALHOSTNAME = None
+
+# Dictionary for key-word arguments to be used for function ssl.wrap_socket()
+# See http://docs.python.org/2/library/ssl.html#ssl.wrap_socket
+import ssl
+SMTP_TLSARGS = {
+#  'keyfile':None,
+#  'certfile':None,
+  'cert_reqs':ssl.CERT_OPTIONAL,
+  'ssl_version':ssl.PROTOCOL_TLSv1_2,
+  'ca_certs':'{{ smtp_cacert_pathname }}',
+  'expected_fingerprints':None,
+  # ciphers only supported with Python 2.7+
+  'ciphers': "HIGH:!aNULL:!eNULL",
+}
+
+# From address in sent e-mail
+SMTP_FROM = '{{ smtp_from_address }}'
+
+#-----------------------------------------------------------------------
+# Imports and pre-filled vars
+#-----------------------------------------------------------------------
+
+# from Python's standard lib
+import sys,os,time,calendar,socket,smtplib,logging
+from calendar import timegm
+import email.utils
+from email.header import Header as email_Header
+
+# from python-ldap
+import ldap,ldap.filter,ldap.sasl,ldapurl
+from ldap.ldapobject import ReconnectLDAPObject
+
+# the separate mailutil module
+import mailutil
+
+# Optional use of module SocksiPy
+if SMTP_PROXY!=None:
+  import socks
+  mailutil.smtp_socket = socks.socksocket
+  socks.setdefaultproxy(**SMTP_PROXY)
+else:
+  mailutil.smtp_socket = socket.socket
+
+#-----------------------------------------------------------------------
+# Classes and functions
+#-----------------------------------------------------------------------
+
+
+def generalized_time(t):
+  """
+  Convert seconds since epoch into LDAP syntax GeneralizedTime
+  """
+  return time.strftime(
+    '%Y%m%d%H%M%SZ',
+    time.gmtime(t)
+  )
+
+
+def connect_and_bind(ldap_url):
+  """
+  Connect and bind to the LDAP directory
+  """
+
+  class PwdLDAPUrl(ldapurl.LDAPUrl):
+    """
+    Special class for handling additional LDAP URL extensions
+    """
+    attr2extype = {
+      'who':'bindname',
+      'cred':'X-BINDPW',
+      'start_tls':'startTLS',
+      'trace_level':'trace',
+    }
+
+  lu = PwdLDAPUrl(ldap_url)
+  trace_level = int(lu.trace_level or '0')
+  start_tls = int(lu.start_tls or '1')
+  ldap_conn = ldap.initialize(lu.initializeUrl(),trace_level=0,trace_file=sys.stderr)
+  ldap_conn._trace_level = trace_level
+  if lu.urlscheme.lower()=='ldapi' and not lu.who:
+    ldap_conn.sasl_interactive_bind_s('',ldap.sasl.external())
+  else:
+    if lu.urlscheme.lower()=='ldap' and start_tls:
+      ldap_conn.start_tls_s()
+    # Aus Sicherheitsgruenden wird Trace-Log fuer LDAP Simple Bind Request
+    # mit Passwort ausgeschaltet
+    ldap_conn._trace_level = 0
+    ldap_conn.simple_bind_s(lu.who or '',lu.cred or '')
+    ldap_conn._trace_level = trace_level
+  return ldap_conn,lu
+
+#-----------------------------------------------------------------------
+# Main
+#-----------------------------------------------------------------------
+
+script_name = sys.argv[0]
+my_logger = logging.getLogger(script_name)
+my_stream_formatter = logging.Formatter(fmt=LOG_FORMAT)
+my_stream_handler = logging.StreamHandler()
+my_stream_handler.setFormatter(my_stream_formatter)
+my_logger.addHandler(my_stream_handler)
+my_logger.setLevel(LOG_LEVEL)
+
+host_fqdn = socket.getfqdn()
+
+my_logger.debug('Starting %s %s or %s',script_name,__version__,host_fqdn)
+
+if ENSURE_DNS_CNAME and \
+   socket.gethostbyname(ENSURE_DNS_CNAME)!=socket.gethostbyname(host_fqdn):
+  my_logger.info('%s is not %s => aborting',repr(host_fqdn),repr(ENSURE_DNS_CNAME))
+  sys.exit(0)
+
+# Determine oldest possible last timestamp (sounds strange, yeah!)
+current_time = time.time()
+current_time_str = generalized_time(current_time)
+oldest_last_run_time = current_time-NOTIFY_OLDEST_TIMESPAN
+try:
+  last_run_time_str = open(STATE_FILENAME,'rb').read().strip()
+except IOError,e:
+  my_logger.warn('Error reading file %s: %s',repr(STATE_FILENAME),str(e))
+  last_run_time = oldest_last_run_time
+else:
+  last_run_time = calendar.timegm(time.strptime(last_run_time_str,'%Y%m%d%H%M%SZ'))
+  my_logger.debug('Read last run timestamp %s (%(0.1)f) from file %s',repr(last_run_time_str),last_run_time,repr(STATE_FILENAME))
+  if oldest_last_run_time>last_run_time:
+    my_logger.info('Timestamp read from file %s too old => ignoring',repr(STATE_FILENAME))
+    last_run_time = oldest_last_run_time
+
+last_run_time_str = generalized_time(last_run_time)
+my_logger.debug('last_run_time_str = %s / last_run_time = %(0.1)f',repr(last_run_time_str),last_run_time)
+
+try:
+  ldap_conn,ldap_url = connect_and_bind(PWD_LDAP_URL)
+except ldap.LDAPError,e:
+  my_logger.error('LDAPError during connecting to %s: %s',repr(PWD_LDAP_URL),str(e))
+  sys.exit(1)
+else:
+  my_logger.info('Successfully bound to %s as %s',repr(ldap_conn._uri),repr(ldap_conn.whoami_s()))
+
+
+# Read pwdPolicy entries
+#-----------------------------------------------------------------------
+
+ldap_pwdpolicy_results = ldap_conn.search_ext_s(
+  ldap_url.dn,
+  ldap.SCOPE_SUBTREE,
+  filterstr=PWDPOLICY_FILTER,
+  attrlist=['cn','pwdMaxAge','pwdExpireWarning'],
+)
+
+if not ldap_pwdpolicy_results:
+  my_logger.error('No pwdPolicy entries found => nothing to do => abort')
+  sys.exit(1)
+
+pwd_policy_list = [
+  (dn,int(entry['pwdMaxAge'][0]),int(entry['pwdExpireWarning'][0]))
+  for dn,entry in ldap_pwdpolicy_results
+]
+
+my_logger.debug('Found %d pwdPolicy entries: %s',len(pwd_policy_list),pwd_policy_list)
+
+pwd_expire_warning_list = []
+
+for pwd_policy,pwd_max_age,pwd_expire_warning in pwd_policy_list:
+
+  filterstr_inputs_dict = {
+    'pwdpolicy':pwd_policy,
+    'pwdchangedtime_ge':generalized_time(current_time-pwd_max_age),
+    'pwdchangedtime_le':generalized_time(current_time-(pwd_max_age-pwd_expire_warning)),
+  }
+  my_logger.debug('filterstr_inputs_dict = %s',filterstr_inputs_dict)
+
+  pwd_expirywarn_filter = PWD_EXPIRYWARN_FILTER_TMPL % filterstr_inputs_dict
+
+  my_logger.debug('Searching users for password expiry warning with: %s',repr(pwd_expirywarn_filter))
+  ldap_results = ldap_conn.search_ext_s(
+    ldap_url.dn,
+    ldap_url.scope,
+    filterstr=pwd_expirywarn_filter,
+    attrlist=['objectClass','uid','cn','displayName','description','mail','creatorsName','modifiersName'],
+  )
+
+  for ldap_dn,ldap_entry in ldap_results:
+
+    to_addr = ldap_entry['mail'][0].decode('utf-8')
+    my_logger.debug('Prepare notification for %s sent to %s',repr(ldap_dn),repr(to_addr))
+    default_headers = (
+      ('From',SMTP_FROM),
+      ('Date',email.utils.formatdate(time.time(),True)),
+    )
+    user_data = {
+      'user_uid':ldap_entry['uid'][0].decode('utf-8'),
+      'user_cn':ldap_entry.get('cn',[''])[0].decode('utf-8'),
+      'user_displayname':ldap_entry.get('displayName',[''])[0].decode('utf-8'),
+      'user_description':ldap_entry.get('description',[''])[0].decode('utf-8'),
+      'emailaddr':to_addr,
+      'fromaddr':SMTP_FROM,
+      'user_dn':ldap_dn.decode('utf-8'),
+      'web_ctx_host':(WEB_CTX_HOST).decode('ascii'),
+      'app_path_prefix':WEB_PATH_PREFIX,
+    }
+
+    user_data['admin_cn'] = u'unknown'
+    user_data['admin_mail'] = u'unknown'
+    for admin_dn_attr in ('modifiersName','creatorsName'):
+      try:
+        admin_dn,admin_entry = ldap_conn.search_ext_s(
+          ldap_entry[admin_dn_attr][0],
+          ldap.SCOPE_BASE,
+          filterstr=FILTERSTR_USER.encode('utf-8'),
+          attrlist=['objectClass','uid','cn','mail'],
+        )[0]
+      except ldap.LDAPError,e:
+        my_logger.debug('LDAPError reading %s: %s: %s',repr(admin_dn_attr),repr(ldap_entry[admin_dn_attr][0]),str(e))
+      except IndexError:
+        my_logger.debug('Not real admin referenced in %s: %s',repr(admin_dn_attr),repr(ldap_entry[admin_dn_attr][0]))
+      else:
+        user_data['admin_cn'] = admin_entry.get('cn',[''])[0].decode('utf-8')
+        user_data['admin_mail'] = admin_entry.get('mail',[''])[0].decode('utf-8')
+        my_logger.debug('Admin displayName read from %s: %s',repr(admin_dn_attr),repr(user_data['admin_cn']))
+        break
+
+    pwd_expire_warning_list.append(user_data)
+
+# Close LDAP connection
+ldap_conn.unbind_s()
+
+my_logger.debug('pwd_expire_warning_list = %s',pwd_expire_warning_list)
+
+if pwd_expire_warning_list:
+
+  # Read mail template file
+  smtp_message_tmpl = open(PWD_EXPIRYWARN_MAIL_TEMPLATE,'rb').read().decode('utf-8')
+
+  my_logger.debug('Open SMTP connection to %s via %s from %s',repr(SMTP_URL),repr(SMTP_PROXY),repr(SMTP_LOCALHOSTNAME))
+  smtp_conn = mailutil.smtp_connection(
+    SMTP_URL,local_hostname=SMTP_LOCALHOSTNAME,
+    tls_args=SMTP_TLSARGS,
+    debug_level=SMTP_DEBUGLEVEL
+  )
+
+  notification_counter = 0
+
+  for user_data in pwd_expire_warning_list:
+
+    to_addr = user_data['emailaddr']
+    smtp_message = smtp_message_tmpl % user_data
+    smtp_subject = PWD_EXPIRYWARN_MAIL_SUBJECT % user_data
+    my_logger.debug('smtp_subject = %s',repr(smtp_subject))
+    my_logger.debug('smtp_message = %s',repr(smtp_message))
+    try:
+      smtp_conn.send_simple_message(
+        SMTP_FROM,
+        [to_addr.encode('utf-8')],
+        'utf-8',
+        default_headers+(
+          ('Subject',smtp_subject),
+          ('To',to_addr),
+        ),
+        smtp_message,
+      )
+    except smtplib.SMTPRecipientsRefused,e:
+      my_logger.error('Recipient %s rejected: %s',repr(to_addr),str(e))
+      continue
+    else:
+      notification_counter += 1
+
+  my_logger.info('Sent %d notifications',notification_counter)
+  my_logger.debug('Close SMTP connection to %s',repr(SMTP_URL))
+  smtp_conn.quit()
+
+else:
+
+  my_logger.info('No results => no notifications')
+
+# Write the last run timestamp
+try:
+  state_file = open(STATE_FILENAME,'wb')
+  state_file.write(current_time_str)
+  state_file.close()
+except Exception,e:
+  my_logger.error('Error writing file %s: %s',repr(STATE_FILENAME),str(e))
+else:
+  my_logger.debug('Wrote timestamp %s to file %s',repr(current_time_str),repr(STATE_FILENAME))
+
+sys.exit(0)

@@ -68,7 +68,7 @@
   notify:
     - "restart aedirpwd"
 
-- name: "Install password service CRON scripts from template"
+- name: "Install password service CRON scripts"
   copy:
     src: "aedirpwd/{{ item }}"
     dest: "{{ aedir_sbin }}/{{ item }}"
@@ -77,6 +77,14 @@
     mode: 0750
   with_items:
     - aedirpwd_cron.py
+
+- name: "Install password expiry warning CRON script"
+  template:
+    src: "aedirpwd/pwd_expiry_check.py.j2"
+    dest: "{{ aedir_sbin }}/pwd_expiry_check.py"
+    owner: root
+    group: "{{ aedirpwd_web_group }}"
+    mode: 0750
 
 - name: Install systemd unit file from template
   template:
@@ -104,3 +112,12 @@
     cron_file: aedir_tools
     minute: "*/2"
     job: "{{ aedir_python }} {{ aedir_sbin }}/aedirpwd_cron.py {{ aedir_etc }}/aedirpwd"
+
+- name: "Run pwd_expiry_check.py as CRON job"
+  cron:
+    name: "pwd_expiry_check"
+    state: present
+    user: ae-dir-pwd
+    cron_file: aedir_tools
+    hour: "*/12"
+    job: "{{ aedir_python }} {{ aedir_sbin }}/pwd_expiry_check.py"
