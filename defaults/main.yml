@@ -377,6 +377,19 @@ aedirpwd_web_group: ae-dir-pwd
 # SMTP parameters
 #---------------------------------------------------------------------------
 
+# SMTP server used as smart host (SMTP relay)
+# query string of URL may contain two more parameters:
+# STARTTLS: Send STARTTLS (see also config parameter SMTP_TLSARGS)
+# VIA: Use this hostname or IP address for connection
+#SMTP_URL = 'smtp://user:password@mail-relay.example.com/?STARTTLS&VIA=mail-relay-othername.example.com'
+smtp_relay_url: "smtp://smtp.example.com:587/?STARTTLS"
+
+# from address to be used when sending e-mails
+smtp_admin_address: "ae-admins@{{ openldap_service_fqdn }}"
+
+# from address to be used when sending e-mails
+smtp_from_address: "{{ smtp_admin_address }}"
+
 # The CA certificate file bundle for sending e-mail via SMTP/STARTTLS
 smtp_cacert_filename:  "{{ openldap_cacert_filename }}"
 
