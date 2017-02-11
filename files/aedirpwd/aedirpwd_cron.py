@@ -25,7 +25,6 @@ import ldap
 import mailutil
 
 # the separate python-aedir module
-import aedir
 import aedir.process
 
 #-----------------------------------------------------------------------
