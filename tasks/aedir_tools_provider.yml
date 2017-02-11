@@ -77,6 +77,15 @@
     user: root
     cron_file: aedir_tools
 
+- name: "set env var LDAPRC={{ aedir_etc }}/ldap.conf in /etc/cron.d/aedir_tools"
+  cron:
+    env: yes
+    name: "LDAPRC"
+    value: "{{ aedir_etc }}/ldap.conf"
+    state: present
+    user: root
+    cron_file: aedir_tools
+
 - name: Run aedir_update_groups.py as CRON job
   cron:
     name: "aedir_update_groups"
