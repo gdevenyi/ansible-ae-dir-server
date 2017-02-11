@@ -14,6 +14,10 @@ __version__ = '0.1.0'
 # from Python's standard lib
 import os
 import sys
+import smtplib
+import time
+import email.utils
+from email.header import Header as email_Header
 
 # the separate python-aedir module
 import aedir.process
@@ -33,11 +37,28 @@ LDAP_TIMEOUT = 10.0
 LDAP_MAXRETRYCOUNT = 4
 
 # LDAP filter string to be used to search for pwdPolicy entries
-PWDPOLICY_FILTER = r'(&(objectClass=pwdPolicy)(&(pwdMaxAge=*)(!(pwdMaxAge=0)))(pwdExpireWarning=*)(!(pwdAllowUserChange=FALSE)))'
+PWDPOLICY_FILTER = (
+    '(&'
+        '(objectClass=pwdPolicy)'
+        '(&(pwdMaxAge=*)(!(pwdMaxAge=0)))'
+        '(pwdExpireWarning=*)'
+        '(!(pwdAllowUserChange=FALSE))'
+    ')'
+)
 
 # Filter string templates
-PWD_EXPIRYWARN_FILTER_TMPL = r'(&(objectClass=aeUser)(aeStatus=0)(uid=*)(displayName=*)(mail=*)(pwdPolicySubentry=%(pwdpolicy)s)(pwdChangedTime>=%(pwdchangedtime_ge)s)(pwdChangedTime<=%(pwdchangedtime_le)s))'
-PWD_EXPIRED_FILTER_TMPL = r'(&(objectClass=aeUser)(aeStatus=0)(uid=*)(displayName=*)(mail=*)(pwdPolicySubentry=%(pwdpolicy)s)(pwdChangedTime<=20140204162745Z))'
+PWD_EXPIRYWARN_FILTER_TMPL = (
+    '(&'
+        '(objectClass=aeUser)'
+        '(aeStatus=0)'
+        '(uid=*)'
+        '(displayName=*)'
+        '(mail=*)'
+        '(pwdPolicySubentry=%(pwdpolicy)s)'
+        '(pwdChangedTime>=%(pwdchangedtime_ge)s)'
+        '(pwdChangedTime<=%(pwdchangedtime_le)s)'
+    ')'
+)
 
 # Filter string template for finding an active user entry
 # mainly used to inform about who did something and send e-mail to
@@ -66,25 +87,8 @@ PWD_EXPIRYWARN_MAIL_SUBJECT = u'Password of Æ-DIR account "%(user_uid)s" will e
 PWD_EXPIRYWARN_MAIL_TEMPLATE = os.path.join(TEMPLATES_DIRNAME, 'pwd_expiry_warning.txt')
 
 #-----------------------------------------------------------------------
-# Imports and pre-filled vars
-#-----------------------------------------------------------------------
-
-# from Python's standard lib
-import sys,os,time,calendar,socket,smtplib,logging
-from calendar import timegm
-import email.utils
-from email.header import Header as email_Header
-
-#-----------------------------------------------------------------------
 # Classes and functions
 #-----------------------------------------------------------------------
-
-
-def generalized_time(t):
-    """
-    Convert seconds since epoch into LDAP syntax GeneralizedTime
-    """
-    return time.strftime('%Y%m%d%H%M%SZ', time.gmtime(t))
 
 
 class AEDIRPwdJob(aedir.process.AEProcess):
@@ -144,7 +148,11 @@ class AEDIRPwdJob(aedir.process.AEProcess):
             self.ldap_conn.find_search_base(),
             ldap.SCOPE_SUBTREE,
             filterstr=PWDPOLICY_FILTER,
-            attrlist=['cn','pwdMaxAge','pwdExpireWarning'],
+            attrlist=[
+                'cn',
+                'pwdMaxAge',
+                'pwdExpireWarning'
+            ],
         )
         if not ldap_pwdpolicy_results:
             self.logger.error('No pwdPolicy entries found => nothing to do => abort')
@@ -166,11 +174,11 @@ class AEDIRPwdJob(aedir.process.AEProcess):
 
         for pwd_policy, pwd_max_age, pwd_expire_warning in pwd_policy_list:
             filterstr_inputs_dict = {
-              'pwdpolicy':pwd_policy,
-              'pwdchangedtime_ge':generalized_time(current_time-pwd_max_age),
-              'pwdchangedtime_le':generalized_time(current_time-(pwd_max_age-pwd_expire_warning)),
+                'pwdpolicy':pwd_policy,
+                'pwdchangedtime_ge':ldap.strf_secs(current_time-pwd_max_age),
+                'pwdchangedtime_le':ldap.strf_secs(current_time-(pwd_max_age-pwd_expire_warning)),
             }
-            self.logger.debug('filterstr_inputs_dict = %s',filterstr_inputs_dict)
+            self.logger.debug('filterstr_inputs_dict = %s', filterstr_inputs_dict)
 
             pwd_expirywarn_filter = PWD_EXPIRYWARN_FILTER_TMPL % filterstr_inputs_dict
 
@@ -187,43 +195,54 @@ class AEDIRPwdJob(aedir.process.AEProcess):
 
             for ldap_dn, ldap_entry in ldap_results:
                 to_addr = ldap_entry['mail'][0].decode('utf-8')
-                self.logger.debug('Prepare notification for %r sent to %r',ldap_dn,to_addr)
+                self.logger.debug('Prepare notification for %r sent to %r', ldap_dn, to_addr)
                 default_headers = (
-                    ('From',SMTP_FROM),
-                    ('Date',email.utils.formatdate(time.time(),True)),
+                    ('From', SMTP_FROM),
+                    ('Date', email.utils.formatdate(time.time(), True)),
                 )
                 user_data = {
                     'user_uid':ldap_entry['uid'][0].decode('utf-8'),
-                    'user_cn':ldap_entry.get('cn',[''])[0].decode('utf-8'),
-                    'user_displayname':ldap_entry.get('displayName',[''])[0].decode('utf-8'),
-                    'user_description':ldap_entry.get('description',[''])[0].decode('utf-8'),
+                    'user_cn':ldap_entry.get('cn', [''])[0].decode('utf-8'),
+                    'user_displayname':ldap_entry.get('displayName', [''])[0].decode('utf-8'),
+                    'user_description':ldap_entry.get('description', [''])[0].decode('utf-8'),
                     'emailaddr':to_addr,
                     'fromaddr':SMTP_FROM,
                     'user_dn':ldap_dn.decode('utf-8'),
                     'web_ctx_host':(WEB_CTX_HOST).decode('ascii'),
                     'app_path_prefix':WEB_PATH_PREFIX,
                 }
-
                 user_data['admin_cn'] = u'unknown'
                 user_data['admin_mail'] = u'unknown'
                 for admin_dn_attr in ('modifiersName', 'creatorsName'):
                     try:
-                        admin_dn,admin_entry = self.ldap_conn.search_ext_s(
+                        admin_dn, admin_entry = self.ldap_conn.search_ext_s(
                             ldap_entry[admin_dn_attr][0],
                             ldap.SCOPE_BASE,
                             filterstr=FILTERSTR_USER.encode('utf-8'),
                             attrlist=self.admin_attrs,
                         )[0]
                     except ldap.LDAPError, ldap_err:
-                        self.logger.debug('LDAPError reading %r: %r: %s', admin_dn_attr, ldap_entry[admin_dn_attr][0], ldap_err)
+                        self.logger.debug(
+                            'LDAPError reading %r: %r: %s',
+                            admin_dn_attr,
+                            ldap_entry[admin_dn_attr][0],
+                            ldap_err,
+                        )
                     except IndexError:
-                        self.logger.debug('Not real admin referenced in %r: %r', admin_dn_attr, ldap_entry[admin_dn_attr][0])
+                        self.logger.debug(
+                            'No real admin referenced in %r: %r',
+                            admin_dn_attr,
+                            ldap_entry[admin_dn_attr][0],
+                        )
                     else:
                         user_data['admin_cn'] = admin_entry.get('cn', [''])[0].decode('utf-8')
                         user_data['admin_mail'] = admin_entry.get('mail', [''])[0].decode('utf-8')
-                        self.logger.debug('Admin displayName read from %r: %r', admin_dn_attr, user_data['admin_cn'])
+                        self.logger.debug(
+                            'Admin displayName read from %r: %r',
+                            admin_dn_attr,
+                            user_data['admin_cn'],
+                        )
                         break
-
                 pwd_expire_warning_list.append(user_data)
 
         self.logger.debug('pwd_expire_warning_list = %s', pwd_expire_warning_list)
@@ -234,7 +253,7 @@ class AEDIRPwdJob(aedir.process.AEProcess):
             self.logger.info('Sending e-mails is disabled => no notifications')
         else:
             # Read mail template file
-            with open(PWD_EXPIRYWARN_MAIL_TEMPLATE,'rb') as template_file:
+            with open(PWD_EXPIRYWARN_MAIL_TEMPLATE, 'rb') as template_file:
                 smtp_message_tmpl = template_file.read().decode('utf-8')
             smtp_conn = self._smtp_connection(
                 SMTP_URL,
@@ -261,10 +280,10 @@ class AEDIRPwdJob(aedir.process.AEProcess):
                         smtp_message,
                     )
                 except smtplib.SMTPRecipientsRefused, smtp_err:
-                  self.logger.error('Recipient %r rejected: %s', to_addr, smtp_err)
-                  continue
+                    self.logger.error('Recipient %r rejected: %s', to_addr, smtp_err)
+                    continue
                 else:
-                  notification_counter += 1
+                    notification_counter += 1
             self.logger.info('Sent %d notifications', notification_counter)
 
 
