@@ -71,9 +71,6 @@ NOTIFY_OLDEST_TIMESPAN = 2 * 86400.0
 # is equal to this, else abort
 MAIL_ENABLED = True # '{{ groups['ae-dir-providers'][0] }}'=='{{ ansible_fqdn }}'
 
-# Where to store the last run timestamp
-STATE_FILENAME = '{{ aedir_rundir }}/pwd_expiry_check.state'
-
 # path prefix used in HTTP(S) URLs pointing to password self-service
 WEB_PATH_PREFIX = u'/pwd'
 
