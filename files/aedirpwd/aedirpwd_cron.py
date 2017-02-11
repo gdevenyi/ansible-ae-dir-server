@@ -82,24 +82,6 @@ class AEDIRPwdJob(aedir.process.AEProcess):
             ldap.strf_secs(current_time)
         )
 
-    def _smtp_connection(self):
-        """
-        Open SMTP connection if there's not one yet
-        """
-        if self._smtp_conn is not None:
-            return self._smtp_conn
-        self.logger.debug(
-            'Open SMTP connection to %r from %r',
-            SMTP_URL,
-            SMTP_LOCALHOSTNAME
-        )
-        self._smtp_conn = mailutil.smtp_connection(
-            SMTP_URL, local_hostname=SMTP_LOCALHOSTNAME,
-            tls_args=SMTP_TLSARGS,
-            debug_level=SMTP_DEBUGLEVEL
-        )
-        return self._smtp_conn
-
     def _expire_pwd_reset(self, last_run_timestr, current_run_timestr):
         """
         Remove expired msPwdResetObject attributes
@@ -171,7 +153,12 @@ class AEDIRPwdJob(aedir.process.AEProcess):
         Send single welcome message for a user
         """
         self.logger.debug('msg_attrs = %r', msg_attrs)
-        smtp_conn = self._smtp_connection()
+        smtp_conn = self._smtp_connection(
+            SMTP_URL,
+            local_hostname=SMTP_LOCALHOSTNAME,
+            tls_args=SMTP_TLSARGS,
+            debug_level=SMTP_DEBUGLEVEL
+        )
         smtp_message = smtp_message_tmpl.format(**msg_attrs)
         smtp_subject = NOTIFY_EMAIL_SUBJECT.format(**msg_attrs)
         self.logger.debug('smtp_subject = %r', smtp_subject)
