@@ -1,0 +1,273 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+"""
+This CRON script checks for soon to expire or already expired passwords.
+
+It reads the pwdPolicy entries and pwdChangedTime attributes from
+user entries.
+
+Author: Michael Ströder <michael@stroeder.com>
+"""
+
+__version__ = '0.1.0'
+
+# from Python's standard lib
+import os
+import sys
+
+# the separate python-aedir module
+import aedir.process
+
+# from python-ldap
+import ldap
+
+#-----------------------------------------------------------------------
+# Configuration constants
+#-----------------------------------------------------------------------
+
+# Timeout in seconds when connecting to local and remote LDAP servers
+# used for ldap.OPT_NETWORK_TIMEOUT and ldap.OPT_TIMEOUT
+LDAP_TIMEOUT = 10.0
+
+# Number of times connecting to LDAP is tried
+LDAP_MAXRETRYCOUNT = 4
+
+# LDAP filter string to be used to search for pwdPolicy entries
+PWDPOLICY_FILTER = r'(&(objectClass=pwdPolicy)(&(pwdMaxAge=*)(!(pwdMaxAge=0)))(pwdExpireWarning=*)(!(pwdAllowUserChange=FALSE)))'
+
+# Filter string templates
+PWD_EXPIRYWARN_FILTER_TMPL = r'(&(objectClass=aeUser)(aeStatus=0)(uid=*)(displayName=*)(mail=*)(pwdPolicySubentry=%(pwdpolicy)s)(pwdChangedTime>=%(pwdchangedtime_ge)s)(pwdChangedTime<=%(pwdchangedtime_le)s))'
+PWD_EXPIRED_FILTER_TMPL = r'(&(objectClass=aeUser)(aeStatus=0)(uid=*)(displayName=*)(mail=*)(pwdPolicySubentry=%(pwdpolicy)s)(pwdChangedTime<=20140204162745Z))'
+
+# Filter string template for finding an active user entry
+# mainly used to inform about who did something and send e-mail to
+FILTERSTR_USER = ur'(&(objectClass=aeUser)(aeStatus=0)(displayName=*)(mail=*))'
+
+# Maximum timespan to search for password-less entries in the past
+NOTIFY_OLDEST_TIMESPAN = 2 * 86400.0
+
+# If non-zero this specifies to run step 2. only if the host's FQDN
+# is equal to this, else abort
+MAIL_ENABLED = True # '{{ groups['ae-dir-providers'][0] }}'=='{{ ansible_fqdn }}'
+
+# Where to store the last run timestamp
+STATE_FILENAME = '{{ aedir_rundir }}/pwd_expiry_check.state'
+
+# path prefix used in HTTP(S) URLs pointing to password self-service
+WEB_PATH_PREFIX = u'/pwd'
+
+# Import constants from configuration module
+sys.path.append(sys.argv[1])
+from aedirpwd_cnf import *
+
+# E-Mail subject for notification message
+PWD_EXPIRYWARN_MAIL_SUBJECT = u'Password of Æ-DIR account "%(user_uid)s" will expire soon!'
+# E-Mail body template file for notification message
+PWD_EXPIRYWARN_MAIL_TEMPLATE = os.path.join(TEMPLATES_DIRNAME, 'pwd_expiry_warning.txt')
+
+#-----------------------------------------------------------------------
+# Imports and pre-filled vars
+#-----------------------------------------------------------------------
+
+# from Python's standard lib
+import sys,os,time,calendar,socket,smtplib,logging
+from calendar import timegm
+import email.utils
+from email.header import Header as email_Header
+
+#-----------------------------------------------------------------------
+# Classes and functions
+#-----------------------------------------------------------------------
+
+
+def generalized_time(t):
+    """
+    Convert seconds since epoch into LDAP syntax GeneralizedTime
+    """
+    return time.strftime('%Y%m%d%H%M%SZ', time.gmtime(t))
+
+
+class AEDIRPwdJob(aedir.process.AEProcess):
+    """
+    Job instance
+    """
+    script_version = __version__
+    pyldap_tracelevel = int(os.environ.get('PYLDAP_TRACELEVEL', '0'))
+    notify_oldest_timespan = NOTIFY_OLDEST_TIMESPAN
+    user_attrs = [
+        'objectClass',
+        'uid',
+        'cn',
+        'displayName',
+        'description',
+        'mail',
+        'creatorsName',
+        'modifiersName',
+    ]
+    admin_attrs = [
+        'objectClass',
+        'uid',
+        'cn',
+        'mail'
+    ]
+
+    def __init__(self):
+        aedir.process.AEProcess.__init__(self)
+        self.notification_counter = 0
+        self._smtp_conn = None
+
+    def _get_time_strings(self):
+        """
+        Determine
+        1. oldest possible last timestamp (sounds strange, yeah!)
+        2. and current time
+        """
+        current_time = time.time()
+        return (
+            ldap.strf_secs(current_time-self.notify_oldest_timespan),
+            ldap.strf_secs(current_time)
+        )
+
+    def run_worker(self, state):
+        """
+        Run the job
+        """
+        last_run_timestr, current_run_timestr = self._get_time_strings()
+        self._send_password_expiry_notifications(last_run_timestr, current_run_timestr)
+        return current_run_timestr # end of run_worker()
+
+    def _get_pwd_policy_entries(self):
+        """
+        Search all pwdPolicy entries with expiring passwords (pwdMaxAge set)
+        """
+        ldap_pwdpolicy_results = self.ldap_conn.search_ext_s(
+            self.ldap_conn.find_search_base(),
+            ldap.SCOPE_SUBTREE,
+            filterstr=PWDPOLICY_FILTER,
+            attrlist=['cn','pwdMaxAge','pwdExpireWarning'],
+        )
+        if not ldap_pwdpolicy_results:
+            self.logger.error('No pwdPolicy entries found => nothing to do => abort')
+        pwd_policy_list = [
+            (dn, int(entry['pwdMaxAge'][0]), int(entry['pwdExpireWarning'][0]))
+            for dn, entry in ldap_pwdpolicy_results
+        ]
+        self.logger.debug('Found %d pwdPolicy entries: %s', len(pwd_policy_list), pwd_policy_list)
+        return pwd_policy_list # enf of _get_pwd_policy_entries()
+
+    def _send_password_expiry_notifications(self, last_run_timestr, current_run_timestr):
+        """
+        send password expiry warning e-mails
+        """
+        current_time = ldap.strp_secs(current_run_timestr)
+
+        pwd_policy_list = self._get_pwd_policy_entries()
+        pwd_expire_warning_list = []
+
+        for pwd_policy, pwd_max_age, pwd_expire_warning in pwd_policy_list:
+            filterstr_inputs_dict = {
+              'pwdpolicy':pwd_policy,
+              'pwdchangedtime_ge':generalized_time(current_time-pwd_max_age),
+              'pwdchangedtime_le':generalized_time(current_time-(pwd_max_age-pwd_expire_warning)),
+            }
+            self.logger.debug('filterstr_inputs_dict = %s',filterstr_inputs_dict)
+
+            pwd_expirywarn_filter = PWD_EXPIRYWARN_FILTER_TMPL % filterstr_inputs_dict
+
+            self.logger.debug(
+                'Search users for password expiry warning with %r',
+                pwd_expirywarn_filter
+            )
+            ldap_results = self.ldap_conn.search_ext_s(
+                self.ldap_conn.find_search_base(),
+                ldap.SCOPE_SUBTREE,
+                filterstr=pwd_expirywarn_filter,
+                attrlist=self.user_attrs,
+            )
+
+            for ldap_dn, ldap_entry in ldap_results:
+                to_addr = ldap_entry['mail'][0].decode('utf-8')
+                self.logger.debug('Prepare notification for %r sent to %r',ldap_dn,to_addr)
+                default_headers = (
+                    ('From',SMTP_FROM),
+                    ('Date',email.utils.formatdate(time.time(),True)),
+                )
+                user_data = {
+                    'user_uid':ldap_entry['uid'][0].decode('utf-8'),
+                    'user_cn':ldap_entry.get('cn',[''])[0].decode('utf-8'),
+                    'user_displayname':ldap_entry.get('displayName',[''])[0].decode('utf-8'),
+                    'user_description':ldap_entry.get('description',[''])[0].decode('utf-8'),
+                    'emailaddr':to_addr,
+                    'fromaddr':SMTP_FROM,
+                    'user_dn':ldap_dn.decode('utf-8'),
+                    'web_ctx_host':(WEB_CTX_HOST).decode('ascii'),
+                    'app_path_prefix':WEB_PATH_PREFIX,
+                }
+
+                user_data['admin_cn'] = u'unknown'
+                user_data['admin_mail'] = u'unknown'
+                for admin_dn_attr in ('modifiersName', 'creatorsName'):
+                    try:
+                        admin_dn,admin_entry = self.ldap_conn.search_ext_s(
+                            ldap_entry[admin_dn_attr][0],
+                            ldap.SCOPE_BASE,
+                            filterstr=FILTERSTR_USER.encode('utf-8'),
+                            attrlist=self.admin_attrs,
+                        )[0]
+                    except ldap.LDAPError, ldap_err:
+                        self.logger.debug('LDAPError reading %r: %r: %s', admin_dn_attr, ldap_entry[admin_dn_attr][0], ldap_err)
+                    except IndexError:
+                        self.logger.debug('Not real admin referenced in %r: %r', admin_dn_attr, ldap_entry[admin_dn_attr][0])
+                    else:
+                        user_data['admin_cn'] = admin_entry.get('cn', [''])[0].decode('utf-8')
+                        user_data['admin_mail'] = admin_entry.get('mail', [''])[0].decode('utf-8')
+                        self.logger.debug('Admin displayName read from %r: %r', admin_dn_attr, user_data['admin_cn'])
+                        break
+
+                pwd_expire_warning_list.append(user_data)
+
+        self.logger.debug('pwd_expire_warning_list = %s', pwd_expire_warning_list)
+
+        if not pwd_expire_warning_list:
+            self.logger.info('No results => no notifications')
+        elif not MAIL_ENABLED:
+            self.logger.info('Sending e-mails is disabled => no notifications')
+        else:
+            # Read mail template file
+            with open(PWD_EXPIRYWARN_MAIL_TEMPLATE,'rb') as template_file:
+                smtp_message_tmpl = template_file.read().decode('utf-8')
+            smtp_conn = self._smtp_connection(
+                SMTP_URL,
+                local_hostname=SMTP_LOCALHOSTNAME,
+                tls_args=SMTP_TLSARGS,
+                debug_level=SMTP_DEBUGLEVEL
+            )
+            notification_counter = 0
+            for user_data in pwd_expire_warning_list:
+                to_addr = user_data['emailaddr']
+                smtp_message = smtp_message_tmpl % user_data
+                smtp_subject = PWD_EXPIRYWARN_MAIL_SUBJECT % user_data
+                self.logger.debug('smtp_subject = %r', smtp_subject)
+                self.logger.debug('smtp_message = %r', smtp_message)
+                try:
+                    smtp_conn.send_simple_message(
+                        SMTP_FROM,
+                        [to_addr.encode('utf-8')],
+                        'utf-8',
+                        default_headers+(
+                            ('Subject', smtp_subject),
+                            ('To', to_addr),
+                        ),
+                        smtp_message,
+                    )
+                except smtplib.SMTPRecipientsRefused, smtp_err:
+                  self.logger.error('Recipient %r rejected: %s', to_addr, smtp_err)
+                  continue
+                else:
+                  notification_counter += 1
+            self.logger.info('Sent %d notifications', notification_counter)
+
+
+if __name__ == '__main__':
+    with AEDIRPwdJob() as ae_process:
+        ae_process.run(max_runs=1)
