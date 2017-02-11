@@ -29,13 +29,6 @@ import ldap
 # Configuration constants
 #-----------------------------------------------------------------------
 
-# Timeout in seconds when connecting to local and remote LDAP servers
-# used for ldap.OPT_NETWORK_TIMEOUT and ldap.OPT_TIMEOUT
-LDAP_TIMEOUT = 10.0
-
-# Number of times connecting to LDAP is tried
-LDAP_MAXRETRYCOUNT = 4
-
 # LDAP filter string to be used to search for pwdPolicy entries
 PWDPOLICY_FILTER = (
     '(&'
@@ -65,7 +58,7 @@ PWD_EXPIRYWARN_FILTER_TMPL = (
 FILTERSTR_USER = ur'(&(objectClass=aeUser)(aeStatus=0)(displayName=*)(mail=*))'
 
 # Maximum timespan to search for password-less entries in the past
-NOTIFY_OLDEST_TIMESPAN = 2 * 86400.0
+NOTIFY_OLDEST_TIMESPAN = 1.75 * 86400.0
 
 # If non-zero this specifies to run step 2. only if the host's FQDN
 # is equal to this, else abort
