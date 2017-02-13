@@ -136,11 +136,26 @@
       (<a href="https://tools.ietf.org/html/rfc4510">see RFC 4510</a>).
       Access control and constraints in
       <a href="docs.html#slapd.conf">OpenLDAP configuration</a>
-      prevents your client <a href="docs.html#roles">role</a> to 
+      prevents your client <a href="docs.html#roles">role</a> to
       access/alter entries in an invalid way.
       <br>
       One read-to-use module is available for
       <a href="python.html">Python</a>.
+    </p>
+  </li>
+
+  <li id="delete">
+    <p class="faq_q">
+      I always get an error message <em>insufficientAccess</em> when I try
+      to delete a user or a group. What's wrong?
+    </p>
+    <p class="faq_a">
+      Nothing's wrong. It works as designed.<br>
+      User names, group names and numeric POSIX Id must never be reused.
+      This is enforced by unique constraints and therefore deletion of user
+      and group entries is prevented by ACLs. Set the status to
+      &quot;archived&quot; (2) to make the entries invisible even for the
+      zone admins.
     </p>
   </li>
 
