@@ -96,14 +96,14 @@
   <dt>Search for <var>aeUser</var> with username "lisa" by <var>uid</var>:</dt>
   <dd>
     <code>
-      ldapsearch -b ou=ae-dir -s sub "(uid=lisa)"
+      ldapsearch -H ldaps://ae-dir.example.com -b ou=ae-dir -s sub "(uid=lisa)" "*" "+"
     </code>
   </dd>
 
   <dt>Search on behalf of an <var>aeService</var> (with -X):</dt>
   <dd>
   <code>
-    ldapsearch -b ou=ae-dir -s sub -X 'dn:uid=system_test-1,cn=test-servers-1,cn=test,ou=ae-dir' "*" "+"
+    ldapsearch -H ldaps://ae-dir.example.com -b ou=ae-dir -s sub -X 'dn:uid=system_test-1,cn=test-servers-1,cn=test,ou=ae-dir' "*" "+"
   </code>
   </dd>
 
