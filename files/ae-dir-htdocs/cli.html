@@ -25,6 +25,20 @@
   </li>
 </ul>
 
+<h2 id="openldap-tls">TLS cert valiation</h2>
+<p>
+  Please make sure that you fully understand how OpenLDAP command-line 
+  tools determine which trusted root CA cert to use
+  (see section <a href="http://www.openldap.org/software/man.cgi?query=ldap.conf#TLS_OPTIONS">TLS_OPTIONS in ldap.conf(5)</a>).
+</p>
+<p>
+  If in doubt simply use this to set it by environment variables (does not 
+  work on MacOSX!):
+</p>
+<p>
+  <code>LDAPTLS_CACERT=/path/to/rootca.crt</code>
+</p>
+
 <h2 id="openldap-ldapwhoami">ldapwhoami</h2>
 <p>
   The OpenLDAP command-line tool
@@ -34,7 +48,6 @@
   to the LDAP server. This is handy to test various authentication mechs and
   <a href="http://www.openldap.org/doc/admin24/sasl.html#Mapping%20Authentication%20Identities">authz-ID mappings</a>.
 </p>
-
 <dl>
 
   <dt>
@@ -43,7 +56,7 @@
   </dt>
   <dd>
     <code>
-      LDAPTLS_CACERT=/path/to/rootca.crt ldapwhoami -x -H ldaps://ae-dir.example.com -D "uid=lisa,ou=ae-dir" -W
+       ldapwhoami -x -H ldaps://ae-dir.example.com -D "uid=lisa,ou=ae-dir" -W
     </code>
   </dd>
 
@@ -53,7 +66,7 @@
   </dt>
   <dd>
     <code>
-      LDAPTLS_CACERT=/path/to/rootca.crt ldapwhoami -x -H ldaps://ae-dir.example.com -D "host=bart.example.com,ou=ae-dir" -w
+      ldapwhoami -x -H ldaps://ae-dir.example.com -D "host=bart.example.com,ou=ae-dir" -w
     </code>
   </dd>
 
@@ -63,7 +76,7 @@
   </dt>
   <dd>
     <code>
-      LDAPTLS_CACERT=/path/to/rootca.crt LDAPTLS_CERT=/path/to/client.crt LDAPTLS_KEY=/path/to/client.key ldapwhoami -Y EXTERNAL -H ldaps://ae-dir.example.com
+      LDAPTLS_CERT=/path/to/client.crt LDAPTLS_KEY=/path/to/client.key ldapwhoami -Y EXTERNAL -H ldaps://ae-dir.example.com
     </code>
   </dd>
 
