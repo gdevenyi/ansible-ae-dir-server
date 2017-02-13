@@ -73,6 +73,9 @@ EMAIL_TEMPLATE_ADMIN = TEMPLATES_DIRNAME+'requestpw_admin.txt'
 #SMTP_URL = 'smtp://127.0.0.1'
 SMTP_URL = '{{ smtp_relay_url }}'
 
+# Specifies whether a AE-DIR instance should send e-mail notifications to users or not
+USER_MAIL_ENABLED = {{ aedir_user_mail_enabled }}
+
 # Debug level for SMTP messages sent to stderr
 SMTP_DEBUGLEVEL = 0
 

@@ -60,10 +60,6 @@ FILTERSTR_USER = ur'(&(objectClass=aeUser)(aeStatus=0)(displayName=*)(mail=*))'
 # Maximum timespan to search for password-less entries in the past
 NOTIFY_OLDEST_TIMESPAN = 1.75 * 86400.0
 
-# If non-zero this specifies to run step 2. only if the host's FQDN
-# is equal to this, else abort
-MAIL_ENABLED = True # '{{ groups['ae-dir-providers'][0] }}'=='{{ ansible_fqdn }}'
-
 # path prefix used in HTTP(S) URLs pointing to password self-service
 WEB_PATH_PREFIX = u'/pwd'
 
@@ -239,8 +235,11 @@ class AEDIRPwdJob(aedir.process.AEProcess):
 
         if not pwd_expire_warning_list:
             self.logger.info('No results => no notifications')
-        elif not MAIL_ENABLED:
-            self.logger.info('Sending e-mails is disabled => no notifications')
+        elif not USER_MAIL_ENABLED==True:
+            self.logger.info(
+                'Sending e-mails is disabled => supressed %d notifications',
+                len(pwd_expire_warning_list),
+            )
         else:
             # Read mail template file
             with open(PWD_EXPIRYWARN_MAIL_TEMPLATE, 'rb') as template_file:

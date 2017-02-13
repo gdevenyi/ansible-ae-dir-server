@@ -181,6 +181,10 @@ aedir_confidential_person_attrs:
   - aeNotBefore
   - aeNotAfter
 
+
+# Specifies whether a AE-DIR instance should send e-mail notifications to users or not
+aedir_user_mail_enabled: "{{ groups['ae-dir-providers'][0]==ansible_fqdn }}"
+
 #---------------------------------------------------------------------------
 # OpenLDAP parameters
 #---------------------------------------------------------------------------
