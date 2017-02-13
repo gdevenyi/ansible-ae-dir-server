@@ -37,24 +37,33 @@
 
 <dl>
 
-  <dt>Check <var>aeUser</var> or <var>aeService</var> password via simple bind request with short bind-DN interactively asking for password:</dt>
+  <dt>
+    Check <var>aeUser</var> or <var>aeService</var> password via simple
+    bind request with short bind-DN interactively asking for password:
+  </dt>
   <dd>
     <code>
-      ldapwhoami -x -D "uid=lisa,ou=ae-dir" -W
+      LDAPTLS_CACERT=/path/to/rootca.crt ldapwhoami -x -H ldaps://ae-dir.example.com -D "uid=lisa,ou=ae-dir" -W
     </code>
   </dd>
 
-  <dt>Check <var>aeHost</var> password via simple bind request with short bind-DN and given password:</dt>
+  <dt>
+    Check <var>aeHost</var> password via simple bind request with short
+    bind-DN and given password:
+  </dt>
   <dd>
     <code>
-      ldapwhoami -x -D "host=bart.example.com,ou=ae-dir" -w
+      LDAPTLS_CACERT=/path/to/rootca.crt ldapwhoami -x -H ldaps://ae-dir.example.com -D "host=bart.example.com,ou=ae-dir" -w
     </code>
   </dd>
 
-  <dt>Check <var>aeService</var> authentication via SASL/EXTERNAL bind request and client cert:</dt>
+  <dt>
+    Check <var>aeService</var> authentication via SASL/EXTERNAL bind
+    request and client cert:
+  </dt>
   <dd>
     <code>
-      LDAPTLS_CACERT=/path/to/rootca.crt LDAPTLS_CERT=/path/to/client.crt LDAPTLS_KEY=/path/to/client.key ldapwhoami -Y EXTERNAL -H ldaps://ae-dir-p1.example.com
+      LDAPTLS_CACERT=/path/to/rootca.crt LDAPTLS_CERT=/path/to/client.crt LDAPTLS_KEY=/path/to/client.key ldapwhoami -Y EXTERNAL -H ldaps://ae-dir.example.com
     </code>
   </dd>
 
@@ -170,7 +179,7 @@ Added cn=test42-zone-auditors,cn=test42,ou=ae-dir
   <dt>Open TLS connection to LDAPS port:</dt>
   <dd>
     <code>
-      openssl s_client -connect ae-dir-p1.example.com:636 -CAfile /path/to/rootca.crt
+      openssl s_client -connect ae-dir.example.com:636 -CAfile /path/to/rootca.crt
     </code>
     <br>
     (should display &quot;Verify return code: 0 (ok)&quot;)
