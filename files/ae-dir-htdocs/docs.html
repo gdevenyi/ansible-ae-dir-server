@@ -1367,9 +1367,14 @@
 
 <h3 id="schema-oc-aeSrvGroup">aeSrvGroup</h3>
 <p>
-  All hosts and systems providing a login service must be member of a
-  service group for which entries are created with object class
-  <var>aeSrvGroup</var> and contain the following attributes:
+  In general a <em>service group</em> contains service instances which are
+  together providing a service and are thus considered subject to unified
+  administrative rules. So for each service providing a user login a
+  service group entry has to be added with object class
+  <var>aeSrvGroup</var>. Likely a clustered service consists of multiple
+  hosts or other services which are called the members of the service
+  group.<br>
+  Service group entries have the following attributes:
 </p>
 <dl id="schema-oc-aeSrvGroup-attributes">
   <dt>cn</dt>
