@@ -1450,8 +1450,22 @@
         <a href="https://www.sudo.ws/man/sudoers.ldap.man.html">SUDOERS.LDAP(5)</a>
       </li>
     </ul>
-    The attribute <var>sudoUser</var> must only contain the name
-    of a group (<var>cn</var> of an <var>aeGroup</var> entry) prefixed with '%'.<br>
+    Notes:
+    <ul>
+      <li>
+        The attribute <var>sudoUser</var> is constrained to only contain
+        the name of a group (<a href="#schema-oc-aeGroup-attributes">cn</a>
+        of an <var>aeGroup</var> entry) prefixed with a single percent
+        character.
+      </li>
+      <li>
+        Although you can set attribute <var>sudoHost</var> it does not make
+        sense because restricting sudoers rules to hosts is better achieved
+        by restricting visibility in the service group (attribute <a
+        href="#schema-oc-aeSrvGroup-attributes">aeVisibleSudoers</a> in
+        <var>aeSrvGroup</var> entry).
+      </li>
+    </ul>
   </dd>
   <dt>meta attributes</dt>
   <dd>see <a href="#schema-oc-aeObject-attributes">aeObject</a></dd>
