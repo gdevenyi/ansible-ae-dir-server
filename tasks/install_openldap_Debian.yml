@@ -10,7 +10,7 @@
   apt_repository:
     repo: "{{ ltb_openldap_repo_source }}"
     state: present
-    update_cache: no
+    update_cache: yes
 
 - name: Install LTB OpenLDAP packages and dependencies
   apt:
