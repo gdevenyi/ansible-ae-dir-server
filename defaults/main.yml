@@ -244,6 +244,7 @@ openldap_schema_files:
   - stroeder.com-oid-macros.schema
   - stroeder.com.schema
   - sudoers.schema
+  - autofs.schema
 
 # Pathname of backup script
 openldap_backup_script: "{{ aedir_sbin }}/ae-dir-slapcat.sh"

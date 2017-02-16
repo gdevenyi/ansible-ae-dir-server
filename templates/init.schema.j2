@@ -15,6 +15,9 @@ include {{ openldap_schema_prefix }}/openssh-lpk_openldap.schema
 # sudoers schema, see sudoers.ldap(8)
 include {{ openldap_schema_prefix }}/sudoers.schema
 
+# automount schema
+include {{ openldap_schema_prefix }}/autofs.schema
+
 include {{ openldap_schema_prefix }}/draft-stroeder-mailboxrelatedobject.schema
 include {{ openldap_schema_prefix }}/draft-stroeder-namedobject.schema
 include {{ openldap_schema_prefix }}/draft-findlay-ldap-groupofentries.schema
