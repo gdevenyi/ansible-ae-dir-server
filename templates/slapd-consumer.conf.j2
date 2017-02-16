@@ -124,6 +124,16 @@ localSSF 256
 # minimum required SSF value (security strength factor)
 security ssf=128
 
+# allow anonymous access to supportedSASLMechanisms: EXTERNAL
+access to
+  dn.base=""
+  attrs=supportedSASLMechanisms
+  val.regex="^EXTERNAL$"
+    by * read
+access to
+  dn.base=""
+  attrs=supportedSASLMechanisms
+    by * none
 # allow anonymous access to read standard search base
 access to
   dn.base=""
