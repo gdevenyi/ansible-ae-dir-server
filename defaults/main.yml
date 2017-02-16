@@ -173,7 +173,7 @@ aedir_hosts:
   consumer: "{{ groups['ae-dir-consumers'] }}"
 
 # main provider hostname (e.g. for HA setups)
-aedir_main_provider_hostname: "{{ aedir_hosts.providers[0] }}"
+aedir_main_provider_hostname: "{{ aedir_hosts.provider[0] }}"
 
 # aePerson attributes only readable by zone admins/auditors of people zone
 aedir_confidential_person_attrs:
@@ -183,7 +183,7 @@ aedir_confidential_person_attrs:
 
 
 # Specifies whether a AE-DIR instance should send e-mail notifications to users or not
-aedir_user_mail_enabled: "{{ aedir_hosts.providers[0]==ansible_fqdn }}"
+aedir_user_mail_enabled: "{{ aedir_hosts.provider[0]==ansible_fqdn }}"
 
 #---------------------------------------------------------------------------
 # OpenLDAP parameters
