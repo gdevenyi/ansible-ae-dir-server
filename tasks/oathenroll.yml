@@ -34,16 +34,6 @@
   notify:
     - "restart oathenroll"
 
-- name: "copy {{ aedir_prefix }}/htdocs/css/oathenroll.css"
-  copy:
-    src: "oath-ldap/oathenroll/oathenroll.css"
-    dest: "{{ aedir_prefix }}/htdocs/css/oathenroll.css"
-    follow: no
-    owner: root
-    group: root
-    mode: u=rw,g=r,o=r
-    directory_mode: u=rwx,g=rx,o=rx
-
 - name: "Create oathenroll_cnf.py"
   template:
     src: "{{ oath_ldap_oathenroll_cnf_template }}"

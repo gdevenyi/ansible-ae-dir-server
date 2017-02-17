@@ -36,16 +36,6 @@
     mode: u=rw,g=r,o=r
     directory_mode: u=rwx,g=rx,o=rx
 
-- name: "copy {{ aedir_prefix }}/htdocs/css/aedirpwd.css"
-  copy:
-    src: "aedirpwd/aedirpwd.css"
-    dest: "{{ aedir_prefix }}/htdocs/css/aedirpwd.css"
-    follow: no
-    owner: root
-    group: root
-    mode: u=rw,g=r,o=r
-    directory_mode: u=rwx,g=rx,o=rx
-
 - name: "Create aedirpwd_cnf.py"
   template:
     src: "{{ aedirpwd_cnf_template }}"
