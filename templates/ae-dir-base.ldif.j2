@@ -804,7 +804,7 @@ description: AE-DIR provider replica host for {{ service_fqdn }}
 
 {% for interface in hostvars[host]['ansible_interfaces'] if interface not in ( "lo", "tunl0") %}
 {% set interface_fact = "ansible_{}".format(interface) -%}
-{% if hostvars[host][interface_fact].active=="true" %}
+{% if hostvars[host][interface_fact].has_key("active") and hostvars[host][interface_fact].active==true %}
 dn: cn={{ interface }},host={{ host }},cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir_suffix }}
 changetype: add
 aeStatus: 0
