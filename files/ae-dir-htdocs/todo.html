@@ -21,6 +21,23 @@
   In no particular order:
 </p>
 
+<h2 id="logging">Logging</h2>
+<ul>
+  <li>
+    Log performance data as
+    <a href="https://docs.graylog.org/en/2.2/pages/gelf.html">Graylog Extended Log Format (GELF)</a>
+  </li>
+  <li>
+    The web applications should use Python's <em>logging module</em>
+    and file <em>ae-logging.conf</em>
+  </li>
+  <li>
+    Add
+    <a href="https://github.com/blue-yonder/cee_syslog_handler">cee_syslog_handler</a>
+    in file <em>ae-logging.conf</em>
+  </li>
+</ul>
+
 <h2 id="monitoring">Monitoring</h2>
 <ul>
   <li>
