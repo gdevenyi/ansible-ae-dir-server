@@ -34,10 +34,10 @@
   notify:
     - "restart oathenroll"
 
-- name: "copy oathenroll static files {{ aedir_prefix }}/htdocs/"
+- name: "copy {{ aedir_prefix }}/htdocs/css/oathenroll.css"
   copy:
-    src: "oath-ldap/oathenroll/static/"
-    dest: "{{ aedir_prefix }}/htdocs/oathenroll-static"
+    src: "oath-ldap/oathenroll/oathenroll.css"
+    dest: "{{ aedir_prefix }}/htdocs/css/oathenroll.css"
     follow: no
     owner: root
     group: root
