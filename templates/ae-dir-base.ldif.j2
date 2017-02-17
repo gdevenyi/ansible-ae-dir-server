@@ -100,7 +100,11 @@ objectClass: top
 objectClass: DUAConfigProfile
 profileTTL: 864000
 serviceAuthenticationMethod: pam_ldap:tls:simple
+{% if aedir_hosts.consumer %}
 defaultServerList:{% for host in aedir_hosts.consumer %} {{ hostvars[host].get('openldap_service_fqdn',host) }}{% endfor%}
+{% elif aedir_hosts.provider %}
+defaultServerList:{% for host in aedir_hosts.provider %} {{ hostvars[host].get('openldap_service_fqdn',host) }}{% endfor%}
+{% endif %}
 
 defaultSearchBase: {{ aedir_suffix }}
 defaultSearchScope: sub
@@ -800,6 +804,7 @@ description: AE-DIR provider replica host for {{ service_fqdn }}
 
 {% for interface in hostvars[host]['ansible_interfaces'] if interface not in ( "lo", "tunl0") %}
 {% set interface_fact = "ansible_{}".format(interface) -%}
+{% if interface_fact.active=="true" %}
 dn: cn={{ interface }},host={{ host }},cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir_suffix }}
 changetype: add
 aeStatus: 0
@@ -822,6 +827,7 @@ objectClass: aeNwDevice
 objectClass: ieee802Device
 objectClass: ipHost
 
+{% endif %}
 {% endfor %}
 dn: uid=ae-dir-slapd_{{ service_hostname }},cn=ae,{{ aedir_suffix }}
 changetype: add
