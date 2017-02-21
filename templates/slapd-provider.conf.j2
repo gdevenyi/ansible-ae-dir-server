@@ -780,6 +780,7 @@ access to
     by set="user & this/-1/aeSetupGroups/member" =arscxd
     by set="user & this/aeSrvGroup/aeSetupGroups/member" read
     by set="user & this/-2/aeZoneAuditors/member" read
+    by * none break
 # aeService entries
 access to
   dn.regex="^uid=({{ aedir_aeservice_uid_regex }}),cn=({{ aedir_aesrvgroup_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
