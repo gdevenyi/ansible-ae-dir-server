@@ -29,12 +29,12 @@ nameForms: ( 1.3.6.1.4.1.5427.1.389.42.15.6 NAME 'aeSudoRule-aeZone-NF' OC aeSud
 dITStructureRules: ( 7 NAME 'namedObject-aeZone-SR-1' FORM namedObject-aeZone-NF-cn SUP ( 2 ) )
 nameForms: ( 1.3.6.1.4.1.5427.1.389.42.15.7 NAME 'namedObject-aeZone-NF-cn' OC namedObject MUST ( cn ) )
 dITStructureRules: ( 8 NAME 'namedObject-aeZone-SR-2' FORM namedObject-aeZone-NF-uniqueIdentifier SUP ( 2 ) )
-nameForms: ( 1.3.6.1.4.1.5427.1.389.42.15.8 NAME 'namedObject-aeZone-NF-uniqueIdentifier' OC namedObject MUST ( uniqueIdentifier ) MAY ( cn ) ) ) )
+nameForms: ( 1.3.6.1.4.1.5427.1.389.42.15.8 NAME 'namedObject-aeZone-NF-uniqueIdentifier' OC namedObject MUST ( uniqueIdentifier ) MAY ( cn ) )
 # namedPolicy
 dITStructureRules: ( 9 NAME 'namedPolicy-aeZone-SR-1' FORM namedPolicy-aeZone-NF-cn SUP ( 2 ) )
 nameForms: ( 1.3.6.1.4.1.5427.1.389.42.15.9 NAME 'namedPolicy-aeZone-NF-cn' OC namedPolicy MUST ( cn ) )
 dITStructureRules: ( 10 NAME 'namedPolicy-aeZone-SR-2' FORM namedPolicy-aeZone-NF-uniqueIdentifier SUP ( 2 ) )
-nameForms: ( 1.3.6.1.4.1.5427.1.389.42.15.10 NAME 'namedPolicy-aeZone-NF-uniqueIdentifier' OC namedPolicy MUST ( uniqueIdentifier ) MAY ( cn ) ) ) )
+nameForms: ( 1.3.6.1.4.1.5427.1.389.42.15.10 NAME 'namedPolicy-aeZone-NF-uniqueIdentifier' OC namedPolicy MUST ( uniqueIdentifier ) MAY ( cn ) )
 # aePerson
 dITStructureRules: ( 11 NAME 'aePerson-aeZone-SR-1' FORM aePerson-aeZone-NF-employeeNumber SUP ( 2 ) )
 nameForms: ( 1.3.6.1.4.1.5427.1.389.42.15.11 NAME 'aePerson-aeZone-NF-employeeNumber' OC aePerson MUST ( employeeNumber ) )
