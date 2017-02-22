@@ -466,10 +466,24 @@ class AEGroupDN(DynamicDNSelectList):
   oid = 'AEGroupDN-oid'
   desc = 'AE-DIR: DN of user group entry'
   input_fallback = False # no fallback to normal input field
-  ldap_url = 'ldap:///_?cn?sub?(&(objectClass=aeGroup)(aeStatus=0))'
+  ldap_url = 'ldap:///_??sub?(&(objectClass=aeGroup)(aeStatus=0))'
   ref_attrs = (
     ('memberOf',u'Members',None,u'Search all member entries of this user group'),
   )
+
+  def displayValue(self,valueindex=0,commandbutton=0):
+    dn_comp_list = ldap.dn.str2dn(self.attrValue)
+    group_cn = dn_comp_list[0][0][1].decode(self._ls.charset)
+    parent_dn = ldap.dn.dn2str(dn_comp_list[1:]).decode(self._ls.charset)
+    r = [
+      'cn=<strong>{0}</strong>,{1}'.format(
+        self._form.utf2display(group_cn),
+        self._form.utf2display(parent_dn),
+      ).encode()
+    ]
+    if commandbutton:
+      r.extend(self._additional_links())
+    return w2lapp.cnf.misc.command_link_separator.join(r)
 
 syntax_registry.registerAttrType(
   AEGroupDN.oid,[
@@ -482,12 +496,11 @@ syntax_registry.registerAttrType(
 )
 
 
-class AEZoneAdminGroupDN(DynamicDNSelectList):
+class AEZoneAdminGroupDN(AEGroupDN):
   oid = 'AEZoneAdminGroupDN-oid'
   desc = 'AE-DIR: DN of zone admin group entry'
-  input_fallback = False # no fallback to normal input field
   ldap_url = (
-    'ldap:///_?cn?sub?'
+    'ldap:///_??sub?'
     '(&'
       '(objectClass=aeGroup)'
       '(aeStatus=0)'
@@ -500,9 +513,6 @@ class AEZoneAdminGroupDN(DynamicDNSelectList):
       ')'
     ')'
   )
-  ref_attrs = (
-    ('memberOf',u'Members',None,u'Search all member entries of this user group'),
-  )
 
 syntax_registry.registerAttrType(
   AEZoneAdminGroupDN.oid,[
@@ -512,12 +522,11 @@ syntax_registry.registerAttrType(
 )
 
 
-class AEZoneAuditorGroupDN(DynamicDNSelectList):
+class AEZoneAuditorGroupDN(AEGroupDN):
   oid = 'AEZoneAuditorGroupDN-oid'
   desc = 'AE-DIR: DN of zone auditor group entry'
-  input_fallback = False # no fallback to normal input field
   ldap_url = (
-    'ldap:///_?cn?sub?'
+    'ldap:///_??sub?'
     '(&'
       '(objectClass=aeGroup)'
       '(aeStatus=0)'
@@ -533,9 +542,6 @@ class AEZoneAuditorGroupDN(DynamicDNSelectList):
       ')'
     ')'
   )
-  ref_attrs = (
-    ('memberOf',u'Members',None,u'Search all member entries of this user group'),
-  )
 
 syntax_registry.registerAttrType(
   AEZoneAuditorGroupDN.oid,[
@@ -544,12 +550,11 @@ syntax_registry.registerAttrType(
 )
 
 
-class AESrvGroupRightsGroupDN(DynamicDNSelectList):
+class AESrvGroupRightsGroupDN(AEGroupDN):
   oid = 'AESrvGroupRightsGroupDN-oid'
   desc = 'AE-DIR: DN of user group entry'
-  input_fallback = False # no fallback to normal input field
   ldap_url = (
-    'ldap:///_?cn?sub?'
+    'ldap:///_??sub?'
     '(&'
       '(objectClass=aeGroup)'
       '(aeStatus=0)'
@@ -562,9 +567,6 @@ class AESrvGroupRightsGroupDN(DynamicDNSelectList):
         ')'
       ')'
     ')'
-  )
-  ref_attrs = (
-    ('memberOf',u'Members',None,u'Search all member entries of this user group'),
   )
 
 syntax_registry.registerAttrType(
