@@ -1,7 +1,7 @@
 ---
 # install OpenLDAP packages
 
-- name: "Add LTB OpenLDAP repository key from {{ ltb_openldap_repo_key }}"
+- name: "Add LTB OpenLDAP repository key"
   apt_key:
     data: "{{ lookup('file', 'RPM-GPG-KEY-LTB-project') }}"
     state: present

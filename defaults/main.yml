@@ -194,11 +194,8 @@ openldap_role: "consumer"
 
 # which repo to use for LTB OpenLDAP builds (Debian and RHEL/CentOS)
 ltb_openldap_repo:
-  Debian:
-    source: "deb http://ltb-project.org/debian/{{ ansible_distribution_release }} {{ ansible_distribution_release }} main"
-    key: "http://ltb-project.org/wiki/lib/RPM-GPG-KEY-LTB-project"
-ltb_openldap_repo_source: "{{ ltb_openldap_repo[lsb_id].source }}"
-ltb_openldap_repo_key: "{{ ltb_openldap_repo[lsb_id].key }}"
+  Debian: "deb https://ltb-project.org/debian/{{ ansible_distribution_release }} {{ ansible_distribution_release }} main"
+ltb_openldap_repo_source: "{{ ltb_openldap_repo[lsb_id] }}"
 
 # default FQDN in LDAP service URL
 openldap_service_fqdn: "{{ inventory_hostname }}"
