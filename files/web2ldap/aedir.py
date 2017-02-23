@@ -562,7 +562,6 @@ class AESrvGroupRightsGroupDN(AEGroupDN):
       '(!'
         '(|'
           '(cn:dn:=pub)'
-          '(cn:dn:=ae)'
           '(cn=*-zone-admins)'
           '(cn=*-zone-auditors)'
         ')'
