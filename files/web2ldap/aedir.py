@@ -423,6 +423,7 @@ class AEMemberUid(MemberUID):
   oid = 'AEMemberUid-oid'
   desc = 'AE-DIR: username (uid) of member of a group'
   ldap_url = None
+  showValueButton = False
 
   def _member_uids_from_member(self):
     return [
