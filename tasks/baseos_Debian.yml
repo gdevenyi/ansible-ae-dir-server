@@ -18,4 +18,5 @@
 #    - netfilter-persistent
 #    - iptables-persistent
     - joe
+    - apt-transport-https
     - ca-certificates
