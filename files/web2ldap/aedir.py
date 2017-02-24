@@ -20,7 +20,7 @@ import ldaputil.base
 from ldap.controls.readentry import PreReadControl
 
 # web2ldap's internal application modules
-import w2lapp.searchform,w2lapp.schema.plugins.inetorgperson,w2lapp.schema.plugins.sudoers
+import w2lapp.searchform,w2lapp.schema.plugins.inetorgperson,w2lapp.schema.plugins.sudoers,w2lapp.schema.plugins.ppolicy
 
 from w2lapp.schema.syntaxes import \
   DirectoryString,DistinguishedName,SelectList,GeneralizedTime, \
@@ -1746,6 +1746,23 @@ syntax_registry.registerAttrType(
   ],
   structural_oc_oids=[
     AE_USER_OID, # aeUser
+  ]
+)
+
+
+class AEPwdPolicy(w2lapp.schema.plugins.ppolicy.PwdPolicySubentry):
+  oid = 'AEPwdPolicy-oid'
+  desc = 'AE-DIR: pwdPolicySubentry'
+  ldap_url = 'ldap:///_??sub?(&(objectClass=aePolicy)(objectClass=pwdPolicy)(aeStatus=0))'
+
+syntax_registry.registerAttrType(
+  AEPwdPolicy.oid,[
+    '1.3.6.1.4.1.42.2.27.8.1.23', # pwdPolicySubentry
+  ],
+  structural_oc_oids=[
+    AE_USER_OID,    # aeUser
+    AE_SERVICE_OID, # aeService
+    AE_HOST_OID,    # aeHost
   ]
 )
 
