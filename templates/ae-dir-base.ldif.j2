@@ -456,7 +456,39 @@ pwdMinLength: 12
 pwdMustChange: FALSE
 pwdSafeModify: FALSE
 
-# policy for primary aeUser entries
+# policy for aeUser entries for role AE admin
+dn: cn=ppolicy-ae-admins,cn=ae,{{ aedir_suffix }}
+cn: ppolicy-ae-admins
+description:: UGFzc3dvcmQgcG9saWN5IGZvciDDhiBhZG1pbiB1c2VyIGFjY291bnRzIChhZVVzZXIp
+objectClass: namedPolicy
+objectClass: aePolicy
+objectClass: pwdPolicy
+objectClass: msPwdResetPolicy
+changetype: add
+aeStatus: 0
+aeTicketId: {{ aedir_init_ticket_id }}
+msPwdResetAdminPwLen: 9
+msPwdResetEnabled: TRUE
+msPwdResetHashAlgorithm: 2.16.840.1.101.3.4.2.3
+msPwdResetMaxAge: 120
+msPwdResetPwLen: 64
+pwdAllowUserChange: TRUE
+pwdAttribute: userPassword
+pwdCheckQuality: 2
+pwdExpireWarning: 864000
+pwdFailureCountInterval: 600
+pwdGraceAuthNLimit: 0
+pwdInHistory: 30
+pwdLockout: TRUE
+pwdLockoutDuration: 600
+pwdMaxAge: 14515200
+pwdMaxFailure: 3
+pwdMinAge: 30
+pwdMinLength: 12
+pwdMustChange: FALSE
+pwdSafeModify: FALSE
+
+# policy for primary/base aeUser entries
 dn: cn=ppolicy-base-users,cn=ae,{{ aedir_suffix }}
 changetype: add
 cn: ppolicy-base-users
@@ -551,7 +583,7 @@ oathOTPLength: 8
 #---------------------------------------------------------------------------
 #
 # dummy department entry
-dn: departmentNumber=0,cn=people,ou=ae-dir
+dn: departmentNumber=0,cn=people,{{ aedir_suffix }}
 changetype: add
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
@@ -573,7 +605,7 @@ objectClass: aePerson
 objectClass: aeObject
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
-aeDept: departmentNumber=0,cn=people,ou=ae-dir
+aeDept: departmentNumber=0,cn=people,{{ aedir_suffix }}
 aeTag: ae-tag-init
 cn: {{ person_attrs.given_name }} {{ person_attrs.sur_name }}
 displayName: {{ person_attrs.given_name }} {{ person_attrs.sur_name }} ({{ unique_identifier }})
@@ -604,7 +636,7 @@ aePerson: uniqueIdentifier={{ ae_user.unique_identifier }},cn={{ aedir_org_zone 
 description: {{ ae_user.description }}
 homeDirectory: /home/{{ ae_user.uid }}
 loginShell: /bin/bash
-pwdPolicySubentry: cn=ppolicy-users,cn=ae,{{ aedir_suffix }}
+pwdPolicySubentry: cn=ppolicy-ae-admins,cn=ae,{{ aedir_suffix }}
 cn: {{ aedir_init_aepersons[ae_user.unique_identifier].given_name }} {{ aedir_init_aepersons[ae_user.unique_identifier].sur_name }}
 displayName: {{ aedir_init_aepersons[ae_user.unique_identifier].given_name }}
   {{ aedir_init_aepersons[ae_user.unique_identifier].sur_name }}
