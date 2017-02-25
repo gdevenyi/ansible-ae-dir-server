@@ -236,7 +236,6 @@ openldap_schema_files:
   - mspwdreset.schema
   - oath-ldap.schema
   - openssh-lpk_openldap.schema
-  - rfc2307bis.schema
   - stroeder.com-oid-macros.schema
   - stroeder.com.schema
   - sudoers.schema
