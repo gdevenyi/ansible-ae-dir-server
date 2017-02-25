@@ -1,0 +1,57 @@
+#######################################################################
+# Audit database {{ aedir_accesslog_suffix }}
+#######################################################################
+
+database mdb
+
+suffix "{{ aedir_accesslog_suffix }}"
+directory {{ openldap_data }}/accesslog
+
+require strong
+
+# Always set rootdn since needed by internally writing overlays
+rootdn "cn=root,{{ aedir_accesslog_suffix }}"
+# rootpw not needed in production!
+#rootpw donotenable!!!
+
+lastmod on
+
+# database parameters
+maxsize {{ openldap_db_accesslog_maxsize }}
+dbnosync
+checkpoint 20000 1
+envflags writemap
+
+sizelimit -1
+
+# Index-Konfiguration
+index reqStart eq
+index reqType eq
+index reqDN eq
+index reqAuthzID eq
+index reqResult eq
+index reqEntryUUID eq
+index objectClass eq
+
+#---------------------------------------------------------------------------
+# Access rights {{ aedir_accesslog_suffix }}
+#---------------------------------------------------------------------------
+
+access
+  to dn.subtree="{{ aedir_accesslog_suffix }}"
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" read
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
+    by dn.exact="cn=root,{{ aedir_suffix }}" read
+    by * none
+
+#---------------------------------------------------------------------------
+# overlays used within {{ aedir_accesslog_suffix }}
+#---------------------------------------------------------------------------
+
+{% if openldap_noopsrch_enabled %}
+# for counting search results without retrieving them
+overlay noopsrch
+{% endif %}
+
+# for dereferencing control
+overlay deref

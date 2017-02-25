@@ -1,0 +1,22 @@
+#######################################################################
+# Monitoring backend cn=Monitor
+# shall be last database defined
+#######################################################################
+
+database monitor
+
+require strong
+
+# allow read access to current time monitor entry for all bound users
+access to
+  dn.exact="cn=Current,cn=Time,cn=Monitor"
+  attrs=entry,objectClass,cn,monitorTimestamp
+    by users read
+    by * none
+
+access to
+  dn.subtree="cn=monitor"
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" read
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
+    by dn.exact="cn=root,{{ aedir_suffix }}" read
+    by * none

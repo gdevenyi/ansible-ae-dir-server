@@ -224,7 +224,6 @@ openldap_sbin: "{{ openldap_prefix }}/sbin"
 openldap_defaults: "/etc/default/slapd"
 openldap_rundir: "{{ os_openldap_paths[lsb_id].openldap_rundir }}"
 openldap_data: "{{ os_openldap_paths[lsb_id].openldap_data }}"
-openldap_conf_file: "{{ openldap_conf_prefix }}/slapd.conf"
 openldap_ldapi_socket: "{{ openldap_rundir }}/ldapi"
 openldap_ldapi_uri: "ldapi://{{ openldap_ldapi_socket|urlencode|replace('/','%2F') }}"
 

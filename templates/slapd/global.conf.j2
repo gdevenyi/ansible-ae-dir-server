@@ -1,0 +1,181 @@
+#######################################################################
+# Global slapd configuration section
+#######################################################################
+
+# Include all the schema files (nested includes therein)
+include {{ openldap_schema_prefix }}/init.schema
+
+# Where PID and arg files are stored
+pidfile {{ openldap_rundir }}/slapd.pid
+argsfile {{ openldap_rundir }}/slapd.args
+
+#---------------------------------------------------------------------------
+# Load dynamic backend modules:
+#---------------------------------------------------------------------------
+
+moduleload back_mdb
+moduleload back_monitor
+moduleload back_sock
+
+#---------------------------------------------------------------------------
+# Load dynamic overlay modules:
+#---------------------------------------------------------------------------
+
+moduleload accesslog
+moduleload ppolicy
+moduleload memberof
+moduleload rwm
+# on provider *and* consumer as a work-around for ITS#8396
+moduleload syncprov
+
+# contrib modules
+moduleload lastbind
+moduleload deref
+{% if openldap_noopsrch_enabled %}
+moduleload noopsrch
+{% endif %}
+
+{% if openldap_role=="provider" %}
+# only on provider replicas
+moduleload sssvlv
+moduleload constraint
+moduleload refint
+moduleload unique
+{% endif %}
+
+#---------------------------------------------------------------------------
+# slapd global parameters
+#---------------------------------------------------------------------------
+
+{% if openldap_role=="provider" %}
+# serverID must be unique across all provider replicas
+serverID {{ openldap_server_id }}
+{% endif %}
+
+# which messages to send to syslog
+loglevel {{ openldap_log_level }}
+
+# number of worker threads used
+threads {{ openldap_threads }}
+
+# additional rootDSE attributes in external LDIF file
+rootDSE {{ openldap_conf_prefix }}/rootDSE.ldif
+
+#---------------------------------------------------------------------------
+# password hash parameters
+#---------------------------------------------------------------------------
+
+password-hash {CRYPT}
+# SHA-512, 72 bits) of salt, 5000 iterations
+password-crypt-salt-format "$6$%.12s"
+
+#---------------------------------------------------------------------------
+# SASL parameters
+#---------------------------------------------------------------------------
+
+sasl-host {{ openldap_service_fqdn }}
+
+#---------------------------------------------------------------------------
+# TLS parameters
+#---------------------------------------------------------------------------
+
+# optional usage of TLS client certs
+TLSVerifyClient allow
+
+TLSProtocolMin {{ openldap_tls_protocol_min }}
+TLSCipherSuite {{ openldap_tls_cipher_suite }}
+
+TLSCACertificateFile {{ openldap_cacert_pathname }}
+TLSCertificateFile {{ openldap_cert_pathname }}
+TLSCertificateKeyFile {{ openldap_key_pathname }}
+TLSDHParamFile {{ openldap_dhparam_pathname }}
+
+#---------------------------------------------------------------------------
+# Rewrite SASL identity to DIT identity
+#---------------------------------------------------------------------------
+
+# Map root user to rootdn when SASL/EXTERNAL is used with LDAPI
+authz-regexp
+  "gidnumber=0\\+uidnumber=0,cn=peercred,cn=external,cn=auth"
+  "cn=root,{{ aedir_suffix }}"
+
+# Map user/group to existing posixAccount entry when SASL/EXTERNAL is used with LDAPI
+authz-regexp
+  "gidnumber=([0-9]+)\\+uidnumber=([0-9]+),cn=peercred,cn=external,cn=auth"
+  "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=posixAccount)(uidNumber=$2)(aeStatus=0))"
+
+# All mechs based on userID most times with password
+authz-regexp
+  "uid=([a-zA-Z0-9._-]+),cn=(digest-md5|cram-md5|plain|login),cn=auth"
+  "ldap:///{{ aedir_suffix }}??sub?(&(|(uid=$1)(host=$1))(aeStatus=0))"
+
+# Rewrite any cert subject-DN by searching it in attribute seeAlso
+authz-regexp
+  "(cn=[^,]+,{{ openldap_tls_cert_suffix }})"
+  "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=pkiUser)(seeAlso=$1)(seeAlso:dnSubordinateMatch:={{ openldap_tls_cert_suffix }})(aeStatus=0))"
+
+# Rewrite server cert subject-DN by searching FQDN in server entry
+authz-regexp
+  "cn=([a-zA-Z0-9.-]+),{{ openldap_tls_cert_suffix }}"
+  "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=aeHost)(host=$1)(aeStatus=0))"
+
+# subject name patterns of internal AE-DIR PKI with structural object class in OU
+authz-regexp
+  "cn=([a-zA-Z0-9.-]+),ou=(ae[a-zA-Z]+)-cert,{{ aedir_suffix }}"
+  "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=$2)(|(uid=$1)(host=$1))(aeStatus=0))"
+
+#---------------------------------------------------------------------------
+# Global access control and security restrictions
+#---------------------------------------------------------------------------
+
+require LDAPv3
+
+# SSF value for ldapi://
+localSSF 256
+# minimum required SSF value (security strength factor)
+security ssf=128
+
+# allow anonymous access to supportedSASLMechanisms: EXTERNAL
+access to
+  dn.base=""
+  attrs=supportedSASLMechanisms
+  val.regex="^EXTERNAL$"
+    by * read
+access to
+  dn.base=""
+  attrs=supportedSASLMechanisms
+    by * none
+# allow anonymous access to read standard search base
+access to
+  dn.base=""
+  attrs=objectClass
+    by users break
+    by * search
+access to
+  dn.base=""
+  attrs=entry,defaultNamingContext,aeRoot
+    by * read
+access to
+  dn.base=""
+  attrs=namingContexts
+  val.regex="^{{ aedir_suffix }}$"
+    by * read
+
+# allow admin access to read all search bases
+access to
+  dn.base=""
+  attrs=namingContexts,configContext,monitorContext
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" read
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
+    by dn.exact="cn=root,{{ aedir_suffix }}" read
+    by * none
+
+# allow all bound users to read rest of rootDSE
+access to
+  dn.base=""
+    by users read
+
+# allow all bound users to read subschema subentry
+access to
+  dn.base="cn=Subschema"
+    by users read
