@@ -802,10 +802,10 @@ access to
 
 # Read access to aeRemoteHost of referenced login user groups
 access to
-  dn.subtree="ou=ae-dir"
+  dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=account)"
   attrs=aeRemoteHost
-    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,ou=ae-dir" read
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeLoginGroups/member & this" read
     by set="user/-1/aeProxyFor/aeLoginGroups/member & this" read
     by set="user/aeSrvGroup/aeLoginGroups/member & this" read
@@ -848,12 +848,12 @@ access to
 access to
   dn.subtree="{{ aedir_suffix }}"
   attrs=memberOf
-  val.exact="cn=ae-all-zone-admins,cn=ae,ou=ae-dir"
+  val.exact="cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}"
     by * none
 access to
   dn.subtree="{{ aedir_suffix }}"
   attrs=memberOf
-  val.exact="cn=ae-all-zone-auditors,cn=ae,ou=ae-dir"
+  val.exact="cn=ae-all-zone-auditors,cn=ae,{{ aedir_suffix }}"
     by * none
 
 # Read access for all active group members
@@ -1132,7 +1132,7 @@ constraint_attribute
 # if parent aeZone entry has aeDept set then it must match aeDept in aePerson
 constraint_attribute aePerson,entryDN set
   "this/-1/entryDN & ([ldap:///] + this/-1/entryDN + [?entryDN?base?(&(objectClass=aeZone)(|(!(aeDept=*))(aeDept=] + this/aePerson/aeDept + [)))])/entryDN"
-  restrict="ldap:///ou=ae-dir??sub?(objectClass=aeUser)"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeUser)"
 
 # restrict tag references
 constraint_attribute

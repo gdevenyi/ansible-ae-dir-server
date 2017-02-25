@@ -12,7 +12,7 @@ PYLDAP_TRACELEVEL = 0
 LDAP_URL = r'{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub??trace=0,x-saslmech=EXTERNAL'
 
 # SASL authz-ID to be sent along with SASL/EXTERNAL bind
-LDAPI_AUTHZ_ID = 'dn:uid=ae-dir-otpenroll,cn=ae,ou=ae-dir'
+LDAPI_AUTHZ_ID = 'dn:uid=ae-dir-otpenroll,cn=ae,{{ aedir_suffix }}'
 
 # Filter string templates for the various use-cases
 # String-keyed dictionary with input field names used
@@ -20,12 +20,12 @@ LDAPI_AUTHZ_ID = 'dn:uid=ae-dir-otpenroll,cn=ae,ou=ae-dir'
 # Filter string template for finding an active admin entry during login
 # Notes:
 # - must require initialized 2FA user account with filter part (&(objectClass=oathUser)(oathHOTPToken=*))
-# - authorization is enforced via filter part (|(memberOf=cn=otp-zone-admins,cn=otp,ou=ae-dir)(memberOf=cn=ae-admins,cn=ae,ou=ae-dir))
+# - authorization is enforced via filter part (|(memberOf=cn=otp-zone-admins,cn=otp,{{ aedir_suffix }})(memberOf=cn=ae-admins,cn=ae,{{ aedir_suffix }}))
 FILTERSTR_ADMIN_LOGIN = (
     ur'(&(objectClass=aeUser)(uid={uid})'
 #        '(objectClass=oathUser)(oathHOTPToken=*)'          # enforces 2FA user account
-        '(|(memberOf=cn=otp-zone-admins,cn=otp,ou=ae-dir)' # is OTP zone admin
-          '(memberOf=cn=ae-admins,cn=ae,ou=ae-dir)))'      # is AE admin
+        '(|(memberOf=cn=otp-zone-admins,cn=otp,{{ aedir_suffix }})' # is OTP zone admin
+          '(memberOf=cn=ae-admins,cn=ae,{{ aedir_suffix }})))'      # is AE admin
 )
 
 ATTR_OWNER_DN = 'aePerson'

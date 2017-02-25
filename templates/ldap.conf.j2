@@ -5,7 +5,7 @@
 #
 # {{ ansible_managed }}
 
-BASE ou=ae-dir
+BASE {{ aedir_suffix }}
 URI {{ openldap_ldapi_uri }}
 
 # use SASL/EXTERNAL mechanism
