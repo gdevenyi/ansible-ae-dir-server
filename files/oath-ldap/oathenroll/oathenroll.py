@@ -405,9 +405,11 @@ class ResetToken(BaseApp):
         Search all accounts using the token
         """
         ldap_result = self.user_ldap_conn.search_s(
-            'ou=ae-dir',
+            self.ldap_url.dn,
             ldap.SCOPE_SUBTREE,
-            filterstr='(&(objectClass=account)(oathToken={dn}))'.format(dn=dn),
+            filterstr='(&(objectClass=account)(oathToken={dn}))'.format(
+                dn=ldap.filter.escape_filter_chars(dn),
+            ),
             attrlist=['uid', 'description']
         )
         if not ldap_result:
