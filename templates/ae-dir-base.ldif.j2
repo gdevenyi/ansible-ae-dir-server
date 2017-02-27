@@ -458,6 +458,7 @@ pwdSafeModify: FALSE
 
 # policy for aeUser entries for role AE admin
 dn: cn=ppolicy-ae-admins,cn=ae,{{ aedir_suffix }}
+changetype: add
 cn: ppolicy-ae-admins
 description:: UGFzc3dvcmQgcG9saWN5IGZvciDDhiBhZG1pbiB1c2VyIGFjY291bnRzIChhZVVzZXIp
 objectClass: namedPolicy
