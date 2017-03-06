@@ -702,11 +702,11 @@ access to
     by set="user/aeSrvGroup/aeVisibleSudoers & this" read
     by * none
 
-# Give read access to personal names to servers
+# Give read access to personal names and e-mail addresses to servers
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=account)"
-  attrs=cn,mail,givenName,sn,displayName
+  attrs=cn,mail,mailLocalAddress,givenName,sn,displayName
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeDisplayNameGroups/member & this" read
     by set="user/-1/aeProxyFor/aeDisplayNameGroups/member & this" read
