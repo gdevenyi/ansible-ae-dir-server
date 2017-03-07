@@ -8,5 +8,5 @@ objectClass: msPerson
 aeStatus: 0
 aeSourceUri: https://{{ openldap_service_fqdn }}/web2ldap
 aeNotBefore: now
-aeDept: departmentNumber=0,cn=people,{{ aedir_suffix }}
+aeDept: departmentNumber=0,cn={{ aedir_org_zone }},{{ aedir_suffix }}
 
