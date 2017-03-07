@@ -1386,6 +1386,7 @@ syncrepl rid=0{{ loop.index }}
   type=refreshAndPersist
   interval=00:00:01:00
   retry="30 +"
+  keepalive=240:10:30
   searchbase="{{ aedir_suffix }}"
   filter="(objectClass=*)"
   scope=sub
