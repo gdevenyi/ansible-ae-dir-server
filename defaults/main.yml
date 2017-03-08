@@ -2,6 +2,18 @@
 # defaults file for roles/ae-dir
 
 #---------------------------------------------------------------------------
+# pip install arguments
+#---------------------------------------------------------------------------
+
+aedir_pip_index_url: "https://pypi.python.org/simple"
+
+aedir_pip_install_options:
+  - "--upgrade"
+  - "--index-url {{ pip_index_url }}"
+
+aedir_pip_extra_args: "{{ pip_install_options|join(' ') }}"
+
+#---------------------------------------------------------------------------
 # AE-DIR parameters
 #---------------------------------------------------------------------------
 

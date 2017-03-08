@@ -44,7 +44,7 @@
     state: latest
     virtualenv: "{{ aedir_prefix }}"
     virtualenv_site_packages: no
-    extra_args: "--upgrade"
+    extra_args: "{{ aedir_pip_extra_args }}"
   with_items:
     - pip
     - setuptools
@@ -68,7 +68,7 @@
     state: latest
     virtualenv: "{{ aedir_prefix }}"
     virtualenv_site_packages: yes
-    extra_args: "--upgrade"
+    extra_args: "{{ aedir_pip_extra_args }}"
   with_items:
     - mailutil
     - paramiko
