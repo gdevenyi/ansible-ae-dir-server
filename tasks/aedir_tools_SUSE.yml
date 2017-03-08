@@ -28,9 +28,6 @@
     state: present
     disable_recommends: yes
     type: package
-  notify:
-    - "restart {{ web_server }}"
-    - restart web2ldap
   with_items:
     - python-paramiko
     - python-mailutil
