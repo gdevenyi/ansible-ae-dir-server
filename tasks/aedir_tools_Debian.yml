@@ -15,6 +15,7 @@
     - python-dev
     - libpython-dev
     - libffi-dev
+  when: aedir_pip_needs_compiler==True
 
 - name: "Install base packages on {{ lsb_id }}"
   apt:

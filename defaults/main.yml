@@ -7,6 +7,8 @@
 
 aedir_pip_index_url: "https://pypi.python.org/simple"
 
+aedir_pip_needs_compiler: "{{ aedir_pip_index_url == 'https://pypi.python.org/simple' }}"
+
 aedir_pip_install_options:
   - "--upgrade"
   - "--index-url {{ aedir_pip_index_url }}"
