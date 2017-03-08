@@ -17,7 +17,7 @@
     - python-netaddr
     - python-jwcrypto
 
-- name: "Install additional base packages on {{ openldap_role }} on {{ lsb_id }}"
+- name: "Install additional packages on {{ openldap_role }} on {{ lsb_id }}"
   zypper:
     name: "{{ item }}"
     state: present

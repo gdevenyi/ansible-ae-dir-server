@@ -1,5 +1,21 @@
 ---
 
+- name: "Install C compiler packages on {{ lsb_id }}"
+  apt:
+    name: "{{ item }}"
+    state: installed
+    update_cache: no
+    install_recommends: no
+    dpkg_options: 'force-confold,force-confdef'
+  with_items:
+    - gcc
+    - libssl-dev
+    - libsasl2-dev
+    - libldap-dev
+    - python-dev
+    - libpython-dev
+    - libffi-dev
+
 - name: "Install base packages on {{ lsb_id }}"
   apt:
     name: "{{ item }}"
@@ -9,27 +25,44 @@
     dpkg_options: 'force-confold,force-confdef'
   with_items:
     - cron
-    - python
-    - python-paramiko
-    - python-webpy
     - tar
     - gzip
-    - gcc
-    - libssl-dev
-    - libsasl2-dev
-    - libldap-dev
-    - python-dev
-    - libpython-dev
     - python-setuptools
     - virtualenv
     - python-virtualenv
     - python-pip
-    - libffi-dev
     - python-cffi
   notify:
-    - "restart aedirpwd"
+    - restart aedirpwd
+    - restart hotp_validator
+    - restart oathenroll
+    - restart bind_proxy
 
 - name: "PIP install modules in virtualenv {{ aedir_prefix }}"
+  pip:
+    name: "{{ item }}"
+    state: latest
+    virtualenv: "{{ aedir_prefix }}"
+    virtualenv_site_packages: no
+    extra_args: "--upgrade"
+  with_items:
+    - pip
+    - setuptools
+    - pyasn1
+    - pyasn1_modules
+    - python-ldap
+    - aedir
+    - slapdsock
+    - netaddr
+    - cryptography
+    - jwcrypto
+  notify:
+    - restart aedirpwd
+    - restart hotp_validator
+    - restart oathenroll
+    - restart bind_proxy
+
+- name: "PIP install additional modules in virtualenv {{ aedir_prefix }} on {{ openldap_role }} on {{ lsb_id }}"
   pip:
     name: "{{ item }}"
     state: latest
@@ -37,16 +70,13 @@
     virtualenv_site_packages: yes
     extra_args: "--upgrade"
   with_items:
-    - python-ldap
-    - pyasn1
-    - pyasn1_modules
-    - aedir
-    - slapdsock
-    - netaddr
-    - cryptography
-    - jwcrypto
     - mailutil
+    - paramiko
+    - web.py
     - oath
     - passlib
+  when: openldap_role == 'provider'
   notify:
-    - "restart aedirpwd"
+    - restart aedirpwd
+    - restart oathenroll
+    - restart hotp_validator
