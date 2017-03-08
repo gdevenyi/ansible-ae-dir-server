@@ -16,6 +16,11 @@
     - python-slapdsock
     - python-netaddr
     - python-jwcrypto
+  notify:
+    - restart aedirpwd
+    - restart hotp_validator
+    - restart oathenroll
+    - restart bind_proxy
 
 - name: "Install additional packages on {{ openldap_role }} on {{ lsb_id }}"
   zypper:
@@ -32,4 +37,8 @@
     - python-web.py
     - python-oath
     - python-passlib
-  when: openldap_role=="provider"
+  when: openldap_role == 'provider'
+  notify:
+    - restart aedirpwd
+    - restart oathenroll
+    - restart hotp_validator
