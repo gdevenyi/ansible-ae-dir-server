@@ -26,6 +26,8 @@
     - python-pip
     - libffi-dev
     - python-cffi
+  notify:
+    - "restart aedirpwd"
 
 - name: "PIP install modules in virtualenv {{ aedir_prefix }}"
   pip:
@@ -43,28 +45,8 @@
     - netaddr
     - cryptography
     - jwcrypto
-
-- name: "Install additional base packages on {{ openldap_role }} on {{ lsb_id }}"
-  apt:
-    name: "{{ item }}"
-    state: installed
-    update_cache: no
-    install_recommends: no
-    dpkg_options: 'force-confold,force-confdef'
-  with_items:
-    - python-paramiko
-    - python-webpy
-  when: openldap_role=="provider"
-
-- name: "PIP install additional modules on {{ openldap_role }} on {{ lsb_id }}"
-  pip:
-    name: "{{ item }}"
-    state: latest
-    virtualenv: "{{ aedir_prefix }}"
-    virtualenv_site_packages: yes
-    extra_args: "--upgrade"
-  with_items:
     - mailutil
     - oath
     - passlib
-  when: openldap_role=="provider"
+  notify:
+    - "restart aedirpwd"
