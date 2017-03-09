@@ -364,7 +364,7 @@ access to
     by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups/member & this" search
     by * none break
 
-# Read access to aeRemoteHost for referenced login user groups
+# Read access to aeRemoteHost of referenced login user groups
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=account)"
