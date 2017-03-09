@@ -17,10 +17,6 @@
 
 <h1 id="open">Open</h1>
 
-<p>
-  In no particular order:
-</p>
-
 <h2 id="memberof">Group maintenance</h2>
 <ul>
   <li>
@@ -32,68 +28,6 @@
   <li>
     Make <var>memberOf</var> writeable (ACLs, UI, etc.) for responsible
     zone admins.
-  </li>
-</ul>
-
-<h2 id="logging">Logging</h2>
-<ul>
-  <li>
-    Log performance data as
-    <a href="https://docs.graylog.org/en/2.2/pages/gelf.html">Graylog Extended Log Format (GELF)</a>
-  </li>
-  <li>
-    The web applications should use Python's <em>logging module</em>
-    and file <em>ae-logging.conf</em>
-  </li>
-  <li>
-    Add
-    <a href="https://github.com/blue-yonder/cee_syslog_handler">cee_syslog_handler</a>
-    in file <em>ae-logging.conf</em>
-  </li>
-</ul>
-
-<h2 id="monitoring">Monitoring</h2>
-<ul>
-  <li>
-    monitor whether PAM/NSS client still has valid configuration
-  </li>
-</ul>
-
-<h2 id="apparmor">AppArmor</h2>
-<p>
-  Automatically install correct profiles to run
-  <a href="http://wiki.apparmor.net">AppArmor</a> in mandatory mode.
-</p>
-
-<h2 id="pxe">PXE/DHCP/TFTP integration</h2>
-<ul>
-  <li>
-    Extend Python demon implementations to look up correct boot config
-    in &AElig;-DIR (e.g. <a href="https://github.com/mpetazzoni/ptftpd">ptftpd</a>)
-  </li>
-  <li>
-    make use of <a href="docs.html#schema-oc-aeNwDevice">aeNwDevice</a>
-  </li>
-</ul>
-
-<h2 id="nac">Network Access Control</h2>
-<ul>
-  <li>
-    <a href="https://en.wikipedia.org/wiki/IEEE_802.1X">IEEE 802.1X</a>
-  </li>
-  <li>
-    make use of <a href="docs.html#schema-oc-aeNwDevice">aeNwDevice</a>
-  </li>
-</ul>
-
-<h2 id="freeradius">FreeRADIUS</h2>
-<a href="https://freeradius.org/">FreeRADIUS</a> integration:
-<ul>
-  <li>
-    dynamic RADIUS client configuration (with shared secrets)
-  </li>
-  <li>
-    <a href="https://tools.ietf.org/html/draft-ietf-opsawg-tacacs">TACACS+</a>
   </li>
 </ul>
 
@@ -190,6 +124,68 @@
   <li>
     proper keyring support (inspired by Mirko's
     <a href="https://gist.github.com/mfriedenhagen/e488235d732b7becda81#file-password_from_keyring-py">password_from_keyring-py</a>)
+  </li>
+</ul>
+
+<h2 id="logging">Logging</h2>
+<ul>
+  <li>
+    Log performance data as
+    <a href="https://docs.graylog.org/en/2.2/pages/gelf.html">Graylog Extended Log Format (GELF)</a>
+  </li>
+  <li>
+    The web applications should use Python's <em>logging module</em>
+    and file <em>ae-logging.conf</em>
+  </li>
+  <li>
+    Add
+    <a href="https://github.com/blue-yonder/cee_syslog_handler">cee_syslog_handler</a>
+    in file <em>ae-logging.conf</em>
+  </li>
+</ul>
+
+<h2 id="monitoring">Monitoring</h2>
+<ul>
+  <li>
+    monitor whether PAM/NSS client still has valid configuration
+  </li>
+</ul>
+
+<h2 id="apparmor">AppArmor</h2>
+<p>
+  Automatically install correct profiles to run
+  <a href="http://wiki.apparmor.net">AppArmor</a> in mandatory mode.
+</p>
+
+<h2 id="pxe">PXE/DHCP/TFTP integration</h2>
+<ul>
+  <li>
+    Extend Python demon implementations to look up correct boot config
+    in &AElig;-DIR (e.g. <a href="https://github.com/mpetazzoni/ptftpd">ptftpd</a>)
+  </li>
+  <li>
+    make use of <a href="docs.html#schema-oc-aeNwDevice">aeNwDevice</a>
+  </li>
+</ul>
+
+<h2 id="nac">Network Access Control</h2>
+<ul>
+  <li>
+    <a href="https://en.wikipedia.org/wiki/IEEE_802.1X">IEEE 802.1X</a>
+  </li>
+  <li>
+    make use of <a href="docs.html#schema-oc-aeNwDevice">aeNwDevice</a>
+  </li>
+</ul>
+
+<h2 id="freeradius">FreeRADIUS</h2>
+<a href="https://freeradius.org/">FreeRADIUS</a> integration:
+<ul>
+  <li>
+    dynamic RADIUS client configuration (with shared secrets)
+  </li>
+  <li>
+    <a href="https://tools.ietf.org/html/draft-ietf-opsawg-tacacs">TACACS+</a>
   </li>
 </ul>
 
