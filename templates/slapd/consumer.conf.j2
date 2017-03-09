@@ -421,8 +421,7 @@ logdb "{{ aedir_accesslog_suffix }}"
 logops writes
 logold "(objectClass=*)"
 logoldattr entryUUID objectClass cn uid
-# keep for 42 days (6 weeks) and scan twice per day
-logpurge 42+00:00 12:00
+logpurge {{ openldap_log_purge }}
 
 # for back-links to group entries in member entries
 overlay memberof

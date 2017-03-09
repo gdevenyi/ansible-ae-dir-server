@@ -1302,8 +1302,7 @@ logdb "{{ aedir_accesslog_suffix }}"
 logops writes
 logold "(objectClass=*)"
 logoldattr entryUUID objectClass cn uid
-# keep for 3660 days (~ 10 years) and scan once per week
-logpurge 3660+00:00 07+00:00
+logpurge {{ openldap_log_purge }}
 
 # Referential integrity checking
 overlay refint

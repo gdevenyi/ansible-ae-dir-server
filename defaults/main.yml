@@ -323,6 +323,9 @@ openldap_threads: 8
 openldap_db_accesslog_maxsize: 4000000
 openldap_db_um_maxsize: 4000000
 
+# keep for 23 days and scan once per day, see slapo-accesslog(5)
+openldap_log_purge: "23+00:00 01+00:00"
+
 # list of syncrepl providers used on a certain replica
 openldap_syncrepl_providers: "{{ aedir_hosts['provider'] }}"
 
