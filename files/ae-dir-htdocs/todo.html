@@ -21,6 +21,20 @@
   In no particular order:
 </p>
 
+<h2 id="memberof">Group maintenance</h2>
+<ul>
+  <li>
+    Drop <em>slapo-memberOf</em> and use <em>slapo-dynlist</em>
+    instead (see
+    <a href="https://www.openldap.org/its/index.cgi?findid=8613">
+    OpenLDAP ITS#8613</a> for rationale).
+  </li>
+  <li>
+    Make <var>memberOf</var> writeable (ACLs, UI, etc.) for responsible
+    zone admins.
+  </li>
+</ul>
+
 <h2 id="logging">Logging</h2>
 <ul>
   <li>
