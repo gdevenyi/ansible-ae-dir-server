@@ -4,11 +4,11 @@
 # {{ ansible_managed }}
 ############################################################################
 
-{% include 'slapd/global.conf.j2' %}
+{% include 'global.conf.j2' %}
 
-{% include 'slapd/config.conf.j2' %}
+{% include 'config.conf.j2' %}
 
-{% include 'slapd/accesslog.conf.j2' %}
+{% include 'accesslog.conf.j2' %}
 
 #######################################################################
 # Database for {{ aedir_suffix }}
@@ -495,4 +495,4 @@ syncrepl rid=0{{ loop.index }}
 
 {% endfor %}
 
-{% include 'slapd/monitor.conf.j2' %}
+{% include 'monitor.conf.j2' %}
