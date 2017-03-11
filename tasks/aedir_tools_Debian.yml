@@ -39,7 +39,7 @@
     - restart oathenroll
     - restart bind_proxy
 
-- name: "PIP install modules in virtualenv {{ aedir_prefix }}"
+- name: "Additional PIP packages in virtualenv {{ aedir_prefix }} needed for PIP installation"
   pip:
     name: "{{ item }}"
     state: latest
@@ -49,6 +49,15 @@
   with_items:
     - pip
     - setuptools
+
+- name: "Additional PIP packages in virtualenv {{ aedir_prefix }}"
+  pip:
+    name: "{{ item }}"
+    state: latest
+    virtualenv: "{{ aedir_prefix }}"
+    virtualenv_site_packages: no
+    extra_args: "{{ aedir_pip_extra_args }}"
+  with_items:
     - pyasn1
     - pyasn1_modules
     - python-ldap
