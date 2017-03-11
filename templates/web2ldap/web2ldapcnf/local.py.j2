@@ -11,7 +11,7 @@ import sys, os, re
 # for 'validate:' in ansible
 if __name__ == '__main__':
   sys.path.insert(0,'{{ web2ldap_etc }}')
-  sys.path.insert(0,'{{ web2ldap_prefix }}/pylib')
+  sys.path.insert(0,'{{ web2ldap_pylib }}')
 
 # python-ldap
 import ldap
