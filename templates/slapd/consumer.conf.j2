@@ -190,18 +190,6 @@ access to
   attrs=entry,children,objectClass,entryUUID,modifyTimestamp,cn,description,@namedObject,@posixGroup,@sudoRole,@DUAConfigProfile,@pkiCA
     by users read
 
-#------------------------------------------------------------------
-# Security zones in general
-#------------------------------------------------------------------
-
-# Delegated administration for normal zone subtrees on consumers is
-# stripped down to reviewing all entries within a zone by the zone admins/auditors
-access to
-  dn.regex="^.*cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
-    by set.expand="user & [cn=${d1},{{ aedir_suffix }}]/aeZoneAdmins/member" read
-    by set.expand="user & [cn=${d1},{{ aedir_suffix }}]/aeZoneAuditors/member" read
-    by * none break
-
 #---------------------------------------------------------------------------
 # Inactive entries not visible to normal users/systems from here
 #---------------------------------------------------------------------------
@@ -210,6 +198,17 @@ access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(&(aeStatus=*)(!(aeStatus=0)))"
     by * none
+
+#------------------------------------------------------------------
+# Access to active zones is stripped down to reviewing all entries within
+# a zone by the zone admins/auditors
+#------------------------------------------------------------------
+
+access to
+  dn.regex="^.*cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+    by set.expand="user & [cn=${d1},{{ aedir_suffix }}]/aeZoneAdmins/member" read
+    by set.expand="user & [cn=${d1},{{ aedir_suffix }}]/aeZoneAuditors/member" read
+    by * none break
 
 # Acess to user, group and sudoers entries
 #------------------------------------------------------------------
