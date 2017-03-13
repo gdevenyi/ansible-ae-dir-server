@@ -406,19 +406,19 @@ access to
     by * none
 
 #------------------------------------------------------------------
-# Delegated administration of security zones
+# Delegated administration of active zones
 #------------------------------------------------------------------
 
 # Delegated administration for zone subtrees
 access to
-  dn.regex="^cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(&(objectClass=aeZone)(aeStatus=0))"
   attrs=children
     by set.expand="user & this/aeZoneAdmins/member" write
     by set.expand="user & this/aeZoneAuditors/member" read
     by set="user/-1 & this" search
     by * none break
 access to
-  dn.regex="^cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(&(objectClass=aeZone)(aeStatus=0))"
     by set.expand="user & this/aeZoneAdmins/member" read
     by set.expand="user & this/aeZoneAuditors/member" read
     by set="user/-1 & this" read
@@ -636,9 +636,9 @@ access to
     by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" read
     by * none break
 
-# Allow read access to zone admin group references
+# Allow read access to zone admin group references in active zones
 access to
-  filter="(objectClass=aeZone)"
+  filter="(&(objectClass=aeZone)(aeStatus=0))"
   attrs=entry,objectClass,cn,aeZoneAdmins
     by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" read
     by * none break
