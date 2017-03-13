@@ -985,15 +985,19 @@ class AEPerson(DynamicDNSelectList,AEObjectUtil):
       DynamicDNSelectList._determineFilter(self),
       # ae_validity_filter(),
     ]
+    zone_entry = self._zone_entry(attrlist=['aeDept']) or {}
     aedept_filters = [
       '(aeDept={0})'.format(escape_filter_chars(d))
-      for d in self._zone_entry(attrlist=['aeDept']).get('aeDept',[])
+      for d in zone_entry.get('aeDept',[])
     ]
     if len(aedept_filters)>1:
       filter_components.append('(|{})'.format(''.join(aedept_filters)))
     elif len(aedept_filters)==1:
       filter_components.append(aedept_filters[0])
-    ae_status = int(self._entry.get('aeStatus',['0'])[0])
+    try:
+      ae_status = int(self._entry['aeStatus'][0])
+    except (KeyError,ValueError,IndexError):
+      ae_status = 0
     aeperson_aestatus_filters = [
       '(aeStatus={0})'.format(escape_filter_chars(st))
       for st in map(str,self.ae_status_map.get(ae_status,[]))
