@@ -160,8 +160,16 @@
 <h2 id="pxe">PXE/DHCP/TFTP integration</h2>
 <ul>
   <li>
-    Extend Python demon implementations to look up correct boot config
-    in &AElig;-DIR (e.g. <a href="https://github.com/mpetazzoni/ptftpd">ptftpd</a>)
+    Extend one of the following Python demon implementations to look up
+    correct boot config in &AElig;-DIR:
+    <ul>
+      <li>
+        <a href="https://github.com/mpetazzoni/ptftpd">ptftpd</a> (GPLv3)
+      </li>
+      <li>
+        <a href="https://github.com/psychomario/PyPXE">PyPXE</a> (MIT License)
+      </li>
+    </ul>
   </li>
   <li>
     make use of <a href="docs.html#schema-oc-aeNwDevice">aeNwDevice</a>
