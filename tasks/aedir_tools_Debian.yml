@@ -75,7 +75,7 @@
 - name: "PIP install additional modules in virtualenv {{ aedir_prefix }} on {{ openldap_role }} on {{ lsb_id }}"
   pip:
     name: "{{ item }}"
-    state: latest
+    state: present
     virtualenv: "{{ aedir_prefix }}"
     virtualenv_site_packages: yes
     extra_args: "{{ aedir_pip_extra_args }}"
