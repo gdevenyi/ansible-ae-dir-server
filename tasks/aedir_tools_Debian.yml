@@ -42,7 +42,7 @@
 - name: "Additional PIP packages in virtualenv {{ aedir_prefix }} needed for PIP installation"
   pip:
     name: "{{ item }}"
-    state: latest
+    state: present
     virtualenv: "{{ aedir_prefix }}"
     virtualenv_site_packages: no
     extra_args: "{{ aedir_pip_extra_args }}"
@@ -53,7 +53,7 @@
 - name: "Additional PIP packages in virtualenv {{ aedir_prefix }}"
   pip:
     name: "{{ item }}"
-    state: latest
+    state: present
     virtualenv: "{{ aedir_prefix }}"
     virtualenv_site_packages: no
     extra_args: "{{ aedir_pip_extra_args }}"
