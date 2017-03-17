@@ -19,6 +19,8 @@ from pyweblib.forms import HiddenInput
 import ldaputil.base
 from ldap.controls.readentry import PreReadControl
 
+from msbase import Str1stValueDict
+
 # web2ldap's internal application modules
 import w2lapp.searchform,w2lapp.schema.plugins.inetorgperson,w2lapp.schema.plugins.sudoers,w2lapp.schema.plugins.ppolicy
 
@@ -118,6 +120,27 @@ class AEObjectUtil:
 
 class AEHomeDirectory(HomeDirectory):
   oid = 'AEHomeDirectory-oid'
+  # all valid directory prefixes for attribute 'homeDirectory'
+  # but without trailing slash
+  homeDirectoryPrefixes = (
+    '/home',
+    '/Users',
+  )
+
+  def _validate(self,attrValue):
+    for prefix in self.homeDirectoryPrefixes:
+      if attrValue.startswith(prefix):
+        return True
+    return False
+
+  def transmute(self,attrValues):
+    uid = Str1stValueDict(self._entry,'')['uid']
+    for prefix in self.homeDirectoryPrefixes:
+      if attrValues[0].startswith(prefix):
+        break
+    else:
+      prefix = self.homeDirectoryPrefixes[0]
+    return ['/'.join((prefix,uid))]
 
   def formField(self):
     input_field = HiddenInput(
