@@ -85,6 +85,12 @@ aedir_aedept_deptnumber_regex: "[a-zA-Z0-9_.:/-]+"
 aedir_aeservice_sshpubkey_regex: "(ssh-rsa|ssh-dss|ecdsa-sha2-nistp256|ssh-ed25519) [A-Za-z0-9+=/]+ .+"
 aedir_aeuser_sshpubkey_regex: "(ssh-rsa|ssh-dss|ecdsa-sha2-nistp256|ssh-ed25519) [A-Za-z0-9+=/]+ .+"
 
+# all valid directory prefixes for attribute 'homeDirectory'
+# but without trailing slash
+aedir_homedirectory_prefixes:
+  - "/home"
+#  - "/Users"
+
 # ticket identifier of initial ldapadd
 aedir_init_ticket_id: "INIT-42"
 

@@ -63,7 +63,6 @@ w2lapp.schema.plugins.aedir.AETicketId.html_tmpl = '<a href="https://issues.exam
 w2lapp.schema.plugins.aedir.AEHostname.host_lookup=2
 
 import w2lapp.schema.plugins.posixautogen
-#w2lapp.schema.plugins.posixautogen.HomeDirectory.homeDirectoryTemplate = '/home/{uid}'
 w2lapp.schema.plugins.posixautogen.AutogenUIDNumber.minNewValue = {{ aedir_min_uid }}L
 w2lapp.schema.plugins.posixautogen.AutogenUIDNumber.maxNewValue = {{ aedir_max_uid }}L
 w2lapp.schema.plugins.posixautogen.AutogenGIDNumber.minNewValue = {{ aedir_min_gid }}L
@@ -77,6 +76,7 @@ w2lapp.schema.plugins.aedir.AECommonNameAESudoRule.reObj = re.compile('^{{ aedir
 w2lapp.schema.plugins.aedir.AEDepartmentNumber.reObj = re.compile('^{{ aedir_aedept_deptnumber_regex }}$')
 w2lapp.schema.plugins.aedir.AEServiceSshPublicKey.reObj = re.compile('^{{ aedir_aeservice_sshpubkey_regex }}$')
 w2lapp.schema.plugins.aedir.AEUserSshPublicKey.reObj = re.compile('^{{ aedir_aeuser_sshpubkey_regex }}$')
+w2lapp.schema.plugins.aedir.AEHomeDirectory.homeDirectoryPrefixes = ('{{ aedir_homedirectory_prefixes|join("','") }}',)
 
 # Parameters for generating user names
 w2lapp.schema.plugins.aedir.AEUserId.maxLen = {{ aedir_username_length }}L
