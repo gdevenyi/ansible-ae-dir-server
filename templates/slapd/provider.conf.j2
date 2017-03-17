@@ -1191,9 +1191,10 @@ constraint_attribute sudoUser
   set "([%] + [ldap:///{{ aedir_suffix }}??sub?(&(objectClass=aeGroup)(aeStatus=0)(!(|(cn=ae-admins)(cn=ae-auditors)(cn=ae-provider)(cn=ae-replicas)(cn=ae-login-proxies)(cn=*-zone-admins)(cn=*-zone-auditors))))]/cn) & this/sudoUser"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeSudoRule)"
 
-# 'homeDirectory' must be composed as /home/<uid> for 'aeUser' entries
+# 'homeDirectory' must be composed as /<path-prefix>/<uid> for 'aeUser' entries
+# with path-prefix being one of '/home' or '/Users'
 constraint_attribute uid,homeDirectory
-  set "([/home/] + this/uid) & this/homeDirectory"
+  set "( ( [/home] | [/Users] ) + [/] + this/uid) & this/homeDirectory"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeUser)"
 
 # displayName in personal user account must be composed based on "<cn> (<uid>/<uidNumber>)"
