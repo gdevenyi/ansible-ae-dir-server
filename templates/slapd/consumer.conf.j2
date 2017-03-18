@@ -451,18 +451,7 @@ ppolicy_default cn=ppolicy-default,cn=ae,{{ aedir_suffix }}
 ppolicy_hash_cleartext
 ppolicy_use_lockout
 
-# Bind-DN rewriting with internal searches (before external bind listener)
-overlay rwm
-rwm-rewriteEngine on
-rwm-drop-unrequested-attrs no
-# uid=foo,{{ aedir_suffix }} -> entryDN of entry within {{ aedir_suffix }} matching (uid=foo)
-rwm-rewriteMap slapd uid2dn "ldap:///{{ aedir_suffix }}?entryDN?sub?"
-rwm-rewriteContext bindDN
-rwm-rewriteRule "^(uid=[^,]+),{{ aedir_suffix }}$" "${uid2dn($1)}" ":@I"
-# host=foo,{{ aedir_suffix }} -> entryDN of entry within {{ aedir_suffix }} matching (host=foo)
-rwm-rewriteMap slapd host2dn "ldap:///{{ aedir_suffix }}?entryDN?sub?"
-rwm-rewriteContext bindDN
-rwm-rewriteRule "^(host=[^,]+),{{ aedir_suffix }}$" "${host2dn($1)}" ":@I"
+{% include 'slapo-rwm.conf.j2' %}
 
 #---------------------------------------------------------------------------
 # replication of {{ aedir_suffix }}

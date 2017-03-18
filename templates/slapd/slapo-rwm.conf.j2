@@ -1,0 +1,31 @@
+
+# some rewriting is needed to accomodate unusal LDAP clients
+overlay rwm
+rwm-rewriteEngine on
+rwm-drop-unrequested-attrs no
+
+# Bind-DN rewriting with internal searches (before external bind listener)
+# uid=foo,{{ aedir_suffix }} -> entryDN of entry within {{ aedir_suffix }} matching (uid=foo)
+rwm-rewriteMap slapd uid2dn "ldap:///{{ aedir_suffix }}?entryDN?sub?"
+rwm-rewriteContext bindDN
+rwm-rewriteRule "^(uid=[^,]+),{{ aedir_suffix }}$" "${uid2dn($1)}" ":@I"
+# host=foo,{{ aedir_suffix }} -> entryDN of entry within {{ aedir_suffix }} matching (host=foo)
+rwm-rewriteMap slapd host2dn "ldap:///{{ aedir_suffix }}?entryDN?sub?"
+rwm-rewriteContext bindDN
+rwm-rewriteRule "^(host=[^,]+),{{ aedir_suffix }}$" "${host2dn($1)}" ":@I"
+
+{% if aedir_fake_search_roots %}
+# some stupid LDAP clients insist on searching user or group entries in
+# separate container trees beneath the separately configured search root
+# => always map to {{ aedir_suffix }}
+rwm-rewriteContext searchDN
+{% for fake_dn in aedir_fake_search_roots %}
+rwm-rewriteRule "^{{ fake_dn }},{{ aedir_suffix }}$" "{{ aedir_suffix }}" ":@I"
+{% endfor %}
+{% endif %}
+
+# rewrite a group search filter for the short bind-DN form
+# (member=uid=foobar,{{ aedir_suffix }}) to (memberUid=foobar)
+rwm-rewriteContext searchFilter
+rwm-rewriteRule "member=uid=([^,]+),{{ aedir_suffix }}" "memberUid=$1" ":@I"
+
