@@ -13,13 +13,22 @@
     - python-ldap
     - python-pyasn1
     - python-pyasn1-modules
-    - python-slapdsock
     - python-netaddr
     - python-jwcrypto
   notify:
     - restart aedirpwd
     - restart hotp_validator
     - restart oathenroll
+    - restart bind_proxy
+
+- name: "Install python-slapdsock packages on {{ lsb_id }}"
+  zypper:
+    name: python-slapdsock
+    state: present
+    disable_recommends: yes
+    type: package
+  notify:
+    - restart hotp_validator
     - restart bind_proxy
 
 - name: "Install additional packages on {{ openldap_role }} on {{ lsb_id }}"
