@@ -45,6 +45,7 @@ AE_OID_PREFIX = '1.3.6.1.4.1.5427.1.389.100'
 # OIDs of AE-DIR's structural object classes
 AE_USER_OID = AE_OID_PREFIX+'.6.2'
 AE_GROUP_OID = AE_OID_PREFIX+'.6.1'
+AE_MAILGROUP_OID = AE_OID_PREFIX+'.6.27'
 AE_SRVGROUP_OID = AE_OID_PREFIX+'.6.13'
 AE_SUDORULE_OID = AE_OID_PREFIX+'.6.7'
 AE_HOST_OID = AE_OID_PREFIX+'.6.6.1'
@@ -436,6 +437,22 @@ syntax_registry.registerAttrType(
   ],
   structural_oc_oids=[
     AE_GROUP_OID, # aeGroup
+  ],
+)
+
+
+class AEMailGroupMember(DynamicDNSelectList):
+  oid = 'AEMailGroupMember-oid'
+  desc = 'AE-DIR: Member of a mail group'
+  input_fallback = False # no fallback to normal input field
+  ldap_url = 'ldap:///_?displayName?sub?(&(|(objectClass=aeUser)(objectClass=aeService)(objectClass=aeContact))(mail=*)(aeStatus=0))'
+
+syntax_registry.registerAttrType(
+  AEMailGroupMember.oid,[
+    '2.5.4.31', # member
+  ],
+  structural_oc_oids=[
+    AE_MAILGROUP_OID, # aeMailGroup
   ],
 )
 
@@ -1488,7 +1505,8 @@ syntax_registry.registerAttrType(
     '2.5.4.3', # cn alias commonName
   ],
   structural_oc_oids=[
-    AE_GROUP_OID,    # aeGroup
+    AE_GROUP_OID,     # aeGroup
+    AE_MAILGROUP_OID, # aeMailGroup
   ]
 )
 

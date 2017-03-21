@@ -424,7 +424,14 @@ logpurge {{ openldap_log_purge }}
 
 # for back-links to group entries in member entries
 overlay memberof
+
 memberof-group-oc aeGroup
+memberof-member-ad member
+memberof-memberof-ad memberOf
+memberof-dangling ignore
+memberof-refint true
+
+memberof-group-oc aeMailGroup
 memberof-member-ad member
 memberof-memberof-ad memberOf
 memberof-dangling ignore

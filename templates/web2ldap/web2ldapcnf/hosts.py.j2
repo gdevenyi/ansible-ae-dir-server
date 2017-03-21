@@ -371,6 +371,13 @@ ae_dir_config = Web2LDAPConfig(
       %(description)s
     </div>
     """,
+    'aeMailGroup':r"""
+    <div class="aestatus%(aeStatus)s">
+      <var>%(entryDN)s</var><br>
+      Mail group %(cn)s &lt;%(mail)s&gt;<br>
+      %(description)s
+    </div>
+    """,
     'aeSrvGroup':r"""
     <div class="aestatus%(aeStatus)s">
       <var>%(entryDN)s</var><br>
@@ -442,6 +449,12 @@ ae_dir_config = Web2LDAPConfig(
       Policy %(cn)s: %(description)s
     </div>
     """,
+    'aeContact':r"""
+    <div class="aestatus%(aeStatus)s">
+      <var>%(entryDN)s</var><br>
+      Contact %(cn)s: %(description)s
+    </div>
+    """,
   },
   read_template={
     'msPwdResetObject':os.path.join(web2ldapcnf.templates_dir,'ae-dir','read_msPwdResetObject.html'),
@@ -451,6 +464,7 @@ ae_dir_config = Web2LDAPConfig(
     'msPwdResetPolicy':os.path.join(web2ldapcnf.templates_dir,'read_msPwdResetPolicy.html'),
     'aeRoot':os.path.join(web2ldapcnf.templates_dir,'ae-dir','read_aeRoot.html'),
     'aeGroup':os.path.join(web2ldapcnf.templates_dir,'ae-dir','read_aeGroup.html'),
+    'aeMailGroup':os.path.join(web2ldapcnf.templates_dir,'ae-dir','read_aeMailGroup.html'),
     'aeDept':os.path.join(web2ldapcnf.templates_dir,'ae-dir','read_aeDept.html'),
     'aePerson':os.path.join(web2ldapcnf.templates_dir,'ae-dir','read_aePerson.html'),
     'aeHost':os.path.join(web2ldapcnf.templates_dir,'ae-dir','read_aeHost.html'),
@@ -462,6 +476,7 @@ ae_dir_config = Web2LDAPConfig(
     'aeAuthcToken':os.path.join(web2ldapcnf.templates_dir,'ae-dir','read_aeAuthcToken.html'),
     'aeZone':os.path.join(web2ldapcnf.templates_dir,'ae-dir','read_aeZone.html'),
     'aePerson':os.path.join(web2ldapcnf.templates_dir,'ae-dir','read_aePerson.html'),
+    'aeContact':os.path.join(web2ldapcnf.templates_dir,'ae-dir','read_aeContact.html'),
     'aePosixIdRanges':os.path.join(web2ldapcnf.templates_dir,'ae-dir','read_aePosixIdRanges.html'),
     'namedObject':os.path.join(web2ldapcnf.templates_dir,'read_namedObject.html'),
     'namedPolicy':os.path.join(web2ldapcnf.templates_dir,'read_namedPolicy.html'),
@@ -482,6 +497,7 @@ ae_dir_config = Web2LDAPConfig(
     'msPwdResetPolicy':os.path.join(web2ldapcnf.templates_dir,'inputform_msPwdResetPolicy.html'),
     'aeDept':os.path.join(web2ldapcnf.templates_dir,'ae-dir','inputform_aeDept.html'),
     'aeGroup':os.path.join(web2ldapcnf.templates_dir,'ae-dir','inputform_aeGroup.html'),
+    'aeMailGroup':os.path.join(web2ldapcnf.templates_dir,'ae-dir','inputform_aeMailGroup.html'),
     'aeHost':os.path.join(web2ldapcnf.templates_dir,'ae-dir','inputform_aeHost.html'),
     'aeService':os.path.join(web2ldapcnf.templates_dir,'ae-dir','inputform_aeService.html'),
     'aeSrvGroup':os.path.join(web2ldapcnf.templates_dir,'ae-dir','inputform_aeSrvGroup.html'),
@@ -491,6 +507,7 @@ ae_dir_config = Web2LDAPConfig(
     'aeAuthcToken':os.path.join(web2ldapcnf.templates_dir,'ae-dir','inputform_aeAuthcToken.html'),
     'aeZone':os.path.join(web2ldapcnf.templates_dir,'ae-dir','inputform_aeZone.html'),
     'aePerson':os.path.join(web2ldapcnf.templates_dir,'ae-dir','inputform_aePerson.html'),
+    'aeContact':os.path.join(web2ldapcnf.templates_dir,'ae-dir','inputform_aeContact.html'),
     'aePosixIdRanges':os.path.join(web2ldapcnf.templates_dir,'ae-dir','inputform_aePosixIdRanges.html'),
     'namedObject':os.path.join(web2ldapcnf.templates_dir,'inputform_namedObject.html'),
     'namedPolicy':os.path.join(web2ldapcnf.templates_dir,'inputform_namedPolicy.html'),
@@ -512,6 +529,7 @@ ae_dir_config = Web2LDAPConfig(
   addform_entry_templates={
     u'Æ-DIR tag':os.path.join(web2ldapcnf.templates_dir,'ae-dir','add_aeTag.ldif'),
     u'Æ-DIR user group':os.path.join(web2ldapcnf.templates_dir,'ae-dir','add_aeGroup.ldif'),
+    u'Æ-DIR mail group':os.path.join(web2ldapcnf.templates_dir,'ae-dir','add_aeMailGroup.ldif'),
     u'Æ-DIR primary user account':os.path.join(web2ldapcnf.templates_dir,'ae-dir','add_aeUser_inetLocalMailRecipient.ldif'),
     u'Æ-DIR personal user account':os.path.join(web2ldapcnf.templates_dir,'ae-dir','add_aeUser.ldif'),
     u'Æ-DIR OATH-HOTP token':os.path.join(web2ldapcnf.templates_dir,'ae-dir','add_oath_hotp_token.ldif'),
@@ -519,6 +537,7 @@ ae_dir_config = Web2LDAPConfig(
     u'Æ-DIR password policy':os.path.join(web2ldapcnf.templates_dir,'ae-dir','add_pwdPolicy.ldif'),
     u'Æ-DIR OATH-HOTP parameters':os.path.join(web2ldapcnf.templates_dir,'ae-dir','add_oathHOTPParams.ldif'),
     u'Æ-DIR person':os.path.join(web2ldapcnf.templates_dir,'ae-dir','add_aePerson.ldif'),
+    u'Æ-DIR contact':os.path.join(web2ldapcnf.templates_dir,'ae-dir','add_aeContact.ldif'),
     u'Æ-DIR department':os.path.join(web2ldapcnf.templates_dir,'ae-dir','add_aeDept.ldif'),
     u'Æ-DIR network device':os.path.join(web2ldapcnf.templates_dir,'ae-dir','add_aeNwDevice.ldif'),
     u'Æ-DIR server/service group':os.path.join(web2ldapcnf.templates_dir,'ae-dir','add_aeSrvGroup.ldif'),

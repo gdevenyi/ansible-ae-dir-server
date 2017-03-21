@@ -551,6 +551,22 @@ access to
     by set="user & this/-1/aeZoneAuditors/member" read
     by * none break
 
+# aeContact entries
+access to
+  dn.regex="^cn=[^,],cn={{ aedir_aezone_cn_regex }},{{ aedir_suffix }}$"
+  filter="(objectClass=aeContact)"
+    by set="user & this/-1/aeZoneAdmins/member" write
+    by set="user & this/-1/aeZoneAuditors/member" read
+    by * none break
+
+# aeMailGroup entries
+access to
+  dn.regex="^cn=({{ aedir_aegroup_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(objectClass=aeMailGroup)"
+    by set="user & this/-1/aeZoneAdmins/member" write
+    by set="user & this/-1/aeZoneAuditors/member" read
+    by * none break
+
 # Organizational entries (departments and persons)
 #------------------------------------------------------------------
 
@@ -1211,7 +1227,13 @@ constraint_attribute cn,sn,givenName
 constraint_attribute
   member
   uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(|(objectClass=aeUser)(objectClass=aeService))(aeStatus=0))"
-  restrict="ldap:///{{ aedir_suffix }}??sub"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeGroup)"
+
+# restrict references from mail groups to have only active accounts/contacts with e-mail address as members
+constraint_attribute
+  member
+  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(|(objectClass=aeUser)(objectClass=aeService)(objectClass=aeContact))(mail=*)(aeStatus=0))"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeMailGroup)"
 
 # department-constraint groups must contain only aeUser members assigned to a specific department
 constraint_attribute
@@ -1227,7 +1249,7 @@ constraint_attribute memberUID
 # restrict memberUID to be consistent with group membership defined in member
 constraint_attribute memberUID,member
   set "this/memberUID & this/member/uid"
-  restrict="ldap:///{{ aedir_suffix }}??sub"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeGroup)"
 
 # the Yubikey serial number must be the same in various attributes
 # Example:
@@ -1329,7 +1351,14 @@ refint_attributes
 
 # for back-links to group entries in member entries
 overlay memberof
+
 memberof-group-oc aeGroup
+memberof-member-ad member
+memberof-memberof-ad memberOf
+memberof-dangling ignore
+memberof-refint true
+
+memberof-group-oc aeMailGroup
 memberof-member-ad member
 memberof-memberof-ad memberOf
 memberof-dangling ignore

@@ -312,6 +312,21 @@ ditcontentrule ( ae-dir-oc:1
   NOT ( businessCategory $ o $ ou $ owner $ seeAlso $ userPassword ) )
 
 
+# also "dynamic groups" based on groupOfURLs/memberURL
+objectclass ( ae-dir-oc:27
+  NAME 'aeMailGroup'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Nailing list entry'
+  STRUCTURAL
+  SUP ( groupOfEntries $ groupOfURLs $ aeObject )
+  MUST ( mail $ description ) )
+
+ditcontentrule ( ae-dir-oc:27
+  NAME 'aeMailGroup-dcr'
+  AUX ( mailboxRelatedObject )
+  NOT ( businessCategory $ o $ ou $ owner $ seeAlso $ userPassword ) )
+
+
 # SUDO rules
 #-----------------------------------------------------------------------
 
@@ -423,14 +438,14 @@ objectclass ( ae-dir-oc:13
 #-----------------------------------------------------------------------
 
 objectclass ( ae-dir-oc:5
-  NAME 'aeMailbox'
+  NAME 'aeContact'
   X-ORIGIN 'AE-DIR'
-  DESC 'AE-DIR: Mailbox entry'
+  DESC 'AE-DIR: Contact entry (e-mail recipient)'
   STRUCTURAL
   SUP ( namedObject $ aeObject ) )
 
 ditcontentrule ( ae-dir-oc:5
-  NAME 'aeMailbox-dcr'
+  NAME 'aeContact-dcr'
   AUX ( inetLocalMailRecipient $ mailboxRelatedObject )
   NOT ( l $ ou $ seeAlso ) )
 
