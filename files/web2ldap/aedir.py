@@ -505,7 +505,7 @@ class AEGroupDN(DynamicDNSelectList):
   oid = 'AEGroupDN-oid'
   desc = 'AE-DIR: DN of user group entry'
   input_fallback = False # no fallback to normal input field
-  ldap_url = 'ldap:///_??sub?(&(objectClass=aeGroup)(aeStatus=0))'
+  ldap_url = 'ldap:///_??sub?(&(|(objectClass=aeGroup)(objectClass=aeMailGroup))(aeStatus=0))'
   ref_attrs = (
     ('memberOf',u'Members',None,u'Search all member entries of this user group'),
   )
