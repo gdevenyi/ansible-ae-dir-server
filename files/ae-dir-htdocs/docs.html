@@ -751,6 +751,7 @@
 </ul>
 
 <table id="schema-soc-table">
+
   <tr>
     <th>NAME</th>
     <th>RDN</th>
@@ -758,18 +759,136 @@
     <th>SUP</th>
     <th>AUX</th>
   </tr>
+
   <tr>
-    <th><a href="#schema-oc-aeRoot">aeRoot</a></th>
-    <td>ou</td>
-    <td>root entry of &AElig;-DIR tree</td>
+    <th><a href="#schema-oc-aeAuthcToken">aeAuthcToken</a></th>
+    <td>cn</td>
+    <td>Authentication token device</td>
+    <td><a href="#schema-oc-aeDevice">aeDevice</a></td>
+    <td>
+      <ul>
+        <li>oathHOTPToken</li>
+        <li>oathTOTPToken</li>
+        <li><a href="#schema-oc-ldapPublicKey">ldapPublicKey</a></li>
+        <li>pkiUser</li>
+      </ul>
+    </td>
+  </tr>
+
+  <tr>
+    <th><a href="#schema-oc-aeContact">aeContact</a></th>
+    <td>mail</td>
+    <td>Mail contact</td>
+    <td>
+      <ul>
+        <li><a href="#schema-oc-aeObject">aeObject</a></li>
+        <li>namedObject</li>
+      </ul>
+    </td>
+    <td>
+      <ul>
+        <li>mailboxRelatedObject</li>
+        <li>inetLocalMailRecipient</li>
+      </ul>
+    </td>
+  </tr>
+
+  <tr>
+    <th><a href="#schema-oc-aeDept">aeDept</a></th>
+    <td>departmentNumber</td>
+    <td>department / organization unit</td>
     <td>
       <ul>
         <li><a href="#schema-oc-aeObject">aeObject</a></li>
         <li>organizationalUnit</li>
       </ul>
     </td>
-    <td><a href="#schema-oc-aePosixIdRanges">aePosixIdRanges</a></td>
+    <td>labeledURIObject</td>
   </tr>
+
+  <tr>
+    <th><a href="#schema-oc-aeGroup">aeGroup</a></th>
+    <td>cn</td>
+    <td>user group</td>
+    <td>
+      <ul>
+        <li><a href="#schema-oc-aeObject">aeObject</a></li>
+        <li>groupOfEntries</li>
+        <li>groupOfURLs</li>
+        <li><a href="#schema-oc-posixGroup">posixGroup</a></li>
+      </ul>
+    </td>
+    <td>-/-</td>
+  </tr>
+
+  <tr>
+    <th><a href="#schema-oc-aeHost">aeHost</a></th>
+    <td>host</td>
+    <td>host information and for host authentication</td>
+    <td><a href="#schema-oc-aeDevice">aeDevice</a></td>
+    <td>
+      <ul>
+        <li><a href="#schema-oc-posixAccount">posixAccount</a></li>
+        <li><a href="#schema-oc-ldapPublicKey">ldapPublicKey</a></li>
+        <li><a href="#schema-oc-pkiUser">pkiUser</a></li>
+        <li>ipHost</li>
+      </ul>
+    </td>
+  </tr>
+
+  <tr>
+    <th><a href="#schema-oc-aeMailGroup">aeMailGroup</a></th>
+    <td>cn</td>
+    <td>user group</td>
+    <td>
+      <ul>
+        <li><a href="#schema-oc-aeObject">aeObject</a></li>
+        <li>groupOfEntries</li>
+        <li>groupOfURLs</li>
+      </ul>
+    </td>
+    <td>
+      <ul>
+        <li>mailboxRelatedObject</li>
+      </ul>
+    </td>
+  </tr>
+
+  <tr>
+    <th><a href="#schema-oc-aeNwDevice">aeNwDevice</a></th>
+    <td>cn</td>
+    <td>Network device information</td>
+    <td><a href="#schema-oc-aeDevice">aeDevice</a></td>
+    <td>
+      <ul>
+        <li>ipHost</li>
+        <li>ieee802Device</li>
+        <li>bootableDevice</li>
+      </ul>
+    </td>
+  </tr>
+
+  <tr>
+    <th><a href="#schema-oc-aeObject">aeObject</a></th>
+    <td>-/-</td>
+    <td>abstract meta class</td>
+    <td></td>
+    <td>-/-</td>
+  </tr>
+
+  <tr>
+    <th><a href="#schema-oc-aePerson">aePerson</a></th>
+    <td>uniqueIdentifier</td>
+    <td>personal information</td>
+    <td>
+      <ul>
+        <li><a href="#schema-oc-aeObject">aeObject</a></li>
+        <li>inetOrgPerson</li>
+      </ul>
+    </td>
+    <td>msPerson</td>
+  </tr>
+
   <tr>
     <th><a href="#schema-oc-aePolicy">aePolicy</a></th>
     <td>cn</td>
@@ -787,25 +906,68 @@
       </ul>
     </td>
   </tr>
+
   <tr>
-    <th><a href="#schema-oc-aeDept">aeDept</a></th>
-    <td>departmentNumber</td>
-    <td>department / organization unit</td>
+    <th><a href="#schema-oc-aeRoot">aeRoot</a></th>
+    <td>ou</td>
+    <td>root entry of &AElig;-DIR tree</td>
     <td>
       <ul>
         <li><a href="#schema-oc-aeObject">aeObject</a></li>
         <li>organizationalUnit</li>
       </ul>
     </td>
-    <td>labeledURIObject</td>
+    <td><a href="#schema-oc-aePosixIdRanges">aePosixIdRanges</a></td>
   </tr>
+
   <tr>
-    <th><a href="#schema-oc-aeObject">aeObject</a></th>
-    <td>-/-</td>
-    <td>abstract meta class</td>
-    <td></td>
+    <th><a href="#schema-oc-aeService">aeService</a></th>
+    <td>uid</td>
+    <td>service user account</td>
+    <td>
+      <ul>
+        <li><a href="#schema-oc-aeObject">aeObject</a></li>
+        <li>account</li>
+      </ul>
+    </td>
+    <td>
+      <ul>
+        <li><a href="#schema-oc-posixAccount">posixAccount</a></li>
+        <li><a href="#schema-oc-inetLocalMailRecipient">inetLocalMailRecipient</a></li>
+        <li><a href="#schema-oc-pkiUser">pkiUser</a></li>
+        <li><a href="#schema-oc-ldapPublicKey">ldapPublicKey</a></li>
+        <li>oathHOTPUser</li>
+        <li>oathTOTPUser</li>
+      </ul>
+    </td>
+  </tr>
+
+  <tr>
+    <th><a href="#schema-oc-aeSrvGroup">aeSrvGroup</a></th>
+    <td>cn</td>
+    <td>host/service group</td>
+    <td>
+      <ul>
+        <li><a href="#schema-oc-aeObject">aeObject</a></li>
+        <li>namedObject</li>
+      </ul>
+    </td>
     <td>-/-</td>
   </tr>
+
+  <tr>
+    <th><a href="#schema-oc-aeSudoRule">aeSudoRule</a></th>
+    <td>cn</td>
+    <td>sudoers entry</td>
+    <td>
+      <ul>
+        <li><a href="#schema-oc-aeObject">aeObject</a></li>
+        <li>sudoRole</li>
+      </ul>
+    </td>
+    <td>-/-</td>
+  </tr>
+
   <tr>
     <th><a href="#schema-oc-aeTag">aeTag</a></th>
     <td>cn</td>
@@ -813,30 +975,7 @@
     <td>namedObject</td>
     <td>-/-</td>
   </tr>
-  <tr>
-    <th><a href="#schema-oc-aeZone">aeZone</a></th>
-    <td>cn</td>
-    <td>zone (delegation container)</td>
-    <td>
-      <ul>
-        <li><a href="#schema-oc-aeObject">aeObject</a></li>
-        <li>namedObject</li>
-      </ul>
-    </td>
-    <td><a href="#schema-oc-aePosixIdRanges">aePosixIdRanges</a></td>
-  </tr>
-  <tr>
-    <th><a href="#schema-oc-aePerson">aePerson</a></th>
-    <td>uniqueIdentifier</td>
-    <td>personal information</td>
-    <td>
-      <ul>
-        <li><a href="#schema-oc-aeObject">aeObject</a></li>
-        <li>inetOrgPerson</li>
-      </ul>
-    </td>
-    <td>msPerson</td>
-  </tr>
+
   <tr>
     <th><a href="#schema-oc-aeUser">aeUser</a></th>
     <td>uid</td>
@@ -860,135 +999,20 @@
       </ul>
     </td>
   </tr>
+
   <tr>
-    <th><a href="#schema-oc-aeGroup">aeGroup</a></th>
+    <th><a href="#schema-oc-aeZone">aeZone</a></th>
     <td>cn</td>
-    <td>user group</td>
-    <td>
-      <ul>
-        <li><a href="#schema-oc-aeObject">aeObject</a></li>
-        <li>groupOfEntries</li>
-        <li>groupOfURLs</li>
-        <li><a href="#schema-oc-posixGroup">posixGroup</a></li>
-      </ul>
-    </td>
-    <td>-/-</td>
-  </tr>
-  <tr>
-    <th><a href="#schema-oc-aeSrvGroup">aeSrvGroup</a></th>
-    <td>cn</td>
-    <td>host/service group</td>
+    <td>zone (delegation container)</td>
     <td>
       <ul>
         <li><a href="#schema-oc-aeObject">aeObject</a></li>
         <li>namedObject</li>
       </ul>
     </td>
-    <td>-/-</td>
+    <td><a href="#schema-oc-aePosixIdRanges">aePosixIdRanges</a></td>
   </tr>
-  <tr>
-    <th><a href="#schema-oc-aeService">aeService</a></th>
-    <td>uid</td>
-    <td>service user account</td>
-    <td>
-      <ul>
-        <li><a href="#schema-oc-aeObject">aeObject</a></li>
-        <li>account</li>
-      </ul>
-    </td>
-    <td>
-      <ul>
-        <li><a href="#schema-oc-posixAccount">posixAccount</a></li>
-        <li><a href="#schema-oc-inetLocalMailRecipient">inetLocalMailRecipient</a></li>
-        <li><a href="#schema-oc-pkiUser">pkiUser</a></li>
-        <li><a href="#schema-oc-ldapPublicKey">ldapPublicKey</a></li>
-        <li>oathHOTPUser</li>
-        <li>oathTOTPUser</li>
-      </ul>
-    </td>
-  </tr>
-  <tr>
-    <th><a href="#schema-oc-aeHost">aeHost</a></th>
-    <td>host</td>
-    <td>host information and for host authentication</td>
-    <td><a href="#schema-oc-aeDevice">aeDevice</a></td>
-    <td>
-      <ul>
-        <li><a href="#schema-oc-posixAccount">posixAccount</a></li>
-        <li><a href="#schema-oc-ldapPublicKey">ldapPublicKey</a></li>
-        <li><a href="#schema-oc-pkiUser">pkiUser</a></li>
-        <li>ipHost</li>
-      </ul>
-    </td>
-  </tr>
-  <tr>
-    <th><a href="#schema-oc-aeAuthcToken">aeAuthcToken</a></th>
-    <td>cn</td>
-    <td>Authentication token device</td>
-    <td><a href="#schema-oc-aeDevice">aeDevice</a></td>
-    <td>
-      <ul>
-        <li>oathHOTPToken</li>
-        <li>oathTOTPToken</li>
-        <li><a href="#schema-oc-ldapPublicKey">ldapPublicKey</a></li>
-        <li>pkiUser</li>
-      </ul>
-    </td>
-  </tr>
-  <tr>
-    <th><a href="#schema-oc-aeNwDevice">aeNwDevice</a></th>
-    <td>cn</td>
-    <td>Network device information</td>
-    <td><a href="#schema-oc-aeDevice">aeDevice</a></td>
-    <td>
-      <ul>
-        <li>ipHost</li>
-        <li>ieee802Device</li>
-        <li>bootableDevice</li>
-      </ul>
-    </td>
-  </tr>
-  <tr>
-    <th><a href="#schema-oc-aeSudoRule">aeSudoRule</a></th>
-    <td>cn</td>
-    <td>sudoers entry</td>
-    <td>sudoRole</td>
-    <td>-/-</td>
-  </tr>
-  <tr>
-    <th><a href="#schema-oc-aeContact">aeContact</a></th>
-    <td>mail</td>
-    <td>Mail contact</td>
-    <td>
-      <ul>
-        <li><a href="#schema-oc-aeObject">aeObject</a></li>
-        <li>namedObject</li>
-      </ul>
-    </td>
-    <td>
-      <ul>
-        <li>mailboxRelatedObject</li>
-        <li>inetLocalMailRecipient</li>
-      </ul>
-    </td>
-  </tr>
-  <tr>
-    <th><a href="#schema-oc-aeMailGroup">aeMailGroup</a></th>
-    <td>cn</td>
-    <td>user group</td>
-    <td>
-      <ul>
-        <li><a href="#schema-oc-aeObject">aeObject</a></li>
-        <li>groupOfEntries</li>
-        <li>groupOfURLs</li>
-      </ul>
-    </td>
-    <td>
-      <ul>
-        <li>mailboxRelatedObject</li>
-      </ul>
-    </td>
-  </tr>
+
 </table>
 
 <h3 id="schema-oc-aeObject">aeObject</h3>
