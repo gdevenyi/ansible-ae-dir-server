@@ -210,15 +210,12 @@ access to
     by set.expand="user & [cn=${d1},{{ aedir_suffix }}]/aeZoneAuditors/member" read
     by * none break
 
-# Acess to user, group and sudoers entries
+# Read acess to user, contacts, group and sudoers entries
 #------------------------------------------------------------------
 
-# Give read access to POSIX groups to:
-# - servers
-# - group members (except member attributes)
 access to
   dn.subtree="{{ aedir_suffix }}"
-  filter="(objectClass=posixGroup)"
+  filter="(objectClass=groupOfEntries)"
   attrs=entry,objectClass,entryUUID,modifyTimestamp,cn,gidNumber
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeVisibleGroups & this" read
@@ -229,8 +226,18 @@ access to
     by * none break
 access to
   dn.subtree="{{ aedir_suffix }}"
+  filter="(objectClass=groupOfEntries)"
+  attrs=member
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
+    by set="user/-1/aeVisibleGroups & this" read
+    by set="user/-1/aeProxyFor/aeVisibleGroups & this" read
+    by set="user/aeSrvGroup/aeVisibleGroups & this" read
+    by set="user/aeSrvGroup/aeProxyFor/aeVisibleGroups & this" read
+    by * none break
+access to
+  dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=posixGroup)"
-  attrs=member,memberUID
+  attrs=memberUID
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeVisibleGroups & this" read
     by set="user/-1/aeProxyFor/aeVisibleGroups & this" read
@@ -240,7 +247,7 @@ access to
 # group members can only read their own member attribute values
 access to
   dn.subtree="{{ aedir_suffix }}"
-  filter="(objectClass=posixGroup)"
+  filter="(objectClass=groupOfEntries)"
   attrs=member
   val.regex="^(.+)$"
     by set.expand="user & [${v1}]" read
@@ -262,10 +269,10 @@ access to
     by set="user/aeSrvGroup/aeVisibleSudoers & this" read
     by * none
 
-# Give read access to personal names and e-mail addresses to servers
+# Grant read access to personal names and e-mail addresses for services/hosts
 access to
   dn.subtree="{{ aedir_suffix }}"
-  filter="(objectClass=account)"
+  filter="(|(objectClass=aeUser)(objectClass=aeService)(objectClass=aeContact))"
   attrs=cn,mail,mailLocalAddress,givenName,sn,displayName
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeDisplayNameGroups/member & this" read
@@ -335,7 +342,7 @@ access to
     by set="user & this/-1" read
     by * none break
 
-# Personal user accounts filtered by (objectClass=aeUser)
+# Read access to personal user accounts and contacts
 #------------------------------------------------------------------
 
 # Give read access to POSIX accounts to servers
@@ -373,6 +380,18 @@ access to
     by set="user/-1/aeProxyFor/aeLoginGroups/member & this" read
     by set="user/aeSrvGroup/aeLoginGroups/member & this" read
     by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups/member & this" read
+    by * none break
+
+# Only on providers
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(objectClass=oathUser)"
+  attrs=oathHOTPToken,oathTOTPToken
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
+    by set="user/-1/aeLoginGroups/member & this" search
+    by set="user/-1/aeProxyFor/aeLoginGroups/member & this" search
+    by set="user/aeSrvGroup/aeLoginGroups/member & this" search
+    by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups/member & this" search
     by * none break
 
 # Read access to specific memberOf *values* to all aeHost entries
@@ -424,14 +443,7 @@ logpurge {{ openldap_log_purge }}
 
 # for back-links to group entries in member entries
 overlay memberof
-
-memberof-group-oc aeGroup
-memberof-member-ad member
-memberof-memberof-ad memberOf
-memberof-dangling ignore
-memberof-refint true
-
-memberof-group-oc aeMailGroup
+memberof-group-oc groupOfEntries
 memberof-member-ad member
 memberof-memberof-ad memberOf
 memberof-dangling ignore
