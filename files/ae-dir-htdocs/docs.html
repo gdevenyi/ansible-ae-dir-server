@@ -764,8 +764,8 @@
     <td>root entry of &AElig;-DIR tree</td>
     <td>
       <ul>
-        <li>organizationalUnit</li>
         <li><a href="#schema-oc-aeObject">aeObject</a></li>
+        <li>organizationalUnit</li>
       </ul>
     </td>
     <td><a href="#schema-oc-aePosixIdRanges">aePosixIdRanges</a></td>
@@ -774,8 +774,12 @@
     <th><a href="#schema-oc-aePolicy">aePolicy</a></th>
     <td>cn</td>
     <td>Policy information</td>
-    <td><a href="#schema-oc-aeDevice">namedPolicy</a></td>
     <td>
+       <ul>
+        <li><a href="#schema-oc-aeObject">aeObject</a></li>
+        <li>namedPolicy</li>
+      </ul>
+   <td>
       <ul>
         <li>pwdPolicy</li>
         <li>oathHOTPParams</li>
@@ -789,8 +793,8 @@
     <td>department / organization unit</td>
     <td>
       <ul>
-        <li>organizationalUnit</li>
         <li><a href="#schema-oc-aeObject">aeObject</a></li>
+        <li>organizationalUnit</li>
       </ul>
     </td>
     <td>labeledURIObject</td>
@@ -876,8 +880,8 @@
     <td>host/service group</td>
     <td>
       <ul>
-        <li>namedObject</li>
         <li><a href="#schema-oc-aeObject">aeObject</a></li>
+        <li>namedObject</li>
       </ul>
     </td>
     <td>-/-</td>
@@ -950,6 +954,40 @@
     <td>sudoers entry</td>
     <td>sudoRole</td>
     <td>-/-</td>
+  </tr>
+  <tr>
+    <th><a href="#schema-oc-aeContact">aeContact</a></th>
+    <td>mail</td>
+    <td>Mail contact</td>
+    <td>
+      <ul>
+        <li><a href="#schema-oc-aeObject">aeObject</a></li>
+        <li>namedObject</li>
+      </ul>
+    </td>
+    <td>
+      <ul>
+        <li>mailboxRelatedObject</li>
+        <li>inetLocalMailRecipient</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <th><a href="#schema-oc-aeMailGroup">aeMailGroup</a></th>
+    <td>cn</td>
+    <td>user group</td>
+    <td>
+      <ul>
+        <li><a href="#schema-oc-aeObject">aeObject</a></li>
+        <li>groupOfEntries</li>
+        <li>groupOfURLs</li>
+      </ul>
+    </td>
+    <td>
+      <ul>
+        <li>mailboxRelatedObject</li>
+      </ul>
+    </td>
   </tr>
 </table>
 
