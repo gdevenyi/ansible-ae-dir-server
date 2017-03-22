@@ -581,7 +581,8 @@ objectclass ( ae-dir-oc:4
 
 ditcontentrule ( ae-dir-oc:4
   NAME 'aeService-dcr'
-  AUX ( posixAccount $ inetLocalMailRecipient $ pkiUser $ ldapPublicKey $
+  AUX ( posixAccount $ pkiUser $ ldapPublicKey $
+        mailboxRelatedObject $ inetLocalMailRecipient $
         oathHOTPUser $ oathTOTPUser )
   NOT ( host $ l $ o $ ou ) )
 
