@@ -56,6 +56,7 @@ AE_TAG_OID = AE_OID_PREFIX+'.6.24'
 AE_POLICY_OID = AE_OID_PREFIX+'.6.26'
 AE_AUTHCTOKEN_OID = AE_OID_PREFIX+'.6.25'
 AE_DEPT_OID = AE_OID_PREFIX+'.6.29'
+AE_CONTACT_OID = AE_OID_PREFIX+'.6.5'
 
 
 syntax_registry.registerAttrType(
@@ -1390,6 +1391,22 @@ syntax_registry.registerAttrType(
     '2.16.840.1.113730.3.1.241', # displayName
   ],
   structural_oc_oids=[AE_USER_OID], # aeUser
+)
+
+
+class AEDisplayNameContact(ComposedAttribute,DirectoryString):
+  oid = 'AEDisplayNameContact-oid'
+  desc = 'Attribute displayName in object class aeContact'
+  compose_templates = (
+    '{cn} <{mail}>',
+    '{cn}',
+  )
+
+syntax_registry.registerAttrType(
+  AEDisplayNameContact.oid,[
+    '2.16.840.1.113730.3.1.241', # displayName
+  ],
+  structural_oc_oids=[AE_CONTACT_OID], # aeContact
 )
 
 
