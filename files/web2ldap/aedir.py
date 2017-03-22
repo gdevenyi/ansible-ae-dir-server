@@ -612,12 +612,39 @@ syntax_registry.registerAttrType(
     AE_OID_PREFIX+'.4.4',  # aeLoginGroups
     AE_OID_PREFIX+'.4.6',  # aeSetupGroups
     AE_OID_PREFIX+'.4.7',  # aeLogStoreGroups
+  ]
+)
+
+
+class AEDisplayNameGroups(AESrvGroupRightsGroupDN):
+  oid = 'AEDisplayNameGroups-oid'
+  desc = 'AE-DIR: DN of visible user group entry'
+  ldap_url = (
+    'ldap:///_??sub?'
+    '(&'
+      '(|'
+        '(objectClass=aeGroup)'
+        '(objectClass=aeMailGroup)'
+      ')'
+      '(aeStatus=0)'
+      '(!'
+        '(|'
+          '(cn:dn:=pub)'
+          '(cn=*-zone-admins)'
+          '(cn=*-zone-auditors)'
+        ')'
+      ')'
+    ')'
+  )
+
+syntax_registry.registerAttrType(
+  AEDisplayNameGroups.oid,[
     AE_OID_PREFIX+'.4.30', # aeDisplayNameGroups
   ]
 )
 
 
-class AEVisibleGroups(AESrvGroupRightsGroupDN):
+class AEVisibleGroups(AEDisplayNameGroups):
   oid = 'AEVisibleGroups-oid'
   desc = 'AE-DIR: DN of visible user group entry'
   always_add_groups = (
