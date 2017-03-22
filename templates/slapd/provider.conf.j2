@@ -399,8 +399,8 @@ access to
   dn.onelevel="cn=otp,{{ aedir_suffix }}"
   filter="(objectClass=oathToken)"
     by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" read
-    by set.expand="user & this/aeZoneAdmins/member" read
-    by set.expand="user & this/aeZoneAuditors/member" read
+    by set="user & this/aeZoneAdmins/member" read
+    by set="user & this/aeZoneAuditors/member" read
     by set="user/oathHOTPToken & this" read
     by set="user & ([ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(member=] + user + [))])/member" read
     by * none
@@ -413,14 +413,14 @@ access to
 access to
   filter="(&(objectClass=aeZone)(aeStatus=0))"
   attrs=children
-    by set.expand="user & this/aeZoneAdmins/member" write
-    by set.expand="user & this/aeZoneAuditors/member" read
+    by set="user & this/aeZoneAdmins/member" write
+    by set="user & this/aeZoneAuditors/member" read
     by set="user/-1 & this" search
     by * none break
 access to
   filter="(&(objectClass=aeZone)(aeStatus=0))"
-    by set.expand="user & this/aeZoneAdmins/member" read
-    by set.expand="user & this/aeZoneAuditors/member" read
+    by set="user & this/aeZoneAdmins/member" read
+    by set="user & this/aeZoneAuditors/member" read
     by set="user/-1 & this" read
     by users search break
     by * none break
