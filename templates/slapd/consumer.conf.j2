@@ -281,6 +281,18 @@ access to
     by set="user/aeSrvGroup/aeProxyFor/aeDisplayNameGroups/member & this" read
     by * none break
 
+# Grant read access to aeContact entries for services/hosts
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(objectClass=aeContact)"
+  attrs=entry,entryUUID,modifyTimestamp,cn,mail,mailLocalAddress,displayName
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
+    by set="user/-1/aeDisplayNameGroups/member & this" read
+    by set="user/-1/aeProxyFor/aeDisplayNameGroups/member & this" read
+    by set="user/aeSrvGroup/aeDisplayNameGroups/member & this" read
+    by set="user/aeSrvGroup/aeProxyFor/aeDisplayNameGroups/member & this" read
+    by * none break
+
 # Give read access to SSH keys, X.509 cert and loginShell to servers which
 # shall allow login for the user's groups
 access to
@@ -382,7 +394,7 @@ access to
     by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups/member & this" search
     by * none break
 
-# Read access to specific memberOf *values* to all aeHost entries
+# Read access to specific memberOf *values* to all services and hosts
 # where aeSrvGroup references this particular group DN
 access to
   dn.subtree="{{ aedir_suffix }}"
@@ -392,6 +404,16 @@ access to
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set.expand="user/-1 & [ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeSrvGroup)(aeStatus=0)(aeVisibleGroups=${v1}))]/entryDN" read
     by set.expand="user/aeSrvGroup & [ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeSrvGroup)(aeStatus=0)(aeVisibleGroups=${v1}))]entryDN" read
+    by self read
+    by * none break
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(objectClass=aeContact)"
+  attrs=memberOf
+  val.regex="^(.+)$"
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
+    by set.expand="user/-1 & [ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeSrvGroup)(aeStatus=0)(aeDisplayNameGroups=${v1}))]/entryDN" read
+    by set.expand="user/aeSrvGroup & [ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeSrvGroup)(aeStatus=0)(aeDisplayNameGroups=${v1}))]entryDN" read
     by self read
     by * none break
 
