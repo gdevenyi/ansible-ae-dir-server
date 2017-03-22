@@ -442,12 +442,14 @@ objectclass ( ae-dir-oc:5
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: Contact entry (e-mail recipient)'
   STRUCTURAL
-  SUP ( namedObject $ aeObject ) )
+  SUP ( namedObject $ aeObject )
+  MUST ( mail )
+  MAY ( o ) )
 
 ditcontentrule ( ae-dir-oc:5
   NAME 'aeContact-dcr'
   AUX ( inetLocalMailRecipient $ mailboxRelatedObject )
-  NOT ( l $ ou $ seeAlso ) )
+  NOT ( seeAlso ) )
 
 # Server and network device entries
 #-----------------------------------------------------------------------
