@@ -382,7 +382,7 @@ access to
     by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups/member & this" search
     by * none break
 
-# Only on providers
+# Grant read access to OATH-LDAP token reference
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=oathUser)"
