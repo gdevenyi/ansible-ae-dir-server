@@ -444,7 +444,7 @@ objectclass ( ae-dir-oc:5
   STRUCTURAL
   SUP ( namedObject $ aeObject )
   MUST ( mail )
-  MAY ( o ) )
+  MAY ( o $ nickName ) )
 
 ditcontentrule ( ae-dir-oc:5
   NAME 'aeContact-dcr'
