@@ -217,7 +217,7 @@ access to
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=groupOfEntries)"
-  attrs=entry,objectClass,entryUUID,modifyTimestamp,cn,gidNumber
+  attrs=entry,objectClass,structuralObjectClass,aeStatus,entryUUID,modifyTimestamp,cn,gidNumber
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeVisibleGroups & this" read
     by set="user/-1/aeProxyFor/aeVisibleGroups & this" read
@@ -264,7 +264,7 @@ access to
 # Give read access to SUDO rules to servers
 access to
   dn.subtree="{{ aedir_suffix }}"
-  attrs=entry,objectClass,entryUUID,modifyTimestamp,@sudoRole
+  attrs=entry,objectClass,structuralObjectClass,aeStatus,entryUUID,modifyTimestamp,@sudoRole
   filter="(objectClass=sudoRole)"
     by set="user/-1/aeVisibleSudoers & this" read
     by set="user/aeSrvGroup/aeVisibleSudoers & this" read
@@ -286,7 +286,7 @@ access to
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=aeContact)"
-  attrs=entry,entryUUID,modifyTimestamp,cn,mail,mailLocalAddress,displayName
+  attrs=entry,objectClass,structuralObjectClass,aeStatus,entryUUID,modifyTimestamp,cn,mail,mailLocalAddress,displayName
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeDisplayNameGroups/member & this" read
     by set="user/-1/aeProxyFor/aeDisplayNameGroups/member & this" read
@@ -326,7 +326,7 @@ access to
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=aeSrvGroup)"
-  attrs=entry,objectClass,aeVisibleGroups,aeVisibleSudoers,aeLogStorePeriod,aeLoginGroups,aeLogStoreGroups
+  attrs=entry,objectClass,structuralObjectClass,aeStatus,aeVisibleGroups,aeVisibleSudoers,aeLogStorePeriod,aeLoginGroups,aeLogStoreGroups
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by self.level{1} read
     by set="user/-1/aeProxyFor & this" read
@@ -339,7 +339,7 @@ access to
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=aeHost)"
-  attrs=entry,objectClass,cn,host
+  attrs=entry,objectClass,structuralObjectClass,aeStatus,cn,host
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeProxyFor & this/-1" read
     by set="user/aeSrvGroup/aeProxyFor & this/-1" read
@@ -362,7 +362,7 @@ access to
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=posixAccount)"
-  attrs=entry,aeStatus,objectClass,entryUUID,modifyTimestamp,uid,uidNumber,gidNumber,homeDirectory,gecos
+  attrs=entry,objectClass,structuralObjectClass,aeStatus,entryUUID,modifyTimestamp,uid,uidNumber,gidNumber,homeDirectory,gecos
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeVisibleGroups/member & this" read
     by set="user/-1/aeProxyFor/aeVisibleGroups/member & this" read
@@ -406,7 +406,7 @@ access to
     by set.expand="user/-1 & [ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeSrvGroup)(aeStatus=0)(aeVisibleGroups=${v1}))]/entryDN" read
     by set.expand="user/aeSrvGroup & [ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeSrvGroup)(aeStatus=0)(aeVisibleGroups=${v1}))]entryDN" read
     by self read
-    by * none break
+    by * none
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=aeContact)"
@@ -416,7 +416,7 @@ access to
     by set.expand="user/-1 & [ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeSrvGroup)(aeStatus=0)(aeDisplayNameGroups=${v1}))]/entryDN" read
     by set.expand="user/aeSrvGroup & [ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeSrvGroup)(aeStatus=0)(aeDisplayNameGroups=${v1}))]entryDN" read
     by self read
-    by * none break
+    by * none
 
 # Last catch ACLs
 #------------------------------------------------------------------
