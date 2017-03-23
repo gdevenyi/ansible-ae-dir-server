@@ -1029,7 +1029,7 @@ unique_uri "ldap:///{{ aedir_suffix }}?employeeNumber,uniqueIdentifier,displayNa
 # only one primary aeUser entry per aePerson
 unique_uri "ldap:///cn={{ aedir_base_zone }},{{ aedir_suffix }}?aePerson?sub"
 # these two constraints are only possible with a negation filter
-unique_uri "ldap:///{{ aedir_suffix }}?cn?sub?(!(|(objectClass=aePerson)(objectClass=aeContact)(objectClass=aeUser)(objectClass=aeNwDevice)))"
+unique_uri "ldap:///{{ aedir_suffix }}?cn?sub?(!(|(objectClass=aePerson)(objectClass=aeUser)(objectClass=aeNwDevice)))"
 unique_uri "ldap:///{{ aedir_suffix }}?gidNumber?sub"
 unique_uri "ldap:///{{ aedir_suffix }}?aeRemoteHost?sub?(!(objectClass=aeUser))"
 
