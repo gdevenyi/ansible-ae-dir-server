@@ -558,6 +558,7 @@ ae_dir_config = Web2LDAPConfig(
   groupadm_defs={
     'groupOfEntries':('member',None),
     'posixGroup':('memberUid','uid'),
+    'nisMailAlias':('rfc822MailMember','mail'),
   },
   read_tablemaxcount={
     'member':40,

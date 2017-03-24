@@ -37,7 +37,10 @@ PYLDAP_TRACELEVEL = int(os.environ.get('PYLDAP_TRACELEVEL', '0'))
 # Attribute containing the group members references
 MEMBER_ATTR = 'member'
 # Attribute containing the group members' uid values
-MEMBERUID_ATTR = 'memberUid'
+MEMBER_ATTRS_MAP = (
+    ('aeGroup', 'memberUid', 'uid'),
+    ('aeMailGroup', 'rfc822MailMember', 'mail'),
+)
 
 # deref control for
 AEUSER_DEREF_CONTROL = DereferenceControl(
@@ -63,88 +66,105 @@ class AEGroupFixer(aedir.process.AEProcess):
         Removes obsolete 'member' and 'memberUID' values and adds
         missing 'memberUID' values in all active aeGroup entries
         """
-        msg_id = self.ldap_conn.search_ext(
-            self.ldap_conn.find_search_base(),
-            ldap.SCOPE_SUBTREE,
-            '(&(objectClass=aeGroup)(aeStatus=0))',
-            attrlist=[
-                MEMBER_ATTR,
-                MEMBERUID_ATTR,
-            ],
-            serverctrls=[AEUSER_DEREF_CONTROL],
-        )
 
-        for _, ldap_results, _, _ in self.ldap_conn.allresults(
-                msg_id,
-                add_ctrls=1,
-            ):
-
-            for ldap_group_dn, ldap_group_entry, ldap_resp_controls in ldap_results:
-
-                if not ldap_resp_controls:
-                    continue
-
-                member_deref_result = ldap_resp_controls[0].derefRes[MEMBER_ATTR]
-
-                old_members = set(ldap_group_entry.get(MEMBER_ATTR, []))
-                old_member_uids = set(ldap_group_entry.get(MEMBERUID_ATTR, []))
-                new_members = set()
-                new_member_uids = set()
-                for deref_dn, deref_entry in member_deref_result:
-                    if deref_entry['aeStatus'][0] == '0':
-                        new_members.add(deref_dn)
-                        new_member_uids.add(deref_entry['uid'][0])
-
-                ldap_group_modlist = []
-
-                remove_members = old_members - new_members
-                if remove_members:
-                    ldap_group_modlist.append(
-                        (ldap.MOD_DELETE, MEMBER_ATTR, list(remove_members)),
+        for group_object_class, member_map_attr, member_user_attr in MEMBER_ATTRS_MAP:
+            msg_id = self.ldap_conn.search_ext(
+                self.ldap_conn.find_search_base(),
+                ldap.SCOPE_SUBTREE,
+                '(&(objectClass={0})(aeStatus=0))'.format(group_object_class),
+                attrlist=[
+                    MEMBER_ATTR,
+                    member_map_attr,
+                ],
+                serverctrls=[
+                    DereferenceControl(
+                        True,
+                        {
+                            MEMBER_ATTR: ['aeStatus', member_user_attr],
+                        }
                     )
+                ],
+            )
 
-                remove_member_uids = old_member_uids - new_member_uids
-                if remove_member_uids:
-                    ldap_group_modlist.append(
-                        (ldap.MOD_DELETE, MEMBERUID_ATTR, list(remove_member_uids)),
-                    )
+            for _, ldap_results, _, _ in self.ldap_conn.allresults(
+                    msg_id,
+                    add_ctrls=1,
+                ):
 
-                add_member_uids = new_member_uids - old_member_uids
-                if add_member_uids:
-                    ldap_group_modlist.append(
-                        (ldap.MOD_ADD, MEMBERUID_ATTR, list(add_member_uids)),
-                    )
+                for ldap_group_dn, ldap_group_entry, ldap_resp_controls in ldap_results:
 
-                if ldap_group_modlist:
-                    try:
-                        self.ldap_conn.modify_s(ldap_group_dn, ldap_group_modlist)
-                    except ldap.LDAPError, ldap_error:
-                        self.logger.error(
-                            u'LDAPError modifying %r: %s ldap_group_modlist = %r',
-                            ldap_group_dn,
-                            ldap_error,
-                            ldap_group_modlist,
+                    if not ldap_resp_controls:
+                        continue
+
+                    member_deref_result = ldap_resp_controls[0].derefRes[MEMBER_ATTR]
+
+                    old_members = set(ldap_group_entry.get(MEMBER_ATTR, []))
+                    old_member_attr_values = set(ldap_group_entry.get(member_map_attr, []))
+                    new_members = set()
+                    new_member_attr_values = set()
+                    for deref_dn, deref_entry in member_deref_result:
+                        if deref_entry['aeStatus'][0] == '0':
+                            new_members.add(deref_dn)
+                            try:
+                                new_member_attr_values.add(deref_entry[member_user_attr][0])
+                            except KeyError:
+                                self.logger.error(
+                                    'Attribute %r not found in entry %r: %r',
+                                    member_user_attr,
+                                    deref_dn,
+                                    deref_entry,
+                                )
+
+                    ldap_group_modlist = []
+
+                    remove_members = old_members - new_members
+                    if remove_members:
+                        ldap_group_modlist.append(
+                            (ldap.MOD_DELETE, MEMBER_ATTR, list(remove_members)),
                         )
+
+                    remove_member_attr_values = old_member_attr_values - new_member_attr_values
+                    if remove_member_attr_values:
+                        ldap_group_modlist.append(
+                            (ldap.MOD_DELETE, member_map_attr, list(remove_member_attr_values)),
+                        )
+
+                    add_member_attr_values = new_member_attr_values - old_member_attr_values
+                    if add_member_attr_values:
+                        ldap_group_modlist.append(
+                            (ldap.MOD_ADD, member_map_attr, list(add_member_attr_values)),
+                        )
+
+                    if ldap_group_modlist:
+                        try:
+                            self.ldap_conn.modify_s(ldap_group_dn, ldap_group_modlist)
+                        except ldap.LDAPError, ldap_error:
+                            self.logger.error(
+                                u'LDAPError modifying %r: %s ldap_group_modlist = %r',
+                                ldap_group_dn,
+                                ldap_error,
+                                ldap_group_modlist,
+                            )
+                        else:
+                            self.logger.debug(
+                                u'Updated %r: ldap_group_modlist = %r',
+                                ldap_group_dn,
+                                ldap_group_modlist,
+                            )
+                            self.logger.info(
+                                (
+                                    u'Updated member values of group entry %r: '
+                                    u'remove_members=%d '
+                                    u'remove_member_attr_values=%d '
+                                    u'add_member_attr_values=%d'
+                                ),
+                                ldap_group_dn,
+                                len(remove_members),
+                                len(remove_member_attr_values),
+                                len(add_member_attr_values)
+                            )
                     else:
-                        self.logger.debug(
-                            u'Updated %r: ldap_group_modlist = %r',
-                            ldap_group_dn,
-                            ldap_group_modlist,
-                        )
-                        self.logger.info(
-                            (
-                                u'Updated member values of group entry %r: '
-                                u'remove_members=%d '
-                                u'remove_member_uids=%d '
-                                u'add_member_uids=%d'
-                            ),
-                            ldap_group_dn,
-                            len(remove_members),
-                            len(remove_member_uids),
-                            len(add_member_uids)
-                        )
-                else:
-                    self.logger.debug(u'Nothing to be done with %r', ldap_group_dn)
+                        self.logger.debug(u'Nothing to be done with %r', ldap_group_dn)
 
         return # end of fix_members()
 

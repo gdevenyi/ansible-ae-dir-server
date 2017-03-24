@@ -318,7 +318,7 @@ objectclass ( ae-dir-oc:27
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: Nailing list entry'
   STRUCTURAL
-  SUP ( groupOfEntries $ groupOfURLs $ aeObject )
+  SUP ( groupOfEntries $ nisMailAlias $ groupOfURLs $ aeObject )
   MUST ( mail $ description ) )
 
 ditcontentrule ( ae-dir-oc:27
