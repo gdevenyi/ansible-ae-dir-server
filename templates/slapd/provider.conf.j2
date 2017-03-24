@@ -1292,14 +1292,14 @@ constraint_attribute
 # restrict references from mail groups to have only active accounts/contacts with e-mail address as members
 constraint_attribute
   member
-  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(|(objectClass=aeUser)(objectClass=aeService)(objectClass=aeContact))(mail=*)(aeStatus=0))"
+  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(|(objectClass=inetLocalMailRecipient)(objectClass=aeContact))(mail=*)(aeStatus=0))"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeMailGroup)"
 
 # department-constraint groups must contain only aeUser members assigned to a specific department
 constraint_attribute
   member
   set "this/member/aePerson/aeDept & this/aeDept"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(&(objectClass=aeGroup)(aeDept=*))"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(&(objectClass=groupOfEntries)(aeDept=*))"
 
 # restrict memberUID to be uid of an active posixAccount
 constraint_attribute memberUID
@@ -1311,9 +1311,9 @@ constraint_attribute memberUID,member
   set "this/memberUID & this/member/uid"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=posixGroup)"
 
-# restrict rfc822MailMember to be mail of an active entry
+# restrict rfc822MailMember to be mail of an active local e-mail account
 constraint_attribute rfc822MailMember
-  uri "ldap:///{{ aedir_suffix }}?mail?sub?(&(|(objectClass=aeUser)(objectClass=aeService)(objectClass=aeContact))(mail=*)(aeStatus=0))"
+  uri "ldap:///{{ aedir_suffix }}?mail?sub?(&(|(objectClass=inetLocalMailRecipient)(objectClass=aeContact))(mail=*)(aeStatus=0))"
   restrict="ldap:///{{ aedir_suffix }}??sub"
 
 # restrict rfc822MailMember to be consistent with group membership defined in member
