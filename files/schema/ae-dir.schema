@@ -319,7 +319,8 @@ objectclass ( ae-dir-oc:27
   DESC 'AE-DIR: Nailing list entry'
   STRUCTURAL
   SUP ( groupOfEntries $ nisMailAlias $ groupOfURLs $ aeObject )
-  MUST ( mail $ description ) )
+  MUST ( mail $ description )
+  MAY ( aeDept ) )
 
 ditcontentrule ( ae-dir-oc:27
   NAME 'aeMailGroup-dcr'
