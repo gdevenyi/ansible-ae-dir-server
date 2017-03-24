@@ -201,6 +201,13 @@ aedir_confidential_person_attrs:
   - aeNotBefore
   - aeNotAfter
 
+# aePerson attributes readable by all base users
+aedir_public_person_attrs:
+  - cn
+  - sn
+  - givenName
+  - mail
+  - userCertificate
 
 # Specifies whether a AE-DIR instance should send e-mail notifications to users or not
 aedir_user_mail_enabled: "{{ aedir_hosts.provider[0]==ansible_fqdn }}"

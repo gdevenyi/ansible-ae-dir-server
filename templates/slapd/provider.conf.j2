@@ -905,7 +905,7 @@ access to
     by set.expand="user/memberOf & [${v1}]" read
     by * none
 
-# Terminating ACLs for aeZone, aeUser and aeGroup entries
+# Last catch ACLs
 #------------------------------------------------------------------
 
 # groups ae-all-zone-admins and ae-all-zone-auditors must be excluded after this!
@@ -1005,7 +1005,7 @@ access to
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=aePerson)"
-  attrs=entry,cn,sn,givenName,mail,userCertificate
+  attrs=entry,{{ aedir_public_person_attrs|join(',') }}
     by dn.onelevel="cn={{ aedir_base_zone }},{{ aedir_suffix }}" read
     by * none
 
@@ -1032,17 +1032,14 @@ access to
 overlay noopsrch
 {% endif %}
 
-# for server-side sorting
-overlay sssvlv
-
 # for dereferencing attributes
 overlay deref
 
-# Initialize constraint overlays
-overlay unique
-overlay constraint
+# for server-side sorting
+overlay sssvlv
 
 # Check sub-tree wide uniqueness of certain attributes
+overlay unique
 unique_uri "ldap:///{{ aedir_suffix }}?uid,uidNumber?sub?(objectClass=*)"
 unique_uri "ldap:///{{ aedir_suffix }}?nickName?sub?(objectClass=*)"
 unique_uri "ldap:///{{ aedir_suffix }}?mailLocalAddress?sub?(objectClass=*)"
@@ -1055,6 +1052,9 @@ unique_uri "ldap:///cn={{ aedir_base_zone }},{{ aedir_suffix }}?aePerson?sub"
 unique_uri "ldap:///{{ aedir_suffix }}?cn?sub?(!(|(objectClass=aePerson)(objectClass=aeUser)(objectClass=aeNwDevice)))"
 unique_uri "ldap:///{{ aedir_suffix }}?gidNumber?sub"
 unique_uri "ldap:///{{ aedir_suffix }}?aeRemoteHost?sub?(!(objectClass=aeUser))"
+
+# Enforce constraints on attribute values
+overlay constraint
 
 constraint_attribute
   host
