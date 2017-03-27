@@ -137,8 +137,9 @@ class AEGroupUpdater(aedir.process.AEProcess):
 
     def fix_static_groups(self):
         """
-        Removes obsolete 'member' and other member values and adds
-        missing other member values in all active aeGroup entries
+        1. Removes obsolete 'member' and other member values and
+        2. adds missing other member values
+        in all active static aeGroup entries
         """
         for group_object_class, member_attrs in MEMBER_ATTRS_MAP.items():
             member_map_attr, member_user_attr = member_attrs
