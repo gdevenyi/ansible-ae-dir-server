@@ -890,6 +890,24 @@ syntax_registry.registerAttrType(
 )
 
 
+class AEEntryDNAEMailGroup(GroupEntryDN):
+  oid = 'AEEntryDNAEMailGroup-oid'
+  desc = 'AE-DIR: entryDN of aeGroup entry'
+  ref_attrs = [
+    ('memberOf',u'Members',None,u'Search all member entries of this mail group'),
+    ('aeVisibleGroups',u'Visible',None,u'Search all server/service groups (aeSrvGroup)\non which this mail group is visible'),
+  ]
+
+syntax_registry.registerAttrType(
+  AEEntryDNAEMailGroup.oid,[
+    '1.3.6.1.1.20', # entryDN
+  ],
+  structural_oc_oids=[
+    AE_MAILGROUP_OID, # aeMailGroup
+  ],
+)
+
+
 class AEEntryDNAEGroup(GroupEntryDN):
   oid = 'AEEntryDNAEGroup-oid'
   desc = 'AE-DIR: entryDN of aeGroup entry'
