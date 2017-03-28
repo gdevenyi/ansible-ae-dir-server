@@ -446,7 +446,7 @@ class AEMailGroupMember(DynamicDNSelectList):
   oid = 'AEMailGroupMember-oid'
   desc = 'AE-DIR: Member of a mail group'
   input_fallback = False # no fallback to normal input field
-  ldap_url = 'ldap:///_?displayName?sub?(&(|(objectClass=aeUser)(objectClass=aeService)(objectClass=aeContact))(mail=*)(aeStatus=0))'
+  ldap_url = 'ldap:///_?displayName?sub?(&(|(objectClass=inetLocalMailRecipient)(objectClass=aeContact))(mail=*)(aeStatus=0))'
 
 syntax_registry.registerAttrType(
   AEMailGroupMember.oid,[
@@ -1858,7 +1858,7 @@ syntax_registry.registerAttrType(
 class AERFC822MailMember(DynamicValueSelectList):
   oid = 'AERFC822MailMember-oid'
   desc = 'AE-DIR: rfc822MailMember'
-  ldap_url = 'ldap:///_?mail?sub?(&(|(objectClass=inetLocalMailRecipient)(objectClass=aeContact))(mail=*)(aeStatus=0))'
+  ldap_url = 'ldap:///_?mail,displayName?sub?(&(|(objectClass=inetLocalMailRecipient)(objectClass=aeContact))(mail=*)(aeStatus=0))'
   html_tmpl = RFC822Address.html_tmpl
 
   def formField(self):
