@@ -1837,6 +1837,32 @@ syntax_registry.registerAttrType(
 )
 
 
+class AERFC822MailMember(DynamicValueSelectList):
+  oid = 'AERFC822MailMember-oid'
+  desc = 'AE-DIR: rfc822MailMember'
+  ldap_url = 'ldap:///_?mail?sub?(&(|(objectClass=inetLocalMailRecipient)(objectClass=aeContact))(mail=*)(aeStatus=0))'
+  html_tmpl = RFC822Address.html_tmpl
+
+  def formField(self):
+    input_field = HiddenInput(
+      self.attrType,
+      ': '.join([self.attrType,self.desc]),
+      self.maxLen,self.maxValues,None,
+    )
+    input_field.charset = self._form.accept_charset
+    input_field.setDefault(self.formValue())
+    return input_field
+
+syntax_registry.registerAttrType(
+  AERFC822MailMember.oid,[
+    '1.3.6.1.4.1.42.2.27.2.1.15', # rfc822MailMember
+  ],
+  structural_oc_oids=[
+    AE_MAILGROUP_OID, # aeMailGroup
+  ]
+)
+
+
 class AEPwdPolicy(w2lapp.schema.plugins.ppolicy.PwdPolicySubentry):
   oid = 'AEPwdPolicy-oid'
   desc = 'AE-DIR: pwdPolicySubentry'
