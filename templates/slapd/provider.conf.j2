@@ -581,7 +581,7 @@ access to
     by * none break
 # administration and readability of aeLocation entries
 access to
-  dn.regex="^uniqueIdentifier=({{ aedir_aelocation_uniqueid_regex }}),cn={{ aedir_aezone_cn_regex }},{{ aedir_suffix }}$"
+  dn.regex="^cn=({{ aedir_aelocation_cn_regex }}),cn={{ aedir_aezone_cn_regex }},{{ aedir_suffix }}$"
   filter="(objectClass=aeLocation)"
     by set="user & this/-1/aeZoneAdmins/member" write
     by set="user & this/-1/aeZoneAuditors/member" read
@@ -1075,8 +1075,8 @@ constraint_attribute
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aePerson)"
 
 constraint_attribute
-  uniqueIdentifier
-  regex "^{{ aedir_aelocation_uniqueid_regex }}$"
+  cn
+  regex "^{{ aedir_aelocation_cn_regex }}$"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeLocation)"
 
 constraint_attribute

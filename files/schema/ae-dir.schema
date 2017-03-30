@@ -272,7 +272,7 @@ objectclass ( ae-dir-oc:35
   DESC 'AE-DIR: Location within an organization'
   STRUCTURAL
   SUP ( locality $ aeObject )
-  MUST ( uniqueIdentifier )
+  MUST ( cn )
   MAY ( postalCode $ telephoneNumber $ facsimileTelephoneNumber $
         c $ ou $ displayName $ aeSourceUri ) )
 

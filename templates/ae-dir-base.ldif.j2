@@ -596,11 +596,11 @@ objectClass: aeObject
 ou: -
 
 # dummy location entry
-dn: uniqueIdentifier=no-location,cn={{ aedir_org_zone }},{{ aedir_suffix }}
+dn: cn=no-location,cn={{ aedir_org_zone }},{{ aedir_suffix }}
 changetype: add
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
-uniqueIdentifier: no-location
+cn: no-location
 displayName: no-location
 objectClass: locality
 objectClass: aeLocation
@@ -618,7 +618,7 @@ objectClass: aeObject
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
 aeDept: departmentNumber=0,cn={{ aedir_org_zone }},{{ aedir_suffix }}
-aeLocation: uniqueIdentifier=no-location,cn={{ aedir_org_zone }},{{ aedir_suffix }}
+aeLocation: cn=no-location,cn={{ aedir_org_zone }},{{ aedir_suffix }}
 aeTag: ae-tag-init
 cn: {{ person_attrs.given_name }} {{ person_attrs.sur_name }}
 displayName: {{ person_attrs.given_name }} {{ person_attrs.sur_name }} ({{ unique_identifier }})
