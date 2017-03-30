@@ -456,6 +456,12 @@ ae_dir_config = Web2LDAPConfig(
       Contact %(cn)s: %(description)s
     </div>
     """,
+    'aeLocation':r"""
+    <div class="aestatus%(aeStatus)s">
+      <var>%(entryDN)s</var><br>
+      Location %(displayName)s
+    </div>
+    """,
   },
   read_template={
     'msPwdResetObject':os.path.join(web2ldapcnf.templates_dir,'ae-dir','read_msPwdResetObject.html'),
