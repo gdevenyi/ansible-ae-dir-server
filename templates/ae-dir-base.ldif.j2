@@ -596,12 +596,12 @@ objectClass: aeObject
 ou: -
 
 # dummy location entry
-dn: uniqueIdentifier=0-none,cn={{ aedir_org_zone }},{{ aedir_suffix }}
+dn: uniqueIdentifier=no-location,cn={{ aedir_org_zone }},{{ aedir_suffix }}
 changetype: add
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
-uniqueIdentifier: 0-none
-displayName: 0-none
+uniqueIdentifier: no-location
+displayName: no-location
 objectClass: locality
 objectClass: aeLocation
 objectClass: aeObject
