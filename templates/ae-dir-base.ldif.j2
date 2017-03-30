@@ -595,6 +595,17 @@ objectClass: aeDept
 objectClass: aeObject
 ou: -
 
+# dummy location entry
+dn: uniqueIdentifier=0-none,cn={{ aedir_org_zone }},{{ aedir_suffix }}
+changetype: add
+aeStatus: 0
+aeTicketId: {{ aedir_init_ticket_id }}
+uniqueIdentifier: 0-none
+displayName: 0-none
+objectClass: locality
+objectClass: aeLocation
+objectClass: aeObject
+
 {% for unique_identifier, person_attrs in aedir_init_aepersons.iteritems() %}
 dn: uniqueIdentifier={{ unique_identifier }},cn={{ aedir_org_zone }},{{ aedir_suffix }}
 changetype: add
@@ -607,6 +618,7 @@ objectClass: aeObject
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
 aeDept: departmentNumber=0,cn={{ aedir_org_zone }},{{ aedir_suffix }}
+aeLocation: uniqueIdentifier=0-nolocation,cn={{ aedir_org_zone }},{{ aedir_suffix }}
 aeTag: ae-tag-init
 cn: {{ person_attrs.given_name }} {{ person_attrs.sur_name }}
 displayName: {{ person_attrs.given_name }} {{ person_attrs.sur_name }} ({{ unique_identifier }})
