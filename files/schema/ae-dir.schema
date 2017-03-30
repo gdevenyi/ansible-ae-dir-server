@@ -273,7 +273,7 @@ objectclass ( ae-dir-oc:35
   STRUCTURAL
   SUP ( locality $ aeObject )
   MUST ( uniqueIdentifier )
-  MAY ( postalCode $ telephoneNumber $ ou $ displayName $ aeSourceUri ) )
+  MAY ( postalCode $ telephoneNumber $ c $ ou $ displayName $ aeSourceUri ) )
 
 ditcontentrule ( ae-dir-oc:35
   NAME 'aeLocation-dcr'
