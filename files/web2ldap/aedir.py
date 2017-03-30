@@ -57,6 +57,7 @@ AE_POLICY_OID = AE_OID_PREFIX+'.6.26'
 AE_AUTHCTOKEN_OID = AE_OID_PREFIX+'.6.25'
 AE_DEPT_OID = AE_OID_PREFIX+'.6.29'
 AE_CONTACT_OID = AE_OID_PREFIX+'.6.5'
+AE_LOCATION_OID = AE_OID_PREFIX+'.6.35'
 
 
 syntax_registry.registerAttrType(
@@ -1032,6 +1033,24 @@ syntax_registry.registerAttrType(
 )
 
 
+class AELocation(DynamicDNSelectList):
+  oid = 'AELocation-oid'
+  desc = 'AE-DIR: DN of location entry'
+  input_fallback = False # no fallback to normal input field
+  ldap_url = 'ldap:///_?displayName?sub?(&(objectClass=aeLocation)(aeStatus=0))'
+  ref_attrs = (
+    ('aeLocation',u'Persons',None,'aePerson',u'Search all persons assigned to this location.'),
+    ('aeLocation',u'Zones',None,'aeZone',u'Search all location-based zones associated with this location.'),
+    ('aeLocation',u'Groups',None,'groupOfEntries',u'Search all location-based groups associated with this location.'),
+  )
+
+syntax_registry.registerAttrType(
+  AELocation.oid,[
+    AE_OID_PREFIX+'.4.35', # aeLocation
+  ]
+)
+
+
 class AEDept(DynamicDNSelectList):
   oid = 'AEDept-oid'
   desc = 'AE-DIR: DN of department entry'
@@ -1442,6 +1461,24 @@ syntax_registry.registerAttrType(
     '2.16.840.1.113730.3.1.241', # displayName
   ],
   structural_oc_oids=[AE_DEPT_OID], # aeDept
+)
+
+
+class AEDisplayNameLocation(ComposedAttribute,DirectoryString):
+  oid = 'AEDisplayNameLocation-oid'
+  desc = 'Attribute displayName in object class aeLocation'
+  compose_templates = (
+    '{uniqueIdentifier}: {l}, {street}',
+    '{uniqueIdentifier}: {l}',
+    '{uniqueIdentifier}: {street}',
+    '{uniqueIdentifier}',
+  )
+
+syntax_registry.registerAttrType(
+  AEDisplayNameLocation.oid,[
+    '2.16.840.1.113730.3.1.241', # displayName
+  ],
+  structural_oc_oids=[AE_LOCATION_OID], # aeLocation
 )
 
 

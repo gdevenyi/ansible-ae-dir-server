@@ -186,9 +186,9 @@ access to
     by group/aeGroup/member="cn=ae-replicas,cn=ae,{{ aedir_suffix }}" none
     by * none break
 
-# department and person entries only required on providers
+# department, location and person entries only required on providers
 access to
-  filter="(|(objectClass=aeDept)(objectClass=aePerson))"
+  filter="(|(objectClass=aeDept)(objectClass=aeLocation)(objectClass=aePerson))"
     by group/aeGroup/member="cn=ae-providers,cn=ae,{{ aedir_suffix }}" read
     by group/aeGroup/member="cn=ae-replicas,cn=ae,{{ aedir_suffix }}" none
     by * none break
@@ -569,7 +569,7 @@ access to
     by set="user & this/-1/aeZoneAuditors/member" read
     by * none break
 
-# Organizational entries (departments and persons)
+# Organizational entries (departments, locations and persons)
 #------------------------------------------------------------------
 
 # administration of aePerson entries
@@ -578,6 +578,15 @@ access to
   filter="(objectClass=aePerson)"
     by set="user & this/-1/aeZoneAdmins/member" write
     by set="user & this/-1/aeZoneAuditors/member" read
+    by * none break
+# administration and readability of aeLocation entries
+access to
+  dn.regex="^uniqueIdentifier=({{ aedir_aelocation_uniqueid_regex }}),cn={{ aedir_aezone_cn_regex }},{{ aedir_suffix }}$"
+  filter="(objectClass=aeLocation)"
+    by set="user & this/-1/aeZoneAdmins/member" write
+    by set="user & this/-1/aeZoneAuditors/member" read
+    by set="user & ([ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(member=] + user + [))])/member" read
+    by set="user/aePerson/aeLocation & this" read
     by * none break
 # administration and readability of aeDept entries
 access to
@@ -1066,6 +1075,11 @@ constraint_attribute
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aePerson)"
 
 constraint_attribute
+  uniqueIdentifier
+  regex "^{{ aedir_aelocation_uniqueid_regex }}$"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeLocation)"
+
+constraint_attribute
   departmentNumber
   regex "^{{ aedir_aedept_deptnumber_regex }}$"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeDept)"
@@ -1205,6 +1219,10 @@ constraint_attribute
   aePerson
   uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(objectClass=aePerson)"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeUser)"
+# if parent aeZone entry has aeLocation set then it must match aeLocation in aePerson
+constraint_attribute aePerson,entryDN set
+  "this/-1/entryDN & ([ldap:///] + this/-1/entryDN + [?entryDN?base?(&(objectClass=aeZone)(|(!(aeLocation=*))(aeLocation=] + this/aePerson/aeLocation + [)))])/entryDN"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeUser)"
 # if parent aeZone entry has aeDept set then it must match aeDept in aePerson
 constraint_attribute aePerson,entryDN set
   "this/-1/entryDN & ([ldap:///] + this/-1/entryDN + [?entryDN?base?(&(objectClass=aeZone)(|(!(aeDept=*))(aeDept=] + this/aePerson/aeDept + [)))])/entryDN"
@@ -1294,6 +1312,12 @@ constraint_attribute
   member
   uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(|(objectClass=inetLocalMailRecipient)(objectClass=aeContact))(mail=*)(aeStatus=0))"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeMailGroup)"
+
+# department-constraint groups must contain only aeUser members assigned to a specific department
+constraint_attribute
+  member
+  set "this/member/aePerson/aeLocation & this/aeLocation"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(&(objectClass=groupOfEntries)(aeLocation=*))"
 
 # department-constraint groups must contain only aeUser members assigned to a specific department
 constraint_attribute

@@ -79,6 +79,7 @@ aedir_aeservice_uid_regex: "[a-zA-Z0-9_.-]+"
 aeticketid_regex: "[A-Z]+-[0-9]+"
 # for entries beneath cn={{ aedir_org_zone }}
 aedir_aeperson_uniqueid_regex: "[a-zA-Z0-9_.:/-]+"
+aedir_aelocation_uniqueid_regex: "[a-zA-Z0-9_.:/-]+"
 aedir_aedept_deptnumber_regex: "[a-zA-Z0-9_.:/-]+"
 # special regex policy rules for SSH public keys
 # e.g. for specifying algorithms or naming conventions for key comment

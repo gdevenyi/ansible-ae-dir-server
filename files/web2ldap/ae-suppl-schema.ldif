@@ -58,6 +58,9 @@ nameForms: ( 1.3.6.1.4.1.5427.1.389.42.15.17 NAME 'aeContact-aeZone-NF-cn' OC ae
 # aeMailGroup
 dITStructureRules: ( 18 NAME 'aeMailGroup-aeZone-SR-1' FORM aeMailGroup-aeZone-NF-cn SUP ( 2 ) )
 nameForms: ( 1.3.6.1.4.1.5427.1.389.42.15.18 NAME 'aeMailGroup-aeZone-NF-cn' OC aeMailGroup MUST ( cn ) )
+# aeLocation
+dITStructureRules: ( 19 NAME 'aeLocation-aeZone-SR-1' FORM aeLocation-aeZone-NF-cn SUP ( 2 ) )
+nameForms: ( 1.3.6.1.4.1.5427.1.389.42.15.19 NAME 'aeLocation-aeZone-NF-cn' OC aeLocation MUST ( uniqueIdentifier ) )
 #
 # aeService can be subordinate of aeZone or aeSrvGroup
 #

@@ -257,6 +257,29 @@ ditcontentrule ( ae-dir-oc:29
         searchGuide $ seeAlso $ st $ teletexTerminalIdentifier $
         telexNumber $ userPassword $ x121Address ) )
 
+# Locations
+#-----------------------------------------------------------------------
+
+attributetype ( ae-dir-at:35
+  NAME 'aeLocation'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Associated location of aePerson, aeZone, etc.'
+  SUP distinguishedName )
+
+objectclass ( ae-dir-oc:35
+  NAME 'aeLocation'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Location within an organization'
+  STRUCTURAL
+  SUP ( locality $ aeObject )
+  MUST ( uniqueIdentifier )
+  MAY ( postalCode $ telephoneNumber $ ou $ displayName $ aeSourceUri ) )
+
+ditcontentrule ( ae-dir-oc:35
+  NAME 'aeLocation-dcr'
+  AUX ( labeledURIObject )
+  NOT (  searchGuide $ seeAlso ) )
+
 # Zones
 #-----------------------------------------------------------------------
 
@@ -285,7 +308,8 @@ objectclass ( ae-dir-oc:20
   STRUCTURAL
   SUP ( namedObject $ aeObject )
   MUST ( description )
-  MAY ( aeDept $ aeZoneAdmins $ aeZoneAuditors $ aePasswordAdmins ) )
+  MAY ( aeDept $ aeLocation $
+        aeZoneAdmins $ aeZoneAuditors $ aePasswordAdmins ) )
 
 ditcontentrule ( ae-dir-oc:20
   NAME 'aeZone-dcr'
@@ -304,7 +328,7 @@ objectclass ( ae-dir-oc:1
   STRUCTURAL
   SUP ( groupOfEntries $ posixGroup $ groupOfURLs $ aeObject )
   MUST ( description )
-  MAY ( aeDept ) )
+  MAY ( aeDept $ aeLocation ) )
 
 ditcontentrule ( ae-dir-oc:1
   NAME 'aeGroup-dcr'
@@ -320,7 +344,7 @@ objectclass ( ae-dir-oc:27
   STRUCTURAL
   SUP ( groupOfEntries $ nisMailAlias $ groupOfURLs $ aeObject )
   MUST ( mail $ description )
-  MAY ( aeDept ) )
+  MAY ( aeDept $ aeLocation ) )
 
 ditcontentrule ( ae-dir-oc:27
   NAME 'aeMailGroup-dcr'
@@ -528,7 +552,7 @@ objectclass ( ae-dir-oc:6.1
   STRUCTURAL
   SUP aeDevice
   MUST ( host )
-  MAY ( aeSrvGroup $ aeStockId $ aeRemoteHost $ userPassword ) )
+  MAY ( aeSrvGroup $ aeStockId $ aeRemoteHost $ aeLocation $ userPassword ) )
 
 ditcontentrule ( ae-dir-oc:6.1
   NAME 'aeHost-dcr'
@@ -558,7 +582,7 @@ objectclass ( ae-dir-oc:8
   DESC 'AE-DIR: person class'
   STRUCTURAL
   SUP ( inetOrgPerson $ aeObject )
-  MUST ( givenName $ aeDept )
+  MUST ( givenName $ aeDept $ aeLocation )
   MAY ( aeSourceUri $ uniqueIdentifier $ employeeNumber $ c ) )
 
 ditcontentrule ( ae-dir-oc:8
