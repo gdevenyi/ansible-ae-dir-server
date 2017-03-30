@@ -1015,12 +1015,46 @@ syntax_registry.registerAttrType(
 )
 
 
+class AEEntryDNAELocation(DistinguishedName):
+  oid = 'AEEntryDNAELocation-oid'
+  desc = 'AE-DIR: entryDN of aeLocation entry'
+  ref_attrs = (
+    ('aeLocation',u'Persons',None,'aePerson',u'Search all persons assigned to this location.'),
+    ('aeLocation',u'Zones',None,'aeZone',u'Search all location-based zones associated with this location.'),
+    ('aeLocation',u'Groups',None,'groupOfEntries',u'Search all location-based zones associated with this location.'),
+  )
+
+syntax_registry.registerAttrType(
+  AEEntryDNAELocation.oid,[
+    '1.3.6.1.1.20', # entryDN
+  ],
+  structural_oc_oids=[
+    AE_DEPT_OID, # aeLocation
+  ],
+)
+
+
+class AELocation(DynamicDNSelectList):
+  oid = 'AELocation-oid'
+  desc = 'AE-DIR: DN of location entry'
+  input_fallback = False # no fallback to normal input field
+  ldap_url = 'ldap:///_?displayName?sub?(&(objectClass=aeLocation)(aeStatus=0))'
+  ref_attrs = AEEntryDNAELocation.ref_attrs
+
+syntax_registry.registerAttrType(
+  AELocation.oid,[
+    AE_OID_PREFIX+'.4.35', # aeLocation
+  ]
+)
+
+
 class AEEntryDNAEDept(DistinguishedName):
   oid = 'AEEntryDNAEDept-oid'
   desc = 'AE-DIR: entryDN of aePerson entry'
   ref_attrs = (
     ('aeDept',u'Persons',None,'aePerson',u'Search all persons assigned to this department.'),
     ('aeDept',u'Zones',None,'aeZone',u'Search all team-related zones associated with this department.'),
+    ('aeDept',u'Groups',None,'groupOfEntries',u'Search all team-related groups associated with this department.'),
   )
 
 syntax_registry.registerAttrType(
@@ -1033,33 +1067,12 @@ syntax_registry.registerAttrType(
 )
 
 
-class AELocation(DynamicDNSelectList):
-  oid = 'AELocation-oid'
-  desc = 'AE-DIR: DN of location entry'
-  input_fallback = False # no fallback to normal input field
-  ldap_url = 'ldap:///_?displayName?sub?(&(objectClass=aeLocation)(aeStatus=0))'
-  ref_attrs = (
-    ('aeLocation',u'Persons',None,'aePerson',u'Search all persons assigned to this location.'),
-    ('aeLocation',u'Zones',None,'aeZone',u'Search all location-based zones associated with this location.'),
-    ('aeLocation',u'Groups',None,'groupOfEntries',u'Search all location-based groups associated with this location.'),
-  )
-
-syntax_registry.registerAttrType(
-  AELocation.oid,[
-    AE_OID_PREFIX+'.4.35', # aeLocation
-  ]
-)
-
-
 class AEDept(DynamicDNSelectList):
   oid = 'AEDept-oid'
   desc = 'AE-DIR: DN of department entry'
   input_fallback = False # no fallback to normal input field
   ldap_url = 'ldap:///_?displayName?sub?(&(objectClass=aeDept)(aeStatus=0))'
-  ref_attrs = (
-    ('aeDept',u'Persons',None,'aePerson',u'Search all persons assigned to this department.'),
-    ('aeDept',u'Zones',None,'aeZone',u'Search all team-related zones associated with this department.'),
-  )
+  ref_attrs = AEEntryDNAEDept.ref_attrs
 
 syntax_registry.registerAttrType(
   AEDept.oid,[
