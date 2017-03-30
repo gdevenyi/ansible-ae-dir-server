@@ -1029,7 +1029,7 @@ syntax_registry.registerAttrType(
     '1.3.6.1.1.20', # entryDN
   ],
   structural_oc_oids=[
-    AE_DEPT_OID, # aeLocation
+    AE_LOCATION_OID, # aeLocation
   ],
 )
 
