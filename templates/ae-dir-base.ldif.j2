@@ -618,7 +618,7 @@ objectClass: aeObject
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
 aeDept: departmentNumber=0,cn={{ aedir_org_zone }},{{ aedir_suffix }}
-aeLocation: uniqueIdentifier=0-nolocation,cn={{ aedir_org_zone }},{{ aedir_suffix }}
+aeLocation: uniqueIdentifier=no-location,cn={{ aedir_org_zone }},{{ aedir_suffix }}
 aeTag: ae-tag-init
 cn: {{ person_attrs.given_name }} {{ person_attrs.sur_name }}
 displayName: {{ person_attrs.given_name }} {{ person_attrs.sur_name }} ({{ unique_identifier }})
