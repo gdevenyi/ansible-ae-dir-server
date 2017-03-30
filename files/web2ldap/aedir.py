@@ -1403,31 +1403,6 @@ syntax_registry.registerAttrType(
 )
 
 
-class AECommonNameAEHost(DirectoryString):
-  oid = 'AECommonNameAEHost-oid'
-  desc = 'Canonical hostname'
-  maxValues = 1
-  derive_from_host = True
-
-  def transmute(self,attrValues):
-    if self.derive_from_host:
-      return list(set([
-        av.split('.')[0].strip().lower()
-        for av in self._entry['host']
-      ]))
-    else:
-      return attrValues
-
-syntax_registry.registerAttrType(
-  AECommonNameAEHost.oid,[
-    '2.5.4.3', # cn alias commonName
-  ],
-  structural_oc_oids=[
-    AE_HOST_OID, # aeHost
-  ],
-)
-
-
 class AEDisplayNameUser(ComposedAttribute,DirectoryString):
   oid = 'AEDisplayNameUser-oid'
   desc = 'Attribute displayName in object class aeUser'
@@ -1481,10 +1456,11 @@ class AEDisplayNameLocation(ComposedAttribute,DirectoryString):
   oid = 'AEDisplayNameLocation-oid'
   desc = 'Attribute displayName in object class aeLocation'
   compose_templates = (
-    '{uniqueIdentifier}: {l}, {street}',
-    '{uniqueIdentifier}: {l}',
-    '{uniqueIdentifier}: {street}',
-    '{uniqueIdentifier}',
+    '{cn}: {l}, {street}',
+    '{cn}: {l}',
+    '{cn}: {street}',
+    '{cn}: {st}',
+    '{cn}',
   )
 
 syntax_registry.registerAttrType(
@@ -1559,12 +1535,22 @@ syntax_registry.registerAttrType(
 )
 
 
-class AECommonNameAEZone(DirectoryString):
-  oid = 'AECommonNameAEZone-oid'
+class AECommonName(DirectoryString):
+  oid = 'AECommonName-oid'
+  desc = 'AE-DIR: common name of aeObject'
   maxValues = 1
+  simpleSanitizers = (
+    str.strip,
+  )
 
-  def sanitizeInput(self,attrValue):
-    return attrValue.strip()
+
+class AECommonNameAEZone(AECommonName):
+  oid = 'AECommonNameAEZone-oid'
+  desc = 'AE-DIR: common name of aeZone'
+  simpleSanitizers = (
+    str.strip,
+    str.lower,
+  )
 
 syntax_registry.registerAttrType(
   AECommonNameAEZone.oid,[
@@ -1572,14 +1558,51 @@ syntax_registry.registerAttrType(
   ],
   structural_oc_oids=[
     AE_ZONE_OID, # aeZone
-  ]
+  ],
 )
 
 
-class AEZonePrefixCommonName(DirectoryString,AEObjectUtil):
+class AECommonNameAELocation(AECommonName):
+  oid = 'AECommonNameAELocation-oid'
+  desc = 'AE-DIR: common name of aeLocation'
+
+syntax_registry.registerAttrType(
+  AECommonNameAELocation.oid,[
+    '2.5.4.3', # cn alias commonName
+  ],
+  structural_oc_oids=[
+    AE_LOCATION_OID, # aeLocation
+  ],
+)
+
+
+class AECommonNameAEHost(AECommonName):
+  oid = 'AECommonNameAEHost-oid'
+  desc = 'Canonical hostname'
+  derive_from_host = True
+
+  def transmute(self,attrValues):
+    if self.derive_from_host:
+      return list(set([
+        av.split('.')[0].strip().lower()
+        for av in self._entry['host']
+      ]))
+    else:
+      return attrValues
+
+syntax_registry.registerAttrType(
+  AECommonNameAEHost.oid,[
+    '2.5.4.3', # cn alias commonName
+  ],
+  structural_oc_oids=[
+    AE_HOST_OID, # aeHost
+  ],
+)
+
+
+class AEZonePrefixCommonName(AECommonName,AEObjectUtil):
   oid = 'AEZonePrefixCommonName-oid'
   desc = 'AE-DIR: Attribute values have to be prefixed with zone name'
-  maxValues = 1
   reObj = re.compile('^[a-z0-9]+-[a-z0-9-]+$')
   special_names = ('zone-admins','zone-auditors')
 
@@ -1610,7 +1633,6 @@ class AEZonePrefixCommonName(DirectoryString,AEObjectUtil):
 
 class AECommonNameAEGroup(AEZonePrefixCommonName):
   oid = 'AECommonNameAEGroup-oid'
-  maxValues = 1
 
 syntax_registry.registerAttrType(
   AECommonNameAEGroup.oid,[
@@ -1625,7 +1647,6 @@ syntax_registry.registerAttrType(
 
 class AECommonNameAESrvGroup(AEZonePrefixCommonName):
   oid = 'AECommonNameAESrvGroup-oid'
-  maxValues = 1
 
 syntax_registry.registerAttrType(
   AECommonNameAESrvGroup.oid,[
@@ -1639,7 +1660,6 @@ syntax_registry.registerAttrType(
 
 class AECommonNameAETag(AEZonePrefixCommonName):
   oid = 'AECommonNameAETag-oid'
-  maxValues = 1
 
   def displayValue(self,valueindex=0,commandbutton=0):
     display_value = AEZonePrefixCommonName.displayValue(self,valueindex,commandbutton)
@@ -1672,7 +1692,6 @@ syntax_registry.registerAttrType(
 
 class AECommonNameAESudoRule(AEZonePrefixCommonName):
   oid = 'AECommonNameAESudoRule-oid'
-  maxValues = 1
 
 syntax_registry.registerAttrType(
   AECommonNameAESudoRule.oid,[
