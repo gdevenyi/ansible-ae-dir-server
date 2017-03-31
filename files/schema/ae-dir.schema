@@ -460,7 +460,7 @@ objectclass ( ae-dir-oc:13
         aeVisibleGroups $ aeDisplayNameGroups $ aeVisibleSudoers $
         aeSSHProxyCommand ) )
 
-# Mailbox entries
+# Contact entries
 #-----------------------------------------------------------------------
 
 objectclass ( ae-dir-oc:5
