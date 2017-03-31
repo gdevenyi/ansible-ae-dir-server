@@ -155,13 +155,23 @@ access to
   dn.base=""
   attrs=entry,defaultNamingContext,aeRoot
     by * read
+
+# grant read access to normal suffix value to everybody (including anonymous)
 access to
   dn.base=""
   attrs=namingContexts
   val.regex="^{{ aedir_suffix }}$"
     by * read
 
-# allow admin access to read all search bases
+# grant read access to accesslog suffix value to all zone admins
+access to
+  dn.base=""
+  attrs=namingContexts
+  val.regex="^{{ aedir_accesslog_suffix }}$"
+    by set="user & ([ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(member=] + user + [))])/member" read
+    by * none break
+
+# allow admin/auditor access to read all search bases
 access to
   dn.base=""
   attrs=namingContexts,configContext,monitorContext
