@@ -753,7 +753,7 @@ access to
     by * none break
 access to
   dn.subtree="{{ aedir_suffix }}"
-  filter="(objectClass=posixGroup)"
+  filter="(objectClass=nisMailAlias)"
   attrs=rfc822MailMember
   val.regex="^(.+)$"
     by set.expand="user/mail & [${v1}]" read
