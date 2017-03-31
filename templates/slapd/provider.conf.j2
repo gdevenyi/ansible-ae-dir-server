@@ -1020,6 +1020,16 @@ access to
     by dn.onelevel="cn={{ aedir_base_zone }},{{ aedir_suffix }}" read
     by * none
 
+# active zone admins are granted to access the accesslog DB
+# (for web2ldap [Audit] links)
+#------------------------------------------------------------------
+
+access to
+  dn.exact="{{ aedir_suffix }}"
+  attrs=auditContext
+    by set="user & ([ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(member=] + user + [))])/member" read
+    by * none
+
 # Last catch ACLs
 #------------------------------------------------------------------
 

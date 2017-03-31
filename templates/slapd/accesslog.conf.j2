@@ -38,10 +38,19 @@ index objectClass eq
 #---------------------------------------------------------------------------
 
 access
-  to dn.subtree="{{ aedir_accesslog_suffix }}"
+  to dn.base="{{ aedir_accesslog_suffix }}"
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" read
     by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
     by dn.exact="cn=root,{{ aedir_suffix }}" read
+    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}" read
+    by * none
+
+access
+  to dn.onelevel="{{ aedir_accesslog_suffix }}"
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" read
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
+    by dn.exact="cn=root,{{ aedir_suffix }}" read
+    by dnattr=reqAuthzID read
     by * none
 
 #---------------------------------------------------------------------------
