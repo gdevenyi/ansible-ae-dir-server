@@ -9,11 +9,11 @@
 <fieldset>
   <table>
     <tr>
-      <td>Common name:</td>
+      <td>Common name (cn):</td>
       <td>%(cn)s</td>
     </tr>
     <tr>
-      <td>e-mail:</td>
+      <td>e-mail (mail):</td>
       <td>%(mail)s</td>
     </tr>
     <tr>
@@ -30,7 +30,14 @@
     </tr>
     <tr>
       <td>Validity period (aeNotBefore..aeNotAfter):</td>
-      <td>from %(aeNotBefore)s until %(aeNotAfter)s</td>
+      <td>
+        <dl>
+          <dt>from</dt>
+          <dd>%(aeNotBefore)s</dd>
+          <dt>until</dt>
+          <dd>%(aeNotAfter)s</dd>
+        </dl>
+      </td>
     </tr>
     <tr>
       <td>Tag(s) (aeTag):</td>

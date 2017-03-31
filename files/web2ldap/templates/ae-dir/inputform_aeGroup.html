@@ -30,12 +30,19 @@
       <td>%(aeTicketId)s</td>
     </tr>
     <tr>
-      <td>Associated department(s):</td>
+      <td>Associated department(s) (aeDept):</td>
       <td>%(aeDept)s</td>
     </tr>
     <tr>
       <td>Validity period (aeNotBefore..aeNotAfter):</td>
-      <td>from %(aeNotBefore)s until %(aeNotAfter)s</td>
+      <td>
+        <dl>
+          <dt>from</dt>
+          <dd>%(aeNotBefore)s</dd>
+          <dt>until</dt>
+          <dd>%(aeNotAfter)s</dd>
+        </dl>
+      </td>
     </tr>
     <tr>
       <td>Tag(s) (aeTag):</td>
@@ -45,7 +52,7 @@
 </fieldset>
 
 <fieldset>
-  <legend>Group members</legend>
+  <legend>Group members (member)</legend>
   <p>%(member)s</p>
 </fieldset>
 

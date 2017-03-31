@@ -14,7 +14,7 @@
       <td>%(departmentNumber)s</td>
     </tr>
     <tr>
-      <td>Organizational unit name:</td>
+      <td>Organizational unit name (ou):</td>
       <td>%(ou)s</td>
     </tr>
     <tr>
@@ -41,7 +41,14 @@
     </tr>
     <tr>
       <td>Validity period (aeNotBefore..aeNotAfter):</td>
-      <td>from %(aeNotBefore)s until %(aeNotAfter)s</td>
+      <td>
+        <dl>
+          <dt>from</dt>
+          <dd>%(aeNotBefore)s</dd>
+          <dt>until</dt>
+          <dd>%(aeNotAfter)s</dd>
+        </dl>
+      </td>
     </tr>
     <tr>
       <td>Tag(s) (aeTag):</td>
@@ -62,11 +69,11 @@
       <td>%(postalCode)s</td>
     </tr>
     <tr>
-      <td>Location:</td>
+      <td>Location (l):</td>
       <td>%(l)s</td>
     </tr>
     <tr>
-      <td>State:</td>
+      <td>State (st):</td>
       <td>%(st)s</td>
     </tr>
     <tr>
@@ -84,7 +91,7 @@
       <td>%(telephoneNumber)s</td>
     </tr>
     <tr>
-      <td>FAX:</td>
+      <td>FAX (facsimileTelephoneNumber):</td>
       <td>%(facsimileTelephoneNumber)s</td>
     </tr>
   </table>
