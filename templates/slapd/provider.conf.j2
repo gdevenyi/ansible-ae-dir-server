@@ -856,6 +856,13 @@ access to
 # Read access to personal user accounts and contacts
 #------------------------------------------------------------------
 
+# Block read access to homeDirectory with value "{{ aedir_homedirectory_hidden }}"
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(homeDirectory={{ aedir_homedirectory_hidden }})"
+  attrs=homeDirectory
+    by * none
+
 # Give read access to POSIX accounts to servers
 access to
   dn.subtree="{{ aedir_suffix }}"
@@ -1297,10 +1304,12 @@ constraint_attribute sudoUser
   set "([%] + [ldap:///{{ aedir_suffix }}??sub?(&(objectClass=aeGroup)(aeStatus=0)(!(|(cn=ae-admins)(cn=ae-auditors)(cn=ae-provider)(cn=ae-replicas)(cn=ae-login-proxies)(cn=*-zone-admins)(cn=*-zone-auditors))))]/cn) & this/sudoUser"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeSudoRule)"
 
-# 'homeDirectory' must be composed as /<path-prefix>/<uid> for 'aeUser' entries
-# with valid path-prefix {{ aedir_homedirectory_prefixes|join(' or ') }}
+# 'homeDirectory' must be either
+# 1. composed as /<path-prefix>/<uid> for 'aeUser' entries
+#    with valid path-prefix {{ aedir_homedirectory_prefixes|join(' or ') }}
+# 2. just set to value "{{ aedir_homedirectory_hidden }}"
 constraint_attribute uid,homeDirectory
-  set "( ( [{{ aedir_homedirectory_prefixes|join('] | [') }}] ) + [/] + this/uid) & this/homeDirectory"
+  set "( [{{ aedir_homedirectory_prefixes|join('] | [') }}] + [/] + this/uid | [{{ aedir_homedirectory_hidden }}] ) & this/homeDirectory"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeUser)"
 
 # displayName in personal user account must be composed based on "<cn> (<uid>/<uidNumber>)"

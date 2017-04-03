@@ -81,6 +81,7 @@ w2lapp.schema.plugins.aedir.AEDepartmentNumber.reObj = re.compile('^{{ aedir_aed
 w2lapp.schema.plugins.aedir.AEServiceSshPublicKey.reObj = re.compile('^{{ aedir_aeservice_sshpubkey_regex }}$')
 w2lapp.schema.plugins.aedir.AEUserSshPublicKey.reObj = re.compile('^{{ aedir_aeuser_sshpubkey_regex }}$')
 w2lapp.schema.plugins.aedir.AEHomeDirectory.homeDirectoryPrefixes = ('{{ aedir_homedirectory_prefixes|join("','") }}',)
+w2lapp.schema.plugins.aedir.AEHomeDirectory.homeDirectoryHidden = '{{ aedir_homedirectory_hidden }}'
 
 # Parameters for generating user names
 w2lapp.schema.plugins.aedir.AEUserId.maxLen = {{ aedir_username_length }}L

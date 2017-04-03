@@ -126,15 +126,20 @@ class AEHomeDirectory(HomeDirectory):
   homeDirectoryPrefixes = (
     '/home',
   )
+  homeDirectoryHidden = '-/-'
 
   def _validate(self,attrValue):
     for prefix in self.homeDirectoryPrefixes:
+      if attrValue==self.homeDirectoryHidden:
+        return True
       if attrValue.startswith(prefix):
         uid = self._entry.get('uid',[''])[0]
         return attrValue.endswith(uid)
     return False
 
   def transmute(self,attrValues):
+    if attrValues==[self.homeDirectoryHidden]:
+      return attrValues
     uid = self._entry.get('uid',[''])[0]
     for prefix in self.homeDirectoryPrefixes:
       if attrValues[0].startswith(prefix):

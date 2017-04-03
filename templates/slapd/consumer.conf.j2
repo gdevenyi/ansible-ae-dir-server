@@ -377,6 +377,13 @@ access to
 # Read access to personal user accounts and contacts
 #------------------------------------------------------------------
 
+# Block read access to homeDirectory with value "{{ aedir_homedirectory_hidden }}"
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(homeDirectory={{ aedir_homedirectory_hidden }})"
+  attrs=homeDirectory
+    by * none
+
 # Give read access to POSIX accounts to servers
 access to
   dn.subtree="{{ aedir_suffix }}"

@@ -92,6 +92,9 @@ aedir_homedirectory_prefixes:
   - "/home"
 #  - "/Users"
 
+# magic value which make homeDirectory attribute invisible
+aedir_homedirectory_hidden: "-/-"
+
 # ticket identifier of initial ldapadd
 aedir_init_ticket_id: "INIT-42"
 
