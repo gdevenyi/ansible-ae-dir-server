@@ -57,10 +57,7 @@ access
 # overlays used within {{ aedir_accesslog_suffix }}
 #---------------------------------------------------------------------------
 
-{% if openldap_noopsrch_enabled %}
-# for counting search results without retrieving them
-overlay noopsrch
-{% endif %}
+{% include 'slapo-noopsrch.conf.j2' %}
 
 # for dereferencing control
 overlay deref
