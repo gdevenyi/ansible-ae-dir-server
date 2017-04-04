@@ -35,6 +35,9 @@ aedir_suffix: "ou=ae-dir"
 # base DN / search root for accesslog entries
 aedir_accesslog_suffix: "cn=accesslog-ae-dir"
 
+# base DN / search root for session entries
+aedir_session_suffix: "cn=ae-session"
+
 # POSIX-GID number range served by AE-DIR
 aedir_min_gid: 30000
 aedir_max_gid: 59999
@@ -269,6 +272,7 @@ openldap_ldapi_uri: "ldapi://{{ openldap_ldapi_socket|urlencode|replace('/','%2F
 # All additional schema files needed
 openldap_schema_files:
   - ae-dir.schema
+  - ae-dir-session.schema
   - draft-findlay-ldap-groupofentries.schema
   - draft-stroeder-mailboxrelatedobject.schema
   - draft-stroeder-namedobject.schema
@@ -347,6 +351,7 @@ openldap_threads: 8
 # Database parameters
 openldap_db_accesslog_maxsize: 4000000
 openldap_db_um_maxsize: 4000000
+openldap_db_session_maxsize: 4000000
 
 # keep for 23 days and scan once per day, see slapo-accesslog(5)
 openldap_log_purge: "23+00:00 01+00:00"

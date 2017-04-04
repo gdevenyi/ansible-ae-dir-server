@@ -1,0 +1,167 @@
+#######################################################################
+# SSO session database {{ aedir_session_suffix }}
+#######################################################################
+
+database mdb
+
+suffix "{{ aedir_session_suffix }}"
+directory {{ openldap_data }}/session
+
+require strong
+
+# Always set rootdn since needed by internally writing overlays
+rootdn "cn=root,{{ aedir_session_suffix }}"
+# rootpw not needed in production!
+#rootpw donotenable!!!
+
+lastmod on
+
+# database parameters
+maxsize {{ openldap_db_session_maxsize }}
+dbnosync
+checkpoint 20000 1
+envflags writemap
+
+sizelimit -1
+
+add_content_acl yes
+
+# Indexing configuration
+index objectClass eq
+index entryCSN eq
+index entryUUID eq
+
+index aeSessionOwner eq
+index aeNotBefore eq
+index aeNotAfter eq
+
+#---------------------------------------------------------------------------
+# Access rights {{ aedir_session_suffix }}
+#---------------------------------------------------------------------------
+
+access to
+  dn.subtree="{{ aedir_session_suffix }}"
+    by group/aeGroup/member="cn=ae-providers,cn=ae,{{ aedir_suffix }}" read
+    by * none break
+
+# who can add subordinate entries
+access
+  to dn.base="{{ aedir_session_suffix }}"
+  attrs=children
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" write
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" write
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
+    by dn.exact="cn=root,{{ aedir_suffix }}" write
+    by * none
+
+access
+  to dn.base="{{ aedir_session_suffix }}"
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" write
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
+    by dn.exact="cn=root,{{ aedir_suffix }}" manage
+    by * none
+
+# restricted access to session secret
+access
+  to dn.onelevel="{{ aedir_session_suffix }}"
+  attrs=aeSessionSecret
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" =ascx
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =ascx
+    by dn.exact="cn=root,{{ aedir_suffix }}" =ascx
+    by dnattr=aeSessionOwner =scx
+    by * none
+
+# add-only (but readable) attributes which cannot be altered later on
+access
+  to dn.onelevel="{{ aedir_session_suffix }}"
+  attrs=aeSessionId,aeSessionOwner,aeSessionBindings,aeNotBefore,aeNotAfter
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" =arscxd
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =arscxd
+    by dn.exact="cn=root,{{ aedir_suffix }}" =arscxd
+    by dnattr=aeSessionOwner read
+    by * none
+
+# access to session counter
+access
+  to dn.onelevel="{{ aedir_session_suffix }}"
+  attrs=aeSessionCounter,aeSessionLastTime
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" write
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" write
+    by dn.exact="cn=root,{{ aedir_suffix }}" write
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
+    by dnattr=aeSessionOwner read
+    by * none
+
+# rest of session objects
+access
+  to dn.onelevel="{{ aedir_session_suffix }}"
+  filter="(&(objectClass=aeSession)(aeSessionCounter>=0))"
+    by dnattr=aeSessionOwner write
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" read
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
+    by dn.exact="cn=root,{{ aedir_suffix }}" write
+    by * none
+
+# block all other access
+access
+  to dn.subtree="{{ aedir_session_suffix }}"
+    by * none
+
+#---------------------------------------------------------------------------
+# overlays used within {{ aedir_session_suffix }}
+#---------------------------------------------------------------------------
+
+{% include 'slapo-noopsrch.conf.j2' %}
+
+# for dereferencing control
+overlay deref
+
+overlay unique
+unique_uri "ldap:///{{ aedir_session_suffix }}?aeSessionOwner?sub?(objectClass=*)"
+
+overlay constraint
+
+# session owners must reference active users or services/hosts
+constraint_attribute
+  aeSessionOwner
+  set "user & this/aeSessionOwner"
+constraint_attribute
+  aeSessionOwner
+  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(|(objectClass=aeUser)(objectClass=aeHost)(objectClass=aeService))(aeStatus=0))"
+
+#---------------------------------------------------------------------------
+# replication of {{ aedir_session_suffix }}
+#---------------------------------------------------------------------------
+
+# syncrepl-Overlay
+overlay syncprov
+syncprov-checkpoint 1000 2
+syncprov-sessionlog 1000
+syncprov-reloadhint TRUE
+
+{% if openldap_syncrepl_providers %}
+{% for provider_replica in openldap_syncrepl_providers if provider_replica!=inventory_hostname %}
+syncrepl rid=1{{ loop.index }}
+  provider=ldaps://{{ hostvars[provider_replica].get('openldap_service_fqdn',provider_replica) }}
+  type=refreshAndPersist
+  interval=00:00:01:00
+  retry="30 +"
+  keepalive=240:10:30
+  searchbase="{{ aedir_session_suffix }}"
+  filter="(objectClass=*)"
+  scope=sub
+  schemachecking=on
+  bindmethod=sasl
+  saslmech=EXTERNAL
+  tls_cacert={{ openldap_cacert_pathname }}
+  tls_cert={{ openldap_cert_pathname }}
+  tls_key={{ openldap_key_pathname }}
+  tls_protocol_min={{ openldap_syncrepl_tls_protocol_min }}
+  tls_cipher_suite={{ openldap_syncrepl_tls_cipher_suite }}
+
+{% endfor %}
+mirrormode true
+{% endif %}
+

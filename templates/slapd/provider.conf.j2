@@ -1527,4 +1527,6 @@ syncrepl rid=0{{ loop.index }}
 mirrormode true
 {% endif %}
 
+{% include 'session.conf.j2' %}
+
 {% include 'monitor.conf.j2' %}

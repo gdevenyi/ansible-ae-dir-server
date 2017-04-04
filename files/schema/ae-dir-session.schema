@@ -1,0 +1,71 @@
+#=======================================================================
+# Schema for Æ-DIR -- Yet another LDAP user and systems management
+# SSO session objects
+#=======================================================================
+
+objectidentifier ae-dir-session-at stroeder-com-pub-ae-dir:10.4
+objectidentifier ae-dir-session-oc stroeder-com-pub-ae-dir:10.6
+
+# session ID also to be used for RDN of session entries
+attributetype ( ae-dir-session-at:1
+  NAME 'aeSessionId'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: unique session identifier'
+  SINGLE-VALUE
+  SUP uniqueIdentifier )
+
+# DN of session owner entry (also enforced to be unique)
+attributetype ( ae-dir-session-at:2
+  NAME 'aeSessionOwner'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: unique session owner'
+  SINGLE-VALUE
+  SUP owner )
+
+# Session bindings
+attributetype ( ae-dir-session-at:3
+  NAME 'aeSessionSecret'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: session secret'
+  SINGLE-VALUE
+  EQUALITY caseIgnoreMatch
+  SUBSTR caseIgnoreSubstringsMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{65536} )
+
+# Session bindings
+attributetype ( ae-dir-session-at:4
+  NAME 'aeSessionBindings'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: session bindings'
+  EQUALITY caseIgnoreMatch
+  SUBSTR caseIgnoreSubstringsMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{65536} )
+
+# Session usage counter
+attributetype ( ae-dir-session-at:5
+  NAME 'aeSessionCounter'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: session usage counter'
+  SINGLE-VALUE
+  EQUALITY integerMatch
+  ORDERING integerOrderingMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 )
+
+# Timestamp of last session usage
+attributetype ( ae-dir-session-at:6
+  NAME 'aeSessionLastTime'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Last session usage time'
+  SINGLE-VALUE
+  EQUALITY generalizedTimeMatch
+  ORDERING generalizedTimeOrderingMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.24 )
+
+objectclass ( ae-dir-session-oc:1
+  NAME 'aeSession'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: session object'
+  STRUCTURAL
+  MUST ( aeSessionId $ aeSessionSecret $ aeSessionOwner $ aeSessionCounter $
+         aeNotBefore $ aeNotAfter $ aeSessionLastTime )
+  MAY ( aeSessionBindings ) )
