@@ -2,7 +2,7 @@
 # Apply AE-DIR configuration to OpenLDAP's slapd
 #-----------------------------------------------------------------------
 
-- name: Delete the dynamic configuration directory
+- name: "Delete the dynamic configuration directory"
   file:
     path: "{{ openldap_conf_prefix }}/slapd.d"
     state: absent
@@ -10,7 +10,7 @@
 # database directory structure
 #-----------------------------------------------------------------------
 
-- name: Create OpenLDAP database root directory
+- name: "Create OpenLDAP database root directory"
   file:
     path: "{{ openldap_data }}"
     state: directory
@@ -18,7 +18,7 @@
     group: ldap
     mode: 0750
 
-- name: Create database directories
+- name: "Create database directories"
   file:
     path: "{{ openldap_data }}/{{ item }}"
     state: directory
@@ -34,7 +34,7 @@
 # slapd.conf and schema files
 #-----------------------------------------------------------------------
 
-- name: Install various OpenLDAP schema files
+- name: "Install various OpenLDAP schema files"
   copy:
     src: "schema/{{ item }}"
     dest: "{{ openldap_schema_prefix }}/{{ item }}"
@@ -45,7 +45,7 @@
   notify:
   - restart slapd
 
-- name: Create central schema including file from template
+- name: "Create central schema including file from template"
   template:
     src: "init.schema.j2"
     dest: "{{ openldap_schema_prefix }}/init.schema"
@@ -83,7 +83,7 @@
   notify:
   - restart slapd
 
-- name: Backup slapd databases in CRON job
+- name: "Backup slapd databases in CRON job"
   cron:
     name: "ae_dir_slapcat"
     state: present
@@ -97,5 +97,5 @@
 # service defaults and service
 #-----------------------------------------------------------------------
 
-- name: ensure slapd is running (and enable it at boot)
+- name: "ensure service slapd is enabled and running"
   service: name=slapd state=started enabled=yes
