@@ -56,6 +56,7 @@ attributetype ( ae-dir-session-at:6
   NAME 'aeSessionAccessTime'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: Last session usage time'
+  SINGLE-VALUE
   EQUALITY generalizedTimeMatch
   ORDERING generalizedTimeOrderingMatch
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.24 )
