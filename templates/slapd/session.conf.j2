@@ -131,6 +131,11 @@ constraint_attribute
   aeSessionOwner
   uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(|(objectClass=aeUser)(objectClass=aeHost)(objectClass=aeService))(aeStatus=0))"
 
+# session usage time must be within validity period
+constraint_attribute
+  aeSessionLastTime
+  set "this & ([ldap:///]+this+[?entryDN?base?(&(aeNotBefore<=]+this/aeSessionLastTime+[)(aeNotAfter>=]+this/aeSessionLastTime+[))])/entryDN"
+
 #---------------------------------------------------------------------------
 # replication of {{ aedir_session_suffix }}
 #---------------------------------------------------------------------------
