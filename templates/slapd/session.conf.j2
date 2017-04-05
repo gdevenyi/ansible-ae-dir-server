@@ -75,7 +75,7 @@ access
 # add-only (but readable) attributes which cannot be altered later on
 access
   to dn.onelevel="{{ aedir_session_suffix }}"
-  attrs=aeSessionId,aeSessionOwner,aeSessionBindings,aeNotBefore,aeNotAfter
+  attrs=aeSessionId,aeSessionOwner,aeSessionBindings,aeNotBefore,aeNotAfter,aeSessionAccessTime
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" =arscxd
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =arscxd
     by dn.exact="cn=root,{{ aedir_suffix }}" =arscxd
@@ -85,7 +85,7 @@ access
 # access to session counter
 access
   to dn.onelevel="{{ aedir_session_suffix }}"
-  attrs=aeSessionCounter,aeSessionLastTime
+  attrs=aeSessionCounter
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" write
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" write
     by dn.exact="cn=root,{{ aedir_suffix }}" write
@@ -133,8 +133,12 @@ constraint_attribute
 
 # session usage time must be within validity period
 constraint_attribute
-  aeSessionLastTime
-  set "this & ([ldap:///]+this+[?entryDN?base?(&(aeNotBefore<=]+this/aeSessionLastTime+[)(aeNotAfter>=]+this/aeSessionLastTime+[))])/entryDN"
+  aeSessionAccessTime
+  set "this & ([ldap:///]+this+[?entryDN?base?(&(aeNotBefore<=]+this/aeSessionAccessTime+[)(aeNotAfter>=]+this/aeSessionAccessTime+[))])/entryDN"
+
+constraint_attribute
+  aeSessionId
+  regex "^ae-dir-{{ openldap_server_id }}-[0-9]+\.[0-9]+$"
 
 #---------------------------------------------------------------------------
 # replication of {{ aedir_session_suffix }}

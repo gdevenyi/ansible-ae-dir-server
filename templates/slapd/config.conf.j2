@@ -11,6 +11,7 @@ access to
   dn.subtree="cn=config"
   attrs=entry,objectClass,olcServerID,olcSaslHost
     by dn.onelevel="cn=ae,{{ aedir_suffix }}" read
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by * none break
 
 access to
