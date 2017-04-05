@@ -180,6 +180,15 @@ access to
     by dn.exact="cn=root,{{ aedir_suffix }}" read
     by * none
 
+{% if openldap_role=="provider" %}
+# allow admins to add new children entries (database root entries)
+access to
+  dn.base=""
+  attrs=children
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" write
+    by dn.exact="cn=root,{{ aedir_suffix }}" write
+{% endif %}
+
 # allow all bound users to read rest of rootDSE
 access to
   dn.base=""
@@ -189,4 +198,3 @@ access to
 access to
   dn.base="cn=Subschema"
     by users read
-
