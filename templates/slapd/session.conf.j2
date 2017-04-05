@@ -128,9 +128,6 @@ overlay constraint
 # session owners must reference active users or services/hosts
 constraint_attribute
   aeSessionOwner
-  set "user & this/aeSessionOwner"
-constraint_attribute
-  aeSessionOwner
   uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(|(objectClass=aeUser)(objectClass=aeHost)(objectClass=aeService))(aeStatus=0))"
 
 # session usage time must be within validity period
