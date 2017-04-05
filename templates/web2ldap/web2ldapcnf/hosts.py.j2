@@ -454,6 +454,10 @@ ae_dir_config = Web2LDAPConfig(
     <div class="aestatus%(aeStatus)s">
       <var>%(entryDN)s</var><br>
       Contact %(cn)s: %(description)s
+      <dl>
+        <dt>Member of:</dt>
+        <dd>%(memberOf)s</dd>
+      </dl>
     </div>
     """,
     'aeLocation':r"""
