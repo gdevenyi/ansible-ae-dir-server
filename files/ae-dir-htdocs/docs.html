@@ -291,9 +291,10 @@
 <p>
   Zone admins in the special zone <a href="#dit-zone-people">people</a> are
   <em>People Admins</em> and can write organizational entries
-  (<a href="#schema-oc-aePerson">aePerson</a> and
-  <a href="#schema-oc-aeDept">aeDept</a>) and maintain organizational
-  management relationships.
+  (<a href="#schema-oc-aePerson">aePerson</a>,
+  <a href="#schema-oc-aeDept">aeDept</a> and
+  <a href="#schema-oc-aeLocation">aeLocation</a>)
+  and maintain organizational management relationships.
 </p>
 
 <h2 id="role-zone-auditor">Zone Auditor</h2>
@@ -388,8 +389,18 @@
 </p>
 <ul>
   <li>
-    organizational entries (<a href="#schema-oc-aePerson">aePerson</a> and
-    <a href="#schema-oc-aeDept">aeDept</a>)
+    organizational entries
+    <ul>
+      <li>
+        <a href="#schema-oc-aePerson">aePerson</a>
+      </li>
+      <li>
+        <a href="#schema-oc-aeDept">aeDept</a>
+      </li>
+      <li>
+        <a href="#schema-oc-aePerson">aeLocation</a>
+      </li>
+    </ul>
   </li>
   <li>
     some more credential attributes (e.g. shared secrets used for
@@ -581,9 +592,7 @@
 
 <h3 id="dit-zone-people">cn=people,ou=ae-dir</h3>
 <p>
-  Zone <em>people</em> is used for storing
-  person (<a href="#schema-oc-aePerson">aePerson</a>) and
-  department (<a href="#schema-oc-aeDept">aeDept</a>) entries.
+  Zone <em>people</em> is used for storing organizational entries.
   These can be maintained manually or could be synced with a HR
   system or similar if appropriate.
   Make sure to avoid hen-and-egg issues when syncing entries.
@@ -777,7 +786,7 @@
 
   <tr>
     <th><a href="#schema-oc-aeContact">aeContact</a></th>
-    <td>mail</td>
+    <td>cn</td>
     <td>Mail contact</td>
     <td>
       <ul>
@@ -834,6 +843,19 @@
         <li>ipHost</li>
       </ul>
     </td>
+  </tr>
+
+  <tr>
+    <th><a href="#schema-oc-aeLocation">aeLocation</a></th>
+    <td>cn</td>
+    <td>location</td>
+    <td>
+      <ul>
+        <li><a href="#schema-oc-aeObject">aeObject</a></li>
+        <li>locality</li>
+      </ul>
+    </td>
+    <td>labeledURIObject</td>
   </tr>
 
   <tr>
@@ -1216,17 +1238,37 @@
   <dt>
     departmentNumber
   </dt>
+  <dd>
+    Unique identifier / short name of department / organizational unit
+  </dd>
   <dt>
     ou
   </dt>
   <dd>
-    Name of department / organizational unit
-  </dd>
-  <dd>
-    Unique identifier for department / organizational unit
+    Descriptive name of department / organizational unit
   </dd>
   <dt>organizationalUnit attributes</dt>
   <dd>see <a href="https://tools.ietf.org/html/rfc4519#section-3.11">RFC 4519: organizationalUnit</a></dd>
+  <dt>meta attributes</dt>
+  <dd>see <a href="#schema-oc-aeObject-attributes">aeObject</a></dd>
+</dl>
+
+<h3 id="schema-oc-aeLocation">aeLocation</h3>
+<p>
+  The object class <var>aeLocation</var> is used for entries representing
+  geographic locations (offices, data centers) and can be referenced from
+  <a href="schema-oc-aePerson">aePerson</a> or
+  <a href="schema-oc-aeHost">aeHost</a> entries.
+</p>
+<dl id="schema-oc-aeLocation-attributes">
+  <dt>
+    cn
+  </dt>
+  <dd>
+    Short name of location
+  </dd>
+  <dt>locality attributes</dt>
+  <dd>see <a href="https://tools.ietf.org/html/rfc4519#section-3.7">RFC 4519: locality</a></dd>
   <dt>meta attributes</dt>
   <dd>see <a href="#schema-oc-aeObject-attributes">aeObject</a></dd>
 </dl>
