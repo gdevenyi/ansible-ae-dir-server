@@ -33,4 +33,6 @@ include {{ openldap_schema_prefix }}/mspwdreset.schema
 
 # AE-DIR -- Yet another LDAP User Management
 include {{ openldap_schema_prefix }}/ae-dir.schema
+{% if openldap_role=="provider" %}
 include {{ openldap_schema_prefix }}/ae-dir-session.schema
+{% endif %}
