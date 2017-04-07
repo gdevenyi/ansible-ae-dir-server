@@ -118,6 +118,23 @@
       </td>
     </tr>
 
+    <tr>
+      <td>
+        Entry DN
+        <select title="Matching rule for entryDN" name="search_mr" size="1">
+          <option value="">--</option>
+          <option value="dnSubordinateMatch">is subordinate of</option>
+          <option value="dnSubtreeMatch">within subtree</option>
+          <option value="dnOneLevelMatch">is child of</option>
+        </select>
+        <input type="hidden" name="search_option" value="({at}={av})">
+        <input type="hidden" name="search_attr" value="entryDN">
+      </td>
+      <td>
+        <input name="search_string" maxlength="50" size="30" value="">
+      </td>
+    </tr>
+
   </table>
 
 </fieldset>
