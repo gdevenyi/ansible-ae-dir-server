@@ -1,17 +1,12 @@
-<p>
+<figure>
   <a href="#img_<!--#echo encoding="none" var="img_anchor" -->">
-  <img
-    class="thumbnail"
-    src="img/<!--#echo encoding="none" var="img_file" -->"
-    title="<!--#echo encoding="none" var="img_title" -->"
-  >
+    <img class="thumbnail" src="img/<!--#echo encoding="none" var="img_file" -->">
   </a>
-  <a href="#_" class="lightbox" id="img_<!--#echo encoding="none" var="img_anchor" -->">
-    <img
-      class="svg_image"
-      src="img/<!--#echo encoding="none" var="img_file" -->"
-      title="<!--#echo encoding="none" var="img_title" -->"
-    >
+  <figcaption><!--#echo encoding="none" var="img_title" --></figcaption>
+</figure>
+<figure class="lightbox" id="img_<!--#echo encoding="none" var="img_anchor" -->">
+  <a href="#_">
+    <img src="img/<!--#echo encoding="none" var="img_file" -->" title="<!--#echo encoding="none" var="img_title" -->">
   </a>
-</p>
-
+  <figcaption><!--#echo encoding="none" var="img_title" --></figcaption>
+</figure>
