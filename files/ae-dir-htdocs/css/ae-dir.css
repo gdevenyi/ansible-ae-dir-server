@@ -252,7 +252,6 @@ span.web2ldap-menu-button {
   padding:0.2em;
   margin:0.5em 0 0.5em 0;
   background-color:#a80a1a;
-  background:linear-gradient(#a80a1a,#c3182a,#c81f2a,#c3182a,#a80a1a);
   background-repeat:no-repeat;
 }
 
@@ -260,7 +259,6 @@ span.web2ldap-dit-navigation {
   padding:0.1em;
   color:#ffffff;
   background-color:#242424;
-  background:linear-gradient(#202020,#3d3d3d,#2c2c2c);
   background-repeat:no-repeat;
 }
 
