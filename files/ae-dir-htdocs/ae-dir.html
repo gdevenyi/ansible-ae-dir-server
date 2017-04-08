@@ -8,15 +8,14 @@
   <strong>&AElig;-DIR</strong> is an acronym for
   <em>Authorized Entities Directory</em>
   (and a small Unicode challenge), an LDAP service based on
-  <a href="http://www.openldap.org">OpenLDAP's</a>
-  <a href="http://www.openldap.org/software/man.cgi?query=slapd">slapd</a>.
+  <a href="http://www.openldap.org">OpenLDAP</a>
 </p>
 
 <p>
   Project goals:
 </p>
 <ul>
-  <li>Strictly follow need-to-know-principle</li>
+  <li>Strictly follow <strong>need to know</strong> and <strong>least privilege</strong> principles</li>
   <li>Consequently delegate administration of manageable small areas</li>
   <li>Provide meaningful audit trails</li>
   <li>Compliance</li>
@@ -27,13 +26,14 @@
 </p>
 <ul>
   <li>Explicit is better than implicit</li>
-  <li>Individual authentication required for secure authorization</li>
+  <li>Secure authorization requires secure authentication</li>
   <li>No anonymous access at all</li>
-  <li>Avoid all-mighty proxy accounts</li>
+  <li>Individual authentication instead of reusing credentials</li>
+  <li>Avoid all-mighty proxy roles</li>
   <li>Do not assume hierarchical structure</li>
   <li>A person is not an user account</li>
   <li>Role separation with multiple user accounts per person</li>
-  <li>Persistent IDs (never re-used) for decent audit trails</li>
+  <li>Persistent IDs (never re-used) for reliable audit trails</li>
   <li>Only encrypted network traffic</li>
   <li>Well-defined semantics for all object classes and attributes (better no data than bad data)</li>
 </ul>
