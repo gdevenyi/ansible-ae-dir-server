@@ -91,6 +91,18 @@ TLSCertificateKeyFile {{ openldap_key_pathname }}
 TLSDHParamFile {{ openldap_dhparam_pathname }}
 
 #---------------------------------------------------------------------------
+# Disable proxy authorization
+#---------------------------------------------------------------------------
+
+authz-policy none
+
+access to
+  attrs=authzTo,authzFrom
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =csrz
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
+    by * none
+
+#---------------------------------------------------------------------------
 # Rewrite SASL identity to DIT identity
 #---------------------------------------------------------------------------
 
