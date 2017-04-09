@@ -212,7 +212,7 @@ access to
 access to
   dn.subtree="{{ aedir_suffix }}"
   attrs=userPassword
-  filter="(&(objectClass=oathToken)(aeStatus=0)(pwdPolicySubentry=cn=ppolicy-otptokens,cn=ae,{{ aedir_suffix }}))"
+  filter="(&(objectClass=oathToken)(aeStatus=0)(pwdPolicySubentry=cn=ppolicy-otptokens,cn=ae,ou=ae-dir)(!(|(oathSecret=*)(oathHOTPCounter=*)(oathLastLogin=*)(oathLastFailure=*))))"
     by dn.base="uid=ae-dir-otpenroll,cn=ae,{{ aedir_suffix }}" =w
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =s
     by self =z
@@ -284,9 +284,9 @@ access to
   filter="(&(objectClass=oathToken)(aeStatus=0))"
   attrs=oathSecret
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =sw
-    by group/aeGroup/member="cn=otp-zone-admins,cn=otp,{{ aedir_suffix }}" =z
+    by set="user & this/-1/aeZoneAdmins/member" =z
     by self =w
-    by * none
+    by * auth
 
 # no access to oathSecret of inactive entries
 access to
