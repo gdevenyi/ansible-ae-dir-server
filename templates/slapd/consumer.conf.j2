@@ -163,7 +163,7 @@ access to
 #---------------------------------------------------------------------------
 
 access to
-  dn.subtree="{{ aedir_suffix }}"
+  dn.onelevel="cn=ae,{{ aedir_suffix }}"
   attrs=authzTo
   filter="(&(objectClass=aeService)(aeStatus=0)(memberOf=cn=ae-login-proxies,cn=ae,ou=ae-dir))"
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =csrw
