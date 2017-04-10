@@ -294,6 +294,26 @@ access to
   attrs=oathSecret
     by * none
 
+# Limit proxy authorization by granting access to 'authzTo'
+# Ensure that no other entity has =x privilege!
+#---------------------------------------------------------------------------
+
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  attrs=authzTo
+  filter="(&(objectClass=aeService)(aeStatus=0)(memberOf=cn=ae-login-proxies,cn=ae,ou=ae-dir))"
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =csrw
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" =csr
+    by set="user/memberOf & ([cn=ae-login-proxies,cn=ae,ou=ae-dir])" read
+    by * none
+
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  attrs=authzTo,authzFrom
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =csrz
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" =csr
+    by * none
+
 #---------------------------------------------------------------------------
 # General ACLs
 # This MUST be below ACLs for password attrs!
@@ -1080,6 +1100,10 @@ unique_uri "ldap:///{{ aedir_suffix }}?aeRemoteHost?sub?(!(objectClass=aeUser))"
 
 # Enforce constraints on attribute values
 overlay constraint
+
+constraint_attribute
+  authzTo
+  count 1
 
 constraint_attribute
   host
