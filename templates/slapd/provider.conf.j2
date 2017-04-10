@@ -324,7 +324,7 @@ access to
 
 access to
   dn.subtree="cn=pub,{{ aedir_suffix }}"
-  attrs=entry,children,objectClass,entryUUID,modifyTimestamp,cn,description,@namedObject,@posixGroup,@sudoRole,@DUAConfigProfile,@pkiCA
+  attrs=entry,children,objectClass,entryUUID,entryDN,modifyTimestamp,cn,description,@namedObject,@posixGroup,@sudoRole,@DUAConfigProfile,@pkiCA
     by users read
 
 # for OATH-LDAP
@@ -695,7 +695,7 @@ access to
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=groupOfEntries)"
-  attrs=entry,objectClass,structuralObjectClass,aeStatus,entryUUID,modifyTimestamp,cn,gidNumber
+  attrs=entry,objectClass,structuralObjectClass,aeStatus,entryUUID,entryDN,modifyTimestamp,cn,gidNumber
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeVisibleGroups & this" read
     by set="user/-1/aeProxyFor/aeVisibleGroups & this" read
@@ -762,7 +762,7 @@ access to
 # Give read access to SUDO rules to servers
 access to
   dn.subtree="{{ aedir_suffix }}"
-  attrs=entry,objectClass,structuralObjectClass,aeStatus,entryUUID,modifyTimestamp,@sudoRole
+  attrs=entry,objectClass,structuralObjectClass,aeStatus,entryUUID,entryDN,modifyTimestamp,@sudoRole
   filter="(objectClass=sudoRole)"
     by set="user/-1/aeVisibleSudoers & this" read
     by set="user/aeSrvGroup/aeVisibleSudoers & this" read
@@ -784,7 +784,7 @@ access to
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=aeContact)"
-  attrs=entry,objectClass,structuralObjectClass,aeStatus,entryUUID,modifyTimestamp,cn,mail,mailLocalAddress,displayName
+  attrs=entry,objectClass,structuralObjectClass,aeStatus,entryUUID,entryDN,modifyTimestamp,cn,mail,mailLocalAddress,displayName
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeDisplayNameGroups/member & this" read
     by set="user/-1/aeProxyFor/aeDisplayNameGroups/member & this" read
@@ -867,7 +867,7 @@ access to
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=posixAccount)"
-  attrs=entry,objectClass,structuralObjectClass,aeStatus,entryUUID,modifyTimestamp,uid,uidNumber,gidNumber,homeDirectory,gecos
+  attrs=entry,objectClass,structuralObjectClass,aeStatus,entryUUID,entryDN,modifyTimestamp,uid,uidNumber,gidNumber,homeDirectory,gecos
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeVisibleGroups/member & this" read
     by set="user/-1/aeProxyFor/aeVisibleGroups/member & this" read
