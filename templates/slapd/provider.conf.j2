@@ -302,10 +302,15 @@ access to
   dn.onelevel="cn=ae,{{ aedir_suffix }}"
   attrs=authzTo
   filter="(&(objectClass=aeService)(aeStatus=0)(memberOf=cn=ae-login-proxies,cn=ae,ou=ae-dir))"
+    by self read
+    by * none break
+
+access to
+  dn.onelevel="cn=ae,{{ aedir_suffix }}"
+  attrs=authzTo
+  filter="(&(objectClass=aeService)(aeStatus=0))"
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =csrw
-    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" =csr
-    by set="user/memberOf & ([cn=ae-login-proxies,cn=ae,ou=ae-dir])" read
-    by * none
+    by * none break
 
 access to
   dn.subtree="{{ aedir_suffix }}"
