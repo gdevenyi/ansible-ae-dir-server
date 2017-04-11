@@ -150,6 +150,12 @@ aedir_ldapi_services:
     uid_number: 995
     gid_number: 995
     description: The system user used for simple bind proxy
+  # system user for WebSSO component
+  ae-dir-web-sso:
+    cn: WebSSO component
+    uid_number: 994
+    gid_number: 994
+    description: The system user used for WebSSO
 
 # which zone to use for aePerson and aeDept entries
 # (must be listed in aedir_init_aezones below)
