@@ -28,7 +28,7 @@ from w2lapp.schema.syntaxes import \
   DynamicDNSelectList,RFC822Address,Integer,ComposedAttribute, \
   NotBefore,NotAfter,OID,syntax_registry
 
-from w2lapp.schema.plugins.nis import UidNumber,GidNumber,MemberUID
+from w2lapp.schema.plugins.nis import UidNumber,GidNumber,MemberUID,Shell
 from w2lapp.schema.plugins.ppolicy import PwdExpireWarning,PwdMaxAge
 from w2lapp.schema.plugins.inetorgperson import DisplayNameInetOrgPerson
 from w2lapp.schema.plugins.groups import GroupEntryDN
@@ -1997,6 +1997,26 @@ syntax_registry.registerAttrType(
   ],
   structural_oc_oids=[
     AE_SUDORULE_OID, # aeSudoRule
+  ]
+)
+
+
+class AELoginShell(Shell):
+  oid = 'AELoginShell-oid'
+  desc = 'AE-DIR: Login shell for POSIX users'
+  attr_value_dict = {
+    u'/bin/bash':u'/bin/bash',
+    u'/bin/true':u'/bin/true',
+    u'/bin/false':u'/bin/false',
+  }
+
+syntax_registry.registerAttrType(
+  AELoginShell.oid,[
+    '1.3.6.1.1.1.1.4', # loginShell
+  ],
+  structural_oc_oids=[
+    AE_USER_OID,    # aeUser
+    AE_SERVICE_OID, # aeService
   ]
 )
 
