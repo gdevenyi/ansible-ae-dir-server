@@ -1972,6 +1972,35 @@ syntax_registry.registerAttrType(
 )
 
 
+class AESudoHost(IA5String):
+  oid = 'AESudoHost-oid'
+  desc = 'AE-DIR: sudoHost'
+  maxValues = 1
+  reobj = re.compile('^ALL$')
+
+  def transmute(self,attrValues):
+    return ['ALL']
+
+  def formField(self):
+    input_field = HiddenInput(
+      self.attrType,
+      ': '.join([self.attrType,self.desc]),
+      self.maxLen,self.maxValues,None,
+      default=self.formValue()
+    )
+    input_field.charset = self._form.accept_charset
+    return input_field
+
+syntax_registry.registerAttrType(
+  AESudoHost.oid,[
+    '1.3.6.1.4.1.15953.9.1.2', # sudoHost
+  ],
+  structural_oc_oids=[
+    AE_SUDORULE_OID, # aeSudoRule
+  ]
+)
+
+
 # Register all syntax classes in this module
 for name in dir():
   syntax_registry.registerSyntaxClass(eval(name))

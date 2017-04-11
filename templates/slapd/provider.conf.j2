@@ -1187,6 +1187,12 @@ constraint_attribute
   regex "^{{ aedir_aesudorule_cn_regex }}$"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeSudoRule)"
 
+# visibility of aeSudoRule entries is maintained for 'aeSrvGroup'
+# => limit sudoHost to 'ALL'
+constraint_attribute
+  sudoHost
+  regex "^ALL$"
+
 # attribute 'mobile'
 constraint_attribute
   mobile
