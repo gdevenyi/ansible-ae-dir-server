@@ -98,6 +98,13 @@ aedir_homedirectory_prefixes:
 # magic value which make homeDirectory attribute invisible
 aedir_homedirectory_hidden: "-/-"
 
+# available values for attribute 'loginShell'
+aedir_login_shells:
+  - /bin/bash
+  - /bin/true
+  - /bin/false
+  - /usr/bin/rssh
+
 # ticket identifier of initial ldapadd
 aedir_init_ticket_id: "INIT-42"
 
