@@ -644,9 +644,9 @@
   rights of bound entity.
 </p>
 
-<!--#set var="img_anchor" value="eer" -->
-<!--#set var="img_file" value="eer.svg" -->
-<!--#set var="img_title" value="entity relationship diagram" -->
+<!--#set var="img_anchor" value="eer-complete" -->
+<!--#set var="img_file" value="eer-complete.svg" -->
+<!--#set var="img_title" value="complete entity relationship diagram" -->
 <!--#include file="ssi/img.shtml" -->
 
 <ul>
@@ -665,13 +665,24 @@
   <li>
     Sometimes references are implicit by tree structure (child of):
     <ul>
-      <li>aeZone → ae*</li>
-      <li>aeSrvGroup → aeHost / aeService</li>
+      <li>ae* → aeZone</li>
+      <li>aeHost or aeService → aeSrvGroup</li>
     </ul>
   </li>
 </ul>
+
 <p>
-  The cross-zone references allows zone admins to delegate tasks to
+  The following smaller diagram shows only references for assigning
+  <a href="#roles">&AElig;-DIR roles</a>.
+</p>
+
+<!--#set var="img_anchor" value="eer-roles" -->
+<!--#set var="img_file" value="eer-roles.svg" -->
+<!--#set var="img_title" value="entity roles relationship diagram" -->
+<!--#include file="ssi/img.shtml" -->
+
+<p>
+  Setting cross-zone references allow zone admins to delegate tasks to
   zone admins of other zones:
 </p>
 <ol>
