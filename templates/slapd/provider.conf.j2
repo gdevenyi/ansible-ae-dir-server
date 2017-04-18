@@ -1370,15 +1370,13 @@ constraint_attribute
   uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(|(objectClass=inetLocalMailRecipient)(objectClass=aeContact))(mail=*)(aeStatus=0))"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeMailGroup)"
 
-# location-constraint groups must contain only aeUser members assigned to a specific location
-constraint_attribute
-  member
+# location-constrainted groups must contain only aeUser members assigned to a specific location
+constraint_attribute member
   set "this/member/aePerson/aeLocation & this/aeLocation"
   restrict="ldap:///{{ aedir_suffix }}??sub?(&(objectClass=groupOfEntries)(aeLocation=*))"
 
-# department-constraint groups must contain only aeUser members assigned to a specific department
-constraint_attribute
-  member
+# department-constrainted groups must contain only aeUser members assigned to a specific department
+constraint_attribute member
   set "this/member/aePerson/aeDept & this/aeDept"
   restrict="ldap:///{{ aedir_suffix }}??sub?(&(objectClass=groupOfEntries)(aeDept=*))"
 
