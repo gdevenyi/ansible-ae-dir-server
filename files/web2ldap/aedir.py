@@ -129,9 +129,9 @@ class AEHomeDirectory(HomeDirectory):
   homeDirectoryHidden = '-/-'
 
   def _validate(self,attrValue):
+    if attrValue==self.homeDirectoryHidden:
+      return True
     for prefix in self.homeDirectoryPrefixes:
-      if attrValue==self.homeDirectoryHidden:
-        return True
       if attrValue.startswith(prefix):
         uid = self._entry.get('uid',[''])[0]
         return attrValue.endswith(uid)
