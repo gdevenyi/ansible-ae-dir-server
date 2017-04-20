@@ -32,60 +32,76 @@
   </li>
 </ul>
 
-<h2 id="sso">WebSSO / SAML</h2>
-<ul>
-  <li>
-    WebSSO with CAS protocol
-  </li>
-  <li>
-    SAML 2.0 support based on one of these:
-    <table>
-      <tr>
-        <th>Project name</a></th>
-        <th>License</th>
-        <th>Programming<br>Language</th>
-        <th>Notes</th>
-      <tr>
-      <tr>
-        <td><a href="https://pypi.python.org/pypi/pysaml2">pysaml2</a></td>
-        <td>Apache License 2.0</td>
-        <td>Python</td>
-        <td>no ready-to-use web application, only SAML, much work to implement missing pieces</td>
-      <tr>
-      <tr>
-        <td><a href="https://ipsilon-project.org/">ipsilon</a></td>
-        <td>GPLv3</td>
-        <td>Python</td>
-        <td>many dependencies also on FreeIPA/sssd modules, hard to install</td>
-      <tr>
-      <tr>
-        <td><a href="http://www.keycloak.org/documentation.html">keycloak</a></td>
-        <td>Apache License 2.0</td>
-        <td>Java</td>
-        <td>ships with <em>wildfly</em></td>
-      <tr>
-      <tr>
-        <td><a href="https://shibboleth.net/">Shibboleth</a></td>
-        <td>Duo?</td>
-        <td>Java</td>
-        <td></td>
-      <tr>
-      <tr>
-        <td><a href="https://www.apereo.org/projects/cas">CAS</a></td>
-        <td>Apache License 2.0</td>
-        <td>Java</td>
-        <td></td>
-      <tr>
-    </table>
-  </li>
-</ul>
+<h2 id="sso">WebSSO / SAML / Oauth 2.0 / Open ID connect</h2>
+<p>Possible IdP implementations:</p>
+<table>
+  <tr>
+    <th>Project name</th>
+    <th>License</th>
+    <th>Programming<br>Language</th>
+    <th>Notes</th>
+  </tr>
+  <tr>
+    <td>
+      <a href="https://pypi.python.org/pypi/pysaml2">pysaml2</a>
+      and
+      <a href="https://pypi.python.org/pypi/oic">oic</a>
+    </td>
+    <td>Apache License 2.0</td>
+    <td>Python</td>
+    <td>
+      <ul>
+        <li>no ready-to-use web application</li>
+        <li>much work to implement missing pieces</li>
+        <li>highest flexibility</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td><a href="https://ipsilon-project.org/">ipsilon</a></td>
+    <td>GPLv3</td>
+    <td>Python</td>
+    <td>
+      <ul>
+        <li>many dependencies especially on FreeIPA/sssd modules</li>
+        <li>hard to install</li>
+        <li>bad documentation</li>
+        <li>seems unmaintained</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td><a href="http://www.keycloak.org/documentation.html">keycloak</a></td>
+    <td>Apache License 2.0</td>
+    <td>Java</td>
+    <td>
+      <ul>
+        <li>runs within <em>wildfly</em></li>
+        <li>compex too install</li>
+        <li>more hardening efforts</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td><a href="https://shibboleth.net/">Shibboleth</a></td>
+    <td>Duo?</td>
+    <td>Java</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><a href="https://www.apereo.org/projects/cas">CAS</a></td>
+    <td>Apache License 2.0</td>
+    <td>Java</td>
+    <td></td>
+  </tr>
+</table>
 
 <h2 id="pki">X.509 PKI</h2>
 <ul>
   <li>
     Issue server certs to
-    <a href="docs.html#schema-oc-aeHost">aeHost</var>,
-    <a href="docs.html#schema-oc-aeNwDevice">aeNwDevice</var>,
+    <a href="docs.html#schema-oc-aeHost">aeHost</a>,
+    <a href="docs.html#schema-oc-aeNwDevice">aeNwDevice</a>,
     <a href="docs.html#schema-oc-aeService">aeService</a> or
     <a href="docs.html#schema-oc-aeSrvGroup">aeSrvGroup</a>
     based on authorization of role
@@ -204,49 +220,49 @@
 
 <h2 id="ae-dir-demon">PAM/NSS caching demon</h2>
 <dl>
-  <dt>Improve Performance</h2>
+  <dt>Improve Performance</dt>
   <dd>
     &AElig;-DIR-specific caching demon knows the data and therefore can search
     more efficiently without local configuration (see notes about
     <a href="apps.html#pam-nss-smart">smart clients</a>)
   </dd>
-  <dt>Automation / Recovery on error</h2>
+  <dt>Automation / Recovery on error</dt>
   <dd>
     special system user for
     <a href="docs.html#schema-oc-aeHost">aeHost</a> with host
     password allowed to set system password in local configuration
   </dd>
-  <dt>Location-specific replicas</h2>
+  <dt>Location-specific replicas</dt>
   <dd>
     read DC locations in attribute <var>aeLocation</var> of
     <a href="docs.html#schema-oc-aeHost">aeHost</a> entry
     to determine &quot;near&quot; consumer replicas to access
   </dd>
-  <dt>Monitoring</h2>
+  <dt>Monitoring</dt>
   <dd>
     integrated monitoring (alarming and performance)
   </dd>
-  <dt>Maps</h2>
+  <dt>Maps</dt>
   <dd>
     <dl>
-      <dt>group</h2>
+      <dt>group</dt>
       <dd>
         The <em>group</em> map could be extended with generic groups
         based on <a href="docs.html#schema-oc-aeSrvGroup-attributes">
         rights groups attributes</a> with well-known <var>gidNumber</var>.
       </dd>
-      <dt>aliases</h2>
+      <dt>aliases</dt>
       <dd>
         For simple mail forwarding the <em>aliases</em> map should be
         supported with generic aliases based on
         <a href="docs.html#schema-oc-aeSrvGroup-attributes">
         rights groups attributes</a>.
       </dd>
-      <dt>hosts</h2>
+      <dt>hosts</dt>
       <dd>
         Do hosts lookup similar to ideas for <a href="#dns">DNS</a>.
       </dd>
-      <dt>ethers</h2>
+      <dt>ethers</dt>
       <dd>
         The <em>ethers</em> map could be virtually provided for hosts
         within the same local network (collision domain) similar to
@@ -254,13 +270,7 @@
       </dd>
     </dl>
   </dd>
-  <dt></h2>
-  <dd>
-  </dd>
-  <dt></h2>
-  <dd>
-  </dd>
-  <dt>Implementation details</h2>
+  <dt>Implementation details</dt>
   <dd>
     <ul>
       <li>
@@ -290,9 +300,9 @@
   <li>
     use PowerDNS to serve attributes as DNS RRs to augment regular DNS service:
     <ul>
-      <li><a href="docs.html#schema-oc-aeHost">aeHost</var> (A and PTR)</li>
-      <li><a href="docs.html#schema-oc-aeNwDevice">aeNwDevice</var> (A and PTR)</li>
-      <li><a href="docs.html#schema-oc-aeZone">aeZone</var> (SOA)</li>
+      <li><a href="docs.html#schema-oc-aeHost">aeHost</a> (A and PTR)</li>
+      <li><a href="docs.html#schema-oc-aeNwDevice">aeNwDevice</a> (A and PTR)</li>
+      <li><a href="docs.html#schema-oc-aeZone">aeZone</a> (SOA)</li>
     </ul>
   </li>
   <li>
