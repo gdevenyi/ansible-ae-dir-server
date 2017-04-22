@@ -119,6 +119,45 @@ class AEObjectUtil:
       result = zone_cn
     return result # _get_zone_name()
 
+  def _person_filter(self,person_dn_attr,entry,deref_attrs):
+    """
+    return additional aePerson filter based on derefing `deref_attr_type'
+    """
+    person_filter_parts = []
+    for deref_attr_type in deref_attrs:
+      deref_attr_values = filter(None,entry.get(deref_attr_type,[]))
+      if deref_attr_values:
+        person_filter_parts.append(
+          compose_filter(
+            '|',
+            map_filter_parts(deref_attr_type,deref_attr_values),
+          )
+        )
+    if not person_filter_parts:
+      return ''
+    aeperson_filter = '(|)'
+    try:
+      ldap_result = self._ls.l.search_s(
+        self._determineSearchDN(self._dn,self.lu_obj.dn),
+        ldap.SCOPE_SUBTREE,
+        '(&(objectClass=aePerson)(aeStatus=0){})'.format(''.join(person_filter_parts)),
+        attrlist=['1.1'],
+      )
+    except (
+      ldap.NO_SUCH_OBJECT,
+      ldap.INSUFFICIENT_ACCESS,
+      ldap.SIZELIMIT_EXCEEDED,
+      ldap.TIMELIMIT_EXCEEDED,
+    ):
+      pass
+    else:
+      if ldap_result:
+        aeperson_filter = compose_filter(
+          '|',
+          map_filter_parts(person_dn_attr,[ dn for dn,_ in ldap_result ]),
+        )
+    return aeperson_filter
+
 
 class AEHomeDirectory(HomeDirectory):
   oid = 'AEHomeDirectory-oid'
@@ -405,50 +444,11 @@ syntax_registry.registerAttrType(
 )
 
 
-class AEGroupMember(DynamicDNSelectList):
+class AEGroupMember(DynamicDNSelectList,AEObjectUtil):
   oid = 'AEGroupMember-oid'
   desc = 'AE-DIR: Member of a group'
   input_fallback = False # no fallback to normal input field
   ldap_url = 'ldap:///_?displayName?sub?(&(|(objectClass=aeUser)(objectClass=aeService))(aeStatus=0))'
-
-  def _person_filter(self,deref_attrs):
-    """
-    return additional aePerson filter based on derefing `deref_attr_type'
-    """
-    person_filter_parts = []
-    for deref_attr_type in deref_attrs:
-      deref_attr_values = filter(None,self._entry.get(deref_attr_type,[]))
-      if deref_attr_values:
-        person_filter_parts.append(
-          compose_filter(
-            '|',
-            map_filter_parts(deref_attr_type,deref_attr_values),
-          )
-        )
-    if not person_filter_parts:
-      return ''
-    aeperson_filter = '(|)'
-    try:
-      ldap_result = self._ls.l.search_s(
-        self._determineSearchDN(self._dn,self.lu_obj.dn),
-        ldap.SCOPE_SUBTREE,
-        '(&(objectClass=aePerson)(aeStatus=0){})'.format(''.join(person_filter_parts)),
-        attrlist=['1.1'],
-      )
-    except (
-      ldap.NO_SUCH_OBJECT,
-      ldap.INSUFFICIENT_ACCESS,
-      ldap.SIZELIMIT_EXCEEDED,
-      ldap.TIMELIMIT_EXCEEDED,
-    ):
-      pass
-    else:
-      if ldap_result:
-        aeperson_filter = compose_filter(
-          '|',
-          map_filter_parts('aePerson',[ dn for dn,_ in ldap_result ]),
-        )
-    return aeperson_filter
 
   def _zone_filter(self):
     member_zones = filter(None,self._entry.get('aeMemberZone',[]))
@@ -462,7 +462,7 @@ class AEGroupMember(DynamicDNSelectList):
     return member_zone_filter
 
   def _determineFilter(self):
-    aeperson_filter = self._person_filter(('aeDept','aeLocation'))
+    aeperson_filter = self._person_filter('aePerson',self._entry,('aeDept','aeLocation'))
     aezone_filter = self._zone_filter()
     if aeperson_filter:
       filter_str = '(&(objectClass=aeUser)(aeStatus=0){0}{1})'.format(
@@ -1138,33 +1138,32 @@ class AEPerson(DynamicDNSelectList,AEObjectUtil):
     1:(0,1,2),
     2:(0,1,2),
   }
+  deref_attrs = ('aeDept','aeLocation')
 
-  def _determineFilter(self):
-    filter_components = [
-      DynamicDNSelectList._determineFilter(self),
-      # ae_validity_filter(),
-    ]
-    zone_entry = self._zone_entry(attrlist=['aeDept']) or {}
-    aedept_filters = [
-      '(aeDept={0})'.format(escape_filter_chars(d))
-      for d in zone_entry.get('aeDept',[])
-    ]
-    if len(aedept_filters)>1:
-      filter_components.append('(|{})'.format(''.join(aedept_filters)))
-    elif len(aedept_filters)==1:
-      filter_components.append(aedept_filters[0])
+  def _status_filter(self):
     try:
       ae_status = int(self._entry['aeStatus'][0])
     except (KeyError,ValueError,IndexError):
       ae_status = 0
-    aeperson_aestatus_filters = [
-      '(aeStatus={0})'.format(escape_filter_chars(st))
-      for st in map(str,self.ae_status_map.get(ae_status,[]))
+    return compose_filter(
+      '|',
+      map_filter_parts(
+        'aeStatus',
+        map(str,self.ae_status_map.get(ae_status,[])),
+      ),
+    )
+
+  def _determineFilter(self):
+    filter_components = [
+      DynamicDNSelectList._determineFilter(self),
+      self._person_filter(
+        'entryDN',
+        self._zone_entry(attrlist=self.deref_attrs) or {},
+        self.deref_attrs,
+      ),
+      self._status_filter(),
+      # ae_validity_filter(),
     ]
-    if len(aeperson_aestatus_filters)>1:
-      filter_components.append('(|{})'.format(''.join(aeperson_aestatus_filters)))
-    elif len(aeperson_aestatus_filters)==1:
-      filter_components.append(aeperson_aestatus_filters[0])
     ocs = self._entry.object_class_oid_set()
     if 'inetLocalMailRecipient' not in ocs:
       filter_components.append('(mail=*)')
