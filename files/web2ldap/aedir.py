@@ -17,6 +17,7 @@ from pyweblib.forms import HiddenInput
 
 # from internal base modules
 import ldaputil.base
+from ldaputil.base import compose_filter, map_filter_parts
 from ldap.controls.readentry import PreReadControl
 
 # web2ldap's internal application modules
@@ -340,6 +341,22 @@ syntax_registry.registerAttrType(
 )
 
 
+class AEZoneDN(DynamicDNSelectList):
+  oid = 'AEZoneDN-oid'
+  desc = 'AE-DIR: Zone'
+  input_fallback = False # no fallback to normal input field
+  ldap_url = 'ldap:///_?cn?sub?(&(objectClass=aeZone)(aeStatus=0))'
+  ref_attrs = (
+    (None,u'Same zone',None,u'Search all groups constrained to same zone'),
+  )
+
+syntax_registry.registerAttrType(
+  AEZoneDN.oid,[
+    AE_OID_PREFIX+'.4.36', # aeMemberZone
+  ]
+)
+
+
 class AEHost(DynamicDNSelectList):
   oid = 'AEHost-oid'
   desc = 'AE-DIR: Host'
@@ -394,48 +411,69 @@ class AEGroupMember(DynamicDNSelectList):
   input_fallback = False # no fallback to normal input field
   ldap_url = 'ldap:///_?displayName?sub?(&(|(objectClass=aeUser)(objectClass=aeService))(aeStatus=0))'
 
-  def _determineFilter(self):
-    aeperson_filter = None
-    aedept_filters = [
-      '(aeDept={0})'.format(escape_filter_chars(d))
-      for d in self._entry.get('aeDept',[])
-    ]
-    if len(aedept_filters)>1:
-      aedept_filter = '(|{})'.format(''.join(aedept_filters))
-    elif len(aedept_filters)==1:
-      aedept_filter = aedept_filters[0]
-    else:
-      aedept_filter = ''
-    if aedept_filter:
-      try:
-        ldap_result = self._ls.l.search_s(
-          self._determineSearchDN(self._dn,self.lu_obj.dn),
-          ldap.SCOPE_SUBTREE,
-          '(&(objectClass=aePerson)(aeStatus=0){})'.format(aedept_filter),
-          attrlist=['1.1'],
+  def _person_filter(self,deref_attrs):
+    """
+    return additional aePerson filter based on derefing `deref_attr_type'
+    """
+    person_filter_parts = []
+    for deref_attr_type in deref_attrs:
+      deref_attr_values = filter(None,self._entry.get(deref_attr_type,[]))
+      if deref_attr_values:
+        person_filter_parts.append(
+          compose_filter(
+            '|',
+            map_filter_parts(deref_attr_type,deref_attr_values),
+          )
         )
-      except (
-        ldap.NO_SUCH_OBJECT,
-        ldap.INSUFFICIENT_ACCESS,
-        ldap.SIZELIMIT_EXCEEDED,
-        ldap.TIMELIMIT_EXCEEDED,
-      ):
-        aeperson_filters = []
-      else:
-        aeperson_filters = [
-          '(aePerson={0})'.format(escape_filter_chars(dn))
-          for dn,_ in ldap_result
-        ]
-      if len(aeperson_filters)>1:
-        aeperson_filter = '(|{})'.format(''.join(aeperson_filters))
-      elif len(aeperson_filters)==1:
-        aeperson_filter = aeperson_filters[0]
-    if aeperson_filter!=None:
-      filter_str = '(&(aeStatus=0)(|(objectClass=aeService)(&(objectClass=aeUser){0})))'.format(
-        aeperson_filter,
+    if not person_filter_parts:
+      return ''
+    aeperson_filter = '(|)'
+    try:
+      ldap_result = self._ls.l.search_s(
+        self._determineSearchDN(self._dn,self.lu_obj.dn),
+        ldap.SCOPE_SUBTREE,
+        '(&(objectClass=aePerson)(aeStatus=0){})'.format(''.join(person_filter_parts)),
+        attrlist=['1.1'],
+      )
+    except (
+      ldap.NO_SUCH_OBJECT,
+      ldap.INSUFFICIENT_ACCESS,
+      ldap.SIZELIMIT_EXCEEDED,
+      ldap.TIMELIMIT_EXCEEDED,
+    ):
+      pass
+    else:
+      if ldap_result:
+        aeperson_filter = compose_filter(
+          '|',
+          map_filter_parts('aePerson',[ dn for dn,_ in ldap_result ]),
+        )
+    return aeperson_filter
+
+  def _zone_filter(self):
+    member_zones = filter(None,self._entry.get('aeMemberZone',[]))
+    if member_zones:
+      member_zone_filter = compose_filter(
+        '|',
+        map_filter_parts('entryDN:dnSubordinateMatch:',member_zones),
       )
     else:
-      filter_str = DynamicDNSelectList._determineFilter(self)
+      member_zone_filter = ''
+    return member_zone_filter
+
+  def _determineFilter(self):
+    aeperson_filter = self._person_filter(('aeDept','aeLocation'))
+    aezone_filter = self._zone_filter()
+    if aeperson_filter:
+      filter_str = '(&(objectClass=aeUser)(aeStatus=0){0}{1})'.format(
+        aeperson_filter,
+        aezone_filter,
+      )
+    else:
+      filter_str = '(&{0}{1})'.format(
+        DynamicDNSelectList._determineFilter(self),
+        aezone_filter,
+      )
     return filter_str
 
 syntax_registry.registerAttrType(

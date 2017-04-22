@@ -1358,6 +1358,11 @@ constraint_attribute cn,sn,givenName
   set "(this/givenName + [ ] + this/sn) & this/cn"
   restrict="ldap:///{{ aedir_suffix }}??sub?(|(objectClass=aePerson)(objectClass=aeUser))"
 
+# restrict member zone(s) to active zones
+constraint_attribute
+  aeMemberZone
+  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeZone)(aeStatus=0))"
+
 # restrict references from user groups to have only active accounts as members
 constraint_attribute
   member
@@ -1369,6 +1374,11 @@ constraint_attribute
   member
   uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(|(objectClass=inetLocalMailRecipient)(objectClass=aeContact))(mail=*)(aeStatus=0))"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeMailGroup)"
+
+# zone-constrainted groups must contain only members from specific zone
+constraint_attribute member,aeMemberZone
+  set "this/member/-1* & this/aeMemberZone*"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(&(objectClass=groupOfEntries)(aeMemberZone=*))"
 
 # location-constrainted groups must contain only aeUser members assigned to a specific location
 constraint_attribute member

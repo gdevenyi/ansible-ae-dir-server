@@ -320,6 +320,12 @@ ditcontentrule ( ae-dir-oc:20
 # Group entries
 #-----------------------------------------------------------------------
 
+attributetype ( ae-dir-at:36
+  NAME 'aeMemberZone'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: DN(s) of valid member zone(s)'
+  SUP distinguishedName )
+
 # This allows mixed group schema
 # also "dynamic groups" based on groupOfURLs/memberURL
 objectclass ( ae-dir-oc:1
@@ -329,7 +335,7 @@ objectclass ( ae-dir-oc:1
   STRUCTURAL
   SUP ( groupOfEntries $ posixGroup $ groupOfURLs $ aeObject )
   MUST ( description )
-  MAY ( aeDept $ aeLocation ) )
+  MAY ( aeMemberZone $ aeDept $ aeLocation ) )
 
 ditcontentrule ( ae-dir-oc:1
   NAME 'aeGroup-dcr'
@@ -345,7 +351,7 @@ objectclass ( ae-dir-oc:27
   STRUCTURAL
   SUP ( groupOfEntries $ nisMailAlias $ groupOfURLs $ aeObject )
   MUST ( mail $ description )
-  MAY ( aeDept $ aeLocation ) )
+  MAY ( aeMemberZone $ aeDept $ aeLocation ) )
 
 ditcontentrule ( ae-dir-oc:27
   NAME 'aeMailGroup-dcr'
