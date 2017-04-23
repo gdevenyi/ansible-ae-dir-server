@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# Don't use uninitialized vars
+set -o nounset
+# After here exit on any error
+set -e
+
+systemctl stop slapd
+rm -f {{ openldap_data }}/*/*.mdb
+systemctl start slapd
