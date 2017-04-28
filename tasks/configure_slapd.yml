@@ -58,7 +58,7 @@
 
 - name: "Create central schema including file from template"
   template:
-    src: "init.schema.j2"
+    src: "slapd/init.schema.j2"
     dest: "{{ openldap_schema_prefix }}/init.schema"
     owner: root
     group: ldap
@@ -68,7 +68,7 @@
 
 - name: "Create rootDSE.ldif"
   template:
-    src: "rootDSE.ldif.j2"
+    src: "slapd/rootDSE.ldif.j2"
     dest: "{{ openldap_conf_prefix }}/rootDSE.ldif"
     owner: root
     group: ldap

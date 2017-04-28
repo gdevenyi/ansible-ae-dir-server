@@ -1,0 +1,7 @@
+dn: 
+defaultNamingContext: {{ aedir_suffix }}
+aeRoot: {{ aedir_suffix }}
+{% for host in openldap_rootdse_alt_servers %}
+altServer: ldaps://{{ hostvars[host].get('openldap_service_fqdn',host) }}
+{% endfor%}
+
