@@ -3,16 +3,19 @@
 </datalist>
 
 <datalist id="zonenames">
-  <option value="ae" title="&AElig;-DIR itself">&AElig;-DIR</option>
-  <option value="{{ aedir_org_zone }}" title="Person data">People</option>
-  <option value="{{ aedir_base_zone }}" title="Primary/base accounts">Base</option>
-  <option value="pub" title="Public data">Public</option>
+  <option value="ae">ae: &AElig;-DIR</option>
+{% for zone_cn, zone_attrs in aedir_init_aezones|dictsort(case_sensitive=False, by='key') %}
+  <option value="{{ zone_cn|e }}">{{ zone_cn|e }}: {{ zone_attrs['description']|e }}</option>
+{% endfor %}
+  <option value="pub">pub: Public data</option>
 </datalist>
 
 <datalist id="zonedn">
-  <option value="cn=ae,{{ aedir_suffix }}" title="&AElig;-DIR itself">&AElig;-DIR</option>
-  <option value="cn={{ aedir_org_zone }},{{ aedir_suffix }}" title="Personal and department entries">People/Orga</option>
-  <option value="cn=pub,{{ aedir_suffix }}" title="Public data">Public</option>
+  <option value="cn=ae,{{ aedir_suffix }}">ae: &AElig;-DIR</option>
+{% for zone_cn, zone_attrs in aedir_init_aezones|dictsort(case_sensitive=False, by='key') %}
+  <option value="cn={{ zone_cn|e }},{{ aedir_suffix }}">{{ zone_cn|e }}: {{ zone_attrs['description']|e }}</option>
+{% endfor %}
+  <option value="cn=pub,{{ aedir_suffix }}">pub: Public data</option>
 </datalist>
 
 <a title="Read about searching in the user guide"
