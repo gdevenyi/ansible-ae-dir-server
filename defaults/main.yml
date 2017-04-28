@@ -175,16 +175,16 @@ aedir_base_zone: base
 aedir_init_aezones:
   people:
     ticket_id: "{{ aedir_init_ticket_id }}"
-    description: "Zone for people and department entries"
+    description: "People and department entries"
   base:
     ticket_id: "{{ aedir_init_ticket_id }}"
-    description: "Zone for primary office users and groups"
+    description: "Primary office users and groups"
   otp:
     ticket_id: "{{ aedir_init_ticket_id }}"
-    description: "Zone for OTP tokens (OATH-LDAP)"
+    description: "OTP tokens (OATH-LDAP)"
   test:
     ticket_id: "{{ aedir_init_ticket_id }}"
-    description: "Playground zone for weird tests"
+    description: "Testing playground"
 
 # template file used for generating gen_csr.cnf
 aedir_gen_csr_cnf: "gen_csr.cnf.j2"
