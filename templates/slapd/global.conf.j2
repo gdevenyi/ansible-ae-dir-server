@@ -96,7 +96,7 @@ TLSDHParamFile {{ openldap_dhparam_pathname }}
 
 # Map root user to rootdn when SASL/EXTERNAL is used with LDAPI
 authz-regexp
-  "gidnumber=0\\+uidnumber=0,cn=peercred,cn=external,cn=auth"
+  "gidnumber={{ aedir_rootdn_gid_number }}\\+uidnumber={{ aedir_rootdn_uid_number }},cn=peercred,cn=external,cn=auth"
   "cn=root,{{ aedir_suffix }}"
 
 # Map user/group to existing posixAccount entry when SASL/EXTERNAL is used with LDAPI

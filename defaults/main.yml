@@ -163,6 +163,10 @@ aedir_ldapi_services:
     gid_number: 994
     description: The system user used for WebSSO
 
+# POSIX UID and GID which is mapped to rootdn
+aedir_rootdn_uid_number: 0
+aedir_rootdn_gid_number: 0
+
 # which zone to use for aePerson and aeDept entries
 # (must be listed in aedir_init_aezones below)
 aedir_org_zone: people
