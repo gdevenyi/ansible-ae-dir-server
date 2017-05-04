@@ -86,8 +86,12 @@ TLSProtocolMin {{ openldap_tls_protocol_min }}
 TLSCipherSuite {{ openldap_tls_cipher_suite }}
 
 TLSCACertificateFile {{ openldap_cacert_pathname }}
+{% if openldap_cert_pathname %}
 TLSCertificateFile {{ openldap_cert_pathname }}
+{% endif %}
+{% if openldap_key_pathname %}
 TLSCertificateKeyFile {{ openldap_key_pathname }}
+{% endif %}
 TLSDHParamFile {{ openldap_dhparam_pathname }}
 
 #---------------------------------------------------------------------------
