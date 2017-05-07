@@ -26,8 +26,9 @@ lsb_id_map:
 # LSB id to be used during plays
 lsb_id: "{{ lsb_id_map.get(ansible_lsb.id,ansible_lsb.id) }}"
 
-# whether to perform init tasks
-aedir_init: 0
+# Perform init tasks: set to True only on the command-line when 
+# initializing an empty AE-DIR environment from scratch
+aedir_init: False
 
 # base DN / search root for AE-DIR entries
 aedir_suffix: "ou=ae-dir"

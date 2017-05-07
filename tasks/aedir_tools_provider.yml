@@ -29,7 +29,7 @@
     owner: root
     group: ldap
     mode: 0644
-  when: aedir_init == "1"
+  when: aedir_init == True or aedir_init == "True"
 
 - name: "Specific installation for {{ lsb_id }}"
   include: "aedir_tools_{{ lsb_id }}.yml"
