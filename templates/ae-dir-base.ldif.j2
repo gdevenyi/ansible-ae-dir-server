@@ -785,7 +785,7 @@ objectClass: groupOfEntries
 objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
-{% if oath_ldap_enabled=="1" %}
+{% if oath_ldap_enabled==True %}
 member: uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}
 member: uid=ae-dir-bind-proxy,cn=ae,{{ aedir_suffix }}
 member: uid={{ oath_ldap_oathenroll_web_user }},cn=ae,{{ aedir_suffix }}

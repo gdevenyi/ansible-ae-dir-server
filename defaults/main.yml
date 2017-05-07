@@ -384,7 +384,8 @@ openldap_noopsrch_enabled: "{{ lsb_id=='SUSE' }}"
 #---------------------------------------------------------------------------
 
 # enable OATH-LDAP (with external bind listeners in slapd.conf)
-oath_ldap_enabled: 0
+# set to True to enable (default is False=disabled)
+oath_ldap_enabled: False
 
 # map slapd role to bind listener parameters
 oath_dict:

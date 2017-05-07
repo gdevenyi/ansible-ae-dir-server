@@ -36,4 +36,4 @@
 
 - name: "OATH-LDAP tasks on {{ openldap_role }}"
   include: "oath-ldap.yml"
-  when: oath_ldap_enabled == "1"
+  when: oath_ldap_enabled == True
