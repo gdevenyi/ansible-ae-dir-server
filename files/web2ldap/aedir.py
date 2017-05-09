@@ -309,20 +309,21 @@ class AEUserId(IA5String):
   oid = 'AEUserId-oid'
   desc = 'AE-DIR: User name'
   maxValues = 1
+  minLen = 4
   maxLen = 4
   maxCollisionChecks = 15
   UID_LETTERS = 'abcdefghijklmnopqrstuvwxyz'
   reobj = re.compile('^%s$' % (UID_LETTERS))
+  genLen = 4
 
   def __init__(self,sid,form,ls,dn,schema,attrType,attrValue,entry=None):
     IA5String.__init__(self,sid,form,ls,dn,schema,attrType,attrValue,entry=entry)
-    self.minLen = self.maxLen
 
   def _genUid(self):
     gen_collisions = 0
     while gen_collisions < self.maxCollisionChecks:
       # generate new random UID candidate
-      uid_candidate = ldaputil.passwd.RandomString(self.maxLen,self.UID_LETTERS)
+      uid_candidate = ldaputil.passwd.RandomString(self.genLen,self.UID_LETTERS)
       # check whether UID candidate already exists
       uid_result = self._ls.l.search_s(
         self._ls.currentSearchRoot,

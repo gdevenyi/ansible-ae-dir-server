@@ -50,6 +50,9 @@ aedir_max_uid: "{{ aedir_max_gid }}"
 # Parameters for generating user names
 aedir_username_length: 4
 aedir_username_gen_trials: 15
+# Parameters for checking user names
+aedir_username_minlen: "{{ aedir_username_length }}"
+aedir_username_maxlen: "{{ aedir_username_length }}"
 
 # Some paths for tools
 aedir_prefix: "/opt/ae-dir"
@@ -77,7 +80,7 @@ aedir_aetag_cn_regex: "{{ aedir_aegroup_cn_regex }}"
 aedir_aesudorule_cn_regex: "{{ aedir_aegroup_cn_regex }}"
 aedir_aesrvgroup_cn_regex: "{{ aedir_aegroup_cn_regex }}"
 # attribute 'uid'
-aedir_aeuser_uid_regex: "[a-z]{{ '{' }}{{ aedir_username_length }}{{ '}' }}"
+aedir_aeuser_uid_regex: "[a-z]{{ '{' }}{{ aedir_username_minlen }},{{ aedir_username_maxlen }}{{ '}' }}"
 aedir_aeservice_uid_regex: "[a-zA-Z0-9_.-]+"
 # attribute 'aeTicketId'
 aeticketid_regex: "[A-Z]+-[0-9]+"

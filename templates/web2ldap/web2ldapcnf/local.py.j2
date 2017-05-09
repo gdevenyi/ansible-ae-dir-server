@@ -89,7 +89,9 @@ w2lapp.schema.plugins.aedir.AELoginShell.attr_value_dict = {
 }
 
 # Parameters for generating/checking user names
-w2lapp.schema.plugins.aedir.AEUserId.maxLen = {{ aedir_username_length }}L
+w2lapp.schema.plugins.aedir.AEUserId.genLen = {{ aedir_username_length }}L
+w2lapp.schema.plugins.aedir.AEUserId.minLen = {{ aedir_username_minlen }}L
+w2lapp.schema.plugins.aedir.AEUserId.maxLen = {{ aedir_username_maxlen }}L
 w2lapp.schema.plugins.aedir.AEUserId.reObj = re.compile('^{{ aedir_aeuser_uid_regex }}$')
 w2lapp.schema.plugins.aedir.AEUserId.maxGenTrials = {{ aedir_username_gen_trials }}L
 
