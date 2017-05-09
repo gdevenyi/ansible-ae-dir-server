@@ -871,6 +871,14 @@ access to
 # Read access to network device entries filtered by (objectClass=aeNwDevice)
 #------------------------------------------------------------------
 
+# aeNwDevice entries can be read by some aeHost entries
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(objectClass=aeNwDevice)"
+  attrs=entry,entryUUID,entryDN,objectClass,aeFqdn,ipHostNumber
+    by set="{{ aedir_aenwdevice_visibility_set }}" read
+    by * none break
+
 # aeNwDevice entries have to be subordinate entries of aeHost entries
 access to
   dn.subtree="{{ aedir_suffix }}"
