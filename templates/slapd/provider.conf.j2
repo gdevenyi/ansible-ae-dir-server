@@ -64,9 +64,9 @@ index entryUUID eq
 
 # for host and network management
 index macAddress eq
-index ipHostNumber eq
+index ipHostNumber eq,pres
 index host sub,eq
-index aeFqdn sub,eq
+index aeFqdn sub,eq,pres
 index aeNwDevice eq
 
 # for aeUser
@@ -871,13 +871,15 @@ access to
 # Read access to network device entries filtered by (objectClass=aeNwDevice)
 #------------------------------------------------------------------
 
+{% if aedir_aenwdevice_visibility_set %}
 # aeNwDevice entries can be read by some aeHost entries
 access to
   dn.subtree="{{ aedir_suffix }}"
-  filter="(objectClass=aeNwDevice)"
+  filter="(&(objectClass=aeNwDevice)(aeFqdn=*)(ipHostNumber=*))"
   attrs=entry,entryUUID,entryDN,objectClass,aeFqdn,ipHostNumber
     by set="{{ aedir_aenwdevice_visibility_set }}" read
     by * none break
+{% endif %}
 
 # aeNwDevice entries have to be subordinate entries of aeHost entries
 access to
