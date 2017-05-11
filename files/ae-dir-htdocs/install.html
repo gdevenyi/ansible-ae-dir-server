@@ -96,7 +96,7 @@
   <li>
     Invoke ansible play in sub-directory <code>ansible/</code>
     (here using command <code>su</code>):
-    <pre>ANSIBLE_HOSTS=hosts ansible-playbook ae-dir-servers.yml --become -K --become-method=su --extra-vars="aedir_init=True"</pre>
+    <pre>ANSIBLE_HOSTS=hosts ansible-playbook ae-dir-servers.yml --become -K --become-method=su --extra-vars='{"aedir_init":True}'</pre>
   </li>
   <li>
     Log into one provider system become user <em>root</em> and run the
