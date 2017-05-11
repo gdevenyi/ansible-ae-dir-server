@@ -336,7 +336,7 @@ openldap_cert_filename: "{{ openldap_service_fqdn }}.crt"
 openldap_key_filename: "{{ openldap_service_fqdn }}.key"
 
 # local directory for fetched CSRs
-local_openldap_csr_dir: "files/pki-csr-files"
+local_openldap_csr_dir: "{{ inventory_dir }}/files/pki-csr-files"
 
 # whether to overwrite existing private key
 openldap_key_gen: 0

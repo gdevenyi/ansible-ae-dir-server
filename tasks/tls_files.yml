@@ -38,14 +38,14 @@
   - restart slapd
 
 - name: "Validate cert {{ openldap_cert_filename }} against CA certs {{ openldap_cacert_filename }}"
-  command: "openssl verify -purpose sslserver -CAfile files/{{ openldap_cacert_filename }} files/{{ openldap_cert_filename }}"
+  command: "openssl verify -purpose sslserver -CAfile {{ inventory_dir }}/files/{{ openldap_cacert_filename }} files/{{ openldap_cert_filename }}"
   ignore_errors: yes
   delegate_to: 127.0.0.1
   register: openssl_verify_result
   changed_when: False
 
 - name: "Modulus of cert {{ openldap_cert_filename }}"
-  command: "openssl x509 -in files/{{ openldap_cert_filename }} -noout -modulus"
+  command: "openssl x509 -in {{ inventory_dir }}/files/{{ openldap_cert_filename }} -noout -modulus"
   ignore_errors: yes
   delegate_to: 127.0.0.1
   register: openldap_cert_modulus
