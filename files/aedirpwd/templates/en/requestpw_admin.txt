@@ -1,13 +1,13 @@
-Dear admin,
+Dear zone admin,
 
 a password reset for a user entry was requested.
-
-If someone falsely invoked the password request you can simply 
-ignore this message.
 
 Your actions if this request seems ok:
 1. Please contact the user by telephone or personally.
 2. Tell the user his 2nd password part you can read in his entry.
+
+If someone falsely invoked the password request you can simply 
+ignore this message.
 
 User name:
 %(username)s

@@ -31,12 +31,12 @@ input.submit {
 }
 
 form table td {
-  width:70%;
   border:none;
+  width:70%;
 }
 
 form table th {
-  text-align:right;
+  text-align:left;
   font-weight:normal;
   border:none;
   background-color:transparent;

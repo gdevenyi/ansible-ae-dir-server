@@ -1,8 +1,38 @@
 Dear {user_cn},
 
-an Æ-DIR personal account has been created/activated for you.
+your zone admin
+
+{admin_cn} <{admin_mail}>
+
+has created an Æ-DIR personal account for you.
+
 The next step is invoking the password reset process.
-Please read the instructions in this e-mail carefully.
+
+-------------------------- Password reset ------------------------------
+
+You can request a temporary password for your account here:
+
+https://{web_ctx_host}{app_path_prefix}/requestpw?username={user_uid}
+
+Note: You will need the zone admin to provide a 2nd password.
+
+You can find detailed documentation about password reset process in
+the user guide:
+
+https://{web_ctx_host}/pwd.html#reset-procedure
+
+-------------------------- web2ldap usage ------------------------------
+
+Afterwards you can connect and login to Æ-DIR with web2ldap here:
+
+https://{web_ctx_host}/web2ldap/searchform?{ldap_uri}/ou=ae-dir????bindname={user_uid}
+
+You should add a bookmark for the link above
+because you will probably need it more often.
+
+You can find user guide for web2ldap here:
+
+https://{web_ctx_host}/web2ldap.html
 
 --------------------------- Account details ----------------------------
 
@@ -19,43 +49,6 @@ Distinguished name of user entry:
 
 Created/activated by:
 {admin_cn} <{admin_mail}>
-
--------------------------- Password reset ------------------------------
-
-You can find detailed documentation about password reset process in
-the user guide:
-
-https://{web_ctx_host}/pwd.html#reset-procedure
-
-Please contact this zone admin now (e.g. by phone) and ask him/her 
-to assist you:
-
-{admin_cn} <{admin_mail}>
-
-After contacting the zone admin you can request a temporary password
-for your account here:
-
-https://{web_ctx_host}{app_path_prefix}/requestpw?username={user_uid}
-
-1. The 1st part of the temporary password will be sent to you by
-   e-mail (simply click on the link in the e-mail).
-
-2. The zone admin will tell you the 2nd part of the temporary 
-   password you will have to enter in the form for (re-)setting your 
-   personal password.
-
--------------------------- web2ldap usage ------------------------------
-
-Afterwards you can connect and login to Æ-DIR with web2ldap here:
-
-https://{web_ctx_host}/web2ldap/searchform?{ldap_uri}/ou=ae-dir????bindname={user_uid}
-
-You should add a bookmark for the link above
-because you will probably need it more often.
-
-You can find user guide for web2ldap here:
-
-https://{web_ctx_host}/web2ldap.html
 
 ------------------------------------------------------------------------
 

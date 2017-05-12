@@ -3,31 +3,14 @@ $var title: Temporary password requested for $username
 
 <div id="content">
 
-  <h1>Temporary password requested for $username</h1>
+  <h1>Temporary password set for $username</h1>
 
   <p>
-    A temporary password for LDAP entry
-  </p>
-  <p class="userDN">
-    $userdn
-  </p>
-  <p>
-    was successfully set and sent to $email.
-  </p>
-  <p>
-    Proceed to <a href="resetpw?username=$username">finish password reset</a>.
+    Please <strong>check your e-mail immediately</strong> to proceed.
   </p>
 
-  <ul class="tip">
-    <li>
-      Please check your e-mail immediately because the temporary
-      password is valid only for ten minutes!
-    </li>
-    <li>
-      You need a second part of the temporary password.<br>
-      It will be given to you by an admin of your particular zone (see welcome e-mail).<br>
-      Therefore you should contact him/her <em>now</em>.
-    </li>
-  </ul>
+  <p>
+    The temporary password for user <em>$username</em> was sent to <em>$email</em>.
+  </p>
 
 </div>
