@@ -14,7 +14,7 @@ You can request a temporary password for your account here:
 
 https://{web_ctx_host}{app_path_prefix}/requestpw?username={user_uid}
 
-Note: You will need the zone admin to provide a 2nd password.
+Note: You will need the zone admin to provide a separate reset password.
 
 You can find detailed documentation about password reset process in
 the user guide:

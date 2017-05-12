@@ -13,22 +13,27 @@ $var title: Finish password reset
     <input type="hidden" name="username" value="$username" size="25">
     <input type="hidden" name="temppassword1" value="$temppassword1" size="25" maxlen="$temppassword1_len">
 
-    <table>
-
       $if temppassword2_len>0:
-        <tr>
-          <th>
-            Temporary password part #2
-            (ask zone admin):
-          </th>
-          <td>
-             <input name="temppassword2" value="" size="$temppassword2_len">
-          </td>
-        </tr>
+        <fieldset>
+          <table>
+            <tr>
+              <th>
+                Reset password<br>(ask zone admin):
+              </th>
+              <td>
+                 <input name="temppassword2" value="" size="$temppassword2_len">
+              </td>
+            </tr>
+          </table>
+        </fieldset>
       $else:
         <input type="hidden" name="temppassword2" value="">
 
-      <tr>
+
+  <fieldset>
+    <legend>Input new password twice</legend>
+    <table>
+       <tr>
         <th>
           New password:
         </th>
@@ -37,15 +42,15 @@ $var title: Finish password reset
         </td>
       </tr>
       <tr>
-        <td>
+        <th>
           New password (repeated):
         </td>
-        <td>
+        <th>
           <input type="password" name="newpassword2" value="" size="20">
         </td>
       </tr>
-
     </table>
+  </fieldset>
 
     <input type="submit" class="submit" name="submit" value="Set new password">
 
@@ -53,7 +58,7 @@ $var title: Finish password reset
 
   <ul class="tip">
     <li>
-      Temporary password part #2 will be told you by an admin of 
+      Reset password will be told you by your zone admin of
       your particular zone (see reset e-mail).
     </li>
     <li>Note the minimum password length!</li>
