@@ -11,7 +11,7 @@ web.py 0.37+ (see http://webpy.org/)
 python-ldap 2.4.22+ (see https://www.python-ldap.org/)
 """
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 # from Python's standard lib
 import sys
@@ -43,6 +43,17 @@ import mailutil
 # Import constants from configuration module
 sys.path.append(sys.argv[2])
 from oathenroll_cnf import *
+
+#---------------------------------------------------------------------------
+# constants
+#---------------------------------------------------------------------------
+
+# Mapping of request URL path to Python handler class
+URL2CLASS_MAPPING = (
+  '/','Default',
+#  '/register', 'RegisterToken',
+  '/reset', 'ResetToken',
+)
 
 #---------------------------------------------------------------------------
 # basic functions and classes

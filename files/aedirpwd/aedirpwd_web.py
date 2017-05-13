@@ -44,7 +44,7 @@ import aedir
 # Import constants from configuration module
 sys.path.append(sys.argv[2])
 from aedirpwd_cnf import PWD_LDAP_URL, WEB_CONFIG_DEBUG, WEB_ERROR, \
-    APP_PATH_PREFIX, LAYOUT, TEMPLATES_DIRNAME, URL2CLASS_MAPPING, \
+    APP_PATH_PREFIX, LAYOUT, TEMPLATES_DIRNAME, \
     EMAIL_SUBJECT_ADMIN, EMAIL_SUBJECT_PERSONAL, EMAIL_TEMPLATE_ADMIN, \
     EMAIL_TEMPLATE_PERSONAL, TIME_DISPLAY_FORMAT, \
     FILTERSTR_CHANGEPW, FILTERSTR_REQUESTPW, FILTERSTR_RESETPW, \
@@ -82,6 +82,15 @@ PWDPOLICY_DEREF_CONTROL = DereferenceControl(
 APP_LOGGER = aedir.init_logger(
     log_name=os.path.basename(sys.argv[0]),
     #logger_qualname='aedir.syslog',
+)
+
+# Mapping of request URL path to Python handler class
+URL2CLASS_MAPPING = (
+  '/','Default',
+  '/checkpw', 'CheckPassword',
+  '/changepw', 'ChangePassword',
+  '/requestpw', 'RequestPasswordReset',
+  '/resetpw', 'FinishPasswordReset',
 )
 
 #-----------------------------------------------------------------------

@@ -98,10 +98,3 @@ SMTP_FROM = 'ae-dir-pwd@{{ openldap_service_fqdn }}'
 # URL path prefix used when generating URLs in e-mails
 # handy for reverse proxy setups
 APP_PATH_PREFIX = '/oath'
-
-# Mapping of request URL path to Python handler class
-URL2CLASS_MAPPING = (
-  '/','Default',
-#  '/register', 'RegisterToken',
-  '/reset', 'ResetToken',
-)
