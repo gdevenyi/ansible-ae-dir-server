@@ -11,7 +11,7 @@ web.py 0.37+ (see http://webpy.org/)
 python-ldap 2.4.27+ (see http://www.python-ldap.org/)
 """
 
-__version__ = '0.4.0'
+__version__ = '0.5.0'
 
 # from Python's standard lib
 import string
@@ -47,6 +47,7 @@ from ldap.controls.deref import DereferenceControl
 # mail utility module
 import mailutil
 
+# AE-DIR module
 import aedir
 
 # Import constants from configuration module
@@ -78,6 +79,10 @@ PWDPOLICY_DEREF_CONTROL = DereferenceControl(
         ]+PWDPOLICY_EXPIRY_ATTRS+MSPWDRESETPOLICY_ATTRS,
     }
 )
+
+# initialize a custom logger
+APP_LOGGER = aedir.init_logger(os.path.basename(sys.argv[0]))
+
 
 #-----------------------------------------------------------------------
 # utility functions
@@ -935,18 +940,33 @@ class FinishPasswordReset(ChangePassword):
         return res
 
 
+class AEDirPwdApplication(web.application):
+    pass
+
+
 def run():
     """
     run the web application
     """
     # Initialize web application
-    app = web.application(URL2CLASS_MAPPING, globals())
+    APP_LOGGER.debug('Starting web application script %r', sys.argv[0])
+    app = AEDirPwdApplication(URL2CLASS_MAPPING, globals())
     # Change to directory where the script is located
-    os.chdir(os.path.dirname(sys.argv[0]))
+    dir_name = os.path.dirname(sys.argv[0])
+    APP_LOGGER.debug('chdir to %r', dir_name)
+    os.chdir(dir_name)
     # Set error handling
     if not WEB_ERROR:
+        APP_LOGGER.debug('switch off debugging')
         app.internalerror = False
     # Start the internal web server
+    APP_LOGGER.info(
+        'Script %r starts %r instance listening on %r reading config from %r',
+        sys.argv[0],
+        app.__class__.__name__,
+        sys.argv[1],
+        sys.argv[2],
+    )
     app.run()
 
 
