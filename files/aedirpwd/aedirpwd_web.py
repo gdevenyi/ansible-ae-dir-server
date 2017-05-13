@@ -1,20 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-Web-interface for resetting/changing user passwords in a LDAP server
+AE-DIR password self-service application
 
 Author: Michael Ströder <michael@stroeder.com>
-
-Tested with:
-Python 2.7+ (see http://www.python.org/)
-web.py 0.37+ (see http://webpy.org/)
-python-ldap 2.4.27+ (see http://www.python-ldap.org/)
 """
 
 __version__ = '0.5.0'
 
 # from Python's standard lib
-import string
 import re
 import sys
 import os
@@ -22,9 +16,7 @@ import time
 import socket
 import smtplib
 import hashlib
-import random
 
-from calendar import timegm
 from urllib import quote_plus as url_quote_plus
 
 import email.utils
@@ -37,7 +29,6 @@ import ldap
 import ldap.dn
 import ldap.filter
 import ldap.sasl
-import ldapurl
 from ldap.filter import escape_filter_chars
 from ldap.controls.ppolicy import PasswordPolicyControl
 from ldap.controls.sessiontrack import SessionTrackingControl
@@ -52,7 +43,14 @@ import aedir
 
 # Import constants from configuration module
 sys.path.append(sys.argv[2])
-from aedirpwd_cnf import *
+from aedirpwd_cnf import PWD_LDAP_URL, WEB_CONFIG_DEBUG, WEB_ERROR, \
+    APP_PATH_PREFIX, LAYOUT, TEMPLATES_DIRNAME, URL2CLASS_MAPPING, \
+    EMAIL_SUBJECT_ADMIN, EMAIL_SUBJECT_PERSONAL, EMAIL_TEMPLATE_ADMIN, \
+    EMAIL_TEMPLATE_PERSONAL, TIME_DISPLAY_FORMAT, \
+    FILTERSTR_CHANGEPW, FILTERSTR_REQUESTPW, FILTERSTR_RESETPW, \
+    PWD_ADMIN_LEN, PWD_ADMIN_MAILTO, PWD_EXPIRETIMESPAN, PWD_LENGTH, \
+    PWD_RESET_ENABLED, PWD_TMP_CHARS, PWD_TMP_HASH_ALGO, \
+    SMTP_DEBUGLEVEL, SMTP_FROM, SMTP_LOCALHOSTNAME, SMTP_TLSARGS, SMTP_URL
 
 PWDPOLICY_EXPIRY_ATTRS = [
     'pwdMaxAge',
@@ -86,7 +84,6 @@ APP_LOGGER = aedir.init_logger(
     #logger_qualname='aedir.syslog',
 )
 
-
 #-----------------------------------------------------------------------
 # utility functions
 #-----------------------------------------------------------------------
@@ -105,7 +102,6 @@ def pwd_hash(pw_clear, hash_algo_oid):
     Generate un-salted hash as hex-digest
     """
     return hashlib.new(HASH_OID2NAME[hash_algo_oid], pw_clear).hexdigest()
-
 
 def read_template_file(filename):
     """
@@ -258,7 +254,7 @@ class Default(object):
         ('X-Content-Security-Policy', "default-src 'self';script-src 'none'"),
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
         self.remote_ip = web.ctx.env.get(
             'FORWARDED_FOR',
             web.ctx.env.get('HTTP_X_FORWARDED_FOR', web.ctx.ip)
@@ -286,7 +282,7 @@ class BaseApp(Default):
     """
     Request handler base class which is not used directly
     """
-    post_form = None
+    post_form = web.form.Form()
     get_form = web.form.Form(USERNAME_FIELD)
     logger = APP_LOGGER
 
@@ -360,8 +356,7 @@ class BaseApp(Default):
         )
         user_dn, user_entry, user_controls = resp_data[0]
         if user_controls:
-            deref_control = user_controls[0]
-            deref_dn, deref_entry = deref_control.derefRes['pwdPolicySubentry'][0]
+            _, deref_entry = user_controls[0].derefRes['pwdPolicySubentry'][0]
             user_entry.update(deref_entry)
         return user_dn, user_entry
 
@@ -380,17 +375,13 @@ class BaseApp(Default):
         except ldap.SERVER_DOWN, ldap_err:
             self.logger.error(
                 '%s.POST() Error connecting to %r: %s',
-                self.__class__.__name__,
-                PWD_LDAP_URL,
-                ldap_err,
+                self.__class__.__name__, PWD_LDAP_URL, ldap_err,
             )
             res = self.GET(message=u'LDAP server not reachable!')
         except ldap.LDAPError, ldap_err:
             self.logger.error(
                 '%s.POST() LDAPError when binding to %r: %s',
-                self.__class__.__name__,
-                PWD_LDAP_URL,
-                ldap_err,
+                self.__class__.__name__, PWD_LDAP_URL, ldap_err,
             )
             res = self.GET(message=u'Internal LDAP error!')
         else:
@@ -400,7 +391,6 @@ class BaseApp(Default):
                 self.ldap_conn.ldap_url_obj.initializeUrl(),
                 self.ldap_conn.whoami_s(),
             )
-            self.ldap_conn.ldap_url_obj.initializeUrl(),
             try:
                 # search user entry
                 user_dn, user_entry = self.search_user_entry(self.form.inputs)
@@ -512,13 +502,26 @@ class CheckPassword(BaseApp):
         old_password_ldap = self.form.d.oldpassword.encode('utf-8')
         try:
             self._ldap_user_operations(user_dn, old_password_ldap)
-        except ldap.INVALID_CREDENTIALS:
+        except ldap.INVALID_CREDENTIALS, ldap_err:
+            self.logger.warn(
+                '%s.handle_user_request() binding as %r failed: %s',
+                self.__class__.__name__,
+                user_dn,
+                ldap_err,
+            )
             return self.GET(message=u'Wrong password!')
         except PasswordPolicyExpirationWarning, ppolicy_error:
             expire_time_str = unicode(time.strftime(
                 TIME_DISPLAY_FORMAT,
                 time.localtime(current_time+ppolicy_error.timeBeforeExpiration)
             ))
+            self.logger.info(
+                '%s.handle_user_request() Password of %r will expire soon at %r (%d seconds)',
+                self.__class__.__name__,
+                user_dn,
+                expire_time_str,
+                ppolicy_error.timeBeforeExpiration,
+            )
             return RENDER.changepw_form(
                 self.form.d.username,
                 u'Password will expire soon at %s !' % (expire_time_str)
@@ -811,42 +814,20 @@ class RequestPasswordReset(BaseApp):
             )[0]
         )
         ldap_mod_list = [
-            (
-                ldap.MOD_REPLACE,
-                'msPwdResetPasswordHash',
-                [temp_pwd_hash],
-            ),
-            (
-                ldap.MOD_REPLACE,
-                'msPwdResetTimestamp',
-                [ldap.strf_secs(current_time)]
-            ),
-            (
-                ldap.MOD_REPLACE,
-                'msPwdResetExpirationTime',
-                [ldap.strf_secs(current_time+pwd_expire_timespan)]
-            ),
-            (
-                ldap.MOD_REPLACE,
-                'msPwdResetEnabled',
-                user_entry.get('msPwdResetEnabled', [PWD_RESET_ENABLED])
-            ),
+            (ldap.MOD_REPLACE, 'msPwdResetPasswordHash', [temp_pwd_hash]),
+            (ldap.MOD_REPLACE, 'msPwdResetTimestamp', [ldap.strf_secs(current_time)]),
+            (ldap.MOD_REPLACE, 'msPwdResetExpirationTime', [ldap.strf_secs(current_time+pwd_expire_timespan)]),
+            (ldap.MOD_REPLACE, 'msPwdResetEnabled', user_entry.get('msPwdResetEnabled', [PWD_RESET_ENABLED])),
         ]
         old_objectclasses = [
             oc.lower()
             for oc in user_entry['objectClass']
         ]
         if not 'mspwdresetobject' in old_objectclasses:
-            ldap_mod_list.append(
-                (ldap.MOD_ADD, 'objectClass', ['msPwdResetObject'])
-            )
+            ldap_mod_list.append((ldap.MOD_ADD, 'objectClass', ['msPwdResetObject']))
         if pwd_admin_len:
             ldap_mod_list.append(
-                (
-                    ldap.MOD_REPLACE,
-                    'msPwdResetAdminPw',
-                    [temp_pwd_clear[-pwd_admin_len:].encode('utf-8')]
-                ),
+                (ldap.MOD_REPLACE, 'msPwdResetAdminPw', [temp_pwd_clear[-pwd_admin_len:].encode('utf-8')])
             )
         try:
             self.ldap_conn.modify_ext_s(
@@ -962,26 +943,15 @@ class FinishPasswordReset(ChangePassword):
         if len(temppassword1)+len(temppassword2) != temp_pwd_len:
             return self.GET(message=u'Temporary password parts wrong!')
         temp_pwd_hash = pwd_hash(
-            u''.join((
-                self.form.d.temppassword1,
-                self.form.d.temppassword2,
-            )).encode('utf-8'),
-            user_entry.get(
-                'msPwdResetHashAlgorithm',
-                [PWD_TMP_HASH_ALGO]
-            )[0],
+            u''.join((temppassword1, temppassword2)).encode('utf-8'),
+            user_entry.get('msPwdResetHashAlgorithm', [PWD_TMP_HASH_ALGO])[0],
         )
         pw_input_check_msg = self._check_pw_input(user_entry)
         if not pw_input_check_msg is None:
             return self.GET(message=pw_input_check_msg)
         new_password_ldap = self.form.d.newpassword1.encode('utf-8')
         try:
-            self._ldap_user_operations(
-                user_dn,
-                user_entry,
-                temp_pwd_hash,
-                new_password_ldap
-            )
+            self._ldap_user_operations(user_dn, user_entry, temp_pwd_hash, new_password_ldap)
         except ldap.NO_SUCH_ATTRIBUTE:
             res = self.GET(message=u'Temporary password(s) wrong!')
         except ldap.CONSTRAINT_VIOLATION, ldap_error:
@@ -998,17 +968,13 @@ class FinishPasswordReset(ChangePassword):
         return res
 
 
-class AEDirPwdApplication(web.application):
-    pass
-
-
 def run():
     """
     run the web application
     """
     # Initialize web application
     APP_LOGGER.debug('Starting web application script %r', sys.argv[0])
-    app = AEDirPwdApplication(URL2CLASS_MAPPING, globals(), autoreload=bool(WEB_ERROR))
+    app = web.application(URL2CLASS_MAPPING, globals(), autoreload=bool(WEB_ERROR))
     # Change to directory where the script is located
     APP_LOGGER.debug('chdir to %r', TEMPLATES_DIRNAME)
     os.chdir(TEMPLATES_DIRNAME)
@@ -1025,7 +991,6 @@ def run():
         sys.argv[2],
     )
     app.run()
-
 
 if __name__ == '__main__':
     run()
