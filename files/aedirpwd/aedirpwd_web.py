@@ -81,7 +81,10 @@ PWDPOLICY_DEREF_CONTROL = DereferenceControl(
 )
 
 # initialize a custom logger
-APP_LOGGER = aedir.init_logger(os.path.basename(sys.argv[0]))
+APP_LOGGER = aedir.init_logger(
+    log_name=os.path.basename(sys.argv[0]),
+    #logger_qualname='aedir.syslog',
+)
 
 
 #-----------------------------------------------------------------------
@@ -116,7 +119,6 @@ def read_template_file(filename):
 #-----------------------------------------------------------------------
 # Some custom exception classes for password policy handling
 #-----------------------------------------------------------------------
-
 
 class PasswordPolicyException(ldap.LDAPError):
     """
@@ -243,6 +245,7 @@ class Default(object):
     Handle default index request
     """
     ldap_url = aedir.AEDirUrl(PWD_LDAP_URL)
+    logger = APP_LOGGER
     http_headers = (
         ('Cache-Control', 'no-store,no-cache,max-age=0,must-revalidate'),
         ('X-XSS-Protection', '1; mode=block'),
@@ -260,6 +263,13 @@ class Default(object):
             'FORWARDED_FOR',
             web.ctx.env.get('HTTP_X_FORWARDED_FOR', web.ctx.ip)
         )
+        self.logger.debug(
+            '%s() %s request from %s (via %s)',
+            self.__class__.__name__,
+            web.ctx.env['REQUEST_METHOD'],
+            self.remote_ip,
+            web.ctx.ip,
+        )
         # Set additional headers in response
         for header, value in self.http_headers:
             web.header(header, value)
@@ -276,10 +286,9 @@ class BaseApp(Default):
     """
     Request handler base class which is not used directly
     """
-
     post_form = None
-
     get_form = web.form.Form(USERNAME_FIELD)
+    logger = APP_LOGGER
 
     def _sess_track_ctrl(self, username='-/-'):
         """
@@ -306,6 +315,12 @@ class BaseApp(Default):
         filterstr = (
             self.filterstr_template % filterstr_inputs_dict
         ).encode('utf-8')
+        self.logger.debug(
+            '%s.search_user_entry() base=%r filterstr=%r',
+            self.__class__.__name__,
+            self.ldap_conn.ldap_url_obj.dn,
+            filterstr,
+        )
         msg_id = self.ldap_conn.search_ext(
             self.ldap_conn.ldap_url_obj.dn,
             ldap.SCOPE_SUBTREE,
@@ -328,7 +343,21 @@ class BaseApp(Default):
             add_ctrls=1,
         )[1]
         if not resp_data or len(resp_data) != 1:
-            raise ldap.NO_UNIQUE_ENTRY('No or non-unique search result for %s' % (repr(filterstr)))
+            self.logger.warn(
+                '%s.search_user_entry() base=%r filterstr=%r -> No unique search result: %r',
+                self.__class__.__name__,
+                self.ldap_conn.ldap_url_obj.dn,
+                filterstr,
+                resp_data,
+            )
+            raise ldap.NO_UNIQUE_ENTRY('No unique search result')
+        self.logger.info(
+            '%s.search_user_entry() beneath %r with %r returned: %r',
+            self.__class__.__name__,
+            self.ldap_conn.ldap_url_obj.dn,
+            filterstr,
+            resp_data[0],
+        )
         user_dn, user_entry, user_controls = resp_data[0]
         if user_controls:
             deref_control = user_controls[0]
@@ -348,11 +377,30 @@ class BaseApp(Default):
         # Make connection to LDAP server
         try:
             self.ldap_conn = aedir.AEDirObject(PWD_LDAP_URL, trace_level=0)
-        except ldap.SERVER_DOWN:
+        except ldap.SERVER_DOWN, ldap_err:
+            self.logger.error(
+                '%s.POST() Error connecting to %r: %s',
+                self.__class__.__name__,
+                PWD_LDAP_URL,
+                ldap_err,
+            )
             res = self.GET(message=u'LDAP server not reachable!')
-        except ldap.LDAPError:
+        except ldap.LDAPError, ldap_err:
+            self.logger.error(
+                '%s.POST() LDAPError when binding to %r: %s',
+                self.__class__.__name__,
+                PWD_LDAP_URL,
+                ldap_err,
+            )
             res = self.GET(message=u'Internal LDAP error!')
         else:
+            self.logger.debug(
+                '%s.POST() Successfully bound to %r as %r',
+                self.__class__.__name__,
+                self.ldap_conn.ldap_url_obj.initializeUrl(),
+                self.ldap_conn.whoami_s(),
+            )
+            self.ldap_conn.ldap_url_obj.initializeUrl(),
             try:
                 # search user entry
                 user_dn, user_entry = self.search_user_entry(self.form.inputs)
@@ -364,10 +412,20 @@ class BaseApp(Default):
                 # Call specific handler for LDAP user
                 res = self.handle_user_request(user_dn, user_entry)
         # Anyway we should try to close the LDAP connection
+        self.logger.debug(
+            '%s.POST() Unbind from %r',
+            self.__class__.__name__,
+            self.ldap_conn.ldap_url_obj.initializeUrl(),
+        )
         try:
             self.ldap_conn.unbind_s()
-        except (AttributeError, ldap.LDAPError):
-            pass
+        except (AttributeError, ldap.LDAPError), unbind_err:
+            self.logger.warn(
+                '%s.POST() Error during unbinding from %r: %s',
+                self.__class__.__name__,
+                self.ldap_conn.ldap_url_obj.initializeUrl(),
+                unbind_err,
+            )
         return res
 
 
@@ -950,11 +1008,10 @@ def run():
     """
     # Initialize web application
     APP_LOGGER.debug('Starting web application script %r', sys.argv[0])
-    app = AEDirPwdApplication(URL2CLASS_MAPPING, globals())
+    app = AEDirPwdApplication(URL2CLASS_MAPPING, globals(), autoreload=bool(WEB_ERROR))
     # Change to directory where the script is located
-    dir_name = os.path.dirname(sys.argv[0])
-    APP_LOGGER.debug('chdir to %r', dir_name)
-    os.chdir(dir_name)
+    APP_LOGGER.debug('chdir to %r', TEMPLATES_DIRNAME)
+    os.chdir(TEMPLATES_DIRNAME)
     # Set error handling
     if not WEB_ERROR:
         APP_LOGGER.debug('switch off debugging')
