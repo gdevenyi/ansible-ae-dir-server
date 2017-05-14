@@ -1,15 +1,17 @@
 Dear %(user_cn)s,
 
 the password of your Æ-DIR personal account will expire soon and you
-have to change it as soon as possible here:
+have to change it as soon as possible. Better now than too late!
+
+After password expiration you will not be able to change the
+password yourself without help of a zone admin!
+
+Password change form:
 
 https://%(web_ctx_host)s%(app_path_prefix)s/changepw?username=%(user_uid)s
 
-After password expiration you will not be able to change the
-password yourself without admin interaction!
-
 If it's already too late you have to follow the instructions in section
-"Password reset".
+"Password reset" below.
 
 --------------------------- Account details ----------------------------
 
@@ -29,25 +31,16 @@ Created/activated by:
 
 -------------------------- Password reset ------------------------------
 
-You can find detailed documentation about password reset process here:
+You can request a temporary password for your account here:
 
-https://%(web_ctx_host)s/pwd.html#reset-procedure
+https://{web_ctx_host}{app_path_prefix}/requestpw?username={user_uid}
 
-Please contact these zone admin(s) now (e.g. by phone) and ask him/her
-to assist you:
+Note: You will need the zone admin to provide a separate reset password.
 
-%(admin_cn)s <%(admin_mail)s>
+You can find detailed documentation about password reset process in
+the user guide:
 
-After contacting the zone admin you can request a temporary password
-for your account here:
-
-https://%(web_ctx_host)s%(app_path_prefix)s/requestpw?username=%(user_uid)s
-
-1. The 1st part of the temporary password will be sent to you by
-   e-mail (simply click on the link in the e-mail).
-
-2. The zone admin will tell you a separate reset password you will have to
-   enter in the form for (re-)setting your personal password.
+https://{web_ctx_host}/pwd.html#reset-procedure
 
 ------------------------------------------------------------------------
 
