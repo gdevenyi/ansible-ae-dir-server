@@ -856,7 +856,7 @@ class SlapdCheck(LocalCheck):
                     'olcTLSCertificateKeyFile',
                 ],
             )[0]
-            server_cert_pem = open(config_tls_attrs['olcTLSCACertificateFile'][0], 'rb').read()
+            server_cert_pem = open(config_tls_attrs['olcTLSCertificateFile'][0], 'rb').read()
             server_cert_obj = cryptography.x509.load_pem_x509_certificate(server_cert_pem, crypto_default_backend())
             cert_validity_days = (server_cert_obj.not_valid_after - datetime.datetime.utcnow()).days
             if cert_validity_days <= CERT_ERROR_DAYS:
@@ -868,9 +868,10 @@ class SlapdCheck(LocalCheck):
             self.result(
                 cert_check_result,
                 'SlapdCert',
-                check_output='Server cert valid until %s (%d days ahead)' % (
-                    server_cert_obj.not_valid_after.strftime('%Y-%m-%d %H-%M UTC'),
+                check_output='Server cert valid until %s UTC (%d days ahead), path name %r' % (
+                    server_cert_obj.not_valid_after,
                     cert_validity_days,
+                    config_tls_attrs['olcTLSCertificateFile'][0],
                 ),
             )
 
