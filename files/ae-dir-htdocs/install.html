@@ -65,9 +65,17 @@
   </li>
   <li>
     Prepare to have SSH access to all &AElig;-DIR servers as user
-    <em>root</em> (via <code>su</code> or <code>sudo</code>) and make
-    yourself familiar with using
+    <em>root</em> (via <code>su</code> or <code>sudo</code>)
+  </li>
+  <li>
+    Make yourself familiar with how to use
     <a href="https://docs.ansible.com/ansible/become.html">ansible become</a>.
+  </li>
+  <li>
+    Check whether you can access the hosts with
+    <a href="https://docs.ansible.com/ansible/setup_module.html">ansible setup</a>:
+    <pre>ansible all -i 'hostname.example.com,' -m setup</pre>
+    The trailing comma after the FQDN is needed!
   </li>
   <li>
     Issue X.509 TLS server certificates with appropriate <var>CN</var> and
