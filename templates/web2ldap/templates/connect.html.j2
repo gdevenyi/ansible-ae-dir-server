@@ -30,27 +30,56 @@
 </ul>
 
 <h2>Admin/auditor short cuts</h2>
-<ul>
-  <li>
-    <a class="CommandLink"
-       href="/web2ldap/searchform?{{ openldap_ldapi_uri }}/{{ aedir_accesslog_suffix }}????bindname=">
-      Search access log
-    </a>
-    (only &AElig; admins/auditors)
-  </li>
-  <li>
-    <a class="CommandLink"
-       href="/web2ldap?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub?(&(objectClass=aeUser)(aeStatus=0)(!(userPassword=*)))?bindname=">
-      Search active personal user accounts without password
-    </a>
-  </li>
-  <li>
-    <a class="CommandLink"
-       href="/web2ldap?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub?(objectClass=msPwdResetObject)?bindname=">
-      Search on-going password resets
-    </a>
-  </li>
-</ul>
+<table>
+  <tr>
+    <th>Task</th>
+    <th>Admin Role(s)</th>
+  </tr>
+  <tr>
+    <td>
+      <a class="CommandLink"
+         href="/web2ldap?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub?(&(objectClass=aeUser)(aeStatus=0)(!(userPassword=*)))?bindname=">
+        Search active personal user accounts without password
+      </a>
+    </td>
+    <td>
+      &AElig; admins/auditors, Zone admins
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a class="CommandLink"
+         href="/web2ldap?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub?(&(objectClass=aeObject)(aeStatus=0)(aeNotAfter<={value_currenttime}))?bindname=">
+        Search expired entries still active
+      </a>
+    </td>
+    <td>
+      &AElig; admins/auditors, Zone admins
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a class="CommandLink"
+         href="/web2ldap?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub?(objectClass=msPwdResetObject)?bindname=">
+        Search on-going password resets
+      </a>
+    </td>
+    <td>
+      &AElig; admins/auditors, Zone admins
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a class="CommandLink"
+         href="/web2ldap/searchform?{{ openldap_ldapi_uri }}/{{ aedir_accesslog_suffix }}????bindname=">
+        Search access log
+      </a>
+    </td>
+    <td>
+      &AElig; admins/auditors
+    </td>
+  </tr>
+</table>
 
 <h3>&AElig;-DIR remote servers</h3>
 {% for role in ['provider', 'consumer'] %}
