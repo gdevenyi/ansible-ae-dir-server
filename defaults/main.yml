@@ -472,3 +472,33 @@ smtp_cacert_filename:  "{{ openldap_cacert_filename }}"
 
 # The CA certificate file for sending e-mail via SMTP/STARTTLS
 smtp_cacert_pathname: "{{ aedir_etc }}/{{ smtp_cacert_filename }}"
+
+#---------------------------------------------------------------------------
+# Parameters for monitoring script
+#---------------------------------------------------------------------------
+
+# directory where to install slapd_check.sh
+slapd_checkmk_local: /usr/lib/check_mk_agent/local
+
+# path name of slapd's Unix Domain Socket for LDAPI
+slapd_check_ldapi_socket: ""
+# example for LTB's OpenLDAP builds
+#slapd_check_ldapi_socket: "/usr/local/openldap/var/run/ldapi"
+
+# local LDAPI URI for reading config and monitor contexts
+slapd_check_ldapi_uri: "ldapi://{{ slapd_check_ldapi_socket|urlencode|replace('/','%2F') }}"
+
+# fully-qualified domain name of local LDAPS service
+slapd_check_service_fqdn: "{{ ansible_fqdn }}"
+
+# local LDAPS URI
+slapd_check_ldaps_uri: "ldaps://{{ slapd_check_service_fqdn }}"
+
+# expected authz-ID for local LDAPS connection
+# very likely you have to adjust this one
+slapd_check_authz_id: "dn:uid=slapd_{{ slapd_check_service_fqdn.split('.')[0] }},dc=example,dc=com"
+
+# pathnames to add to LD_LIBRARY_PATH
+slapd_check_lib_dirs:
+  # for LTB's openLDAP builds
+  - /usr/local/openldap/lib64

@@ -1,0 +1,11 @@
+#!/bin/sh
+# shell wrapper script for slapd_checkmk.py
+# {{ ansible_managed }}
+
+LD_LIBRARY_PATH="{{ slapd_check_lib_dirs|join(':') }}:${LD_LIBRARY_PATH}"
+export LD_LIBRARY_PATH
+
+{{ aedir_python }} {{ aedir_sbin }}/slapd_checkmk.py \
+  '{{ slapd_check_ldapi_uri }}' \
+  '{{ slapd_check_ldaps_uri }}' \
+  '{{ slapd_check_authz_id }}'

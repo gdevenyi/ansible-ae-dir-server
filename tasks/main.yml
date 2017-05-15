@@ -37,3 +37,8 @@
 - name: "OATH-LDAP tasks on {{ openldap_role }}"
   include: "oath-ldap.yml"
   when: oath_ldap_enabled == True
+
+- name: "Monitoring scripts on {{ openldap_role }}"
+  include: "slapd_monitoring.yml"
+  tags:
+    - monitoring

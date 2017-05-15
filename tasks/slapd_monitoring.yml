@@ -1,0 +1,24 @@
+---
+# tasks file for roles/slapd_check
+
+- name: "Install {{ aedir_sbin }}/slapd_checkmk.py"
+  copy:
+    src: "slapd_checkmk.py"
+    dest: "{{ aedir_sbin }}/slapd_checkmk.py"
+    owner: root
+    group: root
+    mode: 0755
+
+- name: "Check status of directory {{ slapd_checkmk_local }}"
+  stat:
+    path: "{{ slapd_checkmk_local }}"
+  register: slapd_checkmk_local_stat
+
+- name: "Install local check {{ slapd_checkmk_local }}/slapd_checkmk.sh"
+  template:
+    src: "slapd_checkmk.sh.j2"
+    dest: "{{ slapd_checkmk_local }}/slapd_checkmk.sh"
+    owner: root
+    group: root
+    mode: 0755
+  when: slapd_checkmk_local_stat.stat.isdir is defined and slapd_checkmk_local_stat.stat.isdir
