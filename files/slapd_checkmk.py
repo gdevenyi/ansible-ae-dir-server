@@ -26,8 +26,13 @@ import os
 import sys
 import socket
 import time
+import datetime
 import pprint
 import logging
+
+# from Python cryptography
+import cryptography.x509
+from cryptography.hazmat.backends import default_backend as crypto_default_backend
 
 # from python-ldap
 import ldap
@@ -46,7 +51,7 @@ from pyasn1.codec.ber import decoder
 # Configuration constants
 #-----------------------------------------------------------------------
 
-__version__ = '1.1.2'
+__version__ = '1.1.3'
 
 STATE_FILENAME = 'slapd_checkmk.state'
 
@@ -106,6 +111,10 @@ ITEM_NAME_SPECIAL_CHARS = '!:$%=\\'
 
 CatchAllException = (Exception, ldap.LDAPError)
 #CatchAllException = None
+
+# days to warn/error when checking server cert validity
+CERT_ERROR_DAYS = 10
+CERT_WARN_DAYS = 50
 
 #-----------------------------------------------------------------------
 # Classes
@@ -821,6 +830,11 @@ class SlapdCheck(LocalCheck):
                     exc,
                 ),
             )
+            self.result(
+                CHECK_RESULT_UNKNOWN,
+                'SlapdCert',
+                check_output='Server cert not known => cannot determine validity',
+            )
         else:
             self.result(
                 CHECK_RESULT_OK,
@@ -842,6 +856,23 @@ class SlapdCheck(LocalCheck):
                     'olcTLSCertificateKeyFile',
                 ],
             )[0]
+            server_cert_pem = open(config_tls_attrs['olcTLSCACertificateFile'][0], 'rb').read()
+            server_cert_obj = cryptography.x509.load_pem_x509_certificate(server_cert_pem, crypto_default_backend())
+            cert_validity_days = (server_cert_obj.not_valid_after - datetime.datetime.utcnow()).days
+            if cert_validity_days <= CERT_ERROR_DAYS:
+                cert_check_result = CHECK_RESULT_ERROR
+            elif cert_validity_days <= CERT_WARN_DAYS:
+                cert_check_result = CHECK_RESULT_WARNING
+            else:
+                cert_check_result = CHECK_RESULT_OK
+            self.result(
+                cert_check_result,
+                'SlapdCert',
+                check_output='Server cert valid until %s (%d days ahead)' % (
+                    server_cert_obj.not_valid_after.strftime('%Y-%m-%d %H-%M UTC'),
+                    cert_validity_days,
+                ),
+            )
 
         try:
             ldaps_conn = SlapdCheckLDAPObject(
@@ -1606,6 +1637,7 @@ def run():
     slapd_check = SlapdCheck(
         (
             'SlapdBdbCaches',
+            'SlapdCert',
             'SlapdConfig',
             'SlapdMonitor',
             'SlapdConns',
