@@ -63,7 +63,7 @@ CHECK_RESULT_WARNING = 1
 CHECK_RESULT_ERROR = 2
 CHECK_RESULT_UNKNOWN = 3
 
-# which check result to return in case server responds with 
+# which check result to return in case server responds with
 # ldap.UNAVAILABLE_CRITICAL_EXTENSION for no-op search control
 # set this to CHECK_RESULT_ERROR if certain your server supports the control
 CHECK_RESULT_NOOP_SRCH_UNAVAILABLE = CHECK_RESULT_OK
@@ -571,7 +571,7 @@ class OpenLDAPObject:
 
     def get_context_csn(self, naming_context):
         """
-        read the contextCSN values from the backends root entry specified 
+        read the contextCSN values from the backends root entry specified
         by `naming_context'
         """
         ldap_result = self.search_s(
@@ -688,8 +688,7 @@ class OpenLDAPObject:
                     noop_srch_ctrl[0].numSearchResults,
                     noop_srch_ctrl[0].numSearchContinuations,
                 )
-            else:
-                return None
+            return None
 
 
 class SlapdCheckLDAPObject(ReconnectLDAPObject, OpenLDAPObject):
@@ -858,19 +857,20 @@ class SlapdCheck(LocalCheck):
             )[0]
             server_cert_pem = open(config_tls_attrs['olcTLSCertificateFile'][0], 'rb').read()
             server_cert_obj = cryptography.x509.load_pem_x509_certificate(server_cert_pem, crypto_default_backend())
-            cert_validity_days = (server_cert_obj.not_valid_after - datetime.datetime.utcnow()).days
-            if cert_validity_days <= CERT_ERROR_DAYS:
+            cert_validity_rest = (server_cert_obj.not_valid_after - datetime.datetime.utcnow())
+            if cert_validity_rest.days <= CERT_ERROR_DAYS:
                 cert_check_result = CHECK_RESULT_ERROR
-            elif cert_validity_days <= CERT_WARN_DAYS:
+            elif cert_validity_rest.days <= CERT_WARN_DAYS:
                 cert_check_result = CHECK_RESULT_WARNING
             else:
                 cert_check_result = CHECK_RESULT_OK
             self.result(
                 cert_check_result,
                 'SlapdCert',
-                check_output='Server cert valid until %s UTC (%d days ahead), path name %r' % (
+                check_output='Server cert valid until %s UTC (%d days ahead, %0.1f %% elapsed), path name %r' % (
                     server_cert_obj.not_valid_after,
-                    cert_validity_days,
+                    cert_validity_rest.days,
+                    100-100*float(cert_validity_rest.total_seconds())/(server_cert_obj.not_valid_after-server_cert_obj.not_valid_before).total_seconds(),
                     config_tls_attrs['olcTLSCertificateFile'][0],
                 ),
             )
@@ -1162,7 +1162,7 @@ class SlapdCheck(LocalCheck):
                             NOOP_SEARCH_TIMEOUT
                         )
                     )
-                except ldap.UNAVAILABLE_CRITICAL_EXTENSION, ldap_error:
+                except ldap.UNAVAILABLE_CRITICAL_EXTENSION:
                     self.result(
                         CHECK_RESULT_NOOP_SRCH_UNAVAILABLE,
                         item_name,
