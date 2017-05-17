@@ -718,7 +718,7 @@ class RequestPasswordReset(BaseApp):
                 ldap_entry['mail'][0]
                 for _, ldap_entry in ldap_results or []
             ]
-        return admin_addrs or PWD_ADMIN_MAILTO
+        return sorted(set(admin_addrs or PWD_ADMIN_MAILTO))
 
     def _send_pw(self, username, user_dn, user_entry, temp_pwd_clear):
         """
