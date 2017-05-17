@@ -201,7 +201,7 @@ class AEDIRPwdJob(aedir.process.AEProcess):
                 user_data['admin_mail'] = u'unknown'
                 for admin_dn_attr in ('modifiersName', 'creatorsName'):
                     try:
-                        admin_dn, admin_entry = self.ldap_conn.search_ext_s(
+                        _, admin_entry = self.ldap_conn.search_ext_s(
                             ldap_entry[admin_dn_attr][0],
                             ldap.SCOPE_BASE,
                             filterstr=FILTERSTR_USER.encode('utf-8'),
@@ -235,7 +235,7 @@ class AEDIRPwdJob(aedir.process.AEProcess):
 
         if not pwd_expire_warning_list:
             self.logger.info('No results => no notifications')
-        elif not USER_MAIL_ENABLED==True:
+        elif USER_MAIL_ENABLED is not True:
             self.logger.info(
                 'Sending e-mails is disabled => supressed %d notifications',
                 len(pwd_expire_warning_list),
