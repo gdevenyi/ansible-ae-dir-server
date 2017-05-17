@@ -47,9 +47,9 @@ PWD_EXPIRYWARN_FILTER_TMPL = (
         '(uid=*)'
         '(displayName=*)'
         '(mail=*)'
-        '(pwdPolicySubentry=%(pwdpolicy)s)'
-        '(pwdChangedTime>=%(pwdchangedtime_ge)s)'
-        '(pwdChangedTime<=%(pwdchangedtime_le)s)'
+        '(pwdPolicySubentry={pwdpolicy})'
+        '(pwdChangedTime>={pwdchangedtime_ge})'
+        '(pwdChangedTime<={pwdchangedtime_le})'
     ')'
 )
 
@@ -68,7 +68,7 @@ sys.path.append(sys.argv[1])
 from aedirpwd_cnf import *
 
 # E-Mail subject for notification message
-PWD_EXPIRYWARN_MAIL_SUBJECT = u'Password of Æ-DIR account "%(user_uid)s" will expire soon!'
+PWD_EXPIRYWARN_MAIL_SUBJECT = u'Password of Æ-DIR account "{user_uid}" will expire soon!'
 # E-Mail body template file for notification message
 PWD_EXPIRYWARN_MAIL_TEMPLATE = os.path.join(TEMPLATES_DIRNAME, 'pwd_expiry_warning.txt')
 
@@ -166,7 +166,7 @@ class AEDIRPwdJob(aedir.process.AEProcess):
             }
             self.logger.debug('filterstr_inputs_dict = %s', filterstr_inputs_dict)
 
-            pwd_expirywarn_filter = PWD_EXPIRYWARN_FILTER_TMPL.format(filterstr_inputs_dict)
+            pwd_expirywarn_filter = PWD_EXPIRYWARN_FILTER_TMPL.format(**filterstr_inputs_dict)
 
             self.logger.debug(
                 'Search users for password expiry warning with %r',
@@ -253,8 +253,8 @@ class AEDIRPwdJob(aedir.process.AEProcess):
             notification_counter = 0
             for user_data in pwd_expire_warning_list:
                 to_addr = user_data['emailaddr']
-                smtp_message = smtp_message_tmpl % user_data
-                smtp_subject = PWD_EXPIRYWARN_MAIL_SUBJECT % user_data
+                smtp_message = smtp_message_tmpl.format(**user_data)
+                smtp_subject = PWD_EXPIRYWARN_MAIL_SUBJECT.format(**user_data)
                 self.logger.debug('smtp_subject = %r', smtp_subject)
                 self.logger.debug('smtp_message = %r', smtp_message)
                 try:

@@ -318,7 +318,7 @@ class BaseApp(Default):
             ldap.strf_secs(time.time())
         )
         filterstr = (
-            self.filterstr_template % filterstr_inputs_dict
+            self.filterstr_template.format(**filterstr_inputs_dict)
         ).encode('utf-8')
         self.logger.debug(
             '%s.search_user_entry() base=%r filterstr=%r',
@@ -753,8 +753,8 @@ class RequestPasswordReset(BaseApp):
                 'app_path_prefix':APP_PATH_PREFIX,
                 'ldap_uri':self.ldap_conn.ldap_url_obj.initializeUrl(),
             }
-            smtp_message = smtp_message_tmpl % user_data_admin
-            smtp_subject = EMAIL_SUBJECT_ADMIN % user_data_admin
+            smtp_message = smtp_message_tmpl.format(**user_data_admin)
+            smtp_subject = EMAIL_SUBJECT_ADMIN.format(**user_data_admin)
             admin_addrs = self._get_admin_mailaddrs(user_dn)
             smtp_conn.send_simple_message(
                 SMTP_FROM,
@@ -785,8 +785,8 @@ class RequestPasswordReset(BaseApp):
             'ldap_uri':self.ldap_conn.ldap_url_obj.initializeUrl(),
             'admin_email_addrs':u'\n'.join(admin_addrs),
         }
-        smtp_message = smtp_message_tmpl % user_data_user
-        smtp_subject = EMAIL_SUBJECT_PERSONAL % user_data_user
+        smtp_message = smtp_message_tmpl.format(**user_data_user)
+        smtp_subject = EMAIL_SUBJECT_PERSONAL.format(**user_data_user)
         smtp_conn.send_simple_message(
             SMTP_FROM,
             [to_addr.encode('utf-8')],

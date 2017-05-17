@@ -8,9 +8,9 @@ PWD_LDAP_URL = r'{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub??trace=0,x-sas
 
 # Filter string templates for the various use-cases
 # String-keyed dictionary with input field names used
-FILTERSTR_CHANGEPW = ur'(&(objectClass=aeUser)(aeStatus=0)(uid=%(username)s))'
-FILTERSTR_REQUESTPW = ur'(&(objectClass=aeUser)(aeStatus=0)(uid=%(username)s)(mail=%(email)s))'
-FILTERSTR_RESETPW = ur'(&(objectClass=aeUser)(aeStatus=0)(uid=%(username)s)(objectClass=msPwdResetObject)(msPwdResetTimestamp<=%(currenttime)s)(msPwdResetExpirationTime>=%(currenttime)s))'
+FILTERSTR_CHANGEPW = ur'(&(objectClass=aeUser)(aeStatus=0)(uid={username}))'
+FILTERSTR_REQUESTPW = ur'(&(objectClass=aeUser)(aeStatus=0)(uid={username})(mail={email}))'
+FILTERSTR_RESETPW = ur'(&(objectClass=aeUser)(aeStatus=0)(uid={username})(objectClass=msPwdResetObject)(msPwdResetTimestamp<={currenttime})(msPwdResetExpirationTime>={currenttime}))'
 
 # Filter string template for finding an active user entry
 # mainly used to inform about who did something and send e-mail to
@@ -57,12 +57,12 @@ PWD_TMP_HASH_ALGO = '2.16.840.1.101.3.4.2.3' # sha512 [RFC4055]
 PWD_TMP_CHARS = u'abcdefghijkmnopqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ23456789'
 
 # Filename of template for sending e-mail message to user
-EMAIL_SUBJECT_PERSONAL = u'Your temporary reset password for %(username)s'
+EMAIL_SUBJECT_PERSONAL = u'Your temporary reset password for "{username}"'
 EMAIL_TEMPLATE_PERSONAL = TEMPLATES_DIRNAME+'requestpw_user.txt'
 
 # Filename of template for sending e-mail message to admin
 # with second portion of clear-text password
-EMAIL_SUBJECT_ADMIN = u'Password reset for %(username)s needs help'
+EMAIL_SUBJECT_ADMIN = u'Password reset for "{username}" needs help'
 EMAIL_TEMPLATE_ADMIN = TEMPLATES_DIRNAME+'requestpw_admin.txt'
 
 # SMTP server used as smart host (SMTP relay)

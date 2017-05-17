@@ -10,13 +10,13 @@ If someone falsely invoked the password request you can simply
 ignore this message.
 
 User name:
-%(username)s
+{username}
 
 Distinguished name of user entry:
-%(userdn)s
+{userdn}
 
 IP address from which password reset was invoked:
-%(remote_ip)s
+{remote_ip}
 
 Show user entry with reset password:
-https://%(web_ctx_host)s/web2ldap?%(ldap_uri)s/%(userdn)s??base??bindname=
+https://{web_ctx_host}/web2ldap?{ldap_uri}/{userdn}??base??bindname=
