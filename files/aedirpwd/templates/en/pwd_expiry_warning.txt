@@ -33,14 +33,14 @@ Created/activated by:
 
 You can request a temporary password for your account here:
 
-https://{web_ctx_host}{app_path_prefix}/requestpw?username={user_uid}
+https://%(web_ctx_host)s%(app_path_prefix)s/requestpw?username=%(user_uid)s
 
 Note: You will need the zone admin to provide a separate reset password.
 
 You can find detailed documentation about password reset process in
 the user guide:
 
-https://{web_ctx_host}/pwd.html#reset-procedure
+https://%(web_ctx_host)s/pwd.html#reset-procedure
 
 ------------------------------------------------------------------------
 
