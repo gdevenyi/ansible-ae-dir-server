@@ -9,7 +9,7 @@ user entries.
 Author: Michael Ströder <michael@stroeder.com>
 """
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 # from Python's standard lib
 import os
@@ -166,7 +166,7 @@ class AEDIRPwdJob(aedir.process.AEProcess):
             }
             self.logger.debug('filterstr_inputs_dict = %s', filterstr_inputs_dict)
 
-            pwd_expirywarn_filter = PWD_EXPIRYWARN_FILTER_TMPL % filterstr_inputs_dict
+            pwd_expirywarn_filter = PWD_EXPIRYWARN_FILTER_TMPL.format(filterstr_inputs_dict)
 
             self.logger.debug(
                 'Search users for password expiry warning with %r',
