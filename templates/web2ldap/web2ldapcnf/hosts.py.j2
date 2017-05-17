@@ -214,7 +214,11 @@ ae_dir_config = Web2LDAPConfig(
     'createTimestamp','modifyTimestamp','creatorsName','modifiersName',
   ],
   login_template=os.path.join(web2ldapcnf.templates_dir,'ae-dir','login.html'),
-  addform_parent_attrs=['entryCSN'],
+  addform_parent_attrs=[
+    'entryCSN',
+    'creatorsName',
+    'modifiersName',
+  ],
   search_attrs=[
     'aeDept',
     'aeDevicePort',
