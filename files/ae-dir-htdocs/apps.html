@@ -25,9 +25,8 @@
         <a href="#pam-nss-simple">Simple PAM/NSS clients</a>
         <ol>
           <li><a href="#pam-nss-sssd">sssd</a></li>
-        </ol>
-        <ol>
           <li><a href="#pam-nss-nslcd">nss-pam-ldapd (aka nslcd)</a></li>
+          <li><a href="#nsscache">nsscache</a></li>
         </ol>
       </li>
       <li><a href="#pam-nss-smart">Smart PAM/NSS clients</a></li>
@@ -261,6 +260,13 @@
     <a href="https://arthurdejong.org/nss-pam-ldapd/nslcd.conf.5">nslcd.conf(5) manual page</a>
   </li>
 </ul>
+
+<h3 id="nsscache">nsscache</h3>
+<p>
+  If you like syncing the NSS maps locally for off-line use you can
+  look at <a href="https://github.com/google/nsscache">nsscache</a>
+  and its NSS module <a href="https://github.com/google/libnss-cache">libnss-cache</a>.
+</p>
 
 <h2 id="pam-nss-smart">Smart PAM/NSS clients</h2>
 <p>Smart clients optimized for &AElig;-DIR should do the following:</p>

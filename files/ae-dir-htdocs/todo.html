@@ -229,7 +229,7 @@
     more efficiently without local configuration (see notes about
     <a href="apps.html#pam-nss-smart">smart clients</a>)
   </dd>
-  <dt>Automation / Recovery on error</dt>
+  <dt>Automation / Recovery on error (PAM)</dt>
   <dd>
     special system user for
     <a href="docs.html#schema-oc-aeHost">aeHost</a> with host
@@ -302,6 +302,11 @@
         Support using X.509 TLS client certs for
         <a href="apps.html#sasl-external-bind">SASL/EXTERNAL</a>
         bind
+      </li>
+      <li>
+        Look at off-line sync with
+        <a href="https://github.com/google/nsscache">nsscache</a> /
+        <a href="https://github.com/google/libnss-cache">libnss-cache</a>
       </li>
     </ul>
   </dd>
