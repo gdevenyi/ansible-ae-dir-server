@@ -302,11 +302,19 @@ syntax_registry.registerAttrType(
 )
 
 
-class AEUserId(IA5String):
+class AEUid(IA5String):
+  oid = 'AEUid-oid'
+  simpleSanitizers = (
+    str.strip,
+    str.lower,
+  )
+
+
+class AEUserUid(AEUid):
   """
   Class for auto-generating values for aeUser -> uid
   """
-  oid = 'AEUserId-oid'
+  oid = 'AEUserUid-oid'
   desc = 'AE-DIR: User name'
   maxValues = 1
   minLen = 4
@@ -315,6 +323,10 @@ class AEUserId(IA5String):
   UID_LETTERS = 'abcdefghijklmnopqrstuvwxyz'
   reobj = re.compile('^%s$' % (UID_LETTERS))
   genLen = 4
+  simpleSanitizers = (
+    str.strip,
+    str.lower,
+  )
 
   def __init__(self,sid,form,ls,dn,schema,attrType,attrValue,entry=None):
     IA5String.__init__(self,sid,form,ls,dn,schema,attrType,attrValue,entry=entry)
@@ -357,11 +369,24 @@ class AEUserId(IA5String):
     return attrValue.strip().lower()
 
 syntax_registry.registerAttrType(
-  AEUserId.oid,[
+  AEUserUid.oid,[
     '0.9.2342.19200300.100.1.1', # uid
   ],
   structural_oc_oids=[
     AE_USER_OID, # aeUser
+  ],
+)
+
+
+class AEServiceUid(AEUid):
+  oid = 'AEServiceUid-oid'
+
+syntax_registry.registerAttrType(
+  AEServiceUid.oid,[
+    '0.9.2342.19200300.100.1.1', # uid
+  ],
+  structural_oc_oids=[
+    AE_SERVICE_OID, # aeService
   ],
 )
 
