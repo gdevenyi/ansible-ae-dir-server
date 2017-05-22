@@ -60,9 +60,6 @@ FILTERSTR_USER = ur'(&(objectClass=aeUser)(aeStatus=0)(displayName=*)(mail=*))'
 # Maximum timespan to search for password-less entries in the past
 NOTIFY_OLDEST_TIMESPAN = 1.75 * 86400.0
 
-# path prefix used in HTTP(S) URLs pointing to password self-service
-WEB_PATH_PREFIX = u'/pwd'
-
 # Import constants from configuration module
 sys.path.append(sys.argv[1])
 from aedirpwd_cnf import *
@@ -195,7 +192,7 @@ class AEDIRPwdJob(aedir.process.AEProcess):
                     'fromaddr':SMTP_FROM,
                     'user_dn':ldap_dn.decode('utf-8'),
                     'web_ctx_host':(WEB_CTX_HOST).decode('ascii'),
-                    'app_path_prefix':WEB_PATH_PREFIX,
+                    'app_path_prefix':APP_PATH_PREFIX,
                 }
                 user_data['admin_cn'] = u'unknown'
                 user_data['admin_mail'] = u'unknown'
