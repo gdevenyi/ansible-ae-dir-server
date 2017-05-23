@@ -1517,6 +1517,10 @@ syncprov-reloadhint TRUE
 syncrepl rid=0{{ loop.index }}
   provider=ldaps://{{ hostvars[provider_replica].get('openldap_service_fqdn',provider_replica) }}
   type=refreshAndPersist
+  network-timeout={{ openldap_syncrepl_network_timeout }}
+  timeout={{ openldap_syncrepl_timeout }}
+  sizelimit=unlimited
+  timelimit=unlimited
   interval=00:00:01:00
   retry="30 +"
   keepalive=240:10:30

@@ -372,6 +372,10 @@ openldap_csr_subjectaltnames:
 # normal for production: stats
 openldap_log_level: "stats"
 
+# timeout parameters (secs) for syncrepl described in slapd.conf(5)
+openldap_syncrepl_network_timeout: 5
+openldap_syncrepl_timeout: 5
+
 # how many worker threads are started
 # RAM needed per thread: 4MB on 32 bit systems, 8MB on 64 bit systems
 # rule-of-thumb: 4 per real CPU core
