@@ -711,6 +711,8 @@ class SlapdCheckLDAPObject(ReconnectLDAPObject, OpenLDAPObject):
             retry_max=1,
             retry_delay=60.0,
             tls_options=None,
+            network_timeout=LDAP_TIMEOUT,
+            timeout=LDAP_TIMEOUT,
         ):
         ReconnectLDAPObject.__init__(
             self,
@@ -726,8 +728,8 @@ class SlapdCheckLDAPObject(ReconnectLDAPObject, OpenLDAPObject):
         # Switch of automatic alias dereferencing
         self.set_option(ldap.OPT_DEREF, ldap.DEREF_NEVER)
         # Set timeout values
-        self.set_option(ldap.OPT_NETWORK_TIMEOUT, LDAP_TIMEOUT)
-        self.set_option(ldap.OPT_TIMEOUT, LDAP_TIMEOUT)
+        self.set_option(ldap.OPT_NETWORK_TIMEOUT, network_timeout)
+        self.set_option(ldap.OPT_TIMEOUT, timeout)
         # Force server cert validation
         self.set_option(
             ldap.OPT_X_TLS_REQUIRE_CERT,
@@ -1434,7 +1436,7 @@ class SlapdCheck(LocalCheck):
 
         remote_csn_dict = {}
 
-        for syncrepl_target_uri in syncrepl_topology.keys():
+        for syncrepl_target_uri in syncrepl_topology.items():
 
             syncrepl_target_lu_obj = LDAPUrl(syncrepl_target_uri)
             # FIX ME! Does not hurt here, but in theory TLS options could
@@ -1480,6 +1482,8 @@ class SlapdCheck(LocalCheck):
                         (ldap.OPT_X_TLS_CERTFILE, syncrepl_obj.tls_cert),
                         (ldap.OPT_X_TLS_KEYFILE, syncrepl_obj.tls_key),
                     ),
+                    network_timeout=syncrepl_obj.network_timeout,
+                    timeout=syncrepl_obj.timeout,
                 )
             except CatchAllException, exc:
                 self.result(
