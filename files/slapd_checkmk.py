@@ -136,20 +136,20 @@ class LocalCheck(object):
         CHECK_RESULT_UNKNOWN: 'UNKNOWN',
     }
     item_name_special_chars = set(ITEM_NAME_SPECIAL_CHARS)
+    item_names = None
 
-    def __init__(self, item_names, output_file, output_encoding, state_filename=None):
+    def __init__(self, output_file, output_encoding, state_filename=None, item_names=None):
         """
-        item_names
-            List/tuple of all known check_mk item names this check should output
         output_file
             fileobj where to write the output
         output_encoding
             encoding to use when writing output
             'ascii' is always safe, Nagios mandates 'utf-8'
         """
-        self._item_names = []
         self._item_dict = {}
-        for item_name in item_names:
+        for item_name in self.item_names or []:
+            self.add_item(item_name)
+        for item_name in item_names or []:
             self.add_item(item_name)
         self._output_file = output_file
         self._output_encoding = output_encoding
@@ -200,9 +200,8 @@ class LocalCheck(object):
         """
         Preregister a check item by name
         """
-        if item_name in self._item_names:
+        if item_name in self._item_dict:
             raise ValueError('Check item name %r already exists.' % (item_name))
-        self._item_names.append(item_name)
         self._item_dict[item_name] = None
 
     def subst_item_name_chars(self, item_name):
@@ -233,7 +232,7 @@ class LocalCheck(object):
         except KeyError:
             raise ValueError('item_name %r not in known item names %r' % (
                 item_name,
-                self._item_names,
+                self._item_dict.keys(),
             ))
         self._item_dict[item_name] = (
             str(status),
@@ -249,9 +248,7 @@ class LocalCheck(object):
         """
         Outputs all check results registered before with method result()
         """
-        item_names = self._item_names
-        item_names.sort()
-        for i in item_names:
+        for i in sorted(self._item_dict.keys()):
             if not self._item_dict[i]:
                 self.result(
                     CHECK_RESULT_UNKNOWN,
@@ -778,6 +775,20 @@ class SlapdCheck(LocalCheck):
     """
     Check class for OpenLDAP's slapd
     """
+    item_names = (
+        'SlapdBdbCaches',
+        'SlapdCert',
+        'SlapdConfig',
+        'SlapdMonitor',
+        'SlapdConns',
+        'SlapdDatabases',
+        'SlapdOps',
+        'SlapdReplTopology',
+        'SlapdSASLHostname',
+        'SlapdSelfConn',
+        'SlapdStats',
+        'SlapdThreads',
+    )
 
     def checks(self):
 
@@ -1661,20 +1672,6 @@ def run():
     run the script
     """
     slapd_check = SlapdCheck(
-        (
-            'SlapdBdbCaches',
-            'SlapdCert',
-            'SlapdConfig',
-            'SlapdMonitor',
-            'SlapdConns',
-            'SlapdDatabases',
-            'SlapdOps',
-            'SlapdReplTopology',
-            'SlapdSASLHostname',
-            'SlapdSelfConn',
-            'SlapdStats',
-            'SlapdThreads',
-        ),
         output_file=sys.stdout,
         output_encoding='ascii',
         state_filename=STATE_FILENAME,
