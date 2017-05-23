@@ -1436,7 +1436,7 @@ class SlapdCheck(LocalCheck):
 
         remote_csn_dict = {}
 
-        for syncrepl_target_uri in syncrepl_topology.items():
+        for syncrepl_target_uri in syncrepl_topology.keys():
 
             syncrepl_target_lu_obj = LDAPUrl(syncrepl_target_uri)
             # FIX ME! Does not hurt here, but in theory TLS options could
@@ -1482,8 +1482,8 @@ class SlapdCheck(LocalCheck):
                         (ldap.OPT_X_TLS_CERTFILE, syncrepl_obj.tls_cert),
                         (ldap.OPT_X_TLS_KEYFILE, syncrepl_obj.tls_key),
                     ),
-                    network_timeout=syncrepl_obj.network_timeout,
-                    timeout=syncrepl_obj.timeout,
+                    network_timeout=float(syncrepl_obj.network_timeout),
+                    timeout=float(syncrepl_obj.timeout),
                 )
             except CatchAllException, exc:
                 self.result(
