@@ -34,6 +34,10 @@ import logging
 import cryptography.x509
 from cryptography.hazmat.backends import default_backend as crypto_default_backend
 
+# Switch off processing .ldaprc or ldap.conf
+# before importing python-ldap (libldap)
+os.environ['LDAPNOINIT'] = '0'
+
 # from python-ldap
 import ldap
 import ldap.sasl
@@ -51,7 +55,7 @@ from pyasn1.codec.ber import decoder
 # Configuration constants
 #-----------------------------------------------------------------------
 
-__version__ = '1.1.3'
+__version__ = '1.2.0'
 
 STATE_FILENAME = 'slapd_checkmk.state'
 
@@ -777,19 +781,13 @@ class SlapdCheck(LocalCheck):
 
     def checks(self):
 
-        # Determine own fully-qualified domain name
-        host_fqdn = socket.getfqdn()
-
         # Get command-line arguments
         local_ldapi_url = sys.argv[1] or 'ldapi:///'
-        ldaps_uri = sys.argv[2] or 'ldaps://%s' % host_fqdn
+        ldaps_uri = sys.argv[2] or 'ldaps://%s' % socket.getfqdn()
         my_authz_id = sys.argv[3]
 
         # ldap.set_option(ldap.OPT_DEBUG_LEVEL,255)
         ldap._trace_level = PYLDAP_TRACE_LEVEL
-
-        # Switch off processing .ldaprc or ldap.conf
-        os.environ['LDAPNOINIT'] = '0'
 
         # Connect and bind with LDAPI mainly to read cn=config and cn=monitor later
         #----------------------------------------------------------------------
@@ -845,17 +843,43 @@ class SlapdCheck(LocalCheck):
                     monitor_context,
                 )
             )
-            _, config_tls_attrs = ldap_conn.search_ext_s(
+            _, self._config_attrs = ldap_conn.search_ext_s(
                 config_context,
                 ldap.SCOPE_BASE,
                 '(objectClass=*)',
                 [
+                    'olcSaslHost',
                     'olcTLSCACertificateFile',
                     'olcTLSCertificateFile',
                     'olcTLSCertificateKeyFile',
                 ],
             )[0]
-            server_cert_pem = open(config_tls_attrs['olcTLSCertificateFile'][0], 'rb').read()
+
+            try:
+                olc_sasl_host = self._config_attrs['olcSaslHost'][0]
+            except (KeyError, IndexError):
+                self.result(
+                    CHECK_RESULT_OK,
+                    'SlapdSASLHostname',
+                    check_output='olcSaslHost not set'
+                )
+            else:
+                try:
+                    _ = socket.gethostbyname(olc_sasl_host)
+                except socket.gaierror, socket_err:                    
+                    self.result(
+                        CHECK_RESULT_WARNING,
+                        'SlapdSASLHostname',
+                        check_output='olcSaslHost %r not found: %r' % (olc_sasl_host, socket_err),
+                    )
+                else:
+                    self.result(
+                        CHECK_RESULT_OK,
+                        'SlapdSASLHostname',
+                        check_output='olcSaslHost %r found' % (olc_sasl_host),
+                    )
+
+            server_cert_pem = open(self._config_attrs['olcTLSCertificateFile'][0], 'rb').read()
             server_cert_obj = cryptography.x509.load_pem_x509_certificate(server_cert_pem, crypto_default_backend())
             cert_validity_rest = (server_cert_obj.not_valid_after - datetime.datetime.utcnow())
             if cert_validity_rest.days <= CERT_ERROR_DAYS:
@@ -871,7 +895,7 @@ class SlapdCheck(LocalCheck):
                     server_cert_obj.not_valid_after,
                     cert_validity_rest.days,
                     100-100*float(cert_validity_rest.total_seconds())/(server_cert_obj.not_valid_after-server_cert_obj.not_valid_before).total_seconds(),
-                    config_tls_attrs['olcTLSCertificateFile'][0],
+                    self._config_attrs['olcTLSCertificateFile'][0],
                 ),
             )
 
@@ -883,11 +907,11 @@ class SlapdCheck(LocalCheck):
                     # Set TLS connection options from TLS attribute read from
                     # configuration context
                     # path name of file containing all trusted CA certificates
-                    (ldap.OPT_X_TLS_CACERTFILE, config_tls_attrs['olcTLSCACertificateFile'][0]),
+                    (ldap.OPT_X_TLS_CACERTFILE, self._config_attrs['olcTLSCACertificateFile'][0]),
                     # Use slapd server cert/key for client authentication
                     # just like used for syncrepl
-                    (ldap.OPT_X_TLS_CERTFILE, config_tls_attrs['olcTLSCertificateFile'][0]),
-                    (ldap.OPT_X_TLS_KEYFILE, config_tls_attrs['olcTLSCertificateKeyFile'][0]),
+                    (ldap.OPT_X_TLS_CERTFILE, self._config_attrs['olcTLSCertificateFile'][0]),
+                    (ldap.OPT_X_TLS_KEYFILE, self._config_attrs['olcTLSCertificateKeyFile'][0]),
                 ),
             )
         except CatchAllException, exc:
@@ -897,7 +921,7 @@ class SlapdCheck(LocalCheck):
                 check_output='Error connecting to %r: %s %s' % (
                     ldaps_uri,
                     exc,
-                    config_tls_attrs,
+                    self._config_attrs,
                 )
             )
         else:
@@ -1461,9 +1485,10 @@ class SlapdCheck(LocalCheck):
                 self.result(
                     CHECK_RESULT_OK,
                     item_name,
-                    check_output='connection to replication target %r (%s) working' % (
+                    check_output='Successfully connected to provider %r (%s) as %r' % (
                         syncrepl_target_uri,
                         syncrepl_target_ipaddr,
+                        ldap_conn.whoami_s(),
                     ),
                 )
                 remote_csn_dict[ldap_conn._uri.lower()] = {}
@@ -1645,6 +1670,7 @@ def run():
             'SlapdDatabases',
             'SlapdOps',
             'SlapdReplTopology',
+            'SlapdSASLHostname',
             'SlapdSelfConn',
             'SlapdStats',
             'SlapdThreads',
