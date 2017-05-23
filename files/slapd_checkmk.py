@@ -865,7 +865,7 @@ class SlapdCheck(LocalCheck):
                 )
             else:
                 try:
-                    _ = socket.gethostbyname(olc_sasl_host)
+                    _ = socket.getaddrinfo(olc_sasl_host, None)
                 except socket.gaierror, socket_err:                    
                     self.result(
                         CHECK_RESULT_WARNING,
