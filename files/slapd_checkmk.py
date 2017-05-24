@@ -59,8 +59,6 @@ __version__ = '1.2.0'
 
 STATE_FILENAME = 'slapd_checkmk.state'
 
-PYLDAP_TRACE_LEVEL = 0
-
 # constants for the check result codes
 CHECK_RESULT_OK = 0
 CHECK_RESULT_WARNING = 1
@@ -120,6 +118,11 @@ CatchAllException = (Exception, ldap.LDAPError)
 CERT_ERROR_DAYS = 10
 CERT_WARN_DAYS = 50
 
+# set debug parameters for development (normally not needed)
+# ldap.set_option(ldap.OPT_DEBUG_LEVEL,255)
+ldap._trace_level = 1
+ldap._trace_file = sys.stderr
+
 #-----------------------------------------------------------------------
 # Classes
 #-----------------------------------------------------------------------
@@ -137,8 +140,9 @@ class LocalCheck(object):
     }
     item_name_special_chars = set(ITEM_NAME_SPECIAL_CHARS)
     item_names = None
+    output_encoding = 'ascii'
 
-    def __init__(self, output_file, output_encoding, state_filename=None, item_names=None):
+    def __init__(self, output_file, state_filename=None):
         """
         output_file
             fileobj where to write the output
@@ -149,13 +153,10 @@ class LocalCheck(object):
         self._item_dict = {}
         for item_name in self.item_names or []:
             self.add_item(item_name)
-        for item_name in item_names or []:
-            self.add_item(item_name)
         self._output_file = output_file
-        self._output_encoding = output_encoding
         if state_filename != None:
             # Initialize local state file and read old state if it exists
-            self._state = CheckStateFile(STATE_FILENAME)
+            self._state = CheckStateFile(state_filename)
             # Generate *new* state dict to be updated within check and stored
             # later
             self._next_state = {}
@@ -257,7 +258,7 @@ class LocalCheck(object):
                 )
             sys.stdout.write(
                 u'%s\n' % u' '.join(self._item_dict[i]).encode(
-                    self._output_encoding)
+                    self.output_encoding)
             )
         return  # output()
 
@@ -504,7 +505,11 @@ class OpenLDAPObject:
           '(olcSuffix=*)'
         ')'
     )
-
+    naming_context_attrs = [
+        'configContext',
+        'namingContexts',
+        'monitorContext',
+    ]
     all_real_db_filter = (
         '(&'
           '(|'
@@ -534,13 +539,18 @@ class OpenLDAPObject:
         'seeAlso',
     ]
 
-    def get_monitor_entries(self, monitor_context):
+    def __getattr__(self, name):
+        if name in self.naming_context_attrs:
+            if not name in self.__dict__:
+                self.get_naming_context_attrs()
+            return self.__dict__[name]
+
+    def get_monitor_entries(self):
         """
-        returns dict of all monitoring entries read from backend with
-        suffix `monitor_context'
+        returns dict of all monitoring entries
         """
         return dict(self.search_s(
-            monitor_context,
+            self.monitorContext[0],
             ldap.SCOPE_SUBTREE,
             self.all_monitor_entries_filter,
             attrlist=self.all_monitor_entries_attrs,
@@ -556,19 +566,35 @@ class OpenLDAPObject:
             '(objectClass=*)',
             attrlist=attrlist or ['*', '+'],
         )[0]
+        for nc_attr in self.naming_context_attrs:
+            if nc_attr in ldap_rootdse:
+                self.__setattr__(nc_attr, ldap_rootdse[nc_attr])
         return ldap_rootdse  # get_rootdse_attrs()
 
     def get_naming_context_attrs(self):
         """
         returns all naming contexts including special backends
         """
-        return self.get_rootdse_attrs(
-            attrlist=[
-                'configContext',
-                'namingContexts',
-                'monitorContext',
-            ]
+        return self.get_rootdse_attrs(attrlist=self.naming_context_attrs)
+
+    def get_sock_listeners(self):
+        """
+        search `self.configContext[0]' for back-sock listeners (DB and overlay)
+        """
+        ldap_result = self.search_s(
+            naming_context,
+            ldap.SCOPE_BASE,
+            '(&(|(objectClass=olcDbSocketConfig)(objectClass=olcOvSocketConfig))(olcDbSocketPath=*))',
+            attrlist=['olcDbSocketPath', 'olcOvSocketOps'],
         )
+        result = {}
+        for _, sock_entry in ldap_result:
+            socket_path = sock_entry['olcDbSocketPath'][0]
+            result[self.subst_item_name_chars(socket_path)] = (
+                socket_path,
+                '/'.join(sock_entry['olcOvSocketOps']),
+            )
+        return result
 
     def get_context_csn(self, naming_context):
         """
@@ -594,12 +620,12 @@ class OpenLDAPObject:
                 )
         return csn_dict
 
-    def get_syncrepl_topology(self, config_context):
+    def get_syncrepl_topology(self):
         """
         returns list, dict of syncrepl configuration
         """
         ldap_result = self.search_s(
-            config_context,
+            self.configContext[0],
             ldap.SCOPE_ONELEVEL,
             self.syncrepl_filter,
             attrlist=['olcDatabase', 'olcSuffix', 'olcSyncrepl'],
@@ -630,12 +656,12 @@ class OpenLDAPObject:
                     ]
         return syncrepl_list, syncrepl_topology  # get_syncrepl_topology()
 
-    def db_suffixes(self, config_context):
+    def db_suffixes(self):
         """
         Returns suffixes of all real database backends
         """
         ldap_result = self.search_s(
-            config_context,
+            self.configContext[0],
             ldap.SCOPE_ONELEVEL,
             self.all_real_db_filter,
             attrlist=['olcDatabase', 'olcSuffix', 'olcDbDirectory'],
@@ -705,8 +731,8 @@ class SlapdCheckLDAPObject(ReconnectLDAPObject, OpenLDAPObject):
     def __init__(
             self,
             uri,
-            trace_level=0,
-            trace_file=None,
+            trace_level=ldap._trace_level,
+            trace_file=ldap._trace_file,
             trace_stack_limit=8,
             retry_max=1,
             retry_delay=60.0,
@@ -799,17 +825,11 @@ class SlapdCheck(LocalCheck):
         ldaps_uri = sys.argv[2] or 'ldaps://%s' % socket.getfqdn()
         my_authz_id = sys.argv[3]
 
-        # ldap.set_option(ldap.OPT_DEBUG_LEVEL,255)
-        ldap._trace_level = PYLDAP_TRACE_LEVEL
-
         # Connect and bind with LDAPI mainly to read cn=config and cn=monitor later
         #----------------------------------------------------------------------
 
         try:
-            ldap_conn = SlapdCheckLDAPObject(
-                local_ldapi_url,
-                trace_level=PYLDAP_TRACE_LEVEL
-            )
+            ldap_conn = SlapdCheckLDAPObject(local_ldapi_url)
             # Find out whether bind worked
             local_wai = ldap_conn.whoami_s()
         except CatchAllException, exc:
@@ -829,8 +849,6 @@ class SlapdCheck(LocalCheck):
 
         try:
             naming_contexts = ldap_conn.get_naming_context_attrs()
-            config_context = naming_contexts['configContext'][0]
-            monitor_context = naming_contexts['monitorContext'][0]
         except CatchAllException, exc:
             self.result(
                 CHECK_RESULT_ERROR,
@@ -852,12 +870,12 @@ class SlapdCheck(LocalCheck):
                 check_output='Successfully connected to %r as %r found %r and %r' % (
                     ldap_conn._uri,
                     local_wai,
-                    config_context,
-                    monitor_context,
+                    ldap_conn.configContext[0],
+                    ldap_conn.monitorContext[0],
                 )
             )
             _, self._config_attrs = ldap_conn.search_ext_s(
-                config_context,
+                ldap_conn.configContext[0],
                 ldap.SCOPE_BASE,
                 '(objectClass=*)',
                 [
@@ -879,7 +897,7 @@ class SlapdCheck(LocalCheck):
             else:
                 try:
                     _ = socket.getaddrinfo(olc_sasl_host, None)
-                except socket.gaierror, socket_err:                    
+                except socket.gaierror, socket_err:
                     self.result(
                         CHECK_RESULT_WARNING,
                         'SlapdSASLHostname',
@@ -915,7 +933,6 @@ class SlapdCheck(LocalCheck):
         try:
             ldaps_conn = SlapdCheckLDAPObject(
                 ldaps_uri,
-                trace_level=PYLDAP_TRACE_LEVEL,
                 tls_options=(
                     # Set TLS connection options from TLS attribute read from
                     # configuration context
@@ -972,10 +989,9 @@ class SlapdCheck(LocalCheck):
                     )
             ldaps_conn.unbind_s()
 
-#        syncrepl_list = []
         syncrepl_topology = {}
         try:
-            syncrepl_list, syncrepl_topology = ldap_conn.get_syncrepl_topology(config_context)
+            syncrepl_list, syncrepl_topology = ldap_conn.get_syncrepl_topology()
         except CatchAllException, exc:
             self.result(
                 CHECK_RESULT_ERROR,
@@ -1000,7 +1016,7 @@ class SlapdCheck(LocalCheck):
 
         monitor_dict = {}
         try:
-            monitor_dict = ldap_conn.get_monitor_entries(monitor_context)
+            monitor_dict = ldap_conn.get_monitor_entries()
         except CatchAllException, exc:
             self.result(
                 CHECK_RESULT_ERROR,
@@ -1016,7 +1032,7 @@ class SlapdCheck(LocalCheck):
                 'SlapdMonitor',
                 check_output='Successfully retrieved %d entries from %r on %r' % (
                     len(monitor_dict),
-                    monitor_context,
+                    ldap_conn.monitorContext[0],
                     ldap_conn._uri,
                 ),
             )
@@ -1024,7 +1040,7 @@ class SlapdCheck(LocalCheck):
         try:
             monitor_cache = OpenLDAPMonitorCache(
                 monitor_dict,
-                monitor_context,
+                ldap_conn.monitorContext[0],
             )
             current_connections = monitor_cache.get_value(
                 'cn=Current,cn=Connections',
@@ -1116,7 +1132,7 @@ class SlapdCheck(LocalCheck):
                 )
 
         try:
-            db_suffixes = ldap_conn.db_suffixes(config_context)
+            db_suffixes = ldap_conn.db_suffixes()
         except CatchAllException, exc:
             self.result(
                 CHECK_RESULT_ERROR,
@@ -1471,7 +1487,6 @@ class SlapdCheck(LocalCheck):
             try:
                 ldap_conn = SlapdCheckLDAPObject(
                     syncrepl_target_uri,
-                    trace_level=PYLDAP_TRACE_LEVEL,
                     tls_options=(
                         # Set TLS connection options from TLS attribute read from
                         # configuration context
@@ -1677,7 +1692,6 @@ def run():
     """
     slapd_check = SlapdCheck(
         output_file=sys.stdout,
-        output_encoding='ascii',
         state_filename=STATE_FILENAME,
     )
     slapd_check.run()
