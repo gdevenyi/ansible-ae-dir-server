@@ -74,6 +74,9 @@ CHECK_RESULT_NOOP_SRCH_UNAVAILABLE = CHECK_RESULT_OK
 # used for ldap.OPT_NETWORK_TIMEOUT and ldap.OPT_TIMEOUT
 LDAP_TIMEOUT = 4.0
 
+# Timeout in seconds when connecting to slapd-sock listener
+SLAPD_SOCK_TIMEOUT = 2.0
+
 # Time in seconds for searching all entries with the noop search control
 NOOP_SEARCH_TIMEOUT = 6.0
 # at least search root entry should be present
@@ -108,11 +111,8 @@ THREADS_ACTIVE_WARN_UPPER = 6
 # Too many pending threads should not occur
 THREADS_PENDING_WARN = 5
 
-# Special characters which have to be masked in check item names
-ITEM_NAME_SPECIAL_CHARS = '!:$%=\\'
-
-CatchAllException = (Exception, ldap.LDAPError)
-#CatchAllException = None
+CATCH_ALL_EXC = (Exception, ldap.LDAPError)
+#CATCH_ALL_EXC = None
 
 # days to warn/error when checking server cert validity
 CERT_ERROR_DAYS = 10
@@ -120,7 +120,7 @@ CERT_WARN_DAYS = 50
 
 # set debug parameters for development (normally not needed)
 # ldap.set_option(ldap.OPT_DEBUG_LEVEL,255)
-ldap._trace_level = 1
+ldap._trace_level = 2
 ldap._trace_file = sys.stderr
 
 #-----------------------------------------------------------------------
@@ -138,7 +138,7 @@ class LocalCheck(object):
         CHECK_RESULT_ERROR: 'ERROR',
         CHECK_RESULT_UNKNOWN: 'UNKNOWN',
     }
-    item_name_special_chars = set(ITEM_NAME_SPECIAL_CHARS)
+    item_name_special_chars = set('!:$%=/\\')
     item_names = None
     output_encoding = 'ascii'
 
@@ -290,7 +290,7 @@ class CheckStateFile(object):
                 if line
             ]
             return dict(state_tuple_list)
-        except CatchAllException:
+        except CATCH_ALL_EXC:
             return {}
 
     def write_state(self, state):
@@ -505,6 +505,15 @@ class OpenLDAPObject:
           '(olcSuffix=*)'
         ')'
     )
+    slapd_sock_filter = (
+        '(&'
+          '(|'
+            '(objectClass=olcDbSocketConfig)'
+            '(objectClass=olcOvSocketConfig)'
+          ')'
+          '(olcDbSocketPath=*)'
+        ')'
+    )
     naming_context_attrs = [
         'configContext',
         'namingContexts',
@@ -582,17 +591,17 @@ class OpenLDAPObject:
         search `self.configContext[0]' for back-sock listeners (DB and overlay)
         """
         ldap_result = self.search_s(
-            naming_context,
-            ldap.SCOPE_BASE,
-            '(&(|(objectClass=olcDbSocketConfig)(objectClass=olcOvSocketConfig))(olcDbSocketPath=*))',
+            self.configContext[0],
+            ldap.SCOPE_SUBTREE,
+            self.slapd_sock_filter,
             attrlist=['olcDbSocketPath', 'olcOvSocketOps'],
         )
         result = {}
         for _, sock_entry in ldap_result:
             socket_path = sock_entry['olcDbSocketPath'][0]
-            result[self.subst_item_name_chars(socket_path)] = (
+            result['SlapdSock_'+socket_path] = (
                 socket_path,
-                '/'.join(sock_entry['olcOvSocketOps']),
+                '/'.join(sorted(sock_entry['olcOvSocketOps'])),
             )
         return result
 
@@ -814,9 +823,153 @@ class SlapdCheck(LocalCheck):
         'SlapdReplTopology',
         'SlapdSASLHostname',
         'SlapdSelfConn',
+        'SlapdSock',
         'SlapdStats',
         'SlapdThreads',
     )
+
+    def _check_local_ldaps(self, ldaps_uri, my_authz_id):
+        """
+        Connect and bind to local slapd like a remote client
+        mainly to check whether LDAPS with client cert works and maps expected authz-DN
+        """
+        try:
+            ldaps_conn = SlapdCheckLDAPObject(
+                ldaps_uri,
+                tls_options=(
+                    # Set TLS connection options from TLS attribute read from
+                    # configuration context
+                    # path name of file containing all trusted CA certificates
+                    (ldap.OPT_X_TLS_CACERTFILE, self._config_attrs['olcTLSCACertificateFile'][0]),
+                    # Use slapd server cert/key for client authentication
+                    # just like used for syncrepl
+                    (ldap.OPT_X_TLS_CERTFILE, self._config_attrs['olcTLSCertificateFile'][0]),
+                    (ldap.OPT_X_TLS_KEYFILE, self._config_attrs['olcTLSCertificateKeyFile'][0]),
+                ),
+            )
+        except CATCH_ALL_EXC, exc:
+            self.result(
+                CHECK_RESULT_ERROR,
+                'SlapdSelfConn',
+                check_output='Error connecting to %r: %s %s' % (
+                    ldaps_uri,
+                    exc,
+                    self._config_attrs,
+                )
+            )
+        else:
+            # Send LDAP Who Am I ? extended operation and check whether
+            # returned authz-DN is correct
+            try:
+                wai = ldaps_conn.whoami_s()
+            except CATCH_ALL_EXC, exc:
+                self.result(
+                    CHECK_RESULT_ERROR,
+                    'SlapdSelfConn',
+                    check_output='Error during Who Am I? ext.op. on %r: %s' % (
+                        ldaps_conn._uri,
+                        exc,
+                    ),
+                )
+            else:
+                if wai != my_authz_id:
+                    self.result(
+                        CHECK_RESULT_ERROR,
+                        'SlapdSelfConn',
+                        check_output='Received unexpected authz-DN from %r: %r' % (
+                            ldaps_conn._uri,
+                            wai,
+                        ),
+                    )
+                else:
+                    self.result(
+                        CHECK_RESULT_OK,
+                        'SlapdSelfConn',
+                        check_output='successfully bound to %r as %r' % (
+                            ldaps_conn._uri,
+                            wai,
+                        ),
+                    )
+            ldaps_conn.unbind_s()
+        return # end of _check_local_ldaps()
+
+    def _check_slapd_sock(self):
+        try:
+            sock_listeners = self._ldapi_conn.get_sock_listeners()
+        except CATCH_ALL_EXC, exc:
+            self.result(
+                CHECK_RESULT_ERROR,
+                'SlapdSock',
+                check_output='error retrieving back-sock listeners: %s' % (exc)
+            )
+        else:
+            self.result(
+                CHECK_RESULT_OK,
+                'SlapdSock',
+                check_output='Found %d back-sock listeners' % (len(sock_listeners))
+            )
+            for item_name in sock_listeners.keys():
+                self.add_item(item_name)
+                sock_path, sock_ops = sock_listeners[item_name]
+                try:
+                    _sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+                    _sock.connect(sock_path)
+                    _sock.settimeout(SLAPD_SOCK_TIMEOUT)
+                    _sock_f = _sock.makefile()
+                    _sock_f.write('MONITOR\n')
+                    _sock_f.flush()
+                    sock_response = _sock_f.read()
+                except CATCH_ALL_EXC, exc:
+                    self.result(
+                        CHECK_RESULT_ERROR,
+                        item_name,
+                        check_output='Connecting to %s listener %r failed: %s' % (
+                            sock_ops, sock_path, exc,
+                        ),
+                    )
+                else:
+                    self.result(
+                        CHECK_RESULT_OK,
+                        item_name,
+                        check_output='Successfully connected to %s listener %r and received %d bytes' % (
+                            sock_ops,
+                            sock_path,
+                            len(sock_response),
+                        ),
+                    )
+        return # end of _check_slapd_sock()
+
+    def _get_local_csns(self, syncrepl_list):
+        local_csn_dict = {}
+        for db_num, db_suffix, _ in syncrepl_list:
+            local_csn_dict[db_suffix] = []
+            item_name = '_'.join((
+                'SlapdSyncRepl',
+                str(db_num),
+                self.subst_item_name_chars(db_suffix),
+            ))
+            self.add_item(item_name)
+            try:
+                local_csn_dict[db_suffix] = self._ldapi_conn.get_context_csn(db_suffix)
+            except CATCH_ALL_EXC, exc:
+                self.result(
+                    CHECK_RESULT_ERROR,
+                    item_name,
+                    check_output='Error while retrieving local contextCSN of %r: %s' % (
+                        db_suffix,
+                        exc,
+                    ),
+                )
+            else:
+                if not local_csn_dict[db_suffix]:
+                    self.result(
+                        CHECK_RESULT_UNKNOWN,
+                        item_name,
+                        check_output='no local contextCSN values for %r' % (
+                            db_suffix,
+                        ),
+                    )
+        return local_csn_dict # end of _get_local_csns()
 
     def checks(self):
 
@@ -829,10 +982,10 @@ class SlapdCheck(LocalCheck):
         #----------------------------------------------------------------------
 
         try:
-            ldap_conn = SlapdCheckLDAPObject(local_ldapi_url)
+            self._ldapi_conn = SlapdCheckLDAPObject(local_ldapi_url)
             # Find out whether bind worked
-            local_wai = ldap_conn.whoami_s()
-        except CatchAllException, exc:
+            local_wai = self._ldapi_conn.whoami_s()
+        except CATCH_ALL_EXC, exc:
             self.result(
                 CHECK_RESULT_ERROR,
                 'SlapdConfig',
@@ -843,18 +996,14 @@ class SlapdCheck(LocalCheck):
             )
             sys.exit(1)
 
-        # 0. Connect and bind to local slapd like a remote client
-        # mainly to check whether LDAPS with client cert works and maps expected authz-DN
-        #----------------------------------------------------------------------
-
         try:
-            naming_contexts = ldap_conn.get_naming_context_attrs()
-        except CatchAllException, exc:
+            _ = self._ldapi_conn.get_naming_context_attrs()
+        except CATCH_ALL_EXC, exc:
             self.result(
                 CHECK_RESULT_ERROR,
                 'SlapdConfig',
                 check_output='Error getting local configuration on %r: %s' % (
-                    ldap_conn._uri,
+                    self._ldapi_conn._uri,
                     exc,
                 ),
             )
@@ -868,14 +1017,14 @@ class SlapdCheck(LocalCheck):
                 CHECK_RESULT_OK,
                 'SlapdConfig',
                 check_output='Successfully connected to %r as %r found %r and %r' % (
-                    ldap_conn._uri,
+                    self._ldapi_conn._uri,
                     local_wai,
-                    ldap_conn.configContext[0],
-                    ldap_conn.monitorContext[0],
+                    self._ldapi_conn.configContext[0],
+                    self._ldapi_conn.monitorContext[0],
                 )
             )
-            _, self._config_attrs = ldap_conn.search_ext_s(
-                ldap_conn.configContext[0],
+            _, self._config_attrs = self._ldapi_conn.search_ext_s(
+                self._ldapi_conn.configContext[0],
                 ldap.SCOPE_BASE,
                 '(objectClass=*)',
                 [
@@ -930,74 +1079,15 @@ class SlapdCheck(LocalCheck):
                 ),
             )
 
-        try:
-            ldaps_conn = SlapdCheckLDAPObject(
-                ldaps_uri,
-                tls_options=(
-                    # Set TLS connection options from TLS attribute read from
-                    # configuration context
-                    # path name of file containing all trusted CA certificates
-                    (ldap.OPT_X_TLS_CACERTFILE, self._config_attrs['olcTLSCACertificateFile'][0]),
-                    # Use slapd server cert/key for client authentication
-                    # just like used for syncrepl
-                    (ldap.OPT_X_TLS_CERTFILE, self._config_attrs['olcTLSCertificateFile'][0]),
-                    (ldap.OPT_X_TLS_KEYFILE, self._config_attrs['olcTLSCertificateKeyFile'][0]),
-                ),
-            )
-        except CatchAllException, exc:
-            self.result(
-                CHECK_RESULT_ERROR,
-                'SlapdSelfConn',
-                check_output='Error connecting to %r: %s %s' % (
-                    ldaps_uri,
-                    exc,
-                    self._config_attrs,
-                )
-            )
-        else:
-            # Send LDAP Who Am I ? extended operation and check whether
-            # returned authz-DN is correct
-            try:
-                wai = ldaps_conn.whoami_s()
-            except CatchAllException, exc:
-                self.result(
-                    CHECK_RESULT_ERROR,
-                    'SlapdSelfConn',
-                    check_output='Error during Who Am I? ext.op. on %r: %s' % (
-                        ldaps_conn._uri,
-                        exc,
-                    ),
-                )
-            else:
-                if wai != my_authz_id:
-                    self.result(
-                        CHECK_RESULT_ERROR,
-                        'SlapdSelfConn',
-                        check_output='Received unexpected authz-DN from %r: %r' % (
-                            ldaps_conn._uri,
-                            wai,
-                        ),
-                    )
-                else:
-                    self.result(
-                        CHECK_RESULT_OK,
-                        'SlapdSelfConn',
-                        check_output='successfully bound to %r as %r' % (
-                            ldaps_conn._uri,
-                            wai,
-                        ),
-                    )
-            ldaps_conn.unbind_s()
-
         syncrepl_topology = {}
         try:
-            syncrepl_list, syncrepl_topology = ldap_conn.get_syncrepl_topology()
-        except CatchAllException, exc:
+            syncrepl_list, syncrepl_topology = self._ldapi_conn.get_syncrepl_topology()
+        except CATCH_ALL_EXC, exc:
             self.result(
                 CHECK_RESULT_ERROR,
                 'SlapdReplTopology',
                 check_output='Error getting syncrepl topology on %r: %s' % (
-                    ldap_conn._uri,
+                    self._ldapi_conn._uri,
                     exc,
                 ),
             )
@@ -1016,13 +1106,13 @@ class SlapdCheck(LocalCheck):
 
         monitor_dict = {}
         try:
-            monitor_dict = ldap_conn.get_monitor_entries()
-        except CatchAllException, exc:
+            monitor_dict = self._ldapi_conn.get_monitor_entries()
+        except CATCH_ALL_EXC, exc:
             self.result(
                 CHECK_RESULT_ERROR,
                 'SlapdMonitor',
                 check_output='Error getting local monitor data on %r: %s' % (
-                    ldap_conn._uri,
+                    self._ldapi_conn._uri,
                     exc,
                 ),
             )
@@ -1032,15 +1122,15 @@ class SlapdCheck(LocalCheck):
                 'SlapdMonitor',
                 check_output='Successfully retrieved %d entries from %r on %r' % (
                     len(monitor_dict),
-                    ldap_conn.monitorContext[0],
-                    ldap_conn._uri,
+                    self._ldapi_conn.monitorContext[0],
+                    self._ldapi_conn._uri,
                 ),
             )
 
         try:
             monitor_cache = OpenLDAPMonitorCache(
                 monitor_dict,
-                ldap_conn.monitorContext[0],
+                self._ldapi_conn.monitorContext[0],
             )
             current_connections = monitor_cache.get_value(
                 'cn=Current,cn=Connections',
@@ -1058,7 +1148,7 @@ class SlapdCheck(LocalCheck):
                 performance_data='count=%d' % (current_connections),
                 check_output='%d open connections' % (current_connections),
             )
-        except CatchAllException, exc:
+        except CATCH_ALL_EXC, exc:
             self.result(
                 CHECK_RESULT_ERROR,
                 'SlapdConns',
@@ -1074,7 +1164,7 @@ class SlapdCheck(LocalCheck):
                 'cn=Pending,cn=Threads',
                 'monitoredInfo',
             )
-        except CatchAllException, exc:
+        except CATCH_ALL_EXC, exc:
             self.result(
                 CHECK_RESULT_ERROR,
                 'SlapdThreads',
@@ -1097,7 +1187,7 @@ class SlapdCheck(LocalCheck):
 
         try:
             hdb_caches = monitor_cache.bdb_caches()
-        except CatchAllException, exc:
+        except CATCH_ALL_EXC, exc:
             self.result(
                 CHECK_RESULT_ERROR,
                 'SlapdBdbCaches',
@@ -1131,9 +1221,11 @@ class SlapdCheck(LocalCheck):
                     )
                 )
 
+        self._check_slapd_sock()
+
         try:
-            db_suffixes = ldap_conn.db_suffixes()
-        except CatchAllException, exc:
+            db_suffixes = self._ldapi_conn.db_suffixes()
+        except CATCH_ALL_EXC, exc:
             self.result(
                 CHECK_RESULT_ERROR,
                 'SlapdDatabases',
@@ -1195,7 +1287,7 @@ class SlapdCheck(LocalCheck):
                 self.add_item(item_name)
                 try:
                     noop_start_timestamp = time.time()
-                    noop_result = ldap_conn.noop_search_st(
+                    noop_result = self._ldapi_conn.noop_search_st(
                         db_suffix,
                         timeout=NOOP_SEARCH_TIMEOUT,
                     )
@@ -1221,7 +1313,7 @@ class SlapdCheck(LocalCheck):
                         item_name,
                         check_output='no-op search control not supported'
                     )
-                except CatchAllException, exc:
+                except CATCH_ALL_EXC, exc:
                     self.result(
                         CHECK_RESULT_ERROR,
                         item_name,
@@ -1297,7 +1389,7 @@ class SlapdCheck(LocalCheck):
                 'cn=PDU,cn=Statistics', 'monitorCounter')
             stats_referrals = monitor_cache.get_value(
                 'cn=Referrals,cn=Statistics', 'monitorCounter')
-        except CatchAllException, exc:
+        except CATCH_ALL_EXC, exc:
             self.result(
                 CHECK_RESULT_ERROR,
                 'SlapdStats',
@@ -1335,7 +1427,7 @@ class SlapdCheck(LocalCheck):
 
         try:
             monitor_ops_counters = monitor_cache.operation_counters()
-        except CatchAllException, exc:
+        except CATCH_ALL_EXC, exc:
             self.result(
                 CHECK_RESULT_ERROR,
                 'SlapdOps',
@@ -1409,40 +1501,12 @@ class SlapdCheck(LocalCheck):
                     check_output='empty operation counter list',
                 )
 
-        local_csn_dict = {}
+        local_csn_dict = self._get_local_csns(syncrepl_list)
+        
+        # Close LDAPI connection
+        self._ldapi_conn.unbind_s()
 
-        for db_num, db_suffix, _ in syncrepl_list:
-
-            local_csn_dict[db_suffix] = []
-            item_name = '_'.join((
-                'SlapdSyncRepl',
-                str(db_num),
-                self.subst_item_name_chars(db_suffix),
-            ))
-            self.add_item(item_name)
-            try:
-                local_csn_dict[db_suffix] = ldap_conn.get_context_csn(db_suffix)
-            except CatchAllException, exc:
-                self.result(
-                    CHECK_RESULT_ERROR,
-                    item_name,
-                    check_output='Error while retrieving local contextCSN of %r: %s' % (
-                        db_suffix,
-                        exc,
-                    ),
-                )
-            else:
-                if not local_csn_dict[db_suffix]:
-                    self.result(
-                        CHECK_RESULT_UNKNOWN,
-                        item_name,
-                        check_output='no local contextCSN values for %r' % (
-                            db_suffix,
-                        ),
-                    )
-
-        # Close local LDAP connection
-        ldap_conn.unbind_s()
+        self._check_local_ldaps(ldaps_uri, my_authz_id)
 
         # Write current state to disk
         self._state.write_state(self._next_state)
@@ -1473,7 +1537,7 @@ class SlapdCheck(LocalCheck):
                 syncrepl_target_ipaddr = socket.gethostbyname(
                     syncrepl_target_hostname
                 )
-            except CatchAllException, exc:
+            except CATCH_ALL_EXC, exc:
                 self.result(
                     CHECK_RESULT_ERROR,
                     item_name,
@@ -1500,7 +1564,7 @@ class SlapdCheck(LocalCheck):
                     network_timeout=float(syncrepl_obj.network_timeout) or LDAP_TIMEOUT,
                     timeout=float(syncrepl_obj.timeout) or LDAP_TIMEOUT,
                 )
-            except CatchAllException, exc:
+            except CATCH_ALL_EXC, exc:
                 self.result(
                     CHECK_RESULT_ERROR,
                     item_name,
@@ -1537,7 +1601,7 @@ class SlapdCheck(LocalCheck):
                 try:
                     remote_csn_dict[syncrepl_target_uri][db_suffix] = \
                         ldap_conn.get_context_csn(db_suffix)
-                except CatchAllException, exc:
+                except CATCH_ALL_EXC, exc:
                     self.result(
                         CHECK_RESULT_ERROR,
                         item_name,
@@ -1572,7 +1636,7 @@ class SlapdCheck(LocalCheck):
             # Close the LDAP connection to the remote replica
             try:
                 ldap_conn.unbind_s()
-            except CatchAllException, exc:
+            except CATCH_ALL_EXC, exc:
                 pass
 
         state = CHECK_RESULT_WARNING
