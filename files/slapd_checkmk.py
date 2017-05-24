@@ -1497,8 +1497,8 @@ class SlapdCheck(LocalCheck):
                         (ldap.OPT_X_TLS_CERTFILE, syncrepl_obj.tls_cert),
                         (ldap.OPT_X_TLS_KEYFILE, syncrepl_obj.tls_key),
                     ),
-                    network_timeout=float(syncrepl_obj.network_timeout),
-                    timeout=float(syncrepl_obj.timeout),
+                    network_timeout=float(syncrepl_obj.network_timeout) or LDAP_TIMEOUT,
+                    timeout=float(syncrepl_obj.timeout) or LDAP_TIMEOUT,
                 )
             except CatchAllException, exc:
                 self.result(
