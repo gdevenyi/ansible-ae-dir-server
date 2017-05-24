@@ -29,6 +29,7 @@ import time
 import datetime
 import pprint
 import logging
+from cStringIO import StringIO
 
 # from Python cryptography
 import cryptography.x509
@@ -45,6 +46,7 @@ from ldap.ldapobject import ReconnectLDAPObject
 from ldap.controls.simple import ValueLessRequestControl, ResponseControl
 import ldapurl
 from ldapurl import LDAPUrl
+from ldif import ParseLDIF
 
 # from pyasn1
 from pyasn1.type import univ
@@ -928,9 +930,32 @@ class SlapdCheck(LocalCheck):
                         ),
                     )
                 else:
+                    # strip ENTRY\n from response and parse the rest as LDIF
+                    _, sock_monitor_entry = ParseLDIF(
+                        StringIO(sock_response[6:]),
+                        ignore_attrs=['sockLogLevel'],
+                        maxentries=1
+                    )[0]
+                    import pprint
+                    pprint.pprint(sock_monitor_entry)
+                    sock_perf_data = []
+                    # only add numeric monitor data to performance metrics
+                    for metric_key in sorted(sock_monitor_entry.keys()):
+                        try:
+                            float(sock_monitor_entry[metric_key][0])
+                        except ValueError:
+                            continue
+                        else:
+                            sock_perf_data.append(
+                                u'%s=%s' % (
+                                    metric_key,
+                                    sock_monitor_entry[metric_key][0],
+                                )
+                            )
                     self.result(
                         CHECK_RESULT_OK,
                         item_name,
+                        performance_data=u'|'.join(sock_perf_data),
                         check_output='Successfully connected to %s listener %r and received %d bytes' % (
                             sock_ops,
                             sock_path,
