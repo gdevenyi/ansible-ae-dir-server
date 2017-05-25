@@ -47,6 +47,8 @@
     <ul>
       <li>
         <a href="https://docs.ansible.com/ansible/intro_installation.html">ansible 2.2.0.0+</a>
+        (Use Jinja2 2.8.x! <em>ansible</em> does not work with 2.9.x yet!
+        (see <a href="https://github.com/ansible/ansible/issues/20063">issue 20063</a>)
       </li>
       <li>
         <a href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git">git</a>
@@ -55,6 +57,11 @@
         <a href="http://www.dnspython.org">dnspython</a>
       </li>
     </ul>
+    Simple approach:
+    <pre>
+      # virtualenv-2.7 /opt/ansible
+      # /opt/ansible/bin/pip2 install --upgrade ansible==2.2.3.0 Jinja2==2.8.1 dnspython
+    </pre>
   </li>
   <li>
     Create DNS entries for all your &AElig;-DIR servers including correct
