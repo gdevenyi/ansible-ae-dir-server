@@ -10,4 +10,3 @@
   with_items:
     - openssl
     - iptables
-    - joe

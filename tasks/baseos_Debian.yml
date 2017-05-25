@@ -12,8 +12,5 @@
   with_items:
     - openssl
     - iptables
-#    - netfilter-persistent
-#    - iptables-persistent
-    - joe
     - apt-transport-https
     - ca-certificates
