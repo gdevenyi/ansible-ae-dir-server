@@ -936,8 +936,6 @@ class SlapdCheck(LocalCheck):
                         ignore_attrs=['sockLogLevel'],
                         maxentries=1
                     )[0]
-                    import pprint
-                    pprint.pprint(sock_monitor_entry)
                     sock_perf_data = []
                     # only add numeric monitor data to performance metrics
                     for metric_key in sorted(sock_monitor_entry.keys()):
