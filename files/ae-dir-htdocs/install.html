@@ -79,9 +79,13 @@
   <li>
     Issue X.509 TLS server certificates with appropriate <var>CN</var> and
     <var>subjectAltName</var> values for all replicas with your existing
-    PKI's certificate authority.<br>
+    PKI's certificate authority.
+    <br>
     The anti-security concept of wild-card certificates is not compatible
     with &AElig;-DIR's security concept! Therefore these cannot be used!
+    <br>
+    If you don't have a PKI yet you can setup a test certificate authority
+    (CA) with shell scripts found in <code>tools/pki-scripts/</code>.
   </li>
   <li>
     Get the ansible playbooks:
