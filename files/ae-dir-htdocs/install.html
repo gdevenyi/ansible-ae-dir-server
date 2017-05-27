@@ -43,6 +43,15 @@
     Older releases are explicitly not recommended!
   </li>
   <li>
+    The ansible roles needs the following software packages on all target
+    machines to be installed:
+    <ul>
+      <li>Python 2.x</li>
+      <li>python-xml</li>
+      <li>lsb_release command (package <em>lsb-release</em>)</li>
+    </ul>
+  </li>
+  <li>
     Install on your admin workstation:
     <ul>
       <li>
@@ -114,7 +123,7 @@
   <li>
     Invoke ansible play in sub-directory <code>ansible/</code>
     (here using command <code>su</code>):
-    <pre>ANSIBLE_HOSTS=hosts ansible-playbook ae-dir-servers.yml --become -K --become-method=su --extra-vars='{"aedir_init":True}'</pre>
+    <pre>ANSIBLE_HOSTS=hosts ansible-playbook ae-dir-servers.yml --become -K --become-method=su --extra-vars='{"aedir_init":True, "openldap_keygen":True}'</pre>
   </li>
   <li>
     Log into one provider system become user <em>root</em> and run the
