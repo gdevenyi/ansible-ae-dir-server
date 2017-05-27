@@ -59,7 +59,7 @@
 
 - name: "Key generation tasks"
   include: tls_keygen.yml
-  when: openldap_key_gen == "1" and ( openldap_cert_modulus.rc != 0 or openldap_key_modulus.rc != 0 or openldap_cert_modulus.stdout != openldap_key_modulus.stdout )
+  when: openldap_keygen and ( openldap_cert_modulus.rc != 0 or openldap_key_modulus.rc != 0 or openldap_cert_modulus.stdout != openldap_key_modulus.stdout )
 
 - name: "Modulus of cert"
   fail:
@@ -71,9 +71,9 @@
     msg: "Determining modulus of server key {{ openldap_key_pathname }} failed: {{ openldap_key_modulus.stderr }}"
   when: openldap_key_modulus.rc != 0
 
-- name: "Verification of server cert"
+- name: "Verification of server cert {{ openldap_cert_filename }} against CA certs {{ openldap_cacert_filename }} failed"
   fail:
-    msg: "Verification of server cert {{ openldap_cert_filename }} failed: {{ openssl_verify_result.stdout }}"
+    msg: "Verification of server cert {{ openldap_cert_filename }} against CA certs {{ openldap_cacert_filename }} failed: {{ openssl_verify_result.stdout }}"
   when: openssl_verify_result.rc != 0
 
 - name: "Compare modulus of cert and key"

@@ -112,9 +112,6 @@
     hour: "*/12"
     job: "rm {{ aedir_rundir }}/aeperson2aeuser.state > /dev/null 2>&1 || exit 0"
 
-- name: "Install AE-DIR password service (aedirpwd)"
-  include: "aedirpwd.yml"
-
 - name: "ensure cron service is running"
   service:
     name: "cron"

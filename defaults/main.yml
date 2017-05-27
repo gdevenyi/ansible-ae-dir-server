@@ -325,7 +325,7 @@ openldap_backup_compressor: "xz -9"
 openldap_rootdse_alt_servers: "{{ aedir_hosts[openldap_role] }}"
 
 # The CA certificate file for validating the server certs
-openldap_cacert_filename: "slapd-cacerts.pem"
+openldap_cacert_filename: "slapd-ca-chain.pem"
 
 # Suffix expected in subject-DN of server and client certs
 # for authz-regexp directive and pkiUser/seeAlso attributes
@@ -338,8 +338,8 @@ openldap_key_filename: "{{ openldap_service_fqdn }}.key"
 # local directory for fetched CSRs
 local_openldap_csr_dir: "{{ playbook_dir }}/files/pki-csr-files"
 
-# whether to overwrite existing private key
-openldap_key_gen: 0
+# whether to overwrite existing server's private key
+openldap_keygen: 0
 
 # value for slapd.conf directive TLSProtocolMin
 # 3.<x> means TLSv1.<x-1>
@@ -506,3 +506,179 @@ slapd_check_authz_id: "dn:uid=slapd_{{ slapd_check_service_fqdn.split('.')[0] }}
 slapd_check_lib_dirs:
   # for LTB's openLDAP builds
   - /usr/local/openldap/lib64
+
+#---------------------------------------------------------------------------
+# pip install arguments
+#---------------------------------------------------------------------------
+
+web2ldap_pip_index_url: "https://pypi.python.org/simple"
+
+web2ldap_pip_needs_compiler: "{{ web2ldap_pip_index_url == 'https://pypi.python.org/simple' }}"
+
+web2ldap_pip_install_options:
+  - "--upgrade"
+  - "--index-url {{ web2ldap_pip_index_url }}"
+
+web2ldap_pip_extra_args: "{{ web2ldap_pip_install_options|join(' ') }}"
+
+#---------------------------------------------------------------------------
+# web server in general
+#---------------------------------------------------------------------------
+
+# Which web server to install
+web_server: apache2
+
+# FQDN of service interface
+web_service_fqdn: "{{ inventory_hostname }}"
+
+# where to find the spawn-fcgi executable
+spawn_fcgi_exec: "/usr/bin/spawn-fcgi"
+
+# e-mail address of web server admin(s)
+web_server_admin_email: "web2ldap-admin@example.com"
+
+# document root used for https://hostname/
+web_document_root: "{{ web2ldap_prefix }}/htdocs"
+
+#---------------------------------------------------------------------------
+# web2ldap parameters
+#---------------------------------------------------------------------------
+
+# the release to be installed
+web2ldap_version: "1.2.88"
+
+# source filename
+web2ldap_filename: "web2ldap-{{ web2ldap_version }}.tar.gz"
+
+# where to download the web2ldap source archive
+# override this for machines without Internet access
+web2ldap_download_url: "https://www.web2ldap.de/download/{{ web2ldap_filename }}"
+
+# Various path names
+web2ldap_prefix: "/opt/web2ldap-{{ web2ldap_version }}"
+
+# Config directories
+web2ldap_etc: "{{ web2ldap_prefix }}/etc/web2ldap"
+web2ldap_cnfdir: "{{ web2ldap_etc }}/web2ldapcnf"
+web2ldap_templates: "{{ web2ldap_etc }}/templates"
+
+# Full pathname of stand-alone start script
+web2ldap_sbin_script: "{{ web2ldap_prefix }}/sbin/web2ldap.py"
+
+# Full pathname of FastCGI start script
+web2ldap_fcgi_script: "{{ web2ldap_prefix }}/fcgi/web2ldap.py"
+
+# web2ldap modules directory
+web2ldap_pylib: "{{ web2ldap_prefix }}/pylib"
+
+# static HTML docs
+web2ldap_htdocs: "{{ web2ldap_prefix }}/htdocs"
+
+web2ldap_monitor_access_allowed:
+  - 127.0.0.0/255.0.0.0
+  - ::1
+  - fe00::0
+#  - 10.0.0.0/255.0.0.0
+#  - 0.0.0.0/0.0.0.0
+#  - ::0
+
+# user/group to run as
+web2ldap_user: "web2ldap"
+web2ldap_uid: "1760"
+web2ldap_group: "web2ldap"
+web2ldap_gid: "1760"
+
+# Pathnames of PID files
+web2ldap_pidfile_standalone: "{{ web2ldap_prefix }}/var/run/web2ldap-standalone.pid"
+web2ldap_pidfile_fcgi: "{{ web2ldap_prefix }}/var/run/web2ldap-fcgi.pid"
+
+# where to install systemd files
+web2ldap_systemd_dir: "/etc/systemd/system"
+
+# use libldap from this directory
+web2ldap_libldap_dir: /usr/local/openldap/lib64
+
+# which web2ldap service to use
+web2ldap_service: web2ldap-fcgi
+
+#---------------------------------------------------------------------------
+# apache2 parameters
+#---------------------------------------------------------------------------
+
+# conf_pathname: where to place the monolithic apache configuration file
+# mod_dir: directory where Apache modules are found
+# modules: which modules to load
+apache2_config:
+  Debian:
+    user: "www-data"
+    group: "www-data"
+    pid_file: "${APACHE_PID_FILE}"
+    conf_pathname: "/etc/apache2/apache2.conf"
+    mod_dir: "/usr/lib/apache2/modules"
+    ssl_session_cache: "shmcb:/var/run/apache2/ssl_scache(512000)"
+    modules:
+      - mpm_prefork
+      - socache_shmcb
+      - env
+      - fcgid
+      - dir
+      - alias
+      - ssl
+      - mime
+      - authz_core
+      - authz_host
+      - headers
+      - include
+      - deflate
+      - filter
+  SUSE:
+    user: "wwwrun"
+    group: "www"
+    pid_file: ""
+    conf_pathname: "/etc/apache2/httpd.conf"
+    mod_dir: "/usr/lib64/apache2"
+    ssl_session_cache: "shmcb:/var/run/apache2/ssl_scache(512000)"
+    modules:
+      - socache_shmcb
+      - env
+      - fcgid
+      - dir
+      - alias
+      - ssl
+      - mime
+      - authz_core
+      - authz_host
+      - headers
+      - include
+      - deflate
+      - filter
+      - logio
+
+apache_error_log: "syslog:daemon"
+#apache_error_log: "/var/log/apache2/error.log"
+
+apache_log_level: "info"
+
+apache_server_admin: "{{ web_server_admin_email }}"
+
+# which IP nets are allowed to access web2ldap
+apache_web2ldap_requires:
+  - "ip 127.0.0.1"
+  - "ip ::1"
+  - "ip 10.0.0.0/255.0.0.0"
+
+# TLS parameters
+apache_ssl_protocol: "+TLSv1.2"
+apache_ssl_cipher_suite: 'ECDHE-RSA-AES256-SHA:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:!RC4-SHA:!MEDIUM:!ADH:!LOW:!EXP:!NULL'
+
+# Path name of CA cert bundle file
+apache_cacert_filename: "httpd-ca-chain.pem"
+
+# The server certificate and key files
+apache_cert_filename: "{{ web_service_fqdn }}.crt"
+apache_key_filename: "{{ web_service_fqdn }}.key"
+
+# The full path names on the target system
+apache_cacert_pathname: "/etc/ssl/certs/rootca.pem"
+apache_cert_pathname: "/etc/ssl/certs/{{ web_service_fqdn }}.crt"
+apache_key_pathname: "/etc/ssl/private/{{ web_service_fqdn }}.key"

@@ -30,6 +30,21 @@
 - name: "Specific AE-DIR tool tasks on {{ openldap_role }}"
   include: "aedir_tools_{{ openldap_role }}.yml"
 
+- name: "Install web2ldap on {{ openldap_role }}"
+  include_role:
+    name: web2ldap
+    private: True
+  vars:
+    web_server: "apache2"
+    web2ldap_pip_index_url: "{{ aedir_pip_index_url }}"
+    web2ldap_pip_needs_compiler: "{{ aedir_pip_needs_compiler }}"
+    web2ldap_pip_extra_args: "{{ aedir_pip_extra_args }}"
+  when: openldap_role=="provider"
+
+- name: "Install AE-DIR password service (aedirpwd)"
+  include: "aedirpwd.yml"
+  when: openldap_role=="provider"
+
 - name: "Configure web2ldap for AE-DIR on {{ openldap_role }}"
   include: configure_web2ldap.yml
   when: openldap_role=="provider"
