@@ -73,10 +73,21 @@
     </pre>
   </li>
   <li>
-    Create DNS entries for all your &AElig;-DIR servers including correct
-    reverse DNS entries (PTR RRs). While not strictly required it's a good
-    idea to choose a separate DNS subdomain especially not matched by any
-    wild-card certificate you might use.
+    Create DNS entries for all your &AElig;-DIR servers:
+    <ul>
+      <li>
+        Don't forget to add correct reverse DNS entries (PTR RRs).
+      </li>
+      <li>
+        While not strictly required it's a good idea to choose a separate DNS
+        subdomain especially not matched by any wild-card certificate you
+        might use.
+      </li>
+      <li>
+        The DNS should at least contain one dot. Otherwise Chrome web browser
+        won't accept/return cookies.
+      </li>
+    </ul>
   </li>
   <li>
     Prepare to have SSH access to all &AElig;-DIR servers as user
@@ -93,6 +104,10 @@
     The trailing comma after the FQDN is needed!
   </li>
   <li>
+    Get the ansible playbooks:
+    <pre>git clone https://ae-dir.com/git/ae-dir.git</pre>
+  </li>
+  <li>
     Issue X.509 TLS server certificates with appropriate <var>CN</var> and
     <var>subjectAltName</var> values for all replicas with your existing
     PKI's certificate authority.
@@ -102,10 +117,6 @@
     <br>
     If you don't have a PKI yet you can setup a test certificate authority
     (CA) with shell scripts found in <code>tools/pki-scripts/</code>.
-  </li>
-  <li>
-    Get the ansible playbooks:
-    <pre>git clone https://ae-dir.com/git/ae-dir.git</pre>
   </li>
   <li>
     Read and understand <code>ansible/README.md</code>.
@@ -123,7 +134,7 @@
   <li>
     Invoke ansible play in sub-directory <code>ansible/</code>
     (here using command <code>su</code>):
-    <pre>ANSIBLE_HOSTS=hosts ansible-playbook ae-dir-servers.yml --become -K --become-method=su --extra-vars='{"aedir_init":True, "openldap_keygen":True}'</pre>
+    <pre>ansible-playbook ae-dir-servers.yml -i hosts --become -K --become-method=su --extra-vars='{"aedir_init":True, "openldap_keygen":True}'</pre>
   </li>
   <li>
     Log into one provider system become user <em>root</em> and run the
@@ -131,7 +142,16 @@
     <ol>
       <li>
         Add the basic &AElig;-DIR entries with OpenLDAP command-line tool:
-        <pre>ldapmodify -f /opt/ae-dir/etc/ae-dir-base.ldif</pre>
+        <ul>
+          <li>
+            On SUSE / openSUSE:
+            <pre>ldapmodify -f /opt/ae-dir/etc/ae-dir-base.ldif</pre>
+          </li>
+          <li>
+            On Debian:
+            <pre>/usr/local/openldap/bin/ldapmodify -f /opt/ae-dir/etc/ae-dir-base.ldif</pre>
+          </li>
+        </ul>
       </li>
       <li>
         Set the user password of an initial Æ admin (here <em>msin</em>):
