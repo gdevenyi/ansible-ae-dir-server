@@ -4,6 +4,12 @@
 <!--#include file="ssi/head.shtml" -->
 
 <ol>
+  <li><a href="#prereq">Prerequisites</a></li>
+  <li><a href="#install">Installation</a></li>
+</ol>
+
+<h1 id="prereq">Prerequisites</h1>
+<ol>
   <li>
     Make yourself familiar with the
     <a href="docs.html#sys-arch">system architecture</a>.
@@ -52,7 +58,7 @@
     </ul>
   </li>
   <li>
-    Install on your admin workstation:
+    Install on your admin workstation (the <em>ansible controller</em>):
     <ul>
       <li>
         <a href="https://docs.ansible.com/ansible/intro_installation.html">ansible 2.2.0.0+</a>
@@ -118,9 +124,10 @@
     If you don't have a PKI yet you can setup a test certificate authority
     (CA) with shell scripts found in <code>tools/pki-scripts/</code>.
   </li>
-  <li>
-    Read and understand <code>ansible/README.md</code>.
-  </li>
+</ol>
+
+<h1 id="install">Installation</h1>
+<ol>
   <li>
     Create ansible inventory file named <em>hosts</em> to match your
     environment (see file <em>hosts-example</em> for details).
@@ -135,6 +142,21 @@
     Invoke ansible play in sub-directory <code>ansible/</code>
     (here using command <code>su</code>):
     <pre>/opt/ansible/bin/ansible-playbook ae-dir-servers.yml -i hosts --become -K --become-method=su --extra-vars='{"aedir_init":True, "openldap_keygen":True}'</pre>
+    <ul>
+      <li>
+        At first run this will generate TLS server key and signed CSR file
+        and stops with a message where to find the CSR files on your local
+        ansible controller.
+      </li>
+      <li>
+        After signing the CSRs with your CA place the server certificate file(s) into
+        directory <code>ae-dir/ansible/files/</code>.
+      </li>
+      <li>
+        Invoke <var>ansible-playbook</var> command above again to proceed
+        with installation.
+      </li>
+    </ul>
   </li>
   <li>
     Log into one provider system become user <em>root</em> and run the
