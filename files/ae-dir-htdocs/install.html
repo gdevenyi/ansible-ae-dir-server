@@ -100,8 +100,8 @@
   <li>
     Check whether you can access the hosts with
     <a href="https://docs.ansible.com/ansible/setup_module.html">ansible setup</a>:
-    <pre>ansible all -i 'hostname.example.com,' -m setup</pre>
-    The trailing comma after the FQDN is needed!
+    <pre>/opt/ansible/bin/ansible all -i 'hostname.example.com,' -m setup</pre>
+    The trailing comma after the FQDN is needed when using a hostname!
   </li>
   <li>
     Get the ansible playbooks:
@@ -134,7 +134,7 @@
   <li>
     Invoke ansible play in sub-directory <code>ansible/</code>
     (here using command <code>su</code>):
-    <pre>ansible-playbook ae-dir-servers.yml -i hosts --become -K --become-method=su --extra-vars='{"aedir_init":True, "openldap_keygen":True}'</pre>
+    <pre>/opt/ansible/bin/ansible-playbook ae-dir-servers.yml -i hosts --become -K --become-method=su --extra-vars='{"aedir_init":True, "openldap_keygen":True}'</pre>
   </li>
   <li>
     Log into one provider system become user <em>root</em> and run the
