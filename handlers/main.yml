@@ -23,7 +23,14 @@
   service: name=bind_proxy state=restarted
   when: openldap_role == 'consumer' and oath_ldap_enabled == True
 
-- name: "restart web2ldap"
+- name: "restart apache2"
   service:
     name: "apache2"
     state: restarted
+  when: openldap_role == 'provider'
+
+- name: "restart web2ldap"
+  command: "echo"
+  notify:
+    - "restart apache2"
+  when: openldap_role == 'provider'

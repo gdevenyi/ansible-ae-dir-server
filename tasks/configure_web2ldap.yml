@@ -1,6 +1,17 @@
 ---
 # Apply AE-DIR configuration to web2ldap
 
+- name: "Set Python {{ aedir_python }} interpreter in web2ldap scripts"
+  replace:
+    dest: "{{ item }}"
+    regexp: '/usr/bin/python2.7 -ROO'
+    replace: '{{ aedir_python }}'
+    backup: no
+  with_items:
+  - "{{ web2ldap_sbin_script }}"
+  - "{{ web2ldap_fcgi_script }}"
+  - "{{ web2ldap_prefix }}/sbin/checkinst.py"
+
 - name: Create web2ldapcnf/local.py for AE-DIR
   template:
     src: "{{ aedir_web2ldap_cnf_local }}"

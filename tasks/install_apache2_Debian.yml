@@ -1,0 +1,26 @@
+---
+# installing apache2 on Debian
+
+- name: "Install packages needed for running Apache 2.4 on {{ lsb_id }}"
+  apt:
+    name: "{{ item }}"
+    state: installed
+    update_cache: yes
+    cache_valid_time: 3600
+    install_recommends: no
+    dpkg_options: 'force-confold,force-confdef'
+  notify:
+  - "restart {{ web_server }}"
+  with_items:
+  - apache2
+  - apache2-mpm-prefork
+  - libapache2-mod-fcgid
+
+# Debian package seems to be buggy and does not create this
+- name: "Create mod_fcgid directory"
+  file:
+    path: /var/lib/apache2/fcgid
+    state: directory
+    owner: root
+    group: root
+    mode: u=rwx,g=rx,o=rx

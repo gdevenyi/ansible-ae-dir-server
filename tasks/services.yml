@@ -1,0 +1,43 @@
+---
+
+# enable running services
+
+- name: "Enable slapd is running"
+  service:
+    name: slapd
+    state: started
+    enabled: yes
+
+- name: "Ensure cron is running"
+  service:
+    name: "cron"
+    state: started
+    enabled: yes
+  when: openldap_role=="provider"
+
+- name: "Ensure {{ web_server }} is running"
+  service:
+    name: "{{ web_server }}"
+    state: started
+    enabled: yes
+  when: openldap_role=="provider"
+
+- name: "Ensure aedirpwd is running"
+  service:
+    name: "aedirpwd"
+    state: started
+    enabled: yes
+  when: openldap_role=="provider"
+
+- name: "Enable and start service {{ oath_bind_listener }}"
+  service:
+    name: "{{ oath_bind_listener }}"
+    state: started
+    enabled: yes
+  when: oath_ldap_enabled == True
+
+- name: "ensure oathenroll is running"
+  service:
+    name: "oathenroll"
+    state: started
+    enabled: yes

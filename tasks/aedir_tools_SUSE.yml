@@ -7,8 +7,6 @@
     disable_recommends: yes
     type: package
   with_items:
-    - cron
-    - python
     - python-aedir
     - python-ldap
     - python-pyasn1
@@ -20,6 +18,7 @@
     - restart hotp_validator
     - restart oathenroll
     - restart bind_proxy
+    - restart web2ldap
 
 - name: "Install python-slapdsock packages on {{ lsb_id }}"
   zypper:
@@ -43,6 +42,7 @@
     - python-web.py
     - python-oath
     - python-passlib
+    - python-pyweblib
   when: openldap_role == 'provider'
   notify:
     - restart aedirpwd

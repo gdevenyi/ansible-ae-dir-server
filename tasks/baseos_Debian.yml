@@ -10,7 +10,10 @@
     install_recommends: yes
     dpkg_options: 'force-confold,force-confdef'
   with_items:
-    - openssl
-    - iptables
     - apt-transport-https
     - ca-certificates
+    - cron
+    - gzip
+    - openssl
+    - python
+    - tar

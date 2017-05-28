@@ -26,9 +26,6 @@
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
   with_items:
-    - cron
-    - tar
-    - gzip
     - python-setuptools
     - virtualenv
     - python-virtualenv
@@ -39,6 +36,7 @@
     - restart hotp_validator
     - restart oathenroll
     - restart bind_proxy
+    - restart web2ldap
 
 - name: "Additional PIP packages in virtualenv {{ aedir_prefix }} needed for PIP installation"
   pip:
@@ -92,10 +90,12 @@
     extra_args: "{{ aedir_pip_extra_args }}"
   with_items:
     - mailutil
-    - paramiko
-    - web.py
     - oath
+    - paramiko
     - passlib
+    - pyExcelerator
+    - pyweblib
+    - web.py
   when: openldap_role == 'provider'
   notify:
     - restart aedirpwd

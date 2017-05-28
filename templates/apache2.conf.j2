@@ -1,0 +1,169 @@
+#-----------------------------------------------------------------------
+# Apache configuration for web2ldap
+# - overrides configuration of your Linux distribution
+# - hard-coded configuration (loading modules etc.)
+#
+# {{ ansible_managed }}
+#-----------------------------------------------------------------------
+
+# load required Apache modules
+{% for mod in apache2_config[lsb_id].modules %}
+LoadModule {{ mod }}_module {{ apache2_config[lsb_id].mod_dir }}/mod_{{ mod }}.so
+{% endfor %}
+
+ServerTokens ProductOnly
+ServerAdmin {{ apache_server_admin }}
+ServerSignature EMail
+ServerName {{ web_service_fqdn }}
+
+# MIME-Types initialisieren
+TypesConfig /etc/mime.types
+
+# where to send error log messages (e.g. web2ldap traceback of unhandled exceptions)
+ErrorLog {{ apache_error_log }}
+# At least 'notice' is required to get error messages written by
+# applications to stderr (e.g. web2ldap)
+LogLevel {{ apache_log_level }}
+
+{% if apache2_config[lsb_id].pid_file!="" %}
+PidFile {{ apache2_config[lsb_id].pid_file }}
+{% endif %}
+
+Timeout 300
+
+# Parameter fuer keep-alive
+KeepAlive On
+MaxKeepAliveRequests 100
+KeepAliveTimeout 15
+
+StartServers 5
+MinSpareServers 2
+MaxSpareServers 10
+MaxRequestWorkers 50
+MaxConnectionsPerChild 10000
+
+User {{ apache2_config[lsb_id].user }}
+Group {{ apache2_config[lsb_id].group }}
+
+HostnameLookups Off
+
+LogFormat "%h %A %l %u %t \"%r\" %>s %p %O \"%{Referer}i\" \"%{User-Agent}i\"" siem_log
+
+# for non-SSL vhost
+Listen 0.0.0.0:80
+# for SSL vhost
+Listen 0.0.0.0:443
+
+# Global mod_fcgid options
+FcgidIdleTimeout 7200
+FcgidBusyTimeout 600
+FcgidErrorScanInterval 60
+FcgidZombieScanInterval 10
+FcgidProcessLifeTime 86400
+FcgidConnectTimeout 60
+FcgidIOTimeout 600
+#FcgidIPCDir /var/lib/apache2/fcgid/sock
+
+FcgidCmdOptions {{ web2ldap_fcgi_script }} MaxProcesses 1
+
+# SSL Session Resumption
+SSLSessionCache        {{ apache2_config[lsb_id].ssl_session_cache }}
+SSLSessionCacheTimeout  7200
+SSLRandomSeed          startup file:/dev/urandom  512
+SSLRandomSeed          connect builtin
+
+# Default headers sent for any virtual host:
+Header always set Strict-Transport-Security "max-age=15768000 ; includeSubDomains"
+Header always set X-XSS-Protection "1; mode=block"
+Header always set X-Content-Type-Options "nosniff"
+Header always set X-Frame-Options "deny"
+Header always set Frame-Options "DENY"
+Header always set Content-Security-Policy "default-src 'none'; img-src 'self' data:; style-src 'self'; connect-src 'none'; font-src 'self'; frame-src 'none'; child-src 'none'; script-src 'none';"
+Header always set Referrer-Policy "same-origin"
+
+IncludeOptional {{ aedir_etc }}/{{ web_server }}/global/*.conf
+
+<VirtualHost _default_:80>
+
+  RedirectPermanent / https://{{ web_service_fqdn }}
+
+</VirtualHost>
+
+<VirtualHost _default_:443>
+
+  DirectoryIndex index.html index.xhtml index.htm
+
+  CustomLog /var/log/apache2/web2ldap_access.log siem_log
+
+  SSLEngine on
+
+  SSLCACertificateFile {{ apache_cacert_pathname }}
+  SSLCertificateFile {{ apache_cert_pathname }}
+  SSLCertificateKeyFile {{ apache_key_pathname }}
+
+  # Optionally ask for client cert
+#  SSLCARevocationFile /etc/ssl/certs/crl-bundle.pem
+#  SSLVerifyClient optional
+#  SSLVerifyDepth 2
+
+  SSLProtocol {{ apache_ssl_protocol }}
+  SSLCipherSuite {{ apache_ssl_cipher_suite }}
+
+  DocumentRoot "{{ web_document_root }}"
+  <Directory {{ web_document_root }}>
+    AllowOverride Options=Indexes,Includes
+    AllowOverrideList AddOutputFilter AddOutputFilterByType AddType DirectoryIndex
+  </Directory>
+
+  Header always set Strict-Transport-Security "max-age=2592000; includeSubDomains; preload"
+
+  #---------------------------------------------------------------------
+  # web2ldap
+  #---------------------------------------------------------------------
+
+  ScriptAlias /web2ldap {{ web2ldap_fcgi_script }}
+
+  Alias /web2ldap-doc {{ web2ldap_prefix }}/htdocs
+
+  # Enforce using libldap from package openldap-ltb which is linked against OpenSSL
+  FcgidInitialEnv LD_LIBRARY_PATH /usr/local/openldap/lib
+
+  # Needs Python 2.6.7+ or 2.7.3+
+  FcgidInitialEnv PYTHONHASHSEED random
+
+  <Location /web2ldap>
+    SetHandler fcgid-script
+    Options ExecCGI
+    # Tell mod_ssl to set the SSL standard env vars
+    SSLOptions +StdEnvVars
+    <Limit GET POST>
+{% for require in apache_web2ldap_requires %}
+      Require {{ require }}
+{% endfor %}
+    </Limit>
+  </Location>
+
+  <Directory {{ web2ldap_htdocs }}>
+    DirectoryIndex web2ldap.html
+    <Limit GET>
+{% for require in apache_web2ldap_requires %}
+      Require {{ require }}
+{% endfor %}
+    </Limit>
+  </Directory>
+
+{% for location in ['css','js','img'] %}
+  Alias /{{ location }}/web2ldap {{ web2ldap_htdocs }}/{{ location }}/web2ldap
+  <Location /{{ location }}/web2ldap>
+    <Limit GET>
+{% for require in apache_web2ldap_requires %}
+      Require {{ require }}
+{% endfor %}
+    </Limit>
+  </Location>
+
+{% endfor %}
+
+  IncludeOptional {{ aedir_etc }}/{{ web_server }}/vhost/*.conf
+
+</VirtualHost>

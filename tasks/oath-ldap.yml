@@ -60,12 +60,6 @@
     - "restart {{ oath_bind_listener }}"
   when: ansible_service_mgr=="systemd"
 
-- name: "Enable and start service {{ oath_bind_listener }}"
-  service:
-    name: "{{ oath_bind_listener }}"
-    state: started
-    enabled: yes
-
 - name: "OATH-LDAP enrollment web app on {{ openldap_role }}"
   include: "oathenroll.yml"
   when: openldap_role=="provider"

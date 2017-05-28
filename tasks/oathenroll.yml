@@ -15,7 +15,7 @@
 - name: "Apache reverse proxy configuration"
   template:
     src: "apache2/vhost/oathenroll.conf.j2"
-    dest: "{{ web2ldap_prefix }}/etc/{{ web_server }}/vhost/oathenroll.conf"
+    dest: "{{ aedir_etc }}/{{ web_server }}/vhost/oathenroll.conf"
     owner: root
     group: root
     mode: 0644
@@ -65,10 +65,3 @@
     - reload systemd
     - "restart oathenroll"
   when: ansible_service_mgr=="systemd"
-
-- name: "ensure oathenroll is running"
-  service:
-    name: "oathenroll"
-    state: started
-    enabled: yes
-

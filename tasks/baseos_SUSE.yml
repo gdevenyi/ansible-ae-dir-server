@@ -9,4 +9,9 @@
     type: package
   with_items:
     - openssl
-    - iptables
+    - cron
+    - tar
+    - gzip
+    - ca-certificates
+    - python
+    - python-xml

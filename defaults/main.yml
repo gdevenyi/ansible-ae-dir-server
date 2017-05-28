@@ -325,11 +325,12 @@ openldap_backup_compressor: "xz -9"
 openldap_rootdse_alt_servers: "{{ aedir_hosts[openldap_role] }}"
 
 # The CA certificate file for validating the server certs
-openldap_cacert_filename: "slapd-ca-chain.pem"
+openldap_cacert_filename: "ca-chain.pem"
 
 # Suffix expected in subject-DN of server and client certs
 # for authz-regexp directive and pkiUser/seeAlso attributes
-openldap_tls_cert_suffix: "OU=ITS,O=Example,C=DE"
+# Must match values in gen_csr.cnf.j2
+openldap_tls_cert_suffix: "ou=Edit OU,o=Edit O,l=Edit L,st=Edit ST,c=CO"
 
 # The server certificate and key files
 openldap_cert_filename: "{{ openldap_service_fqdn }}.crt"
@@ -356,12 +357,12 @@ openldap_syncrepl_tls_protocol_min: "3.3"
 openldap_syncrepl_tls_cipher_suite: "ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDH-RSA-AES256-GCM-SHA384:!ADH"
 
 # The full path names on the target system
-openldap_cacert_pathname: "{{ openldap_conf_prefix }}/tls/{{ openldap_cacert_filename }}"
-openldap_cert_pathname: "{{ openldap_conf_prefix }}/tls/{{ openldap_service_fqdn }}.crt"
-openldap_key_pathname: "{{ openldap_conf_prefix }}/tls/{{ openldap_service_fqdn }}.key"
+openldap_cacert_pathname: "{{ aedir_etc }}/tls/{{ openldap_cacert_filename }}"
+openldap_cert_pathname: "{{ aedir_etc }}/tls/{{ openldap_service_fqdn }}.crt"
+openldap_key_pathname: "{{ aedir_etc }}/tls/{{ openldap_service_fqdn }}.key"
 
 # for generating DH parameters for perfect forward secrecy
-openldap_dhparam_pathname: "{{ openldap_conf_prefix }}/tls/slapd.dhparam"
+openldap_dhparam_pathname: "{{ aedir_etc }}/tls/slapd.dhparam"
 openldap_dhparam_numbits: 2048
 
 # subject alternative names for gen_csr.sh in OpenSSL syntax
@@ -484,14 +485,6 @@ smtp_cacert_pathname: "{{ aedir_etc }}/{{ smtp_cacert_filename }}"
 # directory where to install slapd_check.sh
 slapd_checkmk_local: /usr/lib/check_mk_agent/local
 
-# path name of slapd's Unix Domain Socket for LDAPI
-slapd_check_ldapi_socket: ""
-# example for LTB's OpenLDAP builds
-#slapd_check_ldapi_socket: "/usr/local/openldap/var/run/ldapi"
-
-# local LDAPI URI for reading config and monitor contexts
-slapd_check_ldapi_uri: "ldapi://{{ slapd_check_ldapi_socket|urlencode|replace('/','%2F') }}"
-
 # fully-qualified domain name of local LDAPS service
 slapd_check_service_fqdn: "{{ ansible_fqdn }}"
 
@@ -506,20 +499,6 @@ slapd_check_authz_id: "dn:uid=slapd_{{ slapd_check_service_fqdn.split('.')[0] }}
 slapd_check_lib_dirs:
   # for LTB's openLDAP builds
   - /usr/local/openldap/lib64
-
-#---------------------------------------------------------------------------
-# pip install arguments
-#---------------------------------------------------------------------------
-
-web2ldap_pip_index_url: "https://pypi.python.org/simple"
-
-web2ldap_pip_needs_compiler: "{{ web2ldap_pip_index_url == 'https://pypi.python.org/simple' }}"
-
-web2ldap_pip_install_options:
-  - "--upgrade"
-  - "--index-url {{ web2ldap_pip_index_url }}"
-
-web2ldap_pip_extra_args: "{{ web2ldap_pip_install_options|join(' ') }}"
 
 #---------------------------------------------------------------------------
 # web server in general
@@ -553,6 +532,9 @@ web2ldap_filename: "web2ldap-{{ web2ldap_version }}.tar.gz"
 # where to download the web2ldap source archive
 # override this for machines without Internet access
 web2ldap_download_url: "https://www.web2ldap.de/download/{{ web2ldap_filename }}"
+
+# src parameter used when retrieving web2ldap source tar.gz
+web2ldap_src: "web2ldap/{{ web2ldap_filename }}"
 
 # Various path names
 web2ldap_prefix: "/opt/web2ldap-{{ web2ldap_version }}"
@@ -672,13 +654,13 @@ apache_ssl_protocol: "+TLSv1.2"
 apache_ssl_cipher_suite: 'ECDHE-RSA-AES256-SHA:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:!RC4-SHA:!MEDIUM:!ADH:!LOW:!EXP:!NULL'
 
 # Path name of CA cert bundle file
-apache_cacert_filename: "httpd-ca-chain.pem"
+apache_cacert_filename: "{{ openldap_cacert_filename }}"
 
 # The server certificate and key files
 apache_cert_filename: "{{ web_service_fqdn }}.crt"
 apache_key_filename: "{{ web_service_fqdn }}.key"
 
 # The full path names on the target system
-apache_cacert_pathname: "/etc/ssl/certs/rootca.pem"
-apache_cert_pathname: "/etc/ssl/certs/{{ web_service_fqdn }}.crt"
-apache_key_pathname: "/etc/ssl/private/{{ web_service_fqdn }}.key"
+apache_cacert_pathname: "{{ openldap_cacert_pathname }}"
+apache_cert_pathname: "{{ openldap_cert_pathname }}"
+apache_key_pathname: "{{ openldap_key_pathname }}"

@@ -1,0 +1,43 @@
+---
+# tasks file for roles/web2ldap
+
+- name: "Unpack {{ web2ldap_filename }} to {{ web2ldap_prefix }}"
+  unarchive:
+    src: "{{ web2ldap_src }}"
+    dest: "/opt"
+    copy: yes
+    creates: "{{ web2ldap_prefix }}"
+    mode: a+r
+    owner: root
+    group: root
+  notify:
+    - "restart {{ web_server }}"
+
+- name: "Install fcgi.py"
+  copy:
+    src: "web2ldap/fcgi.py"
+    dest: "{{ web2ldap_pylib }}/fcgi.py"
+  notify:
+    - restart web2ldap
+
+- name: "Compile {{ web2ldap_prefix }}"
+  shell: "{{ aedir_python }} -O -m compileall {{ web2ldap_prefix }}"
+  args:
+    creates: "{{ web2ldap_pylib }}/w2lapp/__init__.pyo"
+
+- name: "Create directories for optional {{ web_server }} includes"
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: u=rwx,g=rx,o=rx
+  with_items:
+    - "{{ aedir_etc }}/{{ web_server }}"
+    - "{{ aedir_etc }}/{{ web_server }}/global"
+    - "{{ aedir_etc }}/{{ web_server }}/vhost"
+
+- name: Remove .htaccess file
+  file:
+    dest: "{{ web2ldap_htdocs }}/.htaccess"
+    state: absent

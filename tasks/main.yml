@@ -7,15 +7,18 @@
 - name: "Install OpenLDAP packages"
   include: "install_openldap_{{ lsb_id }}.yml"
 
-- name: "TLS configuration for OpenLDAP slapd"
-  include: tls_files.yml
-  tags:
-    - openldap_tls_files
+- name: "Install apache2 on {{ lsb_id }}"
+  include: "install_apache2_{{ lsb_id }}.yml"
+  when: openldap_role == 'provider'
 
 - name: "Configure OpenLDAP slapd for AE-DIR"
   include: configure_slapd.yml
   tags:
      - slapd_conf
+
+- name: "configure apache2"
+  include: "configure_apache2.yml"
+  when: openldap_role == 'provider'
 
 - name: "Add system accounts on {{ openldap_role }}"
   include: system_accounts.yml
@@ -24,6 +27,11 @@
 - name: "Install various AE-DIR tools"
   include: aedir_tools.yml
 
+- name: "TLS configuration for OpenLDAP slapd"
+  include: tls_files.yml
+  tags:
+    - openldap_tls_files
+
 - name: "Specific AE-DIR tool tasks on {{ lsb_id }}"
   include: "aedir_tools_{{ lsb_id }}.yml"
 
@@ -31,14 +39,7 @@
   include: "aedir_tools_{{ openldap_role }}.yml"
 
 - name: "Install web2ldap on {{ openldap_role }}"
-  include_role:
-    name: web2ldap
-    private: True
-  vars:
-    web_server: "apache2"
-    web2ldap_pip_index_url: "{{ aedir_pip_index_url }}"
-    web2ldap_pip_needs_compiler: "{{ aedir_pip_needs_compiler }}"
-    web2ldap_pip_extra_args: "{{ aedir_pip_extra_args }}"
+  include: "web2ldap.yml"
   when: openldap_role=="provider"
 
 - name: "Install AE-DIR password service (aedirpwd)"

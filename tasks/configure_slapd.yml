@@ -105,8 +105,3 @@
     job: "{{ openldap_backup_script }}"
   when: openldap_role == 'provider'
 
-# service defaults and service
-#-----------------------------------------------------------------------
-
-- name: "ensure service slapd is enabled and running"
-  service: name=slapd state=started enabled=yes

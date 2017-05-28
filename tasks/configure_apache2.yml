@@ -1,0 +1,45 @@
+---
+# configuration for web server apache2
+
+- name: "Create config for Apache from template"
+  template:
+    src: 'apache2.conf.j2'
+    dest: "{{ apache2_config[lsb_id].conf_pathname }}"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+  - "restart {{ web_server }}"
+
+- name: "Install apache2 CA cert bundle to {{ apache_cacert_pathname }}"
+  template:
+    src: "{{ apache_cacert_filename }}"
+    dest: "{{ apache_cacert_pathname }}"
+    owner: root
+    group: root
+    mode: 0644
+  when: apache_cacert_filename != openldap_cacert_filename or apache_cacert_pathname != openldap_cacert_pathname
+  notify:
+  - "restart {{ web_server }}"
+
+- name: "Install apache2 server cert to {{ apache_cert_pathname }}"
+  template:
+    src: "{{ apache_cert_filename }}"
+    dest: "{{ apache_cert_pathname }}"
+    owner: root
+    group: root
+    mode: 0644
+  when: apache_cert_filename != openldap_cert_filename or apache_cert_pathname != openldap_cert_pathname
+  notify:
+  - "restart {{ web_server }}"
+
+- name: "Install apache2 server key to {{ apache_key_pathname }}"
+  template:
+    src: "{{ apache_key_filename }}"
+    dest: "{{ apache_key_pathname }}"
+    owner: root
+    group: root
+    mode: 0644
+  when: apache_key_filename and (apache_key_filename != openldap_key_filename or apache_key_pathname != openldap_key_pathname)
+  notify:
+  - "restart {{ web_server }}"

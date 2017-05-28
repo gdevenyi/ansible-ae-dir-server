@@ -1,0 +1,16 @@
+---
+# installing apache2 on Debian
+
+- name: "Install packages needed for running Apache 2.4 on {{ lsb_id }}"
+  zypper:
+    name: "{{ item }}"
+    state: present
+    disable_recommends: yes
+    type: package
+  notify:
+  - "restart {{ web_server }}"
+  with_items:
+  - apache2
+  - apache2-prefork
+  - apache2-mod_fcgid
+

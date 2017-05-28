@@ -16,7 +16,7 @@
 - name: Create Apache configuration include snippets
   template:
     src: "apache2/{{ item }}.j2"
-    dest: "{{ web2ldap_prefix }}/etc/{{ web_server }}/{{ item }}"
+    dest: "{{ aedir_etc }}/{{ web_server }}/{{ item }}"
     owner: root
     group: root
     mode: 0644
@@ -80,12 +80,6 @@
     - reload systemd
     - "restart aedirpwd"
   when: ansible_service_mgr=="systemd"
-
-- name: "ensure aedirpwd is running"
-  service:
-    name: "aedirpwd"
-    state: started
-    enabled: yes
 
 - name: Run aedirpwd_cron as CRON job
   cron:
