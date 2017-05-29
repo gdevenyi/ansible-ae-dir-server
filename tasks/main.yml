@@ -16,10 +16,6 @@
   tags:
      - slapd_conf
 
-- name: "configure apache2"
-  include: "configure_apache2.yml"
-  when: openldap_role == 'provider'
-
 - name: "Add system accounts on {{ openldap_role }}"
   include: system_accounts.yml
   when: openldap_role == 'provider'
@@ -42,11 +38,15 @@
   include: "web2ldap.yml"
   when: openldap_role=="provider"
 
+- name: "Configure apache2"
+  include: "configure_apache2.yml"
+  when: openldap_role == 'provider'
+
 - name: "Install AE-DIR password service (aedirpwd)"
   include: "aedirpwd.yml"
   when: openldap_role=="provider"
 
-- name: "Configure web2ldap for AE-DIR on {{ openldap_role }}"
+- name: "Customize web2ldap for AE-DIR on {{ openldap_role }}"
   include: configure_web2ldap.yml
   when: openldap_role=="provider"
 

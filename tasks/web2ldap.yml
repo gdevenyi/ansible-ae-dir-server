@@ -25,18 +25,6 @@
   args:
     creates: "{{ web2ldap_pylib }}/w2lapp/__init__.pyo"
 
-- name: "Create directories for optional {{ web_server }} includes"
-  file:
-    path: "{{ item }}"
-    state: directory
-    owner: root
-    group: root
-    mode: u=rwx,g=rx,o=rx
-  with_items:
-    - "{{ aedir_etc }}/{{ web_server }}"
-    - "{{ aedir_etc }}/{{ web_server }}/global"
-    - "{{ aedir_etc }}/{{ web_server }}/vhost"
-
 - name: Remove .htaccess file
   file:
     dest: "{{ web2ldap_htdocs }}/.htaccess"
