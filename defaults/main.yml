@@ -483,7 +483,8 @@ smtp_cacert_pathname: "{{ aedir_etc }}/{{ smtp_cacert_filename }}"
 #---------------------------------------------------------------------------
 
 # directory where to install slapd_check.sh
-slapd_checkmk_local: /usr/lib/check_mk_agent/local
+# Probably there's no check_mk agent installed, so set other dir as default
+slapd_checkmk_local: "{{ aedir_sbin }}"
 
 # fully-qualified domain name of local LDAPS service
 slapd_check_service_fqdn: "{{ ansible_fqdn }}"
