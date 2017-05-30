@@ -119,11 +119,18 @@ class AEObjectUtil:
       result = zone_cn
     return result # _get_zone_name()
 
-  def _person_filter(self,person_dn_attr,entry,deref_attrs):
+  def _constrained_persons(
+    self,
+    person_dn_attr,
+    entry,
+    deref_attrs,
+    person_filter='(objectClass=aePerson)(aeStatus=0)',
+    person_attrs=None
+  ):
     """
-    return additional aePerson filter based on derefing `deref_attr_type'
+    return additional aePerson filter based on derefing `deref_attrs'
     """
-    person_filter_parts = []
+    person_filter_parts = [person_filter]
     for deref_attr_type in deref_attrs:
       deref_attr_values = filter(None,entry.get(deref_attr_type,[]))
       if deref_attr_values:
@@ -134,15 +141,24 @@ class AEObjectUtil:
           )
         )
     if not person_filter_parts:
-      return ''
+      return  []
+    ldap_result = self._ls.l.search_s(
+      self._determineSearchDN(self._dn,self.lu_obj.dn),
+      ldap.SCOPE_SUBTREE,
+      '(&{0})'.format(
+        ''.join(person_filter_parts)
+      ),
+      attrlist=person_attrs or ['1.1'],
+    )
+    return ldap_result
+
+  def _person_filter(self,person_dn_attr,entry,deref_attrs):
+    """
+    return additional aePerson filter based on derefing `deref_attrs'
+    """
     aeperson_filter = '(|)'
     try:
-      ldap_result = self._ls.l.search_s(
-        self._determineSearchDN(self._dn,self.lu_obj.dn),
-        ldap.SCOPE_SUBTREE,
-        '(&(objectClass=aePerson)(aeStatus=0){})'.format(''.join(person_filter_parts)),
-        attrlist=['1.1'],
-      )
+      valid_person_entries = self._constrained_persons(person_dn_attr,entry,deref_attrs)
     except (
       ldap.NO_SUCH_OBJECT,
       ldap.INSUFFICIENT_ACCESS,
@@ -151,10 +167,11 @@ class AEObjectUtil:
     ):
       pass
     else:
-      if ldap_result:
+      if valid_person_entries:
+        valid_person_dn_list = [ dn for dn,_ in valid_person_entries ]
         aeperson_filter = compose_filter(
           '|',
-          map_filter_parts(person_dn_attr,[ dn for dn,_ in ldap_result ]),
+          map_filter_parts(person_dn_attr,valid_person_dn_list),
         )
     return aeperson_filter
 
@@ -474,7 +491,7 @@ class AEGroupMember(DynamicDNSelectList,AEObjectUtil):
   oid = 'AEGroupMember-oid'
   desc = 'AE-DIR: Member of a group'
   input_fallback = False # no fallback to normal input field
-  ldap_url = 'ldap:///_?displayName?sub?(&(|(objectClass=aeUser)(objectClass=aeService))(aeStatus=0))'
+  ldap_url = 'ldap:///_?displayName,description,aePerson?sub?(&(|(objectClass=aeUser)(objectClass=aeService))(aeStatus=0))'
 
   def _zone_filter(self):
     member_zones = filter(None,self._entry.get('aeMemberZone',[]))
@@ -488,19 +505,70 @@ class AEGroupMember(DynamicDNSelectList,AEObjectUtil):
     return member_zone_filter
 
   def _determineFilter(self):
-    aeperson_filter = self._person_filter('aePerson',self._entry,('aeDept','aeLocation'))
-    aezone_filter = self._zone_filter()
-    if aeperson_filter:
-      filter_str = '(&(objectClass=aeUser)(aeStatus=0){0}{1})'.format(
-        aeperson_filter,
-        aezone_filter,
-      )
+    return '(&{0}{1})'.format(
+      DynamicDNSelectList._determineFilter(self),
+      self._zone_filter(),
+    )
+
+  def _aeperson_set(self):
+    if 'aeDept' not in self._entry and 'aeLocation' not in self._entry:
+      return None
+    valid_person_dn_set = set()
+    try:
+      valid_person_entries = self._constrained_persons('aePerson',self._entry,('aeDept','aeLocation'))
+    except (
+      ldap.NO_SUCH_OBJECT,
+      ldap.INSUFFICIENT_ACCESS,
+      ldap.SIZELIMIT_EXCEEDED,
+      ldap.TIMELIMIT_EXCEEDED,
+    ):
+      pass
     else:
-      filter_str = '(&{0}{1})'.format(
-        DynamicDNSelectList._determineFilter(self),
-        aezone_filter,
+      if valid_person_entries:
+        valid_person_dn_set = set([ dn for dn,_ in valid_person_entries ])
+    return valid_person_dn_set
+
+  def _get_attr_value_dict(self):
+    attr_value_dict = SelectList._get_attr_value_dict(self)
+    # Use the existing LDAP connection as current user
+    try:
+      ldap_result = self._ls.l.search_s(
+        self._ls.uc_encode(self._determineSearchDN(self._dn,self.lu_obj.dn))[0],
+        self.lu_obj.scope or ldap.SCOPE_SUTREE,
+        filterstr=self._determineFilter(),
+        attrlist=self.lu_obj.attrs,
       )
-    return filter_str
+    except (
+      ldap.NO_SUCH_OBJECT,
+      ldap.SIZELIMIT_EXCEEDED,
+      ldap.TIMELIMIT_EXCEEDED,
+      ldap.PARTIAL_RESULTS,
+      ldap.INSUFFICIENT_ACCESS,
+      ldap.CONSTRAINT_VIOLATION,
+      ldap.REFERRAL,
+    ):
+      return {}
+    if ldap_result:
+      valid_person_dn_set = self._aeperson_set()
+    for dn_r,entry_r in ldap_result:
+      # Check whether it's a real search result (ignore search continuations)
+      if dn_r is None:
+        continue
+      if valid_person_dn_set is not None and \
+         ('aePerson' not in entry_r or entry_r['aePerson'][0] not in valid_person_dn_set):
+        continue
+      option_value = self._ls.uc_decode(dn_r)[0]
+      try:
+        option_text = self._ls.uc_decode(entry_r['displayName'][0])[0]
+      except KeyError:
+        option_text = option_value
+      option_title = entry_r.get('description',[''])[0]
+      if option_title:
+        option_title = self._ls.uc_decode(option_title)[0]
+        attr_value_dict[option_value] = (option_text,option_title)
+      else:
+        attr_value_dict[option_value] = option_text
+    return attr_value_dict # _get_attr_value_dict()
 
 syntax_registry.registerAttrType(
   AEGroupMember.oid,[
