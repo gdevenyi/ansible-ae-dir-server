@@ -85,11 +85,16 @@
     replica's <var>aeService</var> entry:
   </dt>
   <dd>
-    <code>
-      LDAPRC=/etc/openldap/ldap.conf ldapwhoami -Y EXTERNAL -H ldaps://ae-dir-provider.example.com
-    </code>
-    <br>
-    (on Debian use file <var>/usr/local/openldap/etc/openldap/ldap.conf</var>)
+    <ul>
+      <li>
+        On SUSE / openSUSE:
+        <pre>LDAPRC=/etc/openldap/ldap.conf ldapwhoami -Y EXTERNAL -H ldaps://ae-dir-provider.example.com</pre>
+      </li>
+      <li>
+        On Debian:
+        <pre>LDAPRC=/usr/local/openldap/etc/openldap/ldap.conf ldapwhoami -Y EXTERNAL -H ldaps://ae-dir-provider.example.com</pre>
+      </li>
+    </ul>
   </dd>
 
 </dl>
