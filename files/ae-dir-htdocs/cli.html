@@ -27,12 +27,12 @@
 
 <h2 id="openldap-tls">TLS cert valiation</h2>
 <p>
-  Please make sure that you fully understand how OpenLDAP command-line 
+  Please make sure that you fully understand how OpenLDAP command-line
   tools determine which trusted root CA cert to use
   (see section <a href="https://www.openldap.org/software/man.cgi?query=ldap.conf#TLS_OPTIONS">TLS_OPTIONS in ldap.conf(5)</a>).
 </p>
 <p>
-  If in doubt simply use this to set it by environment variables (does not 
+  If in doubt simply use this to set it by environment variables (does not
   work on MacOSX!):
 </p>
 <p>
@@ -78,6 +78,18 @@
     <code>
       LDAPTLS_CERT=/path/to/client.crt LDAPTLS_KEY=/path/to/client.key ldapwhoami -Y EXTERNAL -H ldaps://ae-dir.example.com
     </code>
+  </dd>
+
+  <dt>
+    On a fully installed replica the following should output the DN of the
+    replica's <var>aeService</var> entry:
+  </dt>
+  <dd>
+    <code>
+      LDAPRC=/etc/openldap/ldap.conf ldapwhoami -Y EXTERNAL -H ldaps://ae-dir-provider.example.com
+    </code>
+    <br>
+    (on Debian use file <var>/usr/local/openldap/etc/openldap/ldap.conf</var>)
   </dd>
 
 </dl>
