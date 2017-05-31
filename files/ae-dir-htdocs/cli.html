@@ -1,4 +1,4 @@
-<!--#set var="head_title" value="User Guide" -->
+<!--#set var="head_title" value="User Guide -- command-line tools" -->
 <!--#set var="head_pagedescription" value="User guide for command-line tools" -->
 <!--#set var="base_path" value="" -->
 <!--#include file="ssi/head.shtml" -->
@@ -8,6 +8,31 @@
   <br>
   Developers and system administrators
 </p>
+
+<ol>
+  <li>
+    <a href="#openldap">OpenLDAP command-line tools</a>
+    <ol>
+      <li><a href="#openldap-tls">TLS cert valiation</a></li>
+      <li><a href="#openldap-ldapwhoami">ldapwhoami</a></li>
+      <li><a href="#openldap-ldapsearch">ldapsearch</a></li>
+    </ol>
+  </li>
+  <li>
+    <a href="#">&AElig;-DIR command-line tools</a>
+    <ol>
+      <li><a href="#ae-passwd">ae-passwd.py</a></li>
+      <li><a href="#ae-add-zone">ae-add-zone.py</a></li>
+    </ol>
+  </li>
+  <li>
+    <a href="#openssl">OpenSSL</a>
+    <ol>
+      <li><a href="#openssl-s_client">openssl s_client</a></li>
+      <li><a href="#openssl-verify">openssl verify</a></li>
+    </ol>
+  </li>
+</ol>
 
 <h1 id="openldap">OpenLDAP command-line tools</h1>
 <p>
@@ -201,7 +226,7 @@ Added cn=test42-zone-auditors,cn=test42,ou=ae-dir
 <h2 id="openssl-s_client">openssl s_client</h2>
 <p>
   The OpenSSL command-line tool
-  <a href="https://www.openssl.org/docs/manmaster/apps/s_client.html">s_client(1)</a>
+  <a href="https://www.openssl.org/docs/manmaster/man1/s_client.html">s_client(1)</a>
   opens a TLS connection to the server which is useful to test whether
   server cert validation is correct.
 </p>
@@ -214,6 +239,14 @@ Added cn=test42-zone-auditors,cn=test42,ou=ae-dir
     <br>
     (should display &quot;Verify return code: 0 (ok)&quot;)
   </dd>
+</dl>
+
+<h2 id="openssl-verify">openssl verify</h2>
+<p>
+  The OpenSSL command-line tool
+  <a href="https://www.openssl.org/docs/manmaster/man1/verify.html">verify(1)</a>
+  is useful to validate a certificate (chain) against a locally CA certificate chain.
+</p>
 </dl>
 
 <!--#include file="ssi/footer.shtml" -->
