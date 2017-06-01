@@ -35,8 +35,13 @@
       The official name is <strong>&AElig;-DIR</strong> to be
       distinguishable from any other project (and to challenge Unicode
       capabilities of software). <strong>AE-DIR</strong> is the official
-      pure-ASCII representation. Only capital letters are used in both
-      representations.
+      pure-ASCII representation.
+      <br>
+      Only capital letters are used in both representations when occuring in documentation.
+      <br>
+      Lower-cased letters are used for DNS names (e.g.
+      <var>ae-dir-p1.example.com</var> and the default search base
+      <var>ou=ae-dir</var>.
     </p>
   </li>
 
@@ -84,8 +89,9 @@
       No. &AElig;-DIR makes heavy use of
       <a href="docs.html#slapd.access">OpenLDAP's access control</a>.
       To best of my knowledge other LDAP server implementations do not
-      provide similar powerful access control. If you have different
-      opinion/suggestion please let me know.
+      provide similar powerful access control (despite by implementing
+      custom server-side plugin). If you have different opinion/suggestion
+      please let me know.
     </p>
   </li>
 
