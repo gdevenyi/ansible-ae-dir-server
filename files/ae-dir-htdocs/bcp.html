@@ -10,6 +10,7 @@
       <li><a href="#naming-dns">DNS names</a></li>
       <li><a href="#naming-aeUser">Personal accounts</a></li>
       <li><a href="#naming-aeService">Tool/service accounts</a></li>
+      <li><a href="#naming-aeHost">Host entries</a></li>
       <li><a href="#naming-aeGroup">User group names</a></li>
       <li><a href="#naming-aeSrvGroup">Service group names</a></li>
     </ol>
@@ -25,9 +26,47 @@
 <h1 id="naming">Naming conventions</h1>
 
 <h2 id="naming-dns">DNS names</h2>
+<p>
+  Recommendations:
+</p>
+<ul>
+  <li>
+    Attribute <var>host</var> in
+    <a href="docs.html#schema-oc-aeHost">aeHost</a> entries should contain
+    the canonical hostname returned by command <code>hostname -f</code>.
+  </li>
+  <li>
+    Ideally make sure that the left-most DNS label of the canonical
+    hostname is globally unique and in case of virtual machine matches the
+    dom name.
+  </li>
+  <li>
+    In any case provide a globally unique machine name added to attribute
+    <var>cn</var> in <a href="docs.html#schema-oc-aeHost">aeHost</a> entry.
+  </li>
+  <li>
+    If you plan to use X.509 TLS client certs for host authentication make
+    sure to put the canonical hostname in the certificate's subject DN.
+  </li>
+</ul>
+<p>
+  In general &AElig;-DIR's access control does not care about DNS names at
+  all. But still it's good practice to choose well-formed DNS names for
+  &AElig;-DIR servers possibly following conventions similar like these:
+</p>
+<ul>
+  <li>
+  </li>
+</ul>
+
 <h2 id="naming-aeUser">Personal accounts</h2>
+
 <h2 id="naming-aeService">Tool/service accounts</h2>
+
+<h2 id="naming-aeHost">Host entries</h2>
+
 <h2 id="naming-aeGroup">User group names</h2>
+
 <h2 id="naming-aeSrvGroup">Service group names</h2>
 
 <h1 id="security">Security considerations</h1>
@@ -87,7 +126,7 @@
     <var>aeRemoteHost</var> in the tool's <var>aeService</var> entry.
     <br>
     This results in key option
-    <code>from=..</code> being added by 
+    <code>from=..</code> being added by
     <code>search_authorized_keys.py</code> to the authorized key
     which restricts the usage of the private key to these address(es)
     (see <a href="http://man.openbsd.org/sshd#AUTHORIZED_KEYS_FILE_FORMAT">sshd(8), section "AUTHORIZED KEYS FILE FORMAT"</a>).
