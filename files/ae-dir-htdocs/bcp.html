@@ -1,0 +1,97 @@
+<!--#set var="head_title" value="Best Practices" -->
+<!--#set var="head_pagedescription" value="Best Practices / Recommendations" -->
+<!--#set var="base_path" value="" -->
+<!--#include file="ssi/head.shtml" -->
+
+<ol>
+  <li>
+    <a href="#naming">Naming conventions</a>
+    <ol>
+      <li><a href="#naming-dns">DNS names</a></li>
+      <li><a href="#naming-aeUser">Personal accounts</a></li>
+      <li><a href="#naming-aeService">Tool/service accounts</a></li>
+      <li><a href="#naming-aeGroup">User group names</a></li>
+      <li><a href="#naming-aeSrvGroup">Service group names</a></li>
+    </ol>
+  </li>
+  <li>
+    <a href="#security">Security considerations</a>
+    <ol>
+      <li><a href="#security-aeService">Using tool/service accounts (aeService)</a></li>
+    </ol>
+  </li>
+</ol>
+
+<h1 id="naming">Naming conventions</h1>
+
+<h2 id="naming-dns">DNS names</h2>
+<h2 id="naming-aeUser">Personal accounts</h2>
+<h2 id="naming-aeService">Tool/service accounts</h2>
+<h2 id="naming-aeGroup">User group names</h2>
+<h2 id="naming-aeSrvGroup">Service group names</h2>
+
+<h1 id="security">Security considerations</h1>
+
+<h2 id="security-aeService">Using tool/service accounts (aeService)</h2>
+<p>
+  Some general recommendations if you really cannot avoid using
+  tool/service accounts acting as clients:
+</p>
+<ul>
+  <li>
+    Add an <a href="docs.html#schema-oc-aeService">aeService</a> entry with
+    attribute <var>sshPublicKey</var> and do not use passwords.
+  </li>
+  <li>
+    Use separate <var>aeService</var> entries with different SSH private
+    keys for your different environments and service instances. This avoids
+    having to shut-down all your tools in case a widely used private key
+    was compromised.
+  </li>
+  <li>
+    Set login shell to <code>/bin/true</code> if shell access with invoking
+    commands is not needed.
+  </li>
+  <li>
+    Use fine-grained ownership/permissions for all files to be accessed.
+  </li>
+  <li>
+    Avoid using <em>sudo</em> for tool accounts!
+  </li>
+  <li>
+    If you cannot avoid using <em>sudo</em>:
+    <ul>
+      <li>
+        <strong>Never ever give such a "tool user" simply full root access!</strong>
+        <br>
+        Rather grant the minimum required rights by defining <strong>fine-grained</strong> sudoers rules.
+      </li>
+      <li>
+        For this add a <strong>separate</strong>
+        <a href="docs.html#schema-oc-aeGroup">aeGroup</a> entry used by specific
+        <a href="docs.html#schema-oc-aeSudoRule">aeSudoRule</a>.
+      </li>
+      <li>
+        If you set attribute <code>sudoOptions: !authenticate</code> for
+        password-less <em>sudo</em> then take care that this particular
+        rule cannot be used by personal user accounts!
+      </li>
+    </ul>
+  </li>
+  <li>
+    Consider limiting SSH commands by <var>ForceCommand</var>
+    in the host's <var>sshd_config</var>.
+  </li>
+  <li>
+    Consider setting the client's IP address(es) in attribute
+    <var>aeRemoteHost</var> in the tool's <var>aeService</var> entry.
+    <br>
+    This results in key option
+    <code>from=..</code> being added by 
+    <code>search_authorized_keys.py</code> to the authorized key
+    which restricts the usage of the private key to these address(es)
+    (see <a href="http://man.openbsd.org/sshd#AUTHORIZED_KEYS_FILE_FORMAT">sshd(8), section "AUTHORIZED KEYS FILE FORMAT"</a>).
+  </li>
+</ul>
+
+<!--#include file="ssi/footer.shtml" -->
