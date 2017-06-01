@@ -9,6 +9,7 @@
   <li><a href="#maintenance">Maintenance</a></li>
   <li><a href="#client-integration">Client integration</a></li>
   <li><a href="#security">Security</a></li>
+  <li><a href="#audit">Auditing</a></li>
 </ol>
 
 <h1 id="general">General</h1>
@@ -312,6 +313,46 @@
       authentication factors being attacked separately.
     </p>
   </li>
+
+</ol>
+
+<h1 id="audit">Auditing</h1>
+
+<ol>
+
+  <li id="owner">
+    <p class="faq_q">
+      How to find the owner of an object (entry)?
+    </p>
+    <p class="faq_a">
+      <p>
+        Although widely used the term &quot;owner&quot; is pretty blurry in real-life.
+        <br>
+        In &AElig;-DIR each entry resides within a zone and zones are used
+        for delegation. Therefore finding the respective
+        <a href="docs.html#role-zone-admin">zone admin(s)</a> of the object's
+        zone is a good approach to find the currently responsible
+        &quot;owner(s)&quot;.
+      </p>
+    </p>
+  </li>
+
+  <li id="priv-users">
+    <p class="faq_q">
+      How to find the privileged users?
+    </p>
+    <p class="faq_a">
+      &quot;Privileged&quot; is yet another blurry term which
+      oversimplifies access control to a single security class.
+      <br>
+      Basically access rights (for regular client access) are granted to
+      user groups. So the current group membership of an account defines
+      whether it has to be considered privileged. Note that the result is
+      not a simple yes/no decision. The privileges have always to be
+      reviewed carefully within a particular service context.
+    </p>
+  </li>
+
 
 </ol>
 
