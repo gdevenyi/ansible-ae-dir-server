@@ -1730,11 +1730,13 @@ class AECommonNameAEHost(AECommonName):
   oid = 'AECommonNameAEHost-oid'
   desc = 'Canonical hostname'
   derive_from_host = True
+  host_begin_item = 0
+  host_end_item = None
 
   def transmute(self,attrValues):
     if self.derive_from_host:
       return list(set([
-        av.split('.')[0].strip().lower()
+        '.'.join(av.strip().lower().split('.')[self.host_begin_item:self.host_end_item])
         for av in self._entry['host']
       ]))
     else:
