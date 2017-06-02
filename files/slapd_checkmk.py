@@ -1318,16 +1318,18 @@ class SlapdCheck(LocalCheck):
                     self.result(
                         CHECK_RESULT_WARNING,
                         item_name,
-                        check_output='Request timeout %0.1f s reached while retrieving entry count.' % (
-                            LDAP_TIMEOUT
+                        check_output='Request timeout %0.1f s reached while retrieving entry count for %r.' % (
+                            LDAP_TIMEOUT,
+                            db_suffix,
                         )
                     )
                 except ldap.TIMELIMIT_EXCEEDED:
                     self.result(
                         CHECK_RESULT_WARNING,
                         item_name,
-                        check_output='Search time limit %0.1f s exceeded while retrieving entry count.' % (
-                            NOOP_SEARCH_TIMEOUT
+                        check_output='Search time limit %0.1f s exceeded while retrieving entry count for %r.' % (
+                            NOOP_SEARCH_TIMEOUT,
+                            db_suffix,
                         )
                     )
                 except ldap.UNAVAILABLE_CRITICAL_EXTENSION:
@@ -1340,7 +1342,7 @@ class SlapdCheck(LocalCheck):
                     self.result(
                         CHECK_RESULT_ERROR,
                         item_name,
-                        check_output='Error retrieving entry count: %s' % (exc)
+                        check_output='Error retrieving entry count for %r: %s' % (db_suffix, exc)
                     )
                 else:
                     noop_response_time = time.time() - noop_start_timestamp
