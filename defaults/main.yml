@@ -658,9 +658,8 @@ apache_ssl_cipher_suite: 'ECDHE-RSA-AES256-SHA:DHE-RSA-AES256-GCM-SHA384:DHE-RSA
 apache_cacert_filename: "{{ openldap_cacert_filename }}"
 
 # The server certificate and key files
-apache_cert_filename: "{{ web_service_fqdn }}.crt"
-apache_key_filename: "{{ web_service_fqdn }}.key"
-
+apache_cert_filename: "{{ openldap_cert_filename }}"
+apache_key_filename: "{{ openldap_key_filename }}"
 # The full path names on the target system
 apache_cacert_pathname: "{{ openldap_cacert_pathname }}"
 apache_cert_pathname: "{{ openldap_cert_pathname }}"
