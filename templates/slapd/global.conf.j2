@@ -31,9 +31,7 @@ moduleload syncprov
 # contrib modules
 moduleload lastbind
 moduleload deref
-{% if openldap_noopsrch_enabled %}
 moduleload noopsrch
-{% endif %}
 
 {% if openldap_role=="provider" %}
 # only on provider replicas

@@ -393,10 +393,6 @@ openldap_log_purge: "23+00:00 01+00:00"
 # list of syncrepl providers used on a certain replica
 openldap_syncrepl_providers: "{{ aedir_hosts['provider'] }}"
 
-# Set to True if you are sure that your OpenLDAP installation has overlay
-# slapo-noopsrch available
-openldap_noopsrch_enabled: "{{ lsb_id=='SUSE' }}"
-
 #---------------------------------------------------------------------------
 # OATH-LDAP parameters
 #---------------------------------------------------------------------------

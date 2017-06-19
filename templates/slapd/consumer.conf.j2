@@ -493,7 +493,8 @@ access to
 # overlays used within {{ aedir_suffix }}
 #---------------------------------------------------------------------------
 
-{% include 'slapo-noopsrch.conf.j2' %}
+# for counting search results without retrieving them
+overlay noopsrch
 
 # for dereferencing attributes
 overlay deref
