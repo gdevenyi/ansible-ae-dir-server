@@ -2,14 +2,14 @@
 # Generate new TLS key and fetch the CSR to local file (to be submitted to signing CA)
 
 - name: "Generate new TLS server key pair in files {{ openldap_key_filename }} and {{ aedir_etc }}/tls/{{ openldap_service_fqdn }}.csr"
-  command: "/usr/bin/openssl req -config {{ aedir_etc }}/tls/gen_csr.cnf -batch -new  -nodes -out {{ aedir_etc }}/tls/{{ openldap_service_fqdn }}.csr -keyout {{ openldap_key_pathname }}"
+  command: "/usr/bin/openssl req -config {{ aedir_etc }}/tls/gen_csr.cnf -batch -new -nodes -out {{ aedir_etc }}/tls/{{ openldap_service_fqdn }}.csr -keyout {{ openldap_key_pathname }}"
 
 - name: "Modulus of CSR {{ aedir_etc }}/tls/{{ openldap_service_fqdn }}.csr"
-  command: "openssl req -in {{ aedir_etc }}/tls/{{ openldap_service_fqdn }}.csr -noout -modulus"
+  command: "/usr/bin/openssl req -in {{ aedir_etc }}/tls/{{ openldap_service_fqdn }}.csr -noout -modulus"
   register: gencsr_csr_modulus
 
 - name: "Modulus of key {{ openldap_key_pathname }}"
-  command: "openssl rsa -in {{ openldap_key_pathname }} -noout -modulus"
+  command: "/usr/bin/openssl rsa -in {{ openldap_key_pathname }} -noout -modulus"
   register: gencsr_key_modulus
 
 - name: "Compare modulus of new CSR and key"
