@@ -41,3 +41,4 @@
     name: "oathenroll"
     state: started
     enabled: yes
+  when: openldap_role=="provider" and oath_ldap_enabled == True

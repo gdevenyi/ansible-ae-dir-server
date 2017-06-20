@@ -58,3 +58,8 @@
   include: "slapd_monitoring.yml"
   tags:
     - monitoring
+
+- name: "Services on {{ openldap_role }}"
+  include: "services.yml"
+  tags:
+    - services
