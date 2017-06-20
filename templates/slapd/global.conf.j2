@@ -106,11 +106,6 @@ authz-regexp
   "gidnumber=([0-9]+)\\+uidnumber=([0-9]+),cn=peercred,cn=external,cn=auth"
   "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=posixAccount)(uidNumber=$2)(aeStatus=0))"
 
-# All mechs based on userID most times with password
-authz-regexp
-  "uid=([a-zA-Z0-9._-]+),cn=(digest-md5|cram-md5|plain|login),cn=auth"
-  "ldap:///{{ aedir_suffix }}??sub?(&(|(uid=$1)(host=$1))(aeStatus=0))"
-
 # Rewrite any cert subject-DN by searching it in attribute seeAlso
 authz-regexp
   "(cn=[^,]+,{{ openldap_tls_cert_suffix }})"
