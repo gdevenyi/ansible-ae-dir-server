@@ -69,6 +69,7 @@
     - restart hotp_validator
     - restart oathenroll
     - restart bind_proxy
+    - restart web2ldap
 
 - name: "PIP package slapdsock in virtualenv {{ aedir_prefix }}"
   pip:
@@ -101,3 +102,4 @@
     - restart aedirpwd
     - restart oathenroll
     - restart hotp_validator
+    - restart web2ldap
