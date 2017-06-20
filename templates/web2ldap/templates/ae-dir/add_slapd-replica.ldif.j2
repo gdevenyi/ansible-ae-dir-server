@@ -7,7 +7,7 @@ objectClass: pkiUser
 uid: ae-dir-slapd_
 cn: ae-dir-slapd_
 description: System user for OpenLDAP replica on .ae-dir.example.com
-seeAlso: cn=.ae-dir.example.com,{{ openldap_tls_cert_suffix }}
+seeAlso: cn=.ae-dir.example.com,{{ openldap_tls_cert_suffixes[0] }}
 aeStatus: 0
 pwdPolicySubentry: cn=ppolicy-sasl-external,cn=ae,{{ aedir_suffix }}
 aeNotBefore: now

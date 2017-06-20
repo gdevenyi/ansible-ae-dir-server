@@ -106,20 +106,22 @@ authz-regexp
   "gidnumber=([0-9]+)\\+uidnumber=([0-9]+),cn=peercred,cn=external,cn=auth"
   "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=posixAccount)(uidNumber=$2)(aeStatus=0))"
 
-# Rewrite any cert subject-DN by searching it in attribute seeAlso
+{% for cert_suffix in openldap_tls_cert_suffixes %}
+# Rewrite any cert with subject-DN suffix "{{ cert_suffix }}" by searching it in attribute seeAlso
 authz-regexp
-  "(cn=[^,]+,{{ openldap_tls_cert_suffix }})"
-  "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=pkiUser)(seeAlso=$1)(seeAlso:dnSubordinateMatch:={{ openldap_tls_cert_suffix }})(aeStatus=0))"
+  "(cn=[^,]+,{{ cert_suffix }})"
+  "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=pkiUser)(seeAlso=$1)(seeAlso:dnSubordinateMatch:={{ cert_suffix }})(aeStatus=0))"
 
-# Rewrite server cert subject-DN by searching FQDN in server entry
+# Rewrite server cert with subject-DN suffix "{{ cert_suffix }}" by searching CN attribute value in server entry name attributes
 authz-regexp
-  "cn=([a-zA-Z0-9.-]+),{{ openldap_tls_cert_suffix }}"
-  "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=aeHost)(host=$1)(aeStatus=0))"
+  "cn=([a-zA-Z0-9.-]+),{{ cert_suffix }}"
+  "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=aeHost)(|(cn=$1)(host=$1))(aeStatus=0))"
 
-# subject name patterns of internal AE-DIR PKI with structural object class in OU
+{% endfor %}
+# subject name is equal to AE-DIR entry DN
 authz-regexp
-  "cn=([a-zA-Z0-9.-]+),ou=(ae[a-zA-Z]+)-cert,{{ aedir_suffix }}"
-  "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=$2)(|(uid=$1)(host=$1))(aeStatus=0))"
+  "(.+,{{ aedir_suffix }})"
+  "ldap:///$1??base?(&(|(objectClass=aeUser)(objectClass=aeService)(objectClass=aeHost))(aeStatus=0))"
 
 #---------------------------------------------------------------------------
 # Global access control and security restrictions

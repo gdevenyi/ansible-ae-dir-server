@@ -330,7 +330,8 @@ openldap_cacert_filename: "ca-chain.pem"
 # Suffix expected in subject-DN of server and client certs
 # for authz-regexp directive and pkiUser/seeAlso attributes
 # Must match values in gen_csr.cnf.j2
-openldap_tls_cert_suffix: "ou=Edit OU,o=Edit O,l=Edit L,st=Edit ST,c=CO"
+openldap_tls_cert_suffixes:
+  - "ou=Edit OU,o=Edit O,l=Edit L,st=Edit ST,c=CO"
 
 # The server certificate and key files
 openldap_cert_filename: "{{ openldap_service_fqdn }}.crt"

@@ -893,7 +893,7 @@ homeDirectory: /home/ae-dir-slapd_{{ service_hostname }}
 cn: ae-dir-slapd_{{ service_hostname }}
 uidNumber: {{ gid_number + loop.index }}
 gidNumber: {{ gid_number + loop.index }}
-seeAlso: cn={{ service_fqdn }},{{ openldap_tls_cert_suffix }}
+seeAlso: cn={{ service_fqdn }},{{ openldap_tls_cert_suffixes[0] }}
 aeHost: host={{ host }},cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir_suffix }}
 
 {% endfor %}
