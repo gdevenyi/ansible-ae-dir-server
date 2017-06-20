@@ -52,7 +52,7 @@
   changed_when: False
 
 - name: "Modulus of key {{ openldap_key_pathname }}"
-  command: "openssl rsa -in {{ openldap_key_pathname }} -noout -modulus"
+  command: "/usr/bin/openssl rsa -in {{ openldap_key_pathname }} -noout -modulus"
   ignore_errors: yes
   register: openldap_key_modulus
   changed_when: False
@@ -104,10 +104,15 @@
   notify:
   - restart slapd
 
-- name: "generate TLS DH parameter file ({{ openldap_dhparam_numbits }} bits)"
+- name: "Check TLS DH parameter file {{ openldap_dhparam_pathname }}"
+  command: "/usr/bin/openssl dhparam -in {{ openldap_dhparam_pathname }} -check"
+  ignore_errors: yes
+  register: openldap_dhparam_check
+  changed_when: False
+
+- name: "generate TLS DH parameter file {{ openldap_dhparam_pathname }} ({{ openldap_dhparam_numbits }} bits)"
   command: "/usr/bin/openssl dhparam -out {{ openldap_dhparam_pathname }} {{ openldap_dhparam_numbits }}"
-  args:
-    creates: "{{ openldap_dhparam_pathname }}"
+  when: openldap_dhparam_check.rc != 0
   notify:
   - restart slapd
 
@@ -119,4 +124,3 @@
     mode: 0640
   notify:
   - restart slapd
-
