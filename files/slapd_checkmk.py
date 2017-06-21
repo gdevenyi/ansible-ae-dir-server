@@ -31,9 +31,14 @@ import pprint
 import logging
 from cStringIO import StringIO
 
-# from Python cryptography
-import cryptography.x509
-from cryptography.hazmat.backends import default_backend as crypto_default_backend
+# optional imports from cryptography (aka PyCA) module
+try:
+    import cryptography.x509
+    from cryptography.hazmat.backends import default_backend as crypto_default_backend
+except ImportError:
+    cryptography_avail = False
+else:
+    cryptography_avail = True
 
 # Switch off processing .ldaprc or ldap.conf
 # before importing python-ldap (libldap)
@@ -57,7 +62,7 @@ from pyasn1.codec.ber import decoder
 # Configuration constants
 #-----------------------------------------------------------------------
 
-__version__ = '1.2.0'
+__version__ = '1.2.1'
 
 STATE_FILENAME = 'slapd_checkmk.state'
 
@@ -1084,25 +1089,32 @@ class SlapdCheck(LocalCheck):
                         check_output='olcSaslHost %r found' % (olc_sasl_host),
                     )
 
-            server_cert_pem = open(self._config_attrs['olcTLSCertificateFile'][0], 'rb').read()
-            server_cert_obj = cryptography.x509.load_pem_x509_certificate(server_cert_pem, crypto_default_backend())
-            cert_validity_rest = (server_cert_obj.not_valid_after - datetime.datetime.utcnow())
-            if cert_validity_rest.days <= CERT_ERROR_DAYS:
-                cert_check_result = CHECK_RESULT_ERROR
-            elif cert_validity_rest.days <= CERT_WARN_DAYS:
-                cert_check_result = CHECK_RESULT_WARNING
+            if cryptography_avail:
+                server_cert_pem = open(self._config_attrs['olcTLSCertificateFile'][0], 'rb').read()
+                server_cert_obj = cryptography.x509.load_pem_x509_certificate(server_cert_pem, crypto_default_backend())
+                cert_validity_rest = (server_cert_obj.not_valid_after - datetime.datetime.utcnow())
+                if cert_validity_rest.days <= CERT_ERROR_DAYS:
+                    cert_check_result = CHECK_RESULT_ERROR
+                elif cert_validity_rest.days <= CERT_WARN_DAYS:
+                    cert_check_result = CHECK_RESULT_WARNING
+                else:
+                    cert_check_result = CHECK_RESULT_OK
+                self.result(
+                    cert_check_result,
+                    'SlapdCert',
+                    check_output='Server cert valid until %s UTC (%d days ahead, %0.1f %% elapsed), path name %r' % (
+                        server_cert_obj.not_valid_after,
+                        cert_validity_rest.days,
+                        100-100*float(cert_validity_rest.total_seconds())/(server_cert_obj.not_valid_after-server_cert_obj.not_valid_before).total_seconds(),
+                        self._config_attrs['olcTLSCertificateFile'][0],
+                    ),
+                )
             else:
-                cert_check_result = CHECK_RESULT_OK
-            self.result(
-                cert_check_result,
-                'SlapdCert',
-                check_output='Server cert valid until %s UTC (%d days ahead, %0.1f %% elapsed), path name %r' % (
-                    server_cert_obj.not_valid_after,
-                    cert_validity_rest.days,
-                    100-100*float(cert_validity_rest.total_seconds())/(server_cert_obj.not_valid_after-server_cert_obj.not_valid_before).total_seconds(),
-                    self._config_attrs['olcTLSCertificateFile'][0],
-                ),
-            )
+                self.result(
+                    CHECK_RESULT_UNKNOWN,
+                    'SlapdCert',
+                    check_output='cryptography.x509 not available',
+                )
 
         syncrepl_topology = {}
         try:
