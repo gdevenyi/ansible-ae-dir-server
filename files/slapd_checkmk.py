@@ -32,8 +32,8 @@ import logging
 from cStringIO import StringIO
 
 # optional imports from cryptography (aka PyCA) module
-cryptography_avail = False
-m2crypto_avail = False
+CRYPTOGRAPHY_AVAIL = False
+M2CRYPTO_AVAIL = False
 try:
     import cryptography.x509
     from cryptography.hazmat.backends import default_backend as crypto_default_backend
@@ -43,9 +43,9 @@ except ImportError:
     except ImportError:
         pass
     else:
-        m2crypto_avail = True
+        M2CRYPTO_AVAIL = True
 else:
-    cryptography_avail = True
+    CRYPTOGRAPHY_AVAIL = True
 
 # Switch off processing .ldaprc or ldap.conf
 # before importing python-ldap (libldap)
@@ -69,7 +69,7 @@ from pyasn1.codec.ber import decoder
 # Configuration constants
 #-----------------------------------------------------------------------
 
-__version__ = '1.3.0'
+__version__ = '1.3.1'
 
 STATE_FILENAME = 'slapd_checkmk.state'
 
@@ -847,7 +847,7 @@ class SlapdCheck(LocalCheck):
 
     def _check_cert_validity(self, config_attrs):
         server_cert_pathname = config_attrs['olcTLSCertificateFile'][0]
-        if not cryptography_avail and not m2crypto_avail:
+        if not CRYPTOGRAPHY_AVAIL and not M2CRYPTO_AVAIL:
             # no crypto modules present => abort
             self.result(
                 CHECK_RESULT_UNKNOWN,
@@ -856,12 +856,12 @@ class SlapdCheck(LocalCheck):
             )
             return
         server_cert_pem = open(server_cert_pathname, 'rb').read()
-        if cryptography_avail:
+        if CRYPTOGRAPHY_AVAIL:
             server_cert_obj = cryptography.x509.load_pem_x509_certificate(server_cert_pem, crypto_default_backend())
             cert_not_after = server_cert_obj.not_valid_after
             cert_not_before = server_cert_obj.not_valid_before
             crypto_module = 'cryptography'
-        elif m2crypto_avail:
+        elif M2CRYPTO_AVAIL:
             server_cert_obj = M2Crypto.X509.load_cert_string(server_cert_pem, M2Crypto.X509.FORMAT_PEM)
             cert_not_after = server_cert_obj.get_not_after().get_datetime()
             cert_not_before = server_cert_obj.get_not_before().get_datetime()
@@ -874,13 +874,15 @@ class SlapdCheck(LocalCheck):
             cert_check_result = CHECK_RESULT_WARNING
         else:
             cert_check_result = CHECK_RESULT_OK
+        # less exact usage of .days because of older Python versions without timedelta.total_seconds()
+        elapsed_percentage = 100-100*float(cert_validity_rest.days)/float((cert_not_after-cert_not_before).days)
         self.result(
             cert_check_result,
             'SlapdCert',
             check_output='Server cert valid until %s UTC (%d days ahead, %0.1f %% elapsed), path name %r (via module %s)' % (
                 cert_not_after,
                 cert_validity_rest.days,
-                100-100*float(cert_validity_rest.total_seconds())/(cert_not_after-cert_not_before).total_seconds(),
+                elapsed_percentage,
                 server_cert_pathname,
                 crypto_module,
             ),
