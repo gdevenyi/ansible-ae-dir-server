@@ -32,11 +32,18 @@ import logging
 from cStringIO import StringIO
 
 # optional imports from cryptography (aka PyCA) module
+cryptography_avail = False
+m2crypto_avail = False
 try:
     import cryptography.x509
     from cryptography.hazmat.backends import default_backend as crypto_default_backend
 except ImportError:
-    cryptography_avail = False
+    try:
+        import M2Crypto
+    except ImportError:
+        pass
+    else:
+        m2crypto_avail = True
 else:
     cryptography_avail = True
 
@@ -62,7 +69,7 @@ from pyasn1.codec.ber import decoder
 # Configuration constants
 #-----------------------------------------------------------------------
 
-__version__ = '1.2.1'
+__version__ = '1.3.0'
 
 STATE_FILENAME = 'slapd_checkmk.state'
 
@@ -368,21 +375,22 @@ class SyncReplDesc(object):
         # strip all white spaces from syncrepl statement parameters
         syncrepl_statement = syncrepl_statement.strip()
         # Set class attributes for all known keywords
-        for k in self.known_keywords:
-            setattr(self, k.replace('-', '_'), None)
-        b = []
-        for k in self.known_keywords:
-            k_pos = syncrepl_statement.find(k)
-            if k_pos == 0 or (k_pos > 0 and syncrepl_statement[k_pos - 1] == ' '):
-                b.append(k_pos)
-        b.sort()
-        for i in range(len(b) - 1):
-            k, v = syncrepl_statement[b[i]:b[i + 1]].split('=', 1)
-            k = k.strip()
-            v = v.strip()
-            if v[0] == '"' and v[-1] == '"':
-                v = v[1:-1]
-            setattr(self, k.replace('-', '_'), v)
+        for keyword in self.known_keywords:
+            setattr(self, keyword.replace('-', '_'), None)
+
+        parts = []
+        for keyword in self.known_keywords:
+            k_pos = syncrepl_statement.find(keyword)
+            if k_pos == 0 or (k_pos > 0 and syncrepl_statement[k_pos-1] == ' '):
+                parts.append(k_pos)
+        parts.sort()
+        for k_pos in range(len(parts) - 1):
+            key, val = syncrepl_statement[parts[k_pos]:parts[k_pos+1]].split('=', 1)
+            key = key.strip()
+            val = val.strip()
+            if val[0] == '"' and val[-1] == '"':
+                val = val[1:-1]
+            setattr(self, key.replace('-', '_'), val)
 
     def ldap_url(self):
         """
@@ -837,6 +845,48 @@ class SlapdCheck(LocalCheck):
         'SlapdThreads',
     )
 
+    def _check_cert_validity(self, config_attrs):
+        server_cert_pathname = config_attrs['olcTLSCertificateFile'][0]
+        if not cryptography_avail and not m2crypto_avail:
+            # no crypto modules present => abort
+            self.result(
+                CHECK_RESULT_UNKNOWN,
+                'SlapdCert',
+                check_output='no crypto modules present => could not check validity of %r' % (server_cert_pathname),
+            )
+            return
+        server_cert_pem = open(server_cert_pathname, 'rb').read()
+        if cryptography_avail:
+            server_cert_obj = cryptography.x509.load_pem_x509_certificate(server_cert_pem, crypto_default_backend())
+            cert_not_after = server_cert_obj.not_valid_after
+            cert_not_before = server_cert_obj.not_valid_before
+            crypto_module = 'cryptography'
+        elif m2crypto_avail:
+            server_cert_obj = M2Crypto.X509.load_cert_string(server_cert_pem, M2Crypto.X509.FORMAT_PEM)
+            cert_not_after = server_cert_obj.get_not_after().get_datetime()
+            cert_not_before = server_cert_obj.get_not_before().get_datetime()
+            crypto_module = 'M2Crypto'
+        utc_now = datetime.datetime.now(cert_not_after.tzinfo)
+        cert_validity_rest = cert_not_after - utc_now
+        if cert_validity_rest.days <= CERT_ERROR_DAYS:
+            cert_check_result = CHECK_RESULT_ERROR
+        elif cert_validity_rest.days <= CERT_WARN_DAYS:
+            cert_check_result = CHECK_RESULT_WARNING
+        else:
+            cert_check_result = CHECK_RESULT_OK
+        self.result(
+            cert_check_result,
+            'SlapdCert',
+            check_output='Server cert valid until %s UTC (%d days ahead, %0.1f %% elapsed), path name %r (via module %s)' % (
+                cert_not_after,
+                cert_validity_rest.days,
+                100-100*float(cert_validity_rest.total_seconds())/(cert_not_after-cert_not_before).total_seconds(),
+                server_cert_pathname,
+                crypto_module,
+            ),
+        )
+        return # end of _check_cert_validity()
+
     def _check_local_ldaps(self, ldaps_uri, my_authz_id):
         """
         Connect and bind to local slapd like a remote client
@@ -1089,32 +1139,7 @@ class SlapdCheck(LocalCheck):
                         check_output='olcSaslHost %r found' % (olc_sasl_host),
                     )
 
-            if cryptography_avail:
-                server_cert_pem = open(self._config_attrs['olcTLSCertificateFile'][0], 'rb').read()
-                server_cert_obj = cryptography.x509.load_pem_x509_certificate(server_cert_pem, crypto_default_backend())
-                cert_validity_rest = (server_cert_obj.not_valid_after - datetime.datetime.utcnow())
-                if cert_validity_rest.days <= CERT_ERROR_DAYS:
-                    cert_check_result = CHECK_RESULT_ERROR
-                elif cert_validity_rest.days <= CERT_WARN_DAYS:
-                    cert_check_result = CHECK_RESULT_WARNING
-                else:
-                    cert_check_result = CHECK_RESULT_OK
-                self.result(
-                    cert_check_result,
-                    'SlapdCert',
-                    check_output='Server cert valid until %s UTC (%d days ahead, %0.1f %% elapsed), path name %r' % (
-                        server_cert_obj.not_valid_after,
-                        cert_validity_rest.days,
-                        100-100*float(cert_validity_rest.total_seconds())/(server_cert_obj.not_valid_after-server_cert_obj.not_valid_before).total_seconds(),
-                        self._config_attrs['olcTLSCertificateFile'][0],
-                    ),
-                )
-            else:
-                self.result(
-                    CHECK_RESULT_UNKNOWN,
-                    'SlapdCert',
-                    check_output='cryptography.x509 not available',
-                )
+            self._check_cert_validity(self._config_attrs)
 
         syncrepl_topology = {}
         try:
@@ -1541,7 +1566,7 @@ class SlapdCheck(LocalCheck):
                 )
 
         local_csn_dict = self._get_local_csns(syncrepl_list)
-        
+
         # Close LDAPI connection
         self._ldapi_conn.unbind_s()
 
