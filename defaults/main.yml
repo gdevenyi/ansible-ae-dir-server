@@ -64,9 +64,10 @@ aedir_rundir: "{{ aedir_prefix }}/run"
 # where to install systemd files
 aedir_systemd_dir: "/etc/systemd/system"
 
+# which Python interpreter to use
 aedir_platform_python:
-  Debian: "{{ aedir_bin }}/python"
-  SUSE: "/usr/bin/python"
+  Debian: "{{ aedir_bin }}/python2"
+  SUSE: "/usr/bin/python2"
 aedir_python: "{{ aedir_platform_python[lsb_id] }} -ROO"
 
 # regex patterns for enforcing naming conventions (substring match!)
