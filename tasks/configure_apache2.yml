@@ -14,7 +14,7 @@
     - "{{ aedir_etc }}/{{ web_server }}/vhost"
 
 - name: "Create config for Apache from template"
-  copy:
+  template:
     src: 'apache2.conf.j2'
     dest: "{{ apache2_config[lsb_id].conf_pathname }}"
     owner: root
@@ -46,7 +46,7 @@
   - "restart {{ web_server }}"
 
 - name: "Install apache2 server key to {{ apache_key_pathname }}"
-  template:
+  copy:
     src: "{{ apache_key_filename }}"
     dest: "{{ apache_key_pathname }}"
     owner: root
