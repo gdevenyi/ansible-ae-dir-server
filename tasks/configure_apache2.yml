@@ -14,7 +14,7 @@
     - "{{ aedir_etc }}/{{ web_server }}/vhost"
 
 - name: "Create config for Apache from template"
-  template:
+  copy:
     src: 'apache2.conf.j2'
     dest: "{{ apache2_config[lsb_id].conf_pathname }}"
     owner: root
@@ -24,7 +24,7 @@
   - "restart {{ web_server }}"
 
 - name: "Install apache2 CA cert bundle to {{ apache_cacert_pathname }}"
-  template:
+  copy:
     src: "{{ apache_cacert_filename }}"
     dest: "{{ apache_cacert_pathname }}"
     owner: root
@@ -35,7 +35,7 @@
   - "restart {{ web_server }}"
 
 - name: "Install apache2 server cert to {{ apache_cert_pathname }}"
-  template:
+  copy:
     src: "{{ apache_cert_filename }}"
     dest: "{{ apache_cert_pathname }}"
     owner: root
