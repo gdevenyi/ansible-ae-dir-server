@@ -62,3 +62,6 @@
     owner: root
     group: root
     mode: 0640
+  when: apache_key_filename and (apache_key_filename != openldap_key_filename and apache_key_pathname != openldap_key_pathname)
+  notify:
+  - "restart {{ web_server }}"
