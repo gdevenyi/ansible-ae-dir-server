@@ -594,7 +594,7 @@ syntax_registry.registerAttrType(
 )
 
 
-class AEMailGroupMember(DynamicDNSelectList):
+class AEMailGroupMember(AEGroupMember):
   oid = 'AEMailGroupMember-oid'
   desc = 'AE-DIR: Member of a mail group'
   input_fallback = False # no fallback to normal input field
