@@ -41,6 +41,8 @@
 - name: "Configure apache2"
   include: "configure_apache2.yml"
   when: openldap_role == 'provider'
+  tags:
+     - apache_conf
 
 - name: "Install AE-DIR password service (aedirpwd)"
   include: "aedirpwd.yml"
