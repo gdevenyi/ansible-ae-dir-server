@@ -635,11 +635,20 @@ apache2_config:
       - filter
       - logio
 
+# Apache ErrorLog value
 apache_error_log: "syslog:daemon"
 #apache_error_log: "/var/log/apache2/error.log"
 
+# Apache accesslog file
+apache_access_log: "/var/log/apache2/ae-dir-provider.log"
+
+# Apache LogLevel value
 apache_log_level: "info"
 
+# see https://httpd.apache.org/docs/2.4/mod/mod_log_config.html#formats
+apache_log_format: '"%h %A %l %u %t \"%r\" %>s \"%{Referer}i\" \"%{User-Agent}i\" reqid=%L in=%I out=%O rbody=%B etime=%D"'
+
+# Apache ServerAdmin value
 apache_server_admin: "{{ web_server_admin_email }}"
 
 # which IP nets are allowed to access web2ldap
@@ -648,7 +657,7 @@ apache_web2ldap_requires:
   - "ip ::1"
   - "ip 10.0.0.0/255.0.0.0"
 
-# TLS parameters
+# Apache TLS parameters
 apache_ssl_protocol: "+TLSv1.2"
 apache_ssl_cipher_suite: 'ECDHE-RSA-AES256-SHA:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:!RC4-SHA:!MEDIUM:!ADH:!LOW:!EXP:!NULL'
 
@@ -662,6 +671,3 @@ apache_key_filename: "{{ openldap_key_filename }}"
 apache_cacert_pathname: "{{ openldap_cacert_pathname }}"
 apache_cert_pathname: "{{ openldap_cert_pathname }}"
 apache_key_pathname: "{{ openldap_key_pathname }}"
-
-# see https://httpd.apache.org/docs/2.4/mod/mod_log_config.html#formats
-apache_log_format: '"%h %A %l %u %t \"%r\" %>s %p %O \"%{Referer}i\" \"%{User-Agent}i\" %D"'
