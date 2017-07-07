@@ -47,7 +47,7 @@ Group {{ apache2_config[lsb_id].group }}
 
 HostnameLookups Off
 
-LogFormat "%h %A %l %u %t \"%r\" %>s %p %O \"%{Referer}i\" \"%{User-Agent}i\"" siem_log
+LogFormat {{ apache_log_format }} apache_log_format
 
 # for non-SSL vhost
 Listen 0.0.0.0:80
@@ -93,7 +93,7 @@ IncludeOptional {{ aedir_etc }}/{{ web_server }}/global/*.conf
 
   DirectoryIndex index.html index.xhtml index.htm
 
-  CustomLog /var/log/apache2/web2ldap_access.log siem_log
+  CustomLog /var/log/apache2/web2ldap_access.log apache_log_format
 
   SSLEngine on
 
