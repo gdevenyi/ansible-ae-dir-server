@@ -93,7 +93,7 @@ IncludeOptional {{ aedir_etc }}/{{ web_server }}/global/*.conf
 
   DirectoryIndex index.html index.xhtml index.htm
 
-  CustomLog /var/log/apache2/web2ldap_access.log apache_log_format
+  CustomLog {{ apache_access_log }} apache_log_format
 
   SSLEngine on
 
