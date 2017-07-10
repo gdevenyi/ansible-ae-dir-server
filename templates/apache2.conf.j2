@@ -47,7 +47,7 @@ Group {{ apache2_config[lsb_id].group }}
 
 HostnameLookups Off
 
-LogFormat {{ apache_log_format }} apache_log_format
+LogFormat "{{ apache_log_format }}" apache_log_format
 
 # for non-SSL vhost
 Listen 0.0.0.0:80
