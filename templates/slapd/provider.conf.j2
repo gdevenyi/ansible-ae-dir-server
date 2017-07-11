@@ -1013,7 +1013,8 @@ access to
 access to
   dn.subtree="{{ aedir_suffix }}"
   attrs=@aePosixIdRanges
-    by set="user & ([ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(|(cn=*-zone-admins)(cn=*-zone-auditors))(member=] + user + [))])/member" read
+    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,ou=ae-dir" read
+    by group/aeGroup/member="cn=ae-all-zone-auditors,cn=ae,ou=ae-dir" read
     by * none
 
 # Password policy entries
@@ -1027,7 +1028,8 @@ access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=pwdPolicy)"
     by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" read
-    by set="user & ([ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(|(cn=*-zone-admins)(cn=*-zone-auditors))(member=] + user + [))])/member" read
+    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,ou=ae-dir" read
+    by group/aeGroup/member="cn=ae-all-zone-auditors,cn=ae,ou=ae-dir" read
     by set="user & ([ldap:///] + user + [?entryDN?base?(&(objectClass=aeUser)(aeStatus=0))])/entryDN" read
     by * auth
 
