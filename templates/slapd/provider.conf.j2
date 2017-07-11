@@ -431,7 +431,7 @@ access to
     by set="user & this/aeZoneAdmins/member" read
     by set="user & this/aeZoneAuditors/member" read
     by set="user/oathHOTPToken & this" read
-    by set="user & ([ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(member=] + user + [))])/member" read
+    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,ou=ae-dir" read
     by * none
 
 #------------------------------------------------------------------
@@ -612,7 +612,7 @@ access to
   filter="(objectClass=aeLocation)"
     by set="user & this/-1/aeZoneAdmins/member" write
     by set="user & this/-1/aeZoneAuditors/member" read
-    by set="user & ([ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(member=] + user + [))])/member" read
+    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,ou=ae-dir" read
     by set="user/aePerson/aeLocation & this" read
     by * none break
 # administration and readability of aeDept entries
@@ -621,7 +621,7 @@ access to
   filter="(objectClass=aeDept)"
     by set="user & this/-1/aeZoneAdmins/member" write
     by set="user & this/-1/aeZoneAuditors/member" read
-    by set="user & ([ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(member=] + user + [))])/member" read
+    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,ou=ae-dir" read
     by set="user/aePerson/aeDept & this" read
     by * none break
 
@@ -1006,7 +1006,7 @@ access to
 access to
   dn.base="{{ aedir_suffix }}"
   attrs=uidNumber,gidNumber
-    by set="user & ([ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(member=] + user + [))])/member" write
+    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,ou=ae-dir" write
     by * none
 
 # read access to the POSIX ID ranges for all active aeUser entries
@@ -1051,7 +1051,7 @@ access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=aePerson)"
     by set="user/aePerson & this" read
-    by set="user & ([ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(member=] + user + [))])/member" read
+    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,ou=ae-dir" read
     by * none break
 
 # restricted addressbook usage to person users for normal users
@@ -1069,7 +1069,7 @@ access to
 access to
   dn.exact="{{ aedir_suffix }}"
   attrs=auditContext
-    by set="user & ([ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(member=] + user + [))])/member" read
+    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,ou=ae-dir" read
     by * none
 
 # Last catch ACLs
