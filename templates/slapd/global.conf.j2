@@ -170,7 +170,7 @@ access to
   dn.base=""
   attrs=namingContexts
   val.regex="^{{ aedir_accesslog_suffix }}$"
-    by set="user & ([ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(member=] + user + [))])/member" read
+    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,ou=ae-dir" read
     by * none break
 
 # allow admin/auditor access to read all search bases
