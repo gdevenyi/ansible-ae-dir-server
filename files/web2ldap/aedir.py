@@ -122,7 +122,6 @@ class AEObjectUtil:
 
   def _constrained_persons(
     self,
-    person_dn_attr,
     entry,
     deref_attrs,
     person_filter='(objectClass=aePerson)(aeStatus=0)',
@@ -142,7 +141,7 @@ class AEObjectUtil:
           )
         )
     if not person_filter_parts:
-      return  []
+      return []
     ldap_result = self._ls.l.search_s(
       self._determineSearchDN(self._dn,self.lu_obj.dn),
       ldap.SCOPE_SUBTREE,
@@ -152,29 +151,6 @@ class AEObjectUtil:
       attrlist=person_attrs or ['1.1'],
     )
     return ldap_result
-
-  def _person_filter(self,person_dn_attr,entry,deref_attrs):
-    """
-    return additional aePerson filter based on derefing `deref_attrs'
-    """
-    aeperson_filter = '(|)'
-    try:
-      valid_person_entries = self._constrained_persons(person_dn_attr,entry,deref_attrs)
-    except (
-      ldap.NO_SUCH_OBJECT,
-      ldap.INSUFFICIENT_ACCESS,
-      ldap.SIZELIMIT_EXCEEDED,
-      ldap.TIMELIMIT_EXCEEDED,
-    ):
-      pass
-    else:
-      if valid_person_entries:
-        valid_person_dn_list = [ dn for dn,_ in valid_person_entries ]
-        aeperson_filter = compose_filter(
-          '|',
-          map_filter_parts(person_dn_attr,valid_person_dn_list),
-        )
-    return aeperson_filter
 
 
 class AEHomeDirectory(HomeDirectory):
@@ -530,45 +506,45 @@ class AEGroupMember(DynamicDNSelectList,AEObjectUtil):
     # Use the existing LDAP connection as current user
     attr_value_dict = SelectList._get_attr_value_dict(self)
     try:
-      msg_id = self._ls.l.search_ext(
+      ldap_result = self._ls.l.search_ext_s(
         self._ls.uc_encode(self._determineSearchDN(self._dn,self.lu_obj.dn))[0],
         self.lu_obj.scope or ldap.SCOPE_SUTREE,
         filterstr=self._determineFilter(),
         attrlist=self.lu_obj.attrs+['description'],
         serverctrls=srv_ctrls,
+        add_ctrls=1,
       )
-      for _,res_data,_,_ in self._ls.l.allresults(msg_id,add_ctrls=1):
-        for dn,entry,controls in res_data:
-          if dn is None:
-            # ignore search continuations
-            continue
-          # process dn and entry
-          if controls:
-              deref_control = controls[0]
-              _,deref_entry = deref_control.derefRes['aePerson'][0]
-          elif deref_person_attrset:
-            # if we have constrained attributes, no deref response control
-            # means constraint not valid
-            continue
-          # check constrained values here
-          valid = True
-          for attr_type,attr_values in deref_person_attrset.items():
-            if attr_type not in deref_entry or \
-               deref_entry[attr_type][0] not in attr_values:
-              valid = False
-          if valid:
-            option_value = self._ls.uc_decode(dn)[0]
-            try:
-              option_text = self._ls.uc_decode(entry['displayName'][0])[0]
-            except KeyError:
-              option_text = option_value
-            try:
-              entry_desc = entry['description'][0]
-            except KeyError:
-              option_title = option_value
-            else:
-              option_title = self._ls.uc_decode(entry_desc)[0]
-            attr_value_dict[option_value] = (option_text,option_title)
+      for dn,entry,controls in ldap_result[1]:
+        if dn is None:
+          # ignore search continuations
+          continue
+        # process dn and entry
+        if controls:
+            deref_control = controls[0]
+            _,deref_entry = deref_control.derefRes['aePerson'][0]
+        elif deref_person_attrset:
+          # if we have constrained attributes, no deref response control
+          # means constraint not valid
+          continue
+        # check constrained values here
+        valid = True
+        for attr_type,attr_values in deref_person_attrset.items():
+          if attr_type not in deref_entry or \
+             deref_entry[attr_type][0] not in attr_values:
+            valid = False
+        if valid:
+          option_value = self._ls.uc_decode(dn)[0]
+          try:
+            option_text = self._ls.uc_decode(entry['displayName'][0])[0]
+          except KeyError:
+            option_text = option_value
+          try:
+            entry_desc = entry['description'][0]
+          except KeyError:
+            option_title = option_value
+          else:
+            option_title = self._ls.uc_decode(entry_desc)[0]
+          attr_value_dict[option_value] = (option_text,option_title)
     except (
       ldap.NO_SUCH_OBJECT,
       ldap.SIZELIMIT_EXCEEDED,
@@ -1264,14 +1240,19 @@ class AEPerson(DynamicDNSelectList,AEObjectUtil):
   def _determineFilter(self):
     filter_components = [
       DynamicDNSelectList._determineFilter(self),
-      self._person_filter(
-        'entryDN',
-        self._zone_entry(attrlist=self.deref_attrs) or {},
-        self.deref_attrs,
-      ),
       self._status_filter(),
       # ae_validity_filter(),
     ]
+    zone_entry = self._zone_entry(attrlist=self.deref_attrs) or {}
+    for deref_attr_type in self.deref_attrs:
+      deref_attr_values = filter(None,zone_entry.get(deref_attr_type,[]))
+      if deref_attr_values:
+        filter_components.append(
+          compose_filter(
+            '|',
+            map_filter_parts(deref_attr_type,deref_attr_values),
+          )
+        )
     ocs = self._entry.object_class_oid_set()
     if 'inetLocalMailRecipient' not in ocs:
       filter_components.append('(mail=*)')
