@@ -516,7 +516,7 @@ spawn_fcgi_exec: "/usr/bin/spawn-fcgi"
 web_server_admin_email: "web2ldap-admin@example.com"
 
 # document root used for https://hostname/
-web_document_root: "{{ web2ldap_prefix }}/htdocs"
+web_document_root: "{{ aedir_prefix }}/htdocs"
 
 #---------------------------------------------------------------------------
 # web2ldap parameters
