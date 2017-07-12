@@ -367,6 +367,12 @@ openldap_key_pathname: "{{ aedir_etc }}/tls/{{ openldap_service_fqdn }}.key"
 openldap_dhparam_pathname: "{{ aedir_etc }}/tls/slapd.dhparam"
 openldap_dhparam_numbits: 2048
 
+# password hashing scheme
+# see https://tools.ietf.org/html/draft-stroeder-hashed-userpassword-values
+openldap_password_hash: "{CRYPT}"
+# SHA-512, 72 bits of salt, 5000 iterations (see crypt(3) man page)
+openldap_password_crypt_salt_format: "$6$%.12s"
+
 # subject alternative names for gen_csr.sh in OpenSSL syntax
 openldap_csr_subjectaltnames:
   - "DNS:{{ openldap_service_fqdn }}"

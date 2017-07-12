@@ -63,9 +63,10 @@ rootDSE {{ openldap_conf_prefix }}/rootDSE.ldif
 # password hash parameters
 #---------------------------------------------------------------------------
 
-password-hash {CRYPT}
-# SHA-512, 72 bits) of salt, 5000 iterations
-password-crypt-salt-format "$6$%.12s"
+password-hash {{ openldap_password_hash }}
+{% if openldap_password_hash.upper()=='{CRYPT}' %}
+password-crypt-salt-format "{{ openldap_password_crypt_salt_format }}"
+{% endif %}
 
 #---------------------------------------------------------------------------
 # SASL parameters
