@@ -80,6 +80,12 @@
   tags:
     - oath
 
+- name: "Password sync tasks on {{ openldap_role }}"
+  include: "pwsync.yml"
+  when: openldap_role=="provider" and pwsync_enabled == True
+  tags:
+     - pwsync
+
 - name: "Monitoring scripts on {{ openldap_role }}"
   include: "slapd_monitoring.yml"
   tags:

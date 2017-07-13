@@ -1515,6 +1515,15 @@ ppolicy_use_lockout
 
 {% include 'slapo-rwm.conf.j2' %}
 
+{% if pwsync_enabled==True %}
+# send modify requests to external listener process receiving the requests
+# on Unix Domain socket path {{ pwsync_socket_path }}
+overlay sock
+extensions binddn peername ssf connid
+socketpath {{ pwsync_socket_path }}
+sockops modify
+{% endif %}
+
 #---------------------------------------------------------------------------
 # replication of {{ aedir_suffix }}
 #---------------------------------------------------------------------------

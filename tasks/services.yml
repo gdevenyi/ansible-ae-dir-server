@@ -49,3 +49,10 @@
     state: started
     enabled: yes
   when: openldap_role=="provider" and oath_ldap_enabled == True
+
+- name: "Ensure PASSMOD listener service is running"
+  service:
+    name: "passmod"
+    state: started
+    enabled: yes
+  when: openldap_role=="provider" and pwsync_enabled == True

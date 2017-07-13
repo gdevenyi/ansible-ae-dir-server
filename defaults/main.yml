@@ -193,6 +193,12 @@ aedir_ldapi_services:
     uid_number: "{{ aedir_min_gid-6 }}"
     gid_number: "{{ aedir_min_gid-6 }}"
     description: The system user used for WebSSO
+  # system user for PASSMOD listener
+  ae-dir-pwsync:
+    cn: Password sync listener
+    uid_number: 993
+    gid_number: 993
+    description: The system user allowed to intercept password changes and set password
 
 # POSIX UID and GID which is mapped to rootdn
 aedir_rootdn_uid_number: 0
@@ -418,6 +424,22 @@ openldap_log_purge: "23+00:00 01+00:00"
 
 # list of syncrepl providers used on a certain replica
 openldap_syncrepl_providers: "{{ aedir_hosts['provider'] }}"
+
+#---------------------------------------------------------------------------
+# password sync parameters
+#---------------------------------------------------------------------------
+
+# enable password clear-text syncing (rarely needed)
+pwsync_enabled: False
+
+# user account for running external PASSMOD listener
+pwsync_listener_user: ae-dir-pwsync
+
+# Directory path where Unix domain socket is created
+pwsync_socket_dir: "{{ aedir_rundir }}/passmod"
+# Full pathname of Unix domain socket of bind listener
+# (set this to empty string for disabling the external bind listeners completely)
+pwsync_socket_path: "{{ pwsync_socket_dir }}/socket"
 
 #---------------------------------------------------------------------------
 # OATH-LDAP parameters

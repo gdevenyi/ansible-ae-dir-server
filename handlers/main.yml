@@ -34,3 +34,7 @@
   notify:
     - "restart web server"
   when: openldap_role == 'provider'
+
+- name: restart passmod
+  service: name=passmod state=restarted
+  when: openldap_role == 'provider' and pwsync_enabled == True
