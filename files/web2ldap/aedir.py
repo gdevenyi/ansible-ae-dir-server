@@ -239,7 +239,7 @@ class AEGIDNumber(GidNumber):
     """
     determine which ID pool entry to use
     """
-    return self.id_pool_dn or self._ls.getSearchRoot(self._dn)
+    return self.id_pool_dn or self._ls.currentSearchRoot.encode(self._ls.charset)
 
   def _get_next_gid(self):
     """
@@ -332,7 +332,7 @@ class AEUserUid(AEUid):
       uid_candidate = ldaputil.passwd.RandomString(self.genLen,self.UID_LETTERS)
       # check whether UID candidate already exists
       uid_result = self._ls.l.search_s(
-        self._ls.currentSearchRoot,
+        self._ls.currentSearchRoot.encode(self._ls.charset),
         ldap.SCOPE_SUBTREE,
         '(uid=%s)' % (uid_candidate),
         attrlist=['1.1'],
