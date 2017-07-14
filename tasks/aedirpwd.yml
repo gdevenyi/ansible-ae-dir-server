@@ -38,11 +38,15 @@
 
 - name: "Create aedirpwd_cnf.py"
   template:
-    src: "{{ aedirpwd_cnf_template }}"
+    src: "{{ item }}"
     dest: "{{ aedir_etc }}/aedirpwd/aedirpwd_cnf.py"
     owner: root
     group: root
     mode: 0644
+  with_first_found:
+    - files:
+       - "aedirpwd/aedirpwd_cnf.py.j2"
+      paths: "{{ aedir_templates_dirs }}"
   notify:
     - "restart aedirpwd"
 

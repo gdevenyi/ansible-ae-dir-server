@@ -36,11 +36,15 @@
 
 - name: "Create oathenroll_cnf.py"
   template:
-    src: "{{ oath_ldap_oathenroll_cnf_template }}"
+    src: "{{ item }}"
     dest: "{{ aedir_etc }}/oathenroll/oathenroll_cnf.py"
     owner: root
-    group: root
-    mode: 0644
+    group: "{{ oath_ldap_oathenroll_web_group }}"
+    mode: 0640
+  with_first_found:
+    - files:
+       - "oath-ldap/oathenroll_cnf.py.j2"
+      paths: "{{ aedir_templates_dirs }}"
   notify:
     - "restart oathenroll"
 

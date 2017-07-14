@@ -14,31 +14,43 @@
 
 - name: Create web2ldapcnf/local.py for AE-DIR
   template:
-    src: "{{ aedir_web2ldap_cnf_local }}"
+    src: "{{ item }}"
     dest: "{{ web2ldap_cnfdir }}/local.py"
     owner: root
     group: root
     mode: 0644
+  with_first_found:
+    - files:
+       - "web2ldap/web2ldapcnf/local.py.j2"
+      paths: "{{ aedir_templates_dirs }}"
   notify:
     - restart web2ldap
 
 - name: Create web2ldapcnf/hosts.py for AE-DIR
   template:
-    src: "{{ aedir_web2ldap_cnf_hosts }}"
+    src: "{{ item }}"
     dest: "{{ web2ldap_cnfdir }}/hosts.py"
     owner: root
     group: root
     mode: 0644
+  with_first_found:
+    - files:
+       - "web2ldap/web2ldapcnf/hosts.py.j2"
+      paths: "{{ aedir_templates_dirs }}"
   notify:
     - restart web2ldap
 
 - name: "Create connect AE-DIR landing page for web2ldap"
   template:
-    src: "{{ aedir_web2ldap_connect_template }}"
+    src: "{{ item }}"
     dest: "{{ web2ldap_templates }}/connect.html"
     owner: root
     group: root
     mode: 0644
+  with_first_found:
+    - files:
+       - "web2ldap/templates/connect.html.j2"
+      paths: "{{ aedir_templates_dirs }}"
 
 - name: "Create search provider file pointing to {{ aedir_main_provider_hostname }}"
   template:

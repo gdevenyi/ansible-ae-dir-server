@@ -2,6 +2,25 @@
 # defaults file for roles/ae-dir
 
 #---------------------------------------------------------------------------
+# general ansible arguments
+#---------------------------------------------------------------------------
+
+# directory where to expect local files on the Ansible controller
+aedir_local_files: "{{ playbook_dir }}/files"
+
+# Directories to search for Jinja2 templates (used by with_first_found)
+aedir_templates_dirs:
+  - "{{ inventory_dir }}/templates"
+  - "{{ playbook_dir }}/templates"
+  - "{{ role_path }}/templates"
+
+# Directories to search for files (used by with_first_found)
+aedir_files_dirs:
+  - "{{ inventory_dir }}/files"
+  - "{{ playbook_dir }}/files"
+  - "{{ role_path }}/files"
+
+#---------------------------------------------------------------------------
 # pip install arguments
 #---------------------------------------------------------------------------
 
@@ -254,9 +273,6 @@ aedir_user_mail_enabled: "{{ aedir_hosts.provider[0]==ansible_fqdn }}"
 #  - "ou=groups"
 aedir_fake_search_roots: []
 
-# directory where to expect local files on the Ansible controller
-aedir_local_files: "{{ playbook_dir }}/files"
-
 #---------------------------------------------------------------------------
 # OpenLDAP parameters
 #---------------------------------------------------------------------------
@@ -413,29 +429,14 @@ oath_ldap_socket_dir: "{{ aedir_rundir }}/{{ oath_bind_listener }}"
 # (set this to empty string for disabling the external bind listeners completely)
 oath_ldap_socket_path: "{{ oath_ldap_socket_dir }}/socket"
 
-# jinja template to use for oathenroll_cnf.py
-oath_ldap_oathenroll_cnf_template: "oath-ldap/oathenroll_cnf.py.j2"
-
 # user/group to run password self-service web application
 # must be in {{ aedir_ldapi_services }}
 oath_ldap_oathenroll_web_user: ae-dir-otpenroll
 oath_ldap_oathenroll_web_group: ae-dir-otpenroll
 
 #---------------------------------------------------------------------------
-# web2ldap parameters
-#---------------------------------------------------------------------------
-
-# Jinja template names used
-aedir_web2ldap_cnf_local: "web2ldap/web2ldapcnf/local.py.j2"
-aedir_web2ldap_cnf_hosts: "web2ldap/web2ldapcnf/hosts.py.j2"
-aedir_web2ldap_connect_template: "web2ldap/templates/connect.html.j2"
-
-#---------------------------------------------------------------------------
 # parameters for password services
 #---------------------------------------------------------------------------
-
-# jinja template to use for aedirpwd_cnf.py
-aedirpwd_cnf_template: "aedirpwd/aedirpwd_cnf.py.j2"
 
 # user/group to run password self-service web application
 # must be in {{ aedir_ldapi_services }}
