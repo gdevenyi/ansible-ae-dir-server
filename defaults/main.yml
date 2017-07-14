@@ -497,6 +497,10 @@ cron_config:
     service_name: "cron"
     pkg_name: "cron"
 
+cron_service_name: "{{ cron_config[lsb_id].service_name }}"
+
+cron_pkg_name: "{{ cron_config[lsb_id].pkg_name }}"
+
 #---------------------------------------------------------------------------
 # Parameters for monitoring script
 #---------------------------------------------------------------------------

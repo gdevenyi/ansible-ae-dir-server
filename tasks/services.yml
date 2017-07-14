@@ -8,9 +8,9 @@
     state: started
     enabled: yes
 
-- name: "Ensure {{ cron_config[lsb_id] }} is running"
+- name: "Ensure {{ cron_service_name }} is running"
   service:
-    name: "{{ cron_config[lsb_id].service_name }}"
+    name: "{{ cron_service_name }}"
     state: started
     enabled: yes
   when: openldap_role=="provider"

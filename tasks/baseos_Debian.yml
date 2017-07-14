@@ -12,7 +12,7 @@
   with_items:
     - apt-transport-https
     - ca-certificates
-    - "{{ cron_config[lsb_id].pkg_name }}"
+    - "{{ cron_pkg_name }}"
     - gzip
     - openssl
     - python
