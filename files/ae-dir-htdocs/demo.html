@@ -3,7 +3,25 @@
 <!--#set var="base_path" value="" -->
 <!--#include file="ssi/head.shtml" -->
 
+<h1>Web access</h1>
 <p>
+  <a href="https://demo.ae-dir.com/web2ldap">https://demo.ae-dir.com/web2ldap</a>
 </p>
+
+<h1>LDAP access</h1>
+<table>
+  <tr>
+    <td>Hostname/Port (via TLS)</td>
+    <td>demo.ae-dir.com:636</td>
+  </tr>
+  <tr>
+    <td>Search base</td>
+    <td>ou=ae-dir</td>
+  </tr>
+  <tr>
+    <td>LDAP URL</td>
+    <td><code>ldaps://demo.ae-dir.com/ou=ae-dir</code></td>
+  </tr>
+</table>
 
 <!--#include file="ssi/footer.shtml" -->
