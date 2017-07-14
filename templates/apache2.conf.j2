@@ -37,13 +37,17 @@ MaxKeepAliveRequests 100
 KeepAliveTimeout 15
 
 StartServers 5
+<IfModule prefork.c>
 MinSpareServers 2
 MaxSpareServers 10
+</IfModule>
+
 MaxRequestWorkers 50
 MaxConnectionsPerChild 10000
 
 User {{ apache2_config[lsb_id].user }}
 Group {{ apache2_config[lsb_id].group }}
+Suexec Off
 
 HostnameLookups Off
 
