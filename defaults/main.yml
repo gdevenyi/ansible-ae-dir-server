@@ -65,9 +65,6 @@ aedir_rundir: "{{ aedir_prefix }}/run"
 aedir_systemd_dir: "/etc/systemd/system"
 
 # which Python interpreter to use
-aedir_platform_python:
-  Debian: "{{ aedir_bin }}/python2"
-  SUSE: "/usr/bin/python2"
 aedir_python: "{{ aedir_platform_python[lsb_id] }} -ROO"
 
 # regex patterns for enforcing naming conventions (substring match!)
@@ -268,27 +265,10 @@ aedir_local_files: "{{ playbook_dir }}/files"
 openldap_role: "consumer"
 
 # which repo to use for LTB OpenLDAP builds (Debian and RHEL/CentOS)
-ltb_openldap_repo:
-  Debian: "deb https://ltb-project.org/debian/{{ ansible_distribution_release }} {{ ansible_distribution_release }} main"
 ltb_openldap_repo_source: "{{ ltb_openldap_repo[lsb_id] }}"
 
 # default FQDN in LDAP service URL
 openldap_service_fqdn: "{{ inventory_hostname }}"
-
-# OS-specific maps
-os_openldap_paths:
-  Debian:
-    # LTB-based installation
-    openldap_prefix: /usr/local/openldap
-    openldap_conf_prefix: /usr/local/openldap/etc/openldap
-    openldap_data: /usr/local/openldap/var/openldap-data
-    openldap_rundir: /usr/local/openldap/var/run
-  SUSE:
-    # openSUSE packages
-    openldap_prefix: /usr
-    openldap_conf_prefix: /etc/openldap
-    openldap_data: /var/lib/ldap
-    openldap_rundir: /var/run/slapd
 
 # Some paths
 openldap_prefix: "{{ os_openldap_paths[lsb_id].openldap_prefix }}"
@@ -489,14 +469,6 @@ smtp_cacert_pathname: "{{ aedir_etc }}/{{ smtp_cacert_filename }}"
 # CRON parameters
 #---------------------------------------------------------------------------
 
-cron_config:
-  Debian:
-    service_name: "cron"
-    pkg_name: "cron"
-  SUSE:
-    service_name: "cron"
-    pkg_name: "cron"
-
 cron_service_name: "{{ cron_config[lsb_id].service_name }}"
 
 cron_pkg_name: "{{ cron_config[lsb_id].pkg_name }}"
@@ -610,59 +582,6 @@ web2ldap_service: web2ldap-fcgi
 #---------------------------------------------------------------------------
 # apache2 parameters
 #---------------------------------------------------------------------------
-
-# conf_pathname: where to place the monolithic apache configuration file
-# mod_dir: directory where Apache modules are found
-# modules: which modules to load
-apache2_config:
-  Debian:
-    service_name: "apache2"
-    user: "www-data"
-    group: "www-data"
-    pid_file: "${APACHE_PID_FILE}"
-    conf_pathname: "/etc/apache2/apache2.conf"
-    mod_dir: "/usr/lib/apache2/modules"
-    log_dir: "/var/log/apache2"
-    ssl_session_cache: "shmcb:/var/run/apache2/ssl_scache(512000)"
-    modules:
-      - mpm_prefork
-      - socache_shmcb
-      - env
-      - fcgid
-      - dir
-      - alias
-      - ssl
-      - mime
-      - authz_core
-      - authz_host
-      - headers
-      - include
-      - deflate
-      - filter
-  SUSE:
-    service_name: "apache2"
-    user: "wwwrun"
-    group: "www"
-    pid_file: ""
-    conf_pathname: "/etc/apache2/httpd.conf"
-    mod_dir: "/usr/lib64/apache2"
-    log_dir: "/var/log/apache2"
-    ssl_session_cache: "shmcb:/var/run/apache2/ssl_scache(512000)"
-    modules:
-      - socache_shmcb
-      - env
-      - fcgid
-      - dir
-      - alias
-      - ssl
-      - mime
-      - authz_core
-      - authz_host
-      - headers
-      - include
-      - deflate
-      - filter
-      - logio
 
 # Apache ErrorLog value
 apache_error_log: "syslog:daemon"
