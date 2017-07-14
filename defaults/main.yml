@@ -513,7 +513,7 @@ slapd_check_lib_dirs:
 #---------------------------------------------------------------------------
 
 # Which web server to install
-web_server: apache2
+web_server: "{{ apache2_config[lsb_id].service_name }}"
 
 # FQDN of service interface
 web_service_fqdn: "{{ inventory_hostname }}"
@@ -600,11 +600,13 @@ web2ldap_service: web2ldap-fcgi
 # modules: which modules to load
 apache2_config:
   Debian:
+    service_name: "apache2"
     user: "www-data"
     group: "www-data"
     pid_file: "${APACHE_PID_FILE}"
     conf_pathname: "/etc/apache2/apache2.conf"
     mod_dir: "/usr/lib/apache2/modules"
+    log_dir: "/var/log/apache2"
     ssl_session_cache: "shmcb:/var/run/apache2/ssl_scache(512000)"
     modules:
       - mpm_prefork
@@ -622,11 +624,13 @@ apache2_config:
       - deflate
       - filter
   SUSE:
+    service_name: "apache2"
     user: "wwwrun"
     group: "www"
     pid_file: ""
     conf_pathname: "/etc/apache2/httpd.conf"
     mod_dir: "/usr/lib64/apache2"
+    log_dir: "/var/log/apache2"
     ssl_session_cache: "shmcb:/var/run/apache2/ssl_scache(512000)"
     modules:
       - socache_shmcb
@@ -646,10 +650,10 @@ apache2_config:
 
 # Apache ErrorLog value
 apache_error_log: "syslog:daemon"
-#apache_error_log: "/var/log/apache2/error.log"
+#apache_error_log: "{{ apache2_config[lsb_id].log_dir }}/error.log"
 
 # Apache accesslog file
-apache_access_log: "/var/log/apache2/ae-dir-provider.log"
+apache_access_log: "{{ apache2_config[lsb_id].log_dir }}/ae-dir-{{ openldap_role }}.log"
 
 # Apache LogLevel value
 apache_log_level: "info"
