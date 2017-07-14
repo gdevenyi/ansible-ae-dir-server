@@ -9,7 +9,7 @@
     type: package
   with_items:
     - openssl
-    - cron
+    - "{{ cron_config[lsb_id].pkg_name }}"
     - tar
     - gzip
     - ca-certificates

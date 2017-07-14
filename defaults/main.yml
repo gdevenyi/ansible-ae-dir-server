@@ -486,6 +486,18 @@ smtp_cacert_filename:  "{{ openldap_cacert_filename }}"
 smtp_cacert_pathname: "{{ aedir_etc }}/{{ smtp_cacert_filename }}"
 
 #---------------------------------------------------------------------------
+# CRON parameters
+#---------------------------------------------------------------------------
+
+cron_config:
+  Debian:
+    service_name: "cron"
+    pkg_name: "cron"
+  SUSE:
+    service_name: "cron"
+    pkg_name: "cron"
+
+#---------------------------------------------------------------------------
 # Parameters for monitoring script
 #---------------------------------------------------------------------------
 
