@@ -257,6 +257,9 @@ aedir_user_mail_enabled: "{{ aedir_hosts.provider[0]==ansible_fqdn }}"
 #  - "ou=groups"
 aedir_fake_search_roots: []
 
+# directory where to expect local files on the Ansible controller
+aedir_local_files: "{{ playbook_dir }}/files"
+
 #---------------------------------------------------------------------------
 # OpenLDAP parameters
 #---------------------------------------------------------------------------
@@ -339,7 +342,7 @@ openldap_cert_filename: "{{ openldap_service_fqdn }}.crt"
 openldap_key_filename: "{{ openldap_service_fqdn }}.key"
 
 # local directory for fetched CSRs
-local_openldap_csr_dir: "{{ playbook_dir }}/files/pki-csr-files"
+local_openldap_csr_dir: "{{ aedir_local_files }}/pki-csr-files"
 
 # whether to overwrite existing server's private key
 openldap_keygen: 0
