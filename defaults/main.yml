@@ -153,40 +153,40 @@ aedir_ldapi_services:
   # uid is referenced in OpenLDAP ACLs!
   ae-dir-pwd:
     cn: Password self-service application
-    uid_number: 998
-    gid_number: 998
+    uid_number: "{{ aedir_min_gid-1 }}"
+    gid_number: "{{ aedir_min_gid-1 }}"
     description: The system user allowed to set attributes during user password reset (msPwdResetObject) over LDAPI
   # system user for sync processes
   ae-dir-peoplesync:
     cn: Personnel data sync process
-    uid_number: 999
-    gid_number: 999
+    uid_number: "{{ aedir_min_gid-2 }}"
+    gid_number: "{{ aedir_min_gid-2 }}"
     description: The system user allowed to maintain aePerson entries over LDAPI
   # system user for OTP registration/enrollment web application
   # uid is referenced in OpenLDAP ACLs!
   ae-dir-otpenroll:
     cn: 2FA enrollment application
-    uid_number: 997
-    gid_number: 997
+    uid_number: "{{ aedir_min_gid-3 }}"
+    gid_number: "{{ aedir_min_gid-3 }}"
     description: The system user allowed to init OATH token entries over LDAPI
   # system user for OTP verification listener
   # uid is referenced in OpenLDAP ACLs!
   ae-dir-otpverify:
     cn: OATH-LDAP validator demon
-    uid_number: 996
-    gid_number: 996
+    uid_number: "{{ aedir_min_gid-4 }}"
+    gid_number: "{{ aedir_min_gid-4 }}"
     description: The system user allowed to read shared secrets (OATH-LDAP)
   # system user for bind proxy listener
   ae-dir-bind-proxy:
     cn: OATH-LDAP bind proxy
-    uid_number: 995
-    gid_number: 995
+    uid_number: "{{ aedir_min_gid-5 }}"
+    gid_number: "{{ aedir_min_gid-5 }}"
     description: The system user used for simple bind proxy
   # system user for WebSSO component
   ae-dir-web-sso:
     cn: WebSSO component
-    uid_number: 994
-    gid_number: 994
+    uid_number: "{{ aedir_min_gid-6 }}"
+    gid_number: "{{ aedir_min_gid-6 }}"
     description: The system user used for WebSSO
 
 # POSIX UID and GID which is mapped to rootdn
