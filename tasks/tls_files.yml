@@ -9,7 +9,7 @@
     group: ldap
     mode: 0755
   notify:
-  - restart slapd
+    - restart slapd
 
 - name: Create gen_csr.cnf
   template:
@@ -35,7 +35,7 @@
     group: ldap
     mode: 0644
   notify:
-  - restart slapd
+    - restart slapd
 
 - name: "Validate cert {{ openldap_cert_filename }} against CA certs {{ openldap_cacert_filename }}"
   command: "openssl verify -purpose sslserver -CAfile {{ aedir_local_files }}/{{ openldap_cacert_filename }} files/{{ openldap_cert_filename }}"

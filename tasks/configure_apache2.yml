@@ -21,7 +21,7 @@
     group: root
     mode: 0644
   notify:
-  - "restart {{ web_server }}"
+    - "restart {{ web_server }}"
 
 - name: "Install apache2 CA cert bundle {{ apache_cacert_filename }} to {{ apache_cacert_pathname }}"
   copy:
