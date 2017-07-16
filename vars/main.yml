@@ -1,6 +1,10 @@
 ---
 # vars file for roles/ae-dir-server
 
+# map real LSB id to another LSB id to be used during plays
+lsb_id_map:
+  openSUSE: "SUSE"
+
 # which Python interpreter to use
 aedir_platform_python:
   Debian: "{{ aedir_bin }}/python2"

@@ -38,10 +38,6 @@ aedir_pip_extra_args: "{{ aedir_pip_install_options|join(' ') }}"
 # AE-DIR parameters
 #---------------------------------------------------------------------------
 
-# map real LSB id to another LSB id to be used during plays
-lsb_id_map:
-  openSUSE: "SUSE"
-
 # LSB id to be used during plays
 lsb_id: "{{ lsb_id_map.get(ansible_lsb.id,ansible_lsb.id) }}"
 
