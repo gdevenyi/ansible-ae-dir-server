@@ -22,6 +22,8 @@
 
 - name: "Install various AE-DIR tools"
   include: aedir_tools.yml
+  tags:
+    - aedir_tools
 
 - name: "TLS configuration for OpenLDAP slapd"
   include: tls_files.yml
@@ -30,6 +32,8 @@
 
 - name: "Specific AE-DIR tool tasks on {{ lsb_id }}"
   include: "aedir_tools_{{ lsb_id }}.yml"
+  tags:
+    - aedir_tools
 
 - name: "Specific AE-DIR tool tasks on {{ openldap_role }}"
   include: "aedir_tools_{{ openldap_role }}.yml"
@@ -47,6 +51,8 @@
 - name: "Install AE-DIR password service (aedirpwd)"
   include: "aedirpwd.yml"
   when: openldap_role=="provider"
+  tags:
+    - aedirpwd
 
 - name: "Customize web2ldap for AE-DIR on {{ openldap_role }}"
   include: configure_web2ldap.yml
