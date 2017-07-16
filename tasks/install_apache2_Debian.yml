@@ -10,7 +10,7 @@
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
   notify:
-  - "restart {{ web_server }}"
+  - "restart web server"
   with_items:
   - apache2
   - apache2-mpm-prefork

@@ -8,15 +8,23 @@ lsb_id_map:
 
 # which Python interpreter to use
 aedir_platform_python:
+  CentOS: "{{ aedir_bin }}/python2"
   Debian: "{{ aedir_bin }}/python2"
   SUSE: "/usr/bin/python2"
 
 # which repo to use for LTB OpenLDAP builds (Debian and RHEL/CentOS)
 ltb_openldap_repo:
+  CentOS: "https://ltb-project.org/rpm/$releasever/$basearch"
   Debian: "deb https://ltb-project.org/debian/{{ ansible_distribution_release }} {{ ansible_distribution_release }} main"
 
 # OS-specific maps
 os_openldap_paths:
+  CentOS:
+    # LTB-based installation
+    openldap_prefix: /usr/local/openldap
+    openldap_conf_prefix: /usr/local/openldap/etc/openldap
+    openldap_data: /usr/local/openldap/var/openldap-data
+    openldap_rundir: /usr/local/openldap/var/run
   Debian:
     # LTB-based installation
     openldap_prefix: /usr/local/openldap
@@ -31,6 +39,9 @@ os_openldap_paths:
     openldap_rundir: /var/run/slapd
 
 cron_config:
+  CentOS:
+    service_name: "crond"
+    pkg_name: "cronie"
   Debian:
     service_name: "cron"
     pkg_name: "cron"
@@ -43,6 +54,33 @@ cron_config:
 # log_dir: directory where Apache logs are written to
 # modules: which modules to load
 apache2_config:
+  CentOS:
+    service_name: "httpd"
+    user: "apache"
+    group: "apache"
+    pid_file: ""
+    conf_pathname: "/etc/httpd/conf/httpd.conf"
+    mod_dir: "/usr/lib64/httpd/modules"
+    log_dir: "/var/log/httpd"
+    ssl_session_cache: "shmcb:/var/run/httpd/ssl_scache(512000)"
+    modules:
+      - socache_shmcb
+      - env
+      - unixd
+      - fcgid
+      - dir
+      - alias
+      - ssl
+      - mime
+      - authz_core
+      - authz_host
+      - headers
+      - include
+      - deflate
+      - filter
+      - logio
+      - log_config
+      - mpm_worker
   Debian:
     service_name: "apache2"
     user: "www-data"

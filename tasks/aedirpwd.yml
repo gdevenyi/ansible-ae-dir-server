@@ -24,7 +24,7 @@
     - global/mod_proxy.conf
     - vhost/aedirpwd.conf
   notify:
-    - "restart {{ web_server }}"
+    - "restart web server"
 
 - name: "copy aedirpwd HTML templates to {{ aedir_etc }}/aedirpwd/templates"
   copy:

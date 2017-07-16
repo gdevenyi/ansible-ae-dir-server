@@ -1,0 +1,16 @@
+---
+# tasks file for roles/ae-dir-server
+
+- name: "Install base OS packages"
+  yum:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+    - openssl
+    - "{{ cron_pkg_name }}"
+    - tar
+    - gzip
+    - ca-certificates
+    - python
+    - libxml2-python

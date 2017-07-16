@@ -20,7 +20,7 @@
     group: root
     mode: 0644
   notify:
-    - "restart {{ web_server }}"
+    - "restart web server"
 
 - name: "copy oathenroll HTML templates to {{ aedir_etc }}/oathenroll/templates"
   copy:

@@ -21,7 +21,7 @@
     group: root
     mode: 0644
   notify:
-    - "restart {{ web_server }}"
+    - "restart web server"
 
 - name: "Install apache2 CA cert bundle {{ apache_cacert_filename }} to {{ apache_cacert_pathname }}"
   copy:
@@ -32,7 +32,7 @@
     mode: 0644
   when: apache_cacert_filename != openldap_cacert_filename and apache_cacert_pathname != openldap_cacert_pathname
   notify:
-  - "restart {{ web_server }}"
+  - "restart web server"
 
 - name: "Install apache2 server cert {{ apache_cert_filename }} to {{ apache_cert_pathname }}"
   copy:
@@ -43,7 +43,7 @@
     mode: 0644
   when: apache_cert_filename != openldap_cert_filename and apache_cert_pathname != openldap_cert_pathname
   notify:
-  - "restart {{ web_server }}"
+  - "restart web server"
 
 - name: "Install apache2 server key {{ apache_key_filename }} to {{ apache_key_pathname }}"
   copy:
@@ -54,7 +54,7 @@
     mode: 0644
   when: apache_key_filename and (apache_key_filename != openldap_key_filename and apache_key_pathname != openldap_key_pathname)
   notify:
-  - "restart {{ web_server }}"
+  - "restart web server"
 
 - name: "Set ownership/permissions of apache2 server key {{ apache_key_pathname }}"
   file:
@@ -64,4 +64,4 @@
     mode: 0640
   when: apache_key_filename and (apache_key_filename != openldap_key_filename and apache_key_pathname != openldap_key_pathname)
   notify:
-  - "restart {{ web_server }}"
+  - "restart web server"

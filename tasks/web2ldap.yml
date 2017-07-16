@@ -11,7 +11,7 @@
     owner: root
     group: root
   notify:
-    - "restart {{ web_server }}"
+    - "restart web server"
 
 - name: "Install fcgi.py"
   copy:

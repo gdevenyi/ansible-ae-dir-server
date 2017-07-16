@@ -1,0 +1,43 @@
+---
+# install OpenLDAP packages
+
+- name: copy GPG key file
+  copy:
+    src: RPM-GPG-KEY-LTB-project
+    dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-LTB-project
+    owner: root
+    group: root
+    mode: 0600
+
+- name: "Add LTB OpenLDAP repository"
+  yum_repository:
+    name: ltp-openldap
+    description: LTB OpenLDAP repository
+    baseurl: "{{ ltb_openldap_repo_source }}"
+    gpgkey: "file:///etc/pki/rpm-gpg/RPM-GPG-KEY-LTB-project"
+    gpgcheck: yes
+
+- name: Install OpenLDAP packages and dependencies
+  yum:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  notify:
+    - restart slapd
+  with_items:
+    - openldap-ltb
+    - openldap-ltb-contrib-overlays
+    - openldap-ltb-mdb-utils
+    - openldap-ltb-ppm
+    - openldap-ltb-check-password
+    - cracklib
+
+- name: "Create /etc/default/slapd"
+  template:
+    src: "{{ lsb_id }}/default_slapd.j2"
+    dest: "/etc/default/slapd"
+    owner: root
+    group: ldap
+    mode: 0644
+  notify:
+  - restart slapd
