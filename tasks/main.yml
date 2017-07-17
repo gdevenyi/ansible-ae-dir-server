@@ -1,6 +1,16 @@
 ---
 # tasks file for roles/ae-dir-server
 
+- debug:
+    var: "{{ item }}"
+    verbosity: 1
+  with_items:
+    - inventory_dir
+    - playbook_dir
+    - role_path
+    - aedir_templates_dirs
+    - aedir_files_dirs
+
 - name: "OS base configuration"
   include: "baseos_{{ lsb_id }}.yml"
 
