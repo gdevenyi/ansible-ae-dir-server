@@ -148,8 +148,12 @@
 <h1 id="install">Installation</h1>
 <ol>
   <li>
-    Create ansible inventory file named <em>hosts</em> to match your
-    environment (see file <em>hosts-example</em> for details).
+    Create environment directory structure (e.g. copy directory <em>example/</em>):
+    <code>cp -av example myenv</code>.
+  </li>
+  <li>
+    Edit ansible inventory file <em>myenv/hosts</em> to match your
+    hosts/VMs/containers of your installation environment.
   </li>
   <li>
     Read comments in file
@@ -160,7 +164,7 @@
   <li>
     Invoke ansible play in sub-directory <code>ansible/</code>
     (here using command <code>su</code>):
-    <pre>/opt/ansible/bin/ansible-playbook ae-dir-servers.yml -i hosts --become -K --become-method=su --extra-vars='{"aedir_init":True, "openldap_keygen":True}'</pre>
+    <pre>/opt/ansible/bin/ansible-playbook ae-dir-servers.yml -i myenv/hosts --become -K --become-method=su --extra-vars='{"aedir_init":True, "openldap_keygen":True}'</pre>
     <ul>
       <li>
         At first run this will generate TLS server key and signed CSR file
@@ -169,7 +173,7 @@
       </li>
       <li>
         After signing the CSRs with your CA place the server certificate file(s) into
-        directory <code>ae-dir/ansible/files/</code>.
+        directory <code>ae-dir/ansible/myenv/files/</code>.
       </li>
       <li>
         Invoke <var>ansible-playbook</var> command above again to proceed
@@ -212,8 +216,8 @@
   &copy; 2015-2017 by <a href="https://stroeder.com/impressum.html">Michael Str&ouml;der</a>
 </p>
 <pre>
-  Licensed under the Apache License, Version 2.0 (the "License"); you may 
-  not use files and content provided on this web site except in compliance 
+  Licensed under the Apache License, Version 2.0 (the "License"); you may
+  not use files and content provided on this web site except in compliance
   with the License. You may obtain a copy of the License at
 
       <a href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a>
