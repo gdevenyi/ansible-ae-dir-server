@@ -355,7 +355,7 @@ openldap_syncrepl_tls_protocol_min: "3.3"
 openldap_syncrepl_tls_cipher_suite: "ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDH-RSA-AES256-GCM-SHA384:!ADH"
 
 # The full path names on the target system
-openldap_cacert_pathname: "{{ aedir_etc }}/tls/{{ openldap_cacert_filename }}"
+openldap_cacert_pathname: "{{ aedir_etc }}/tls/{{ openldap_cacert_filename|basename }}"
 openldap_cert_pathname: "{{ aedir_etc }}/tls/{{ openldap_service_fqdn }}.crt"
 openldap_key_pathname: "{{ aedir_etc }}/tls/{{ openldap_service_fqdn }}.key"
 
