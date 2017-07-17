@@ -13,11 +13,15 @@
 
 - name: Create gen_csr.cnf
   template:
-    src: "{{ aedir_gen_csr_cnf }}"
+    src: "{{ item }}"
     dest: "{{ aedir_etc }}/tls/gen_csr.cnf"
     owner: root
     group: ldap
     mode: 0600
+  with_first_found:
+    - files:
+       - "tls/gen_csr.cnf.j2"
+      paths: "{{ aedir_templates_dirs }}"
 
 - name: Create gen_csr.sh
   template:
