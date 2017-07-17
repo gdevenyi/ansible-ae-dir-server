@@ -5,9 +5,6 @@
 # general ansible arguments
 #---------------------------------------------------------------------------
 
-# directory where to expect local files on the Ansible controller
-aedir_local_files: "{{ playbook_dir }}/files"
-
 # Directories to search for Jinja2 templates (used by with_first_found)
 aedir_templates_dirs:
   - "{{ inventory_dir }}/templates/{{role_path|basename}}"
@@ -330,12 +327,12 @@ openldap_cacert_filename: "ca-chain.pem"
 openldap_tls_cert_suffixes:
   - "ou=Edit OU,o=Edit O,l=Edit L,st=Edit ST,c=CO"
 
-# The server certificate and key files
-openldap_cert_filename: "{{ openldap_service_fqdn }}.crt"
-openldap_key_filename: "{{ openldap_service_fqdn }}.key"
+# The server certificate and key files (absolute path names on local controller!)
+openldap_cert_filename: "{{ inventory_dir }}/files/{{ openldap_service_fqdn }}.crt"
+openldap_key_filename: "{{ inventory_dir }}/files/{{ openldap_service_fqdn }}.key"
 
 # local directory for fetched CSRs
-local_openldap_csr_dir: "{{ aedir_local_files }}/pki-csr-files"
+local_openldap_csr_dir: "{{ inventory_dir }}/files/pki-csr-files"
 
 # whether to overwrite existing server's private key
 openldap_keygen: 0
@@ -356,8 +353,8 @@ openldap_syncrepl_tls_cipher_suite: "ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-
 
 # The full path names on the target system
 openldap_cacert_pathname: "{{ aedir_etc }}/tls/{{ openldap_cacert_filename|basename }}"
-openldap_cert_pathname: "{{ aedir_etc }}/tls/{{ openldap_service_fqdn }}.crt"
-openldap_key_pathname: "{{ aedir_etc }}/tls/{{ openldap_service_fqdn }}.key"
+openldap_cert_pathname: "{{ aedir_etc }}/tls/{{ openldap_cert_filename|basename }}"
+openldap_key_pathname: "{{ aedir_etc }}/tls/{{ openldap_key_filename|basename }}"
 
 # for generating DH parameters for perfect forward secrecy
 openldap_dhparam_pathname: "{{ aedir_etc }}/tls/slapd.dhparam"
@@ -461,7 +458,7 @@ smtp_from_address: "{{ smtp_admin_address }}"
 smtp_cacert_filename:  "{{ openldap_cacert_filename }}"
 
 # The CA certificate file for sending e-mail via SMTP/STARTTLS
-smtp_cacert_pathname: "{{ aedir_etc }}/{{ smtp_cacert_filename }}"
+smtp_cacert_pathname: "{{ aedir_etc }}/{{ smtp_cacert_filename|basename }}"
 
 #---------------------------------------------------------------------------
 # CRON parameters
