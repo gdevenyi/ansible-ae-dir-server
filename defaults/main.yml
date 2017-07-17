@@ -10,12 +10,16 @@ aedir_local_files: "{{ playbook_dir }}/files"
 
 # Directories to search for Jinja2 templates (used by with_first_found)
 aedir_templates_dirs:
+  - "{{ inventory_dir }}/templates/{{role_path|basename}}"
+  - "{{ playbook_dir }}/templates/{{role_path|basename}}"
   - "{{ inventory_dir }}/templates"
   - "{{ playbook_dir }}/templates"
   - "{{ role_path }}/templates"
 
 # Directories to search for files (used by with_first_found)
 aedir_files_dirs:
+  - "{{ inventory_dir }}/files/{{role_path|basename}}"
+  - "{{ playbook_dir }}/files/{{role_path|basename}}"
   - "{{ inventory_dir }}/files"
   - "{{ playbook_dir }}/files"
   - "{{ role_path }}/files"
@@ -215,9 +219,6 @@ aedir_init_aezones:
   test:
     ticket_id: "{{ aedir_init_ticket_id }}"
     description: "Testing playground"
-
-# template file used for generating gen_csr.cnf
-aedir_gen_csr_cnf: "gen_csr.cnf.j2"
 
 # List of aePerson entries to be added to ae-dir-base.ldif
 aedir_init_aepersons:
