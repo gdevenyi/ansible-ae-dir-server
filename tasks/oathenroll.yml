@@ -68,4 +68,4 @@
   notify:
     - reload systemd
     - "restart oathenroll"
-  when: ansible_service_mgr=="systemd"
+  when: aedir_service_manager=="systemd"

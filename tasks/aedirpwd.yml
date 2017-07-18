@@ -83,7 +83,7 @@
   notify:
     - reload systemd
     - "restart aedirpwd"
-  when: ansible_service_mgr=="systemd"
+  when: aedir_service_manager=="systemd"
 
 - name: Run aedirpwd_cron as CRON job
   cron:

@@ -42,6 +42,9 @@ aedir_pip_extra_args: "{{ aedir_pip_install_options|join(' ') }}"
 # LSB id to be used during plays
 lsb_id: "{{ lsb_id_map.get(ansible_lsb.id,ansible_lsb.id) }}"
 
+# override service manager fact (e.g. for docker build)
+aedir_service_manager: "{{ ansible_service_mgr }}"
+
 # Perform init tasks: set to True only on the command-line when
 # initializing an empty AE-DIR environment from scratch
 aedir_init: False

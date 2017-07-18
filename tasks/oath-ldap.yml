@@ -58,7 +58,7 @@
   notify:
     - reload systemd
     - "restart {{ oath_bind_listener }}"
-  when: ansible_service_mgr=="systemd"
+  when: aedir_service_manager=="systemd"
 
 - name: "OATH-LDAP enrollment web app on {{ openldap_role }}"
   include: "oathenroll.yml"
