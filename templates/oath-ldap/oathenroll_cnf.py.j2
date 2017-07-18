@@ -64,12 +64,7 @@ EMAIL_SUBJECT = u'Your temporary enrollment password for Yubikey #%(serial)s'
 EMAIL_TEMPLATE = TEMPLATES_DIRNAME+'reset.txt'
 
 # SMTP server used as smart host (SMTP relay)
-# query string of URL may contain two more parameters:
-# STARTTLS: Send STARTTLS (see also config parameter SMTP_TLSARGS)
-# VIA: Use this hostname or IP address for connection
-#SMTP_URL = 'smtp://user:password@mail-relay.example.com/?STARTTLS&VIA=mail-relay-othername.example.com'
-#SMTP_URL = 'smtp://127.0.0.1'
-SMTP_URL = 'smtp://smtp.example.com:587/?STARTTLS'
+SMTP_URL = '{{ smtp_relay_url }}'
 
 # Debug level for SMTP messages sent to stderr
 SMTP_DEBUGLEVEL = 0

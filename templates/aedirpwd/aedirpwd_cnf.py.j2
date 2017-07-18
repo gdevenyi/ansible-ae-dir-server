@@ -66,11 +66,6 @@ EMAIL_SUBJECT_ADMIN = u'Password reset for "{username}" needs help'
 EMAIL_TEMPLATE_ADMIN = TEMPLATES_DIRNAME+'requestpw_admin.txt'
 
 # SMTP server used as smart host (SMTP relay)
-# query string of URL may contain two more parameters:
-# STARTTLS: Send STARTTLS (see also config parameter SMTP_TLSARGS)
-# VIA: Use this hostname or IP address for connection
-#SMTP_URL = 'smtp://user:password@mail-relay.example.com/?STARTTLS&VIA=mail-relay-othername.example.com'
-#SMTP_URL = 'smtp://127.0.0.1'
 SMTP_URL = '{{ smtp_relay_url }}'
 
 # Specifies whether a AE-DIR instance should send e-mail notifications to users or not
