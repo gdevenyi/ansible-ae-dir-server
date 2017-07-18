@@ -196,8 +196,8 @@ aedir_ldapi_services:
   # system user for PASSMOD listener
   ae-dir-pwsync:
     cn: Password sync listener
-    uid_number: 993
-    gid_number: 993
+    uid_number: "{{ aedir_min_gid-7 }}"
+    gid_number: "{{ aedir_min_gid-7 }}"
     description: The system user allowed to intercept password changes and set password
 
 # POSIX UID and GID which is mapped to rootdn
