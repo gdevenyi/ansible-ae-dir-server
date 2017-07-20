@@ -520,7 +520,7 @@ web_document_root: "{{ aedir_prefix }}/htdocs"
 #---------------------------------------------------------------------------
 
 # the release to be installed
-web2ldap_version: "1.2.91"
+web2ldap_version: "1.2.92"
 
 # source filename
 web2ldap_filename: "web2ldap-{{ web2ldap_version }}.tar.gz"
