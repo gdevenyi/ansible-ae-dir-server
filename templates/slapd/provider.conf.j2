@@ -184,6 +184,15 @@ access to
     by users read
     by * none
 
+{% if pwsync_enabled==True %}
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  attrs=entry
+    by set="this & user" write
+    by * none break
+{% endif %}
+#  dn.subtree="^uid=({{ aedir_aeuser_uid_regex }}|{{ aedir_aeservice_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+
 #---------------------------------------------------------------------------
 # The replica ACLs MUST be before secret attributes' ACLs
 #---------------------------------------------------------------------------
