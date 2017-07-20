@@ -174,6 +174,16 @@ access to
     by set="user/aeStatus & [0]" break
     by * auth
 
+# give read access to pseudo-attribute 'entry' in database
+# naming context to all users and stop further ACL processing
+#------------------------------------------------------------------
+
+access to
+  dn.exact="{{ aedir_suffix }}"
+  attrs=entry
+    by users read
+    by * none
+
 #---------------------------------------------------------------------------
 # The replica ACLs MUST be before secret attributes' ACLs
 #---------------------------------------------------------------------------
@@ -1079,7 +1089,7 @@ access to
 
 access to
   dn.exact="{{ aedir_suffix }}"
-  attrs=entry,children,objectClass,ou,description
+  attrs=children,objectClass,ou,description
     by users read
     by * auth
 
