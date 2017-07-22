@@ -81,6 +81,7 @@ apache2_config:
       - logio
       - log_config
       - mpm_worker
+      - systemd
   Debian:
     service_name: "apache2"
     user: "www-data"
