@@ -21,6 +21,12 @@
       <li><a href="#security-aeService">Using tool/service accounts (aeService)</a></li>
     </ol>
   </li>
+  <li>
+    <a href="#ae-dir-setup">&AElig;-DIR setup</a>
+    <ol>
+      <li><a href="#ae-dir-hostnames">Host names</a></li>
+    </ol>
+  </li>
 </ol>
 
 <h1 id="naming">Naming conventions</h1>
@@ -46,16 +52,8 @@
   </li>
   <li>
     If you plan to use X.509 TLS client certs for host authentication make
-    sure to put the canonical hostname in the certificate's subject DN.
-  </li>
-</ul>
-<p>
-  In general &AElig;-DIR's access control does not care about DNS names at
-  all. But still it's good practice to choose well-formed DNS names for
-  &AElig;-DIR servers possibly following conventions similar like these:
-</p>
-<ul>
-  <li>
+    sure to put the unique canonical hostname in the certificate's subject
+    DN which helps to use TLS client certs for host authentication.
   </li>
 </ul>
 
@@ -132,5 +130,64 @@
     (see <a href="http://man.openbsd.org/sshd#AUTHORIZED_KEYS_FILE_FORMAT">sshd(8), section "AUTHORIZED KEYS FILE FORMAT"</a>).
   </li>
 </ul>
+
+<h1 id="ae-dir-setup">&AElig;-DIR setup</h1>
+<p>
+  In general &AElig;-DIR's access control does not care about DNS names or
+  network configuration at all. But it's a good idea to have separate DNS
+  domains and network configuration.
+</p>
+
+<h2 id="ae-dir-network">Networking</h2>
+<p>
+  Recommendations:
+</p>
+<ul>
+  <li>
+    You should put your &AElig;-DIR servers into separate network(s)
+    (IP address range, VLAN).
+  </li>
+  <li>
+    Add host-based firewalling to your &AElig;-DIR servers!
+  </li>
+</ul>
+
+<h2 id="ae-dir-hostnames">Host names</h2>
+<p>
+  <strong>Hostnames should not match any wild-card certificate you are using!</strong>
+</p>
+<p>
+  Besides <a href="#naming-dns">general recommendations</a> some more:
+</p>
+<ul>
+  <li>
+    Don't forget to add correct reverse DNS entries (PTR RRs) required for
+    correctly creating LDIF data for initial load.
+  </li>
+  <li>
+    The hostnames should at least contain one dot. Otherwise Chrome web browser
+    won't accept/return cookies.
+  </li>
+</ul>
+<p>
+  If you have fine-grained access control for delegated sub domains in your
+  DNS server then it's a good idea to use separate sub domains (forward and
+  reverse) and strictly delegate control to &AElig;-DIR system admins
+  (members of group <var>ae-sys-admins</var>).
+  Sub-domains also avoids accidentially matching wild-card certificates
+  issued to your domains.
+</p>
+<p>
+  Example sub-domain:<br>
+  <code>ae-dir.example.com</code>
+</p>
+<p>
+  It's helpful to encode the &AElig;-DIR slapd role into the host names.<br>
+</p>
+<p>
+  Examples:<br>
+  <code>ae-dir-p1.ae-dir.example.com</code> for a provider<br>
+  <code>ae-dir-c2.ae-dir.example.com</code> for a consumer
+</p>
 
 <!--#include file="ssi/footer.shtml" -->
