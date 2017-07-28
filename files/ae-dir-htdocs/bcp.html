@@ -5,11 +5,15 @@
 
 <ol>
   <li>
-    <a href="#naming">Naming conventions</a>
+    <a href="#naming">Names and identifiers</a>
     <ol>
-      <li><a href="#naming-dns">DNS names</a></li>
-      <li><a href="#naming-aeUser">Personal accounts</a></li>
-      <li><a href="#naming-aeService">Tool/service accounts</a></li>
+      <li>
+        <a href="#naming-aeUser">User names</a>
+        <ol>
+          <li><a href="#naming-aeUser">Personal accounts</a></li>
+          <li><a href="#naming-aeService">Tool/service accounts</a></li>
+        </ol>
+      </li>
       <li><a href="#naming-aeHost">Host entries</a></li>
       <li><a href="#naming-aeGroup">User group names</a></li>
       <li><a href="#naming-aeSrvGroup">Service group names</a></li>
@@ -30,11 +34,72 @@
   </li>
 </ol>
 
-<h1 id="naming">Naming conventions</h1>
+<h1 id="naming">Names and identifiers</h1>
 
-<h2 id="naming-dns">DNS names</h2>
+<h2 id="naming-uid">User identifiers</h2>
 <p>
-  Recommendations:
+  The user name of an account is stored in attribute <var>uid</var>
+  and the POSIX-UID is stored in attribute <var>uidNumber</var>.
+</p>
+<p>
+  Recommendations for user names and POSIX-UIDs:
+</p>
+<ul>
+  <li>
+     Must be globally unique!
+  </li>
+  <li>
+    Must never be reused to preserve audit trails
+    and file ownership of file archive!
+  </li>
+  <li>
+    Only lower-cased user names!
+  </li>
+</ul>
+
+<h3 id="naming-aeUser">Personal accounts</h3>
+<p>
+  Recommendations for user names (attribute <var>uid</var>) in
+  <a href="docs.html#schema-oc-aeUser">aeUser</a> entries:
+</p>
+<ul>
+  <li>
+    Do not derive user names from the person's name.
+  </li>
+  <li>
+    It's probably a good idea to let &AElig;-DIR create short random
+    ASCII-letter user names.
+  </li>
+</ul>
+
+<h3 id="naming-aeService">Tool/service accounts</h3>
+<p>
+  Recommendations for user names (attribute <var>uid</var>) in
+  <a href="docs.html#schema-oc-aeService">aeService</a> entries:
+</p>
+<ul>
+  <li>
+    Choose a naming scheme to easily distinguish tool/service accounts
+    from personal user accounts.
+  </li>
+  <li>
+    Use singular form in user name.
+  </li>
+</ul>
+<p>
+  Examples:
+</p>
+<ul>
+  <li>example-test-system-1</li>
+  <li>example-test-system-2</li>
+  <li>example-web-server</li>
+  <li>example-host-42</li>
+</ul>
+
+<h2 id="naming-aeHost">Host entries</h2>
+<p>
+  Recommendations for host names in
+  <a href="docs.html#schema-oc-aeHost">aeHost</a> entries:
 </p>
 <ul>
   <li>
@@ -45,28 +110,83 @@
   <li>
     Ideally make sure that the left-most DNS label of the canonical
     hostname is globally unique and in case of virtual machine matches the
-    dom name.
+    dom(ain) name.
   </li>
   <li>
     In any case provide a globally unique machine name added to attribute
     <var>cn</var> in <a href="docs.html#schema-oc-aeHost">aeHost</a> entry.
   </li>
   <li>
-    If you plan to use X.509 TLS client certs for host authentication make
-    sure to put the unique canonical hostname in the certificate's subject
-    DN which helps to use TLS client certs for host authentication.
+    If you plan to issue X.509 TLS client certs for host authentication
+    make sure to put the unique canonical hostname in the certificate's
+    subject DN.
   </li>
 </ul>
 
-<h2 id="naming-aeUser">Personal accounts</h2>
-
-<h2 id="naming-aeService">Tool/service accounts</h2>
-
-<h2 id="naming-aeHost">Host entries</h2>
-
 <h2 id="naming-aeGroup">User group names</h2>
+<p>
+  General recommendations for user group names (attribute <var>cn</var>)
+  and POSIX-GID (attribute <var>gidNumber</var>) in
+  <a href="docs.html#schema-oc-aeGroup">aeGroup</a> entries:
+</p>
+<ul>
+  <li>
+     Must be globally unique!
+  </li>
+  <li>
+    Must never be reused to preserve audit trails
+    and file ownership of file archive!
+  </li>
+</ul>
+<p>
+  More on group names:
+</p>
+<ul>
+  <li>
+    Only lower-cased group names!
+  </li>
+  <li>
+    Choose a word easily associated with the user group's members,
+  </li>
+  <li>
+    Use plural form in group name.
+  </li>
+  <li>
+    It's probably a good idea to derive group names from unique
+    organizational identifiers, e.g. project IDs etc.
+  </li>
+</ul>
+<p>
+  Examples:
+</p>
+<ul>
+  <li>example-sys-admins-1</li>
+  <li>example-db-admins</li>
+  <li>example-console-users-42</li>
+</ul>
 
 <h2 id="naming-aeSrvGroup">Service group names</h2>
+<p>
+  Recommendations for service group names (attribute <var>cn</var>)
+  <a href="docs.html#schema-oc-aeSrvGroup">aeSrvGroup</a> entries:
+</p>
+<ul>
+  <li>
+    Choose a word easily associated with the service group's members,
+    e.g. <var>example-test-systems-23</var> or <var>example-db-hosts-42</var>.
+  </li>
+  <li>
+    Use plural form in group name.
+  </li>
+</ul>
+<p>
+  Examples:
+</p>
+<ul>
+  <li>example-test-systems-23</li>
+  <li>example-http-services</li>
+  <li>example-db-hosts-42</li>
+</ul>
 
 <h1 id="security">Security considerations</h1>
 
