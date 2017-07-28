@@ -36,15 +36,9 @@
   <li>
     <a href="#dit">Directory Information Tree (DIT)</a>
     <ol>
-      <li>
-        <a href="#dit-ae-dir">ou=ae-dir</a>
-        <ol>
-          <li><a href="#dit-zone-ae">cn=ae,ou=ae-dir</a></li>
-          <li><a href="#dit-zone-people">cn=people,ou=ae-dir</a></li>
-          <li><a href="#dit-zone-pub">cn=pub,ou=ae-dir</a></li>
-        </ol>
-      </li>
-      <li><a href="#dit-accesslog">cn=accesslog-ae-dir</a></li>
+      <li><a href="#dit-zone-ae">Zone ae</a></li>
+      <li><a href="#dit-zone-people">Zone people</a></li>
+      <li><a href="#dit-zone-pub">Zone pub</a></li>
     </ol>
   </li>
   <li>
@@ -626,14 +620,6 @@
     <td>DUAConfigProfile</td>
   </tr>
 </table>
-
-<h2 id="dit-accesslog">cn=accesslog-ae-dir</h2>
-<p>
-  Naming context <em>cn=accesslog-ae-dir</em> is solely used to store
-  audit log entries of all write operations. The schema is formally
-  specified in the Internet draft
-  <a href="https://tools.ietf.org/html/draft-chu-ldap-logschema">draft-chu-ldap-logschema</a>.
-</p>
 
 <h1 id="eer">Entity Relationship</h1>
 <p>
@@ -1840,44 +1826,52 @@
 <p>
 </p>
 
-<h2 id="backends">Backends</h2>
+<h2 id="backends">Database backends</h2>
 
 <p>
   Different backends are used on all <em>slapd</em> instances listed in the following table.
 </p>
 <table>
   <tr>
-    <th>name</th>
-    <th>used for</th>
-    <th>man page</th>
+    <th>Suffix</th>
+    <th>No.</th>
+    <th>Description</th>
+    <th>Backend</th>
   </tr>
   <tr>
-    <td id="slapd-config">slapd-config</td>
+    <td>cn=config</td>
+    <td>0</td>
     <td>used in read-only mode for retrieving configuration (e.g. for monitoring)</td>
     <td>
       <a href="https://www.openldap.org/software/man.cgi?query=slapd-config">slapd-config(5)</a>
     </td>
   </tr>
   <tr>
-    <td id="slapd-mdb">slapd-mdb</td>
+    <td>cn=accesslog-ae-dir</td>
+    <td>1</td>
     <td>
-      real database storage backend used for
-      &AElig;-DIR itself (<a href="#dit-ae-dir">ou=ae-dir</a>) and
-      the accesslog DB (<a href="#dit-accesslog">cn=accesslog-ae-dir</a>)
+      Real database storage backend used for storing  audit log entries of all write operations.
+      The schema is formally specified in the Internet draft
+      <a href="https://tools.ietf.org/html/draft-chu-ldap-logschema">draft-chu-ldap-logschema</a>.
     </td>
     <td>
       <a href="https://www.openldap.org/software/man.cgi?query=slapd-mdb">slapd-mdb(5)</a>
     </td>
   </tr>
   <tr>
-    <td id="slapd-sock">slapd-sock</td>
-    <td>used as overlay for processing simple bind requests during multi-factor authentication (OATH-LDAP)</td>
+    <td>ou=ae-dir</td>
+    <td>2</td>
     <td>
-      <a href="https://www.openldap.org/software/man.cgi?query=slapd-sock">slapd-sock(5)</a>
+      Real database storage backend used for
+      &AElig;-DIR itself (<a href="#dit">see details</a>)
+    </td>
+    <td>
+      <a href="https://www.openldap.org/software/man.cgi?query=slapd-mdb">slapd-mdb(5)</a>
     </td>
   </tr>
   <tr>
-    <td id="slapd-monitor">slapd-monitor</td>
+    <td>cn=monitor</td>
+    <td></td>
     <td>used for retrieving performance monitor data</td>
     <td>
       <a href="https://www.openldap.org/software/man.cgi?query=slapd-monitor">slapd-monitor(5)</a>
@@ -1925,7 +1919,7 @@
   <dd>
     (see also <a href="https://www.openldap.org/software/man.cgi?query=slapo-deref">slapo-deref(5)</a>)
   </dd>
-  <dt id="slapo-sock">slapd-sock</dt>
+  <dt id="slapd-sock">slapd-sock</dt>
   <dd>
     When using two-factor authentication bind requests are externally
     processed. The bind requests are passed to the external bind listeners
