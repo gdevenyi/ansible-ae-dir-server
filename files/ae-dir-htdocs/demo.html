@@ -3,9 +3,29 @@
 <!--#set var="base_path" value="" -->
 <!--#include file="ssi/head.shtml" -->
 
+<h1>Demo accounts</h1>
+<table>
+  <tr>
+    <th>Role</th>
+    <th>User name</th>
+    <th>Password</th>
+  </tr>
+  <tr>
+    <td><a href="docs.html#role-ae-admin">&AElig; Admin</a></td>
+    <td>aead</td>
+    <td>CorrectHorseBatteryStaple</td>
+  </tr>
+  <tr>
+    <td><a href="docs.html#role-zone-admin">Zone Admin (in zone test)</a></td>
+    <td>zots</td>
+    <td>CorrectHorseBatteryStaple</td>
+  </tr>
+</table>
+
 <h1>Web access</h1>
 <p>
   <a href="https://demo.ae-dir.com/web2ldap">https://demo.ae-dir.com/web2ldap</a>
+  gives direct login links
 </p>
 
 <h1>LDAP access</h1>
@@ -23,5 +43,33 @@
     <td><code>ldaps://demo.ae-dir.com/ou=ae-dir</code></td>
   </tr>
 </table>
+<p>
+  Use with OpenLDAP command-line tools (with standard CA cert bundle for
+  validating the server cert issued by
+  <a href="https://letsencrypt.org/">Let’s Encrypt</a>):
+</p>
+
+<pre>
+$ LDAPTLS_CACERT=/etc/ssl/ca-bundle.pem ldapwhoami -H ldaps://demo.ae-dir.com -x -D "uid=zots,ou=ae-dir" -w CorrectHorseBatteryStaple
+dn:uid=zots,cn=test,ou=ae-dir
+</pre>
+
+<pre>
+LDAPTLS_CACERT=/etc/ssl/ca-bundle.pem ldapsearch -LLL -H ldaps://demo.ae-dir.com -x -D "uid=zots,ou=ae-dir" -w CorrectHorseBatteryStaple -b "ou=ae-dir" "(uid=zots)" uid uidNumber mail cn objectClass aePerson
+dn: uid=zots,cn=test,ou=ae-dir
+uid: zots
+uidNumber: 30019
+cn:: SG9yc3QgUsO8YmV6YWhs
+objectClass: account
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+objectClass: aeObject
+objectClass: aeUser
+objectClass: posixAccount
+objectClass: ldapPublicKey
+aePerson: uniqueIdentifier=INIT-PERSON-ID-42,cn=people,ou=ae-dir
+mail: horst@example.com
+</pre>
 
 <!--#include file="ssi/footer.shtml" -->
