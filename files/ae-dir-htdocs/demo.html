@@ -55,7 +55,7 @@ dn:uid=zots,cn=test,ou=ae-dir
 </pre>
 
 <pre>
-LDAPTLS_CACERT=/etc/ssl/ca-bundle.pem ldapsearch -LLL -H ldaps://demo.ae-dir.com -x -D "uid=zots,ou=ae-dir" -w CorrectHorseBatteryStaple -b "ou=ae-dir" "(uid=zots)" uid uidNumber mail cn objectClass aePerson
+LDAPTLS_CACERT=/etc/ssl/ca-bundle.pem ldapsearch -LLL -H ldaps://demo.ae-dir.com -x -D "uid=zots,ou=ae-dir" -w CorrectHorseBatteryStaple -b "ou=ae-dir" "(uid=zots)"
 dn: uid=zots,cn=test,ou=ae-dir
 uid: zots
 uidNumber: 30019
@@ -70,6 +70,7 @@ objectClass: posixAccount
 objectClass: ldapPublicKey
 aePerson: uniqueIdentifier=INIT-PERSON-ID-42,cn=people,ou=ae-dir
 mail: horst@example.com
+&hellip;
 </pre>
 
 <!--#include file="ssi/footer.shtml" -->
