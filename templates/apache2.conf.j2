@@ -85,7 +85,8 @@ Header always set Frame-Options "DENY"
 Header always set Content-Security-Policy "default-src 'none'; img-src 'self' data:; style-src 'self'; connect-src 'none'; font-src 'self'; frame-src 'none'; child-src 'none'; script-src 'none';"
 Header always set Referrer-Policy "same-origin"
 
-IncludeOptional {{ aedir_etc }}/{{ web_server }}/global/*.conf
+ProxyRequests Off
+ProxyPreserveHost On
 
 <VirtualHost _default_:80>
 
@@ -177,6 +178,38 @@ IncludeOptional {{ aedir_etc }}/{{ web_server }}/global/*.conf
 
 {% endfor %}
 
-  IncludeOptional {{ aedir_etc }}/{{ web_server }}/vhost/*.conf
+  #----------------------------------------------------------------------
+  # Æ-DIR password self-service web application (reverse proxy)
+  # {{ ansible_managed }}
+  #----------------------------------------------------------------------
+
+  RedirectPermanent /pwd /pwd/
+  ProxyPass        /pwd/ http://127.0.0.1:8080/ retry=2 timeout=60
+
+  <Location /pwd>
+    # Fix IE problem (http error 408/409)
+    SetEnv proxy-nokeepalive 1
+{% for require in apache_web2ldap_requires %}
+      Require {{ require }}
+{% endfor %}
+  </Location>
+
+{% if oath_ldap_enabled==True %}
+  #----------------------------------------------------------------------
+  # OATH-LDAP enrollment web application (reverse proxy)
+  # {{ ansible_managed }}
+  #----------------------------------------------------------------------
+
+  RedirectPermanent /oath /oath/
+  ProxyPass        /oath/ http://127.0.0.1:8081/ retry=2 timeout=60
+
+  <Location /oath>
+    # Fix IE problem (http error 408/409)
+    SetEnv proxy-nokeepalive 1
+{% for require in apache_web2ldap_requires %}
+      Require {{ require }}
+{% endfor %}
+  </Location>
+{% endif %}
 
 </VirtualHost>

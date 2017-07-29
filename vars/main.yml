@@ -81,6 +81,8 @@ apache2_config:
       - log_config
       - mpm_worker
       - systemd
+      - proxy
+      - proxy_http
   Debian:
     service_name: "apache2"
     user: "www-data"
@@ -104,6 +106,8 @@ apache2_config:
       - headers
       - deflate
       - filter
+      - proxy
+      - proxy_http
   SUSE:
     service_name: "apache2"
     user: "wwwrun"
@@ -127,4 +131,5 @@ apache2_config:
       - deflate
       - filter
       - logio
-
+      - proxy
+      - proxy_http

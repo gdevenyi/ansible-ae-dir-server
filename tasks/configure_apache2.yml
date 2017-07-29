@@ -1,18 +1,6 @@
 ---
 # configuration for web server apache2
 
-- name: "Create directories for optional {{ web_server }} includes"
-  file:
-    path: "{{ item }}"
-    state: directory
-    owner: root
-    group: root
-    mode: u=rwx,g=rx,o=
-  with_items:
-    - "{{ aedir_etc }}/{{ web_server }}"
-    - "{{ aedir_etc }}/{{ web_server }}/global"
-    - "{{ aedir_etc }}/{{ web_server }}/vhost"
-
 - name: "Create config for Apache from template"
   template:
     src: 'apache2.conf.j2'

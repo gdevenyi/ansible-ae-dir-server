@@ -12,16 +12,6 @@
     - "{{ aedir_etc }}/oathenroll"
     - "{{ aedir_etc }}/oathenroll/templates"
 
-- name: "Apache reverse proxy configuration"
-  template:
-    src: "apache2/vhost/oathenroll.conf.j2"
-    dest: "{{ aedir_etc }}/{{ web_server }}/vhost/oathenroll.conf"
-    owner: root
-    group: root
-    mode: 0644
-  notify:
-    - "restart web server"
-
 - name: "copy oathenroll HTML templates to {{ aedir_etc }}/oathenroll/templates"
   copy:
     src: "oath-ldap/oathenroll/templates/"

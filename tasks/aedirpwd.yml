@@ -13,19 +13,6 @@
     - "{{ aedir_etc }}/aedirpwd/templates"
     - "{{ aedir_etc }}/aedirpwd/templates/en"
 
-- name: Create Apache configuration include snippets
-  template:
-    src: "apache2/{{ item }}.j2"
-    dest: "{{ aedir_etc }}/{{ web_server }}/{{ item }}"
-    owner: root
-    group: root
-    mode: 0644
-  with_items:
-    - global/mod_proxy.conf
-    - vhost/aedirpwd.conf
-  notify:
-    - "restart web server"
-
 - name: "copy aedirpwd HTML templates to {{ aedir_etc }}/aedirpwd/templates"
   copy:
     src: "aedirpwd/templates/"
