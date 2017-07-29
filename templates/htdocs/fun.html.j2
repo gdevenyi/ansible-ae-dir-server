@@ -1,6 +1,6 @@
-<!--#set var="head_title" value="Funny stuff" -->
-<!--#set var="head_pagedescription" value="Funny stuff related to this" -->
-<!--#include file="ssi/head.shtml" -->
+{% set head_title="Funny stuff" -%}
+{% set head_pagedescription="Funny stuff related to this" -%}
+{% include "includes/head.html.j2" %}
 
 <h1>xkcd</h1>
 
@@ -27,4 +27,4 @@
   </li>
 </ul>
 
-<!--#include file="ssi/footer.shtml" -->
+{% include "includes/footer.html.j2" %}

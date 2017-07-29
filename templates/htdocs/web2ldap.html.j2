@@ -1,6 +1,6 @@
-<!--#set var="head_title" value="User Guide -- web2ldap" -->
-<!--#set var="head_pagedescription" value="Web administration user interface" -->
-<!--#include file="ssi/head.shtml" -->
+{% set head_title="User Guide -- web2ldap" -%}
+{% set head_pagedescription="Web administration user interface" -%}
+{% include "includes/head.html.j2" %}
 
 <p>
   <strong>Intended Audience:</strong>
@@ -1443,4 +1443,4 @@
   <a href="/web2ldap/oid?ldapi:///ou=ae-dir????bindname=">schema browser</a>
 </p>
 
-<!--#include file="ssi/footer.shtml" -->
+{% include "includes/footer.html.j2" %}

@@ -1,6 +1,6 @@
-<!--#set var="head_title" value="Demo" -->
-<!--#set var="head_pagedescription" value="Online demonstration" -->
-<!--#include file="ssi/head.shtml" -->
+{% set head_title="Demo" -%}
+{% set head_pagedescription="Online demonstration" -%}
+{% include "includes/head.html.j2" %}
 
 <h1>Demo accounts</h1>
 <table>
@@ -76,4 +76,4 @@ mail: horst@example.com
 &hellip;
 </pre>
 
-<!--#include file="ssi/footer.shtml" -->
+{% include "includes/footer.html.j2" %}

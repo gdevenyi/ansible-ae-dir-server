@@ -75,7 +75,6 @@ apache2_config:
       - authz_core
       - authz_host
       - headers
-      - include
       - deflate
       - filter
       - logio
@@ -103,7 +102,6 @@ apache2_config:
       - authz_core
       - authz_host
       - headers
-      - include
       - deflate
       - filter
   SUSE:
@@ -126,7 +124,6 @@ apache2_config:
       - authz_core
       - authz_host
       - headers
-      - include
       - deflate
       - filter
       - logio

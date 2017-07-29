@@ -1,6 +1,6 @@
-<!--#set var="head_title" value="Applications" -->
-<!--#set var="head_pagedescription" value="Application integration examples" -->
-<!--#include file="ssi/head.shtml" -->
+{% set head_title="Applications" -%}
+{% set head_pagedescription="Application integration examples" -%}
+{% include "includes/head.html.j2" %}
 
 <p>
   <strong>Intended Audience:</strong>
@@ -205,10 +205,10 @@
   Linux login:
 </p>
 
-<!--#set var="img_anchor" value="linux-client" -->
-<!--#set var="img_file" value="linux-client.svg" -->
-<!--#set var="img_title" value="&AElig;-DIR integration of Linux with sssd components" -->
-<!--#include file="ssi/img.shtml" -->
+{% set img_anchor="linux-client" -%}
+{% set img_file="linux-client.svg" -%}
+{% set img_title="&AElig;-DIR integration of Linux with sssd components" -%}
+{% include "includes/img.html.j2" %}
 
 <p>
   Two example configuration files for simple bind and SASL/EXTERNAL bind
@@ -309,10 +309,10 @@
   to login to target SSH host.
 </p>
 
-<!--#set var="img_anchor" value="ssh-proxy" -->
-<!--#set var="img_file" value="ssh-proxy.svg" -->
-<!--#set var="img_title" value="SSH proxy integrated with &AElig;-DIR" -->
-<!--#include file="ssi/img.shtml" -->
+{% set img_anchor="ssh-proxy" -%}
+{% set img_file="ssh-proxy.svg" -%}
+{% set img_title="SSH proxy integrated with &AElig;-DIR" -%}
+{% include "includes/img.html.j2" %}
 
 <p>
   See also:
@@ -323,4 +323,4 @@
   </li>
 </ul>
 
-<!--#include file="ssi/footer.shtml" -->
+{% include "includes/footer.html.j2" %}

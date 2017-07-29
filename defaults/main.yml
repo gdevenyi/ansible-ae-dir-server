@@ -270,6 +270,24 @@ aedir_user_mail_enabled: "{{ aedir_hosts.provider[0]==ansible_fqdn }}"
 #  - "ou=groups"
 aedir_fake_search_roots: []
 
+# base names with extension of web pages installed to DocumentRoot
+aedir_htdocs_templates:
+  - ae-dir
+  - apps
+  - bcp
+  - cli
+  - demo
+  - docs
+  - faq
+  - fun
+  - install
+  - oath
+  - pwd
+  - python
+  - todo
+  - user
+  - web2ldap
+
 #---------------------------------------------------------------------------
 # OpenLDAP parameters
 #---------------------------------------------------------------------------

@@ -1,6 +1,6 @@
-<!--#set var="head_title" value="Documentation" -->
-<!--#set var="head_pagedescription" value="Documentation" -->
-<!--#include file="ssi/head.shtml" -->
+{% set head_title="Documentation" -%}
+{% set head_pagedescription="Documentation" -%}
+{% include "includes/head.html.j2" %}
 
 <p>
   <strong>Intended Audience:</strong>
@@ -63,10 +63,10 @@
 
 <h1 id="sys-arch">System architecture</h1>
 
-<!--#set var="img_anchor" value="arch" -->
-<!--#set var="img_file" value="arch.svg" -->
-<!--#set var="img_title" value="&AElig;-DIR overall system architecture" -->
-<!--#include file="ssi/img.shtml" -->
+{% set img_anchor="arch" -%}
+{% set img_file="arch.svg" -%}
+{% set img_title="&AElig;-DIR overall system architecture" -%}
+{% include "includes/img.html.j2" %}
 
 <h2 id="sys-provider">&AElig;-DIR provider</h2>
 <p>
@@ -89,10 +89,10 @@
   the roles above.
 </p>
 
-<!--#set var="img_anchor" value="slapd-provider" -->
-<!--#set var="img_file" value="slapd-provider.svg" -->
-<!--#set var="img_title" value="&AElig;-DIR provider components" -->
-<!--#include file="ssi/img.shtml" -->
+{% set img_anchor="slapd-provider" -%}
+{% set img_file="slapd-provider.svg" -%}
+{% set img_title="&AElig;-DIR provider components" -%}
+{% include "includes/img.html.j2" %}
 
 <p>
   The following system components are running on each
@@ -431,20 +431,20 @@
   The tree structure is also formally specified (within web2ldap's
   configuration) with DIT structure rules and name forms.
 </p>
-<!--#set var="img_anchor" value="dit" -->
-<!--#set var="img_file" value="dit.svg" -->
-<!--#set var="img_title" value="Graph of &AElig;-DIR tree structure" -->
-<!--#include file="ssi/img.shtml" -->
+{% set img_anchor="dit" -%}
+{% set img_file="dit.svg" -%}
+{% set img_title="Graph of &AElig;-DIR tree structure" -%}
+{% include "includes/img.html.j2" %}
 
 <h3 id="dit-zone-ae">cn=ae,ou=ae-dir</h3>
 <p>
   Zone <em>ae</em> is used for administration of &AElig;-DIR itself.
   Therefore some special restrictions apply.
 </p>
-<!--#set var="img_anchor" value="dit-zone-ae" -->
-<!--#set var="img_file" value="dit-zone-ae.svg" -->
-<!--#set var="img_title" value="Sub-tree structure of zone ae" -->
-<!--#include file="ssi/img.shtml" -->
+{% set img_anchor="dit-zone-ae" -%}
+{% set img_file="dit-zone-ae.svg" -%}
+{% set img_title="Sub-tree structure of zone ae" -%}
+{% include "includes/img.html.j2" %}
 
 <table>
   <tr>
@@ -628,10 +628,10 @@
   rights of bound entity.
 </p>
 
-<!--#set var="img_anchor" value="eer-complete" -->
-<!--#set var="img_file" value="eer-complete.svg" -->
-<!--#set var="img_title" value="complete entity relationship diagram" -->
-<!--#include file="ssi/img.shtml" -->
+{% set img_anchor="eer-complete" -%}
+{% set img_file="eer-complete.svg" -%}
+{% set img_title="complete entity relationship diagram" -%}
+{% include "includes/img.html.j2" %}
 
 <ul>
   <li>
@@ -660,10 +660,10 @@
   <a href="#roles">&AElig;-DIR roles</a>.
 </p>
 
-<!--#set var="img_anchor" value="eer-roles" -->
-<!--#set var="img_file" value="eer-roles.svg" -->
-<!--#set var="img_title" value="entity roles relationship diagram" -->
-<!--#include file="ssi/img.shtml" -->
+{% set img_anchor="eer-roles" -%}
+{% set img_file="eer-roles.svg" -%}
+{% set img_title="entity roles relationship diagram" -%}
+{% include "includes/img.html.j2" %}
 
 <p>
   Setting cross-zone references allow zone admins to delegate tasks to
@@ -731,10 +731,10 @@
 <p>
   The following diagram shows the object class hierarchy:
 </p>
-<!--#set var="img_anchor" value="object_classes_graph" -->
-<!--#set var="img_file" value="object_classes_graph.svg" -->
-<!--#set var="img_title" value="Graph of AE-DIR's structural object classes" -->
-<!--#include file="ssi/img.shtml" -->
+{% set img_anchor="object_classes_graph" -%}
+{% set img_file="object_classes_graph.svg" -%}
+{% set img_title="Graph of AE-DIR's structural object classes" -%}
+{% include "includes/img.html.j2" %}
 
 <p>
   The structural object classes are also referenced in the accompanying&hellip;
@@ -1993,4 +1993,4 @@
   </li>
 </ul>
 
-<!--#include file="ssi/footer.shtml" -->
+{% include "includes/footer.html.j2" %}

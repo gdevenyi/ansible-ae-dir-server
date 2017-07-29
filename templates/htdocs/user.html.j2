@@ -1,6 +1,6 @@
-<!--#set var="head_title" value="User Guide" -->
-<!--#set var="head_pagedescription" value="User Guide" -->
-<!--#include file="ssi/head.shtml" -->
+{% set head_title="User Guide" -%}
+{% set head_pagedescription="User Guide" -%}
+{% include "includes/head.html.j2" %}
 
 <dl>
   <dt><a href="web2ldap.html">web2ldap</a></dt>
@@ -22,4 +22,4 @@
   </dd>
 </dl>
 
-<!--#include file="ssi/footer.shtml" -->
+{% include "includes/footer.html.j2" %}

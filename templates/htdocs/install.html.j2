@@ -1,6 +1,6 @@
-<!--#set var="head_title" value="Installation" -->
-<!--#set var="head_pagedescription" value="Installation" -->
-<!--#include file="ssi/head.shtml" -->
+{% set head_title="Installation" -%}
+{% set head_pagedescription="Installation" -%}
+{% include "includes/head.html.j2" %}
 
 <p>
   <strong>Intended Audience:</strong>
@@ -23,7 +23,7 @@
   </li>
   <li>
     If you need more help please consider
-    <a href="https://www.stroeder.com/impressum.shtml">commercial support</a>.
+    <a href="https://www.stroeder.com/impressum.html">commercial support</a>.
   </li>
 </ul>
 
@@ -234,4 +234,4 @@
   <li><a href="https://oath-ldap.stroeder.com/">OATH-LDAP</a></li>
 </ul>
 
-<!--#include file="ssi/footer.shtml" -->
+{% include "includes/footer.html.j2" %}

@@ -1,6 +1,6 @@
-<!--#set var="head_title" value="User Guide -- command-line tools" -->
-<!--#set var="head_pagedescription" value="User guide for command-line tools" -->
-<!--#include file="ssi/head.shtml" -->
+{% set head_title="User Guide -- command-line tools" -%}
+{% set head_pagedescription="User guide for command-line tools" -%}
+{% include "includes/head.html.j2" %}
 
 <p>
   <strong>Intended Audience:</strong>
@@ -247,4 +247,4 @@ Added cn=test42-zone-auditors,cn=test42,ou=ae-dir
   is useful to validate a certificate (chain) against a locally CA certificate chain.
 </p>
 
-<!--#include file="ssi/footer.shtml" -->
+{% include "includes/footer.html.j2" %}

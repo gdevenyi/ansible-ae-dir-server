@@ -14,13 +14,23 @@
 
 - name: "copy AE-DIR HTML docs to {{ aedir_prefix }}/htdocs/"
   copy:
-    src: "ae-dir-htdocs/"
+    src: "htdocs/"
     dest: "{{ aedir_prefix }}/htdocs/"
     follow: no
     owner: root
     group: root
     mode: u=rw,g=r,o=r
     directory_mode: u=rwx,g=rx,o=rx
+
+- name: "copy AE-DIR HTML docs to {{ aedir_prefix }}/htdocs/"
+  template:
+    src: "htdocs/{{ item }}.html.j2"
+    dest: "{{ aedir_prefix }}/htdocs/{{ item }}.html"
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+    directory_mode: u=rwx,g=rx,o=rx
+  with_items: "{{ aedir_htdocs_templates }}"
 
 - name: "Create ae-dir-base.ldif"
   template:
