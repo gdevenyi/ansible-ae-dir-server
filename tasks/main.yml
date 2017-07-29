@@ -47,6 +47,8 @@
 
 - name: "Specific AE-DIR tool tasks on {{ openldap_role }}"
   include: "aedir_tools_{{ openldap_role }}.yml"
+  tags:
+    - aedir_tools
 
 - name: "Install web2ldap on {{ openldap_role }}"
   include: "web2ldap.yml"
