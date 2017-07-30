@@ -49,7 +49,8 @@ aedir_service_manager: "{{ ansible_service_mgr }}"
 # initializing an empty AE-DIR environment from scratch
 aedir_init: False
 
-# base DN / search root for AE-DIR entries
+# base DN / search root / naming context for AE-DIR entries
+# Note: Do yourself a favour and keep it short ;-)
 aedir_suffix: "ou=ae-dir"
 
 # base DN / search root for accesslog entries
