@@ -171,7 +171,7 @@ access to
   dn.base=""
   attrs=namingContexts
   val.regex="^{{ aedir_accesslog_suffix }}$"
-    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,ou=ae-dir" read
+    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}" read
     by * none break
 
 # allow admin/auditor access to read all search bases
