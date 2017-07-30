@@ -91,7 +91,10 @@ def ae_validity_filter(secs=None):
 class AEObjectUtil:
 
   def _zone_entry(self,attrlist=None):
-    zone_dn = ','.join(ldap.dn.explode_dn(self._dn.encode(self._ls.charset))[-2:])
+    zone_dn = 'cn={0},{1}'.format(
+      self._get_zone_name(),
+      self._ls.currentSearchRoot.encode(self._ls.charset),
+    )
     try:
       ldap_result = self._ls.readEntry(
         zone_dn,
@@ -108,11 +111,13 @@ class AEObjectUtil:
       return zone_entry
 
   def _get_zone_name(self):
-    dn_list = ldap.dn.str2dn(self._dn.encode(self._ls.charset))
+    dn_list = ldap.dn.str2dn(
+      self._dn[:-len(self._ls.currentSearchRoot)-1].encode(self._ls.charset)
+    )
     try:
       zone_cn = dict([
         (at,av)
-        for at,av,flags in dn_list[-2]
+        for at,av,flags in dn_list[-1]
       ])['cn'].decode(self._ls.charset)
     except (KeyError,IndexError):
       result = None
