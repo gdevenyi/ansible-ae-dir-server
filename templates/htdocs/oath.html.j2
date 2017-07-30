@@ -1,7 +1,8 @@
 {% set head_title="User Guide -- OATH-LDAP enrollment" -%}
 {% set head_pagedescription="User guide for OATH-LDAP enrollment" -%}
-{% include "includes/head.html.j2" %}
 
+{% extends "layout.html.j2" %}
+{% block content %}
 <p>
   <strong>Intended Audience:</strong>
   All persons acting as &AElig;-DIR OTP / OATH admins
@@ -15,6 +16,4 @@
 <ol>
   <li></li>
 </ol>
-
-
-{% include "includes/footer.html.j2" %}
+{% endblock %}

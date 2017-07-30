@@ -1,7 +1,8 @@
 {% set head_title="User Guide -- command-line tools" -%}
 {% set head_pagedescription="User guide for command-line tools" -%}
-{% include "includes/head.html.j2" %}
 
+{% extends "layout.html.j2" %}
+{% block content %}
 <p>
   <strong>Intended Audience:</strong>
   <br>
@@ -246,5 +247,4 @@ Added cn=test42-zone-auditors,cn=test42,ou=ae-dir
   <a href="https://www.openssl.org/docs/manmaster/man1/verify.html">verify(1)</a>
   is useful to validate a certificate (chain) against a locally CA certificate chain.
 </p>
-
-{% include "includes/footer.html.j2" %}
+{% endblock %}

@@ -1,7 +1,8 @@
 {% set head_title="User Guide -- web2ldap" -%}
 {% set head_pagedescription="Web administration user interface" -%}
-{% include "includes/head.html.j2" %}
 
+{% extends "layout.html.j2" %}
+{% block content %}
 <p>
   <strong>Intended Audience:</strong>
   <br>
@@ -1442,5 +1443,4 @@
   Jump into
   <a href="/web2ldap/oid?ldapi:///ou=ae-dir????bindname=">schema browser</a>
 </p>
-
-{% include "includes/footer.html.j2" %}
+{% endblock %}

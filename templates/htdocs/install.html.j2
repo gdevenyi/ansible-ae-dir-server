@@ -1,7 +1,8 @@
 {% set head_title="Installation" -%}
 {% set head_pagedescription="Installation" -%}
-{% include "includes/head.html.j2" %}
 
+{% extends "layout.html.j2" %}
+{% block content %}
 <p>
   <strong>Intended Audience:</strong>
   System administrators
@@ -233,5 +234,4 @@
   <li><a href="https://www.stroeder.com/slapdsock.html">slapdsock</a></li>
   <li><a href="https://oath-ldap.stroeder.com/">OATH-LDAP</a></li>
 </ul>
-
-{% include "includes/footer.html.j2" %}
+{% endblock %}

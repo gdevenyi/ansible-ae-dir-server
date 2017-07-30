@@ -1,7 +1,8 @@
 {% set head_title="Demo" -%}
 {% set head_pagedescription="Online demonstration" -%}
-{% include "includes/head.html.j2" %}
 
+{% extends "layout.html.j2" %}
+{% block content %}
 <h1>Demo accounts</h1>
 <table>
   <tr>
@@ -75,5 +76,4 @@ aePerson: uniqueIdentifier=INIT-PERSON-ID-42,cn=people,ou=ae-dir
 mail: horst@example.com
 &hellip;
 </pre>
-
-{% include "includes/footer.html.j2" %}
+{% endblock %}

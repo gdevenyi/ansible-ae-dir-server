@@ -1,7 +1,8 @@
 {% set head_title="Documentation" -%}
 {% set head_pagedescription="Documentation" -%}
-{% include "includes/head.html.j2" %}
 
+{% extends "layout.html.j2" %}
+{% block content %}
 <p>
   <strong>Intended Audience:</strong>
   System architects, developers and system administrators
@@ -1992,5 +1993,4 @@
     <a href="https://www.openldap.org/faq/data/cache/1133.html">FAQ-O-MATIC: Sets in Access Control</a>
   </li>
 </ul>
-
-{% include "includes/footer.html.j2" %}
+{% endblock %}

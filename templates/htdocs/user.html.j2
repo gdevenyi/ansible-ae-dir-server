@@ -1,7 +1,8 @@
 {% set head_title="User Guide" -%}
 {% set head_pagedescription="User Guide" -%}
-{% include "includes/head.html.j2" %}
 
+{% extends "layout.html.j2" %}
+{% block content %}
 <dl>
   <dt><a href="web2ldap.html">web2ldap</a></dt>
   <dd>
@@ -21,5 +22,4 @@
     <a href="docs.html#role-ae-admin">&AElig; Admin</a>)
   </dd>
 </dl>
-
-{% include "includes/footer.html.j2" %}
+{% endblock %}

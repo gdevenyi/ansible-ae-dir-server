@@ -1,7 +1,8 @@
 {% set head_title="Authorized Entities Directory" -%}
 {% set head_pagedescription="Authorized Entities Directory" -%}
-{% include "includes/head.html.j2" %}
 
+{% extends "layout.html.j2" %}
+{% block content %}
 <p>
   <strong>&AElig;-DIR</strong> is an acronym for
   <em>Authorized Entities Directory</em>
@@ -42,5 +43,4 @@
   <li>Only encrypted network traffic</li>
   <li>Well-defined semantics for all object classes and attributes (better no data than bad data)</li>
 </ul>
-
-{% include "includes/footer.html.j2" %}
+{% endblock %}

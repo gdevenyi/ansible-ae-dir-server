@@ -1,7 +1,8 @@
 {% set head_title="Python scripting" -%}
 {% set head_pagedescription="Scripting with python-aedir" -%}
-{% include "includes/head.html.j2" %}
 
+{% extends "layout.html.j2" %}
+{% block content %}
 <h1>python-aedir</h1>
 <p>
   This module is based on
@@ -19,5 +20,4 @@
 <h2 id="examples">Examples</h2>
 <p>
 </p>
-
-{% include "includes/footer.html.j2" %}
+{% endblock %}

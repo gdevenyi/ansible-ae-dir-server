@@ -1,7 +1,8 @@
 {% set head_title="FAQ" -%}
 {% set head_pagedescription="Frequently Asked Questions (and Answers)" -%}
-{% include "includes/head.html.j2" %}
 
+{% extends "layout.html.j2" %}
+{% block content %}
 <ol>
   <li><a href="#general">General</a></li>
   <li><a href="#installation">Installation</a></li>
@@ -372,5 +373,4 @@
 
 
 </ol>
-
-{% include "includes/footer.html.j2" %}
+{% endblock %}

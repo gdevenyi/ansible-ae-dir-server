@@ -1,7 +1,8 @@
 {% set head_title="Next steps / to-do list" -%}
 {% set head_pagedescription="To-do items, ideas, next steps" -%}
-{% include "includes/head.html.j2" %}
 
+{% extends "layout.html.j2" %}
+{% block content %}
 <h1 id="done">Done</h1>
 
 <h2 id="mfa">Multi-factor authc</h2>
@@ -352,5 +353,4 @@
     <a href="https://www.bsi.bund.de/DE/Themen/ITGrundschutz/ITGrundschutzKataloge/Inhalt/_content/baust/b05/b05020.html">BSI Grundschutz</a>
   </li>
 </ul>
-
-{% include "includes/footer.html.j2" %}
+{% endblock %}
