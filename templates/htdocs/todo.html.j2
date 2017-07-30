@@ -16,21 +16,6 @@
 
 <h1 id="open">Open</h1>
 
-<h2 id="memberof">Group maintenance</h2>
-<ul>
-  <li>
-    Drop <a href="https://www.openldap.org/software/man.cgi?query=slapo-memberof">slapo-memberOf</a>
-    and use <a href="https://www.openldap.org/software/man.cgi?query=slapo-dynlist">slapo-dynlist</a>
-    instead with reverted group management (see
-    <a href="https://www.openldap.org/its/index.cgi?findid=8613">
-    OpenLDAP ITS#8613</a> for rationale).
-  </li>
-  <li>
-    Make <var>memberOf</var> writeable (ACLs, UI, etc.) for responsible
-    zone admins.
-  </li>
-</ul>
-
 <h2 id="sso">WebSSO</h2>
 <p>Possible IdP implementations for SAML 2.0, OAuth 2.0, Open ID connect:</p>
 <table>
