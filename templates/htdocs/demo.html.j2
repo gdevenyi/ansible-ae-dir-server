@@ -40,11 +40,11 @@
   </tr>
   <tr>
     <td>Search base</td>
-    <td>ou=ae-dir</td>
+    <td>{{ aedir_suffix }}</td>
   </tr>
   <tr>
     <td>LDAP URL</td>
-    <td><code>ldaps://demo.ae-dir.com/ou=ae-dir</code></td>
+    <td><code>ldaps://demo.ae-dir.com/{{ aedir_suffix }}</code></td>
   </tr>
 </table>
 <p>
@@ -54,13 +54,13 @@
 </p>
 
 <pre>
-$ LDAPTLS_CACERT=/etc/ssl/ca-bundle.pem ldapwhoami -H ldaps://demo.ae-dir.com -x -D "uid=zots,ou=ae-dir" -w CorrectHorseBatteryStaple
-dn:uid=zots,cn=test,ou=ae-dir
+$ LDAPTLS_CACERT=/etc/ssl/ca-bundle.pem ldapwhoami -H ldaps://demo.ae-dir.com -x -D "uid=zots,{{ aedir_suffix }}" -w CorrectHorseBatteryStaple
+dn:uid=zots,cn=test,{{ aedir_suffix }}
 </pre>
 
 <pre>
-LDAPTLS_CACERT=/etc/ssl/ca-bundle.pem ldapsearch -LLL -H ldaps://demo.ae-dir.com -x -D "uid=zots,ou=ae-dir" -w CorrectHorseBatteryStaple -b "ou=ae-dir" "(uid=zots)"
-dn: uid=zots,cn=test,ou=ae-dir
+LDAPTLS_CACERT=/etc/ssl/ca-bundle.pem ldapsearch -LLL -H ldaps://demo.ae-dir.com -x -D "uid=zots,{{ aedir_suffix }}" -w CorrectHorseBatteryStaple -b "{{ aedir_suffix }}" "(uid=zots)"
+dn: uid=zots,cn=test,{{ aedir_suffix }}
 uid: zots
 uidNumber: 30019
 cn:: SG9yc3QgUsO8YmV6YWhs
@@ -72,7 +72,7 @@ objectClass: aeObject
 objectClass: aeUser
 objectClass: posixAccount
 objectClass: ldapPublicKey
-aePerson: uniqueIdentifier=INIT-PERSON-ID-42,cn=people,ou=ae-dir
+aePerson: uniqueIdentifier=INIT-PERSON-ID-42,cn=people,{{ aedir_suffix }}
 mail: horst@example.com
 &hellip;
 </pre>

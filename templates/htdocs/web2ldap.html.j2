@@ -139,12 +139,12 @@
   <li>
     DIT navigation links are displayed in the top section:
     <br>
-    <span class="web2ldap-dit-navigation">cn=example,ou=ae-dir</span>
+    <span class="web2ldap-dit-navigation">cn=example,{{ aedir_suffix }}</span>
     <br>
     Each DN component is a separate link to directly navigate to
     the entry. E.g. clicking on the single link
     <span class="web2ldap-dit-navigation">cn=example</span>
-    would directly jump to entry <em>cn=example,ou=ae-dir</em>.
+    would directly jump to entry <em>cn=example,{{ aedir_suffix }}</em>.
   </li>
 </ul>
 <p>
@@ -289,13 +289,13 @@
 </p>
 <ul>
   <li>
-    short form is 'uid=<em>username</em>,ou=ae-dir'
+    short form is 'uid=<em>username</em>,{{ aedir_suffix }}'
   </li>
   <li>
     just the <em>username</em> is automagically expanded to short form above
   </li>
   <li>
-    full DN is 'uid=<em>username</em>,cn=<em>zone</em>,ou=ae-dir' also
+    full DN is 'uid=<em>username</em>,cn=<em>zone</em>,{{ aedir_suffix }}' also
     possible for direct copy &amp; paste
   </li>
 </ul>
@@ -384,7 +384,7 @@
 <ol>
   <li>
     Navigate to top-level LDAP entry by clicking the link
-    <span class="web2ldap-dit-navigation">ou=ae-dir</span>
+    <span class="web2ldap-dit-navigation">{{ aedir_suffix }}</span>
     in the navigation bar at the top.
   </li>
   <li>
@@ -1441,6 +1441,6 @@
 <p>Bookmark:</p>
 <p>
   Jump into
-  <a href="/web2ldap/oid?ldapi:///ou=ae-dir????bindname=">schema browser</a>
+  <a href="/web2ldap/oid?ldapi:///{{ aedir_suffix }}????bindname=">schema browser</a>
 </p>
 {% endblock %}

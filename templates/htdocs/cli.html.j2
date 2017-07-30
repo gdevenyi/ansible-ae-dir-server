@@ -81,7 +81,7 @@
   </dt>
   <dd>
     <code>
-       ldapwhoami -x -H ldaps://ae-dir.example.com -D "uid=lisa,ou=ae-dir" -W
+       ldapwhoami -x -H ldaps://ae-dir.example.com -D "uid=lisa,{{ aedir_suffix }}" -W
     </code>
   </dd>
 
@@ -91,7 +91,7 @@
   </dt>
   <dd>
     <code>
-      ldapwhoami -x -H ldaps://ae-dir.example.com -D "host=bart.example.com,ou=ae-dir" -w
+      ldapwhoami -x -H ldaps://ae-dir.example.com -D "host=bart.example.com,{{ aedir_suffix }}" -w
     </code>
   </dd>
 
@@ -138,14 +138,14 @@
   <dt>Search for <var>aeUser</var> with username "lisa" by <var>uid</var>:</dt>
   <dd>
     <code>
-      ldapsearch -H ldaps://ae-dir.example.com -b ou=ae-dir -s sub "(uid=lisa)" "*" "+"
+      ldapsearch -H ldaps://ae-dir.example.com -b {{ aedir_suffix }} -s sub "(uid=lisa)" "*" "+"
     </code>
   </dd>
 
   <dt>Search on behalf of an <var>aeService</var> (with -X):</dt>
   <dd>
   <code>
-    ldapsearch -H ldaps://ae-dir.example.com -b ou=ae-dir -s sub -X 'dn:uid=system_test-1,cn=test-servers-1,cn=test,ou=ae-dir' "*" "+"
+    ldapsearch -H ldaps://ae-dir.example.com -b {{ aedir_suffix }} -s sub -X 'dn:uid=system_test-1,cn=test-servers-1,cn=test,{{ aedir_suffix }}' "*" "+"
   </code>
   </dd>
 
@@ -187,7 +187,7 @@
 </p>
 <pre class="cli-ae-passwd-example">
 root@ae-dir-deb-p1:~# /opt/ae-dir/bin/ae-passwd.py bart
-new password for uid=bart,cn=ae,ou=ae-dir:
+new password for uid=bart,cn=ae,{{ aedir_suffix }}:
 repeat password:
 </pre>
 
@@ -203,11 +203,11 @@ repeat password:
 </p>
 <pre class="cli-ae-add-zone-example">
 root@ae-dir-deb-p1:~# /opt/ae-dir/bin/ae-add-zone.py test42 IAM-42 "the definite answer"
-Added cn=test42,ou=ae-dir
-Added cn=test42-init,cn=test42,ou=ae-dir
-Tagged cn=test42,ou=ae-dir
-Added cn=test42-zone-admins,cn=test42,ou=ae-dir
-Added cn=test42-zone-auditors,cn=test42,ou=ae-dir
+Added cn=test42,{{ aedir_suffix }}
+Added cn=test42-init,cn=test42,{{ aedir_suffix }}
+Tagged cn=test42,{{ aedir_suffix }}
+Added cn=test42-zone-admins,cn=test42,{{ aedir_suffix }}
+Added cn=test42-zone-auditors,cn=test42,{{ aedir_suffix }}
 </pre>
 
 <h1 id="openssl">OpenSSL command-line tools</h1>

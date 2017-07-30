@@ -422,10 +422,10 @@
 
 <h1 id="dit">Directory Information Tree (DIT)</h1>
 
-<h2 id="dit-ae-dir">ou=ae-dir</h2>
+<h2 id="dit-ae-dir">{{ aedir_suffix }}</h2>
 <p>
   The following diagram illustrates the directory information tree (DIT)
-  structure of &AElig;-DIR in naming context <em>ou=ae-dir</em> where
+  structure of &AElig;-DIR in naming context <em>{{ aedir_suffix }}</em> where
   all &AElig;-DIR entities are stored as separate LDAP entries.
   The nodes contain the <em>relative distinguished name</em> (RDN) and
   the <a href="#schema-soc">structural object class</a> used for that entry.
@@ -437,7 +437,7 @@
 {% set img_title="Graph of &AElig;-DIR tree structure" -%}
 {% include "includes/img.html.j2" %}
 
-<h3 id="dit-zone-ae">cn=ae,ou=ae-dir</h3>
+<h3 id="dit-zone-ae">cn=ae,{{ aedir_suffix }}</h3>
 <p>
   Zone <em>ae</em> is used for administration of &AElig;-DIR itself.
   Therefore some special restrictions apply.
@@ -583,7 +583,7 @@
   </tr>
 </table>
 
-<h3 id="dit-zone-people">cn=people,ou=ae-dir</h3>
+<h3 id="dit-zone-people">cn=people,{{ aedir_suffix }}</h3>
 <p>
   Zone <em>people</em> is used for storing organizational entries.
   These can be maintained manually or could be synced with a HR
@@ -592,7 +592,7 @@
   Manual maintenance is done by role <a href="#role-people-admin">People Admin</a>.
 </p>
 
-<h3 id="dit-zone-pub">cn=pub,ou=ae-dir</h3>
+<h3 id="dit-zone-pub">cn=pub,{{ aedir_suffix }}</h3>
 <p>
   Zone <em>pub</em> contains entries which are
   globally readable by all authenticated clients and
@@ -1196,7 +1196,7 @@
   <dt>ou</dt>
   <dd>
     usually set to <em>ae-dir</em>
-    resulting in naming context / search root <var>ou=ae-dir</var>
+    resulting in naming context / search root <var>{{ aedir_suffix }}</var>
   </dd>
   <dt>meta attributes</dt>
   <dd>see <a href="#schema-oc-aeObject-attributes">aeObject</a></dd>
@@ -1859,7 +1859,7 @@
     </td>
   </tr>
   <tr>
-    <td>ou=ae-dir</td>
+    <td>{{ aedir_suffix }}</td>
     <td>2</td>
     <td>
       Real database storage backend used for
