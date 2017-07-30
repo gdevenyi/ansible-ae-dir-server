@@ -219,17 +219,12 @@ objectclass ( ae-dir-oc:22
   NAME 'aeRoot'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: Top-level search root entry'
-  SUP ( organizationalUnit $ aeObject ) )
+  SUP ( aeObject )
+  MAY ( cn $ dc $ o $ ou  ) )
 
 ditcontentrule ( ae-dir-oc:22
   NAME 'aeRoot-dcr'
-  AUX ( aePosixIdRanges )
-  NOT ( businessCategory $ destinationIndicator $
-        facsimileTelephoneNumber $ internationaliSDNNumber $ l $
-        physicalDeliveryOfficeName $ postalAddress $ postalCode $
-        postOfficeBox $ preferredDeliveryMethod $ registeredAddress $
-        searchGuide $ seeAlso $ st $ street $ teletexTerminalIdentifier $
-        telexNumber $ userPassword $ x121Address ) )
+  AUX ( aePosixIdRanges ) )
 
 # Departments
 #-----------------------------------------------------------------------
