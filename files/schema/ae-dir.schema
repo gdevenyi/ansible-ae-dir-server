@@ -130,7 +130,7 @@ objectclass ( ae-dir-oc:21
   NAME 'aeObject'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: Managed object'
-  ABSTRACT
+  SUP top
   MUST ( aeStatus )
   MAY ( description $ aeNotBefore $ aeNotAfter $ aeTicketId $ aeTag ) )
 
