@@ -82,7 +82,7 @@
   </dt>
   <dd>
     <code>
-       ldapwhoami -x -H ldaps://ae-dir.example.com -D "uid=lisa,{{ aedir_suffix }}" -W
+       ldapwhoami -x -H ldaps://{{ aedir_main_provider_hostname }} -D "uid=lisa,{{ aedir_suffix }}" -W
     </code>
   </dd>
 
@@ -92,7 +92,7 @@
   </dt>
   <dd>
     <code>
-      ldapwhoami -x -H ldaps://ae-dir.example.com -D "host=bart.example.com,{{ aedir_suffix }}" -w
+      ldapwhoami -x -H ldaps://{{ aedir_main_provider_hostname }} -D "host=bart.example.com,{{ aedir_suffix }}" -w
     </code>
   </dd>
 
@@ -102,7 +102,7 @@
   </dt>
   <dd>
     <code>
-      LDAPTLS_CERT=/path/to/client.crt LDAPTLS_KEY=/path/to/client.key ldapwhoami -Y EXTERNAL -H ldaps://ae-dir.example.com
+      LDAPTLS_CERT=/path/to/client.crt LDAPTLS_KEY=/path/to/client.key ldapwhoami -Y EXTERNAL -H ldaps://{{ aedir_main_provider_hostname }}
     </code>
   </dd>
 
@@ -139,14 +139,14 @@
   <dt>Search for <var>aeUser</var> with username "lisa" by <var>uid</var>:</dt>
   <dd>
     <code>
-      ldapsearch -H ldaps://ae-dir.example.com -b {{ aedir_suffix }} -s sub "(uid=lisa)" "*" "+"
+      ldapsearch -H ldaps://{{ aedir_main_provider_hostname }} -b {{ aedir_suffix }} -s sub "(uid=lisa)" "*" "+"
     </code>
   </dd>
 
   <dt>Search on behalf of an <var>aeService</var> (with -X):</dt>
   <dd>
   <code>
-    ldapsearch -H ldaps://ae-dir.example.com -b {{ aedir_suffix }} -s sub -X 'dn:uid=system_test-1,cn=test-servers-1,cn=test,{{ aedir_suffix }}' "*" "+"
+    ldapsearch -H ldaps://{{ aedir_main_provider_hostname }} -b {{ aedir_suffix }} -s sub -X 'dn:uid=system_test-1,cn=test-servers-1,cn=test,{{ aedir_suffix }}' "*" "+"
   </code>
   </dd>
 
@@ -235,7 +235,7 @@ Added cn=test42-zone-auditors,cn=test42,{{ aedir_suffix }}
   <dt>Open TLS connection to LDAPS port:</dt>
   <dd>
     <code>
-      openssl s_client -connect ae-dir.example.com:636 -CAfile /path/to/rootca.crt
+      openssl s_client -connect {{ aedir_main_provider_hostname }}:636 -CAfile /path/to/rootca.crt
     </code>
     <br>
     (should display &quot;Verify return code: 0 (ok)&quot;)
