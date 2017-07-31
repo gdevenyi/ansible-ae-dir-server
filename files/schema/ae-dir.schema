@@ -52,24 +52,6 @@ attributetype ( ae-dir-at:16
   SINGLE-VALUE
   SUP distinguishedName )
 
-attributetype ( ae-dir-at:20
-  NAME 'aeVisibleGroups'
-  X-ORIGIN 'AE-DIR'
-  DESC 'AE-DIR: DN(s) of group entries usable with a certain server group, server, or service'
-  SUP distinguishedName )
-
-attributetype ( ae-dir-at:30
-  NAME 'aeDisplayNameGroups'
-  X-ORIGIN 'AE-DIR'
-  DESC 'AE-DIR: DN(s) of group entries for which member personalnames are displayed'
-  SUP distinguishedName )
-
-attributetype ( ae-dir-at:21
-  NAME 'aeVisibleSudoers'
-  X-ORIGIN 'AE-DIR'
-  DESC 'AE-DIR: DN(s) of sudoer entries usable with a certain server group or server'
-  SUP distinguishedName )
-
 attributetype ( ae-dir-at:22
   NAME 'aeNotBefore'
   X-ORIGIN 'AE-DIR'
@@ -101,6 +83,16 @@ attributetype ( ae-dir-at:9
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: URI of data source for synced person entry'
   SUP labeledURI )
+
+# Generic base attribute type for a fully-qualified domain name
+# NON-ASCII chars are supposed to be IDNA-encoded
+# not directly used
+attributetype ( ae-dir-at:10
+  NAME 'aeFqdn'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Arbitrary fully-qualified domain name (IDNA)'
+  SUP associatedDomain
+  SINGLE-VALUE )
 
 # Tagging
 #-----------------------------------------------------------------------
@@ -443,10 +435,22 @@ attributetype ( ae-dir-at:26
   SUBSTR caseIgnoreSubstringsMatch
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{32768} )
 
-attributetype ( ae-dir-at:27
-  NAME 'aeSrvGroup'
+attributetype ( ae-dir-at:20
+  NAME 'aeVisibleGroups'
   X-ORIGIN 'AE-DIR'
-  DESC 'AE-DIR: DN of server group this server also is member of'
+  DESC 'AE-DIR: DN(s) of group entries usable with a certain server group, server, or service'
+  SUP distinguishedName )
+
+attributetype ( ae-dir-at:30
+  NAME 'aeDisplayNameGroups'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: DN(s) of group entries for which member personalnames are displayed'
+  SUP distinguishedName )
+
+attributetype ( ae-dir-at:21
+  NAME 'aeVisibleSudoers'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: DN(s) of sudoer entries usable with a certain server group or server'
   SUP distinguishedName )
 
 objectclass ( ae-dir-oc:13
@@ -456,10 +460,10 @@ objectclass ( ae-dir-oc:13
   STRUCTURAL
   SUP ( namedObject $ aeObject )
   MUST ( cn $ description )
-  MAY ( aeSrvGroup $ aeProxyFor $ aeLogStorePeriod $
+  MAY ( aeProxyFor $ aeLogStorePeriod $
         aeSetupGroups $ aeLogStoreGroups $ aeLoginGroups $
         aeVisibleGroups $ aeDisplayNameGroups $ aeVisibleSudoers $
-        aeSSHProxyCommand ) )
+        aeSSHProxyCommand $ aeFqdn ) )
 
 # Contact entries
 #-----------------------------------------------------------------------
@@ -478,7 +482,7 @@ ditcontentrule ( ae-dir-oc:5
   AUX ( inetLocalMailRecipient $ mailboxRelatedObject )
   NOT ( seeAlso ) )
 
-# Server and network device entries
+# Host and network device entries
 #-----------------------------------------------------------------------
 
 # DN of aeHost entry
@@ -488,15 +492,11 @@ attributetype ( ae-dir-at:28
   DESC 'AE-DIR: DN of aeHost entry'
   SUP distinguishedName )
 
-# Generic base attribute type for a fully-qualified domain name
-# NON-ASCII chars are supposed to be IDNA-encoded
-# not directly used
-attributetype ( ae-dir-at:10
-  NAME 'aeFqdn'
+attributetype ( ae-dir-at:27
+  NAME 'aeSrvGroup'
   X-ORIGIN 'AE-DIR'
-  DESC 'AE-DIR: Arbitrary fully-qualified domain name (IDNA)'
-  SUP associatedDomain
-  SINGLE-VALUE )
+  DESC 'AE-DIR: DN of server group this server also is member of'
+  SUP distinguishedName )
 
 # Unique inventory number
 attributetype ( ae-dir-at:11
