@@ -1,7 +1,7 @@
 {% set head_title="User Guide -- web2ldap" -%}
 {% set head_pagedescription="Web administration user interface" -%}
 
-{% extends "layout.html.j2" %}
+{% extends aedir_htdocs_layout %}
 {% block content %}
 <p>
   <strong>Intended Audience:</strong>
@@ -267,11 +267,11 @@
 <p>Steps:</p>
 <ol>
   <li>
-    <a href="/web2ldap">Connect to web2ldap</a>
+    <a href="https://{{ aedir_main_provider_hostname }}/web2ldap">Connect to web2ldap</a>
   </li>
   <li>
     Choose link
-    <span class="web2ldap-internal-link">Connect to local &AElig;-DIR</span>.
+    <span class="web2ldap-internal-link">Login to &AElig;-DIR</span>.
   </li>
   <li>
     Enter your user name or bind-DN.

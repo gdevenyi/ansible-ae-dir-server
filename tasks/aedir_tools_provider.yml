@@ -14,7 +14,7 @@
   tags:
     - htdocs
 
-- name: "copy AE-DIR HTML docs to {{ aedir_prefix }}/htdocs/"
+- name: "copy AE-DIR htdocs/ to {{ aedir_prefix }}/htdocs/"
   copy:
     src: "htdocs/"
     dest: "{{ aedir_prefix }}/htdocs/"
@@ -26,7 +26,7 @@
   tags:
     - htdocs
 
-- name: "generate AE-DIR HTML docs in {{ aedir_prefix }}/htdocs/"
+- name: "generate AE-DIR htdocs/ in {{ aedir_prefix }}/htdocs/ based on {{ aedir_htdocs_layout }}"
   template:
     src: "htdocs/{{ item }}.html.j2"
     dest: "{{ aedir_prefix }}/htdocs/{{ item }}.html"

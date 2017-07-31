@@ -289,6 +289,9 @@ aedir_htdocs_templates:
   - user
   - web2ldap
 
+# relative filename of Jinja2 base layout template for all web pages
+aedir_htdocs_layout: "layout.html.j2"
+
 #---------------------------------------------------------------------------
 # OpenLDAP parameters
 #---------------------------------------------------------------------------

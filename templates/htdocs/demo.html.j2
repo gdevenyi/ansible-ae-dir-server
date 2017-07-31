@@ -1,7 +1,7 @@
 {% set head_title="Demo" -%}
 {% set head_pagedescription="Online demonstration" -%}
 
-{% extends "layout.html.j2" %}
+{% extends aedir_htdocs_layout %}
 {% block content %}
 <h1>Demo accounts</h1>
 <table>
@@ -28,7 +28,7 @@
 
 <h1>Web user interface</h1>
 <p>
-  <a href="https://demo.ae-dir.com/web2ldap">https://demo.ae-dir.com/web2ldap</a>
+  <a href="https://{{ aedir_main_provider_hostname }}/web2ldap">https://{{ aedir_main_provider_hostname }}/web2ldap</a>
   shows direct login links
 </p>
 
@@ -36,7 +36,7 @@
 <table>
   <tr>
     <td>Hostname/Port (via TLS)</td>
-    <td>demo.ae-dir.com:636</td>
+    <td>{{ aedir_main_provider_hostname }}:636</td>
   </tr>
   <tr>
     <td>Search base</td>
@@ -44,7 +44,7 @@
   </tr>
   <tr>
     <td>LDAP URL</td>
-    <td><code>ldaps://demo.ae-dir.com/{{ aedir_suffix }}</code></td>
+    <td><code>ldaps://{{ aedir_main_provider_hostname }}/{{ aedir_suffix }}</code></td>
   </tr>
 </table>
 <p>
@@ -54,12 +54,12 @@
 </p>
 
 <pre>
-$ LDAPTLS_CACERT=/etc/ssl/ca-bundle.pem ldapwhoami -H ldaps://demo.ae-dir.com -x -D "uid=zots,{{ aedir_suffix }}" -w CorrectHorseBatteryStaple
+$ LDAPTLS_CACERT=/etc/ssl/ca-bundle.pem ldapwhoami -H ldaps://{{ aedir_main_provider_hostname }} -x -D "uid=zots,{{ aedir_suffix }}" -w CorrectHorseBatteryStaple
 dn:uid=zots,cn=test,{{ aedir_suffix }}
 </pre>
 
 <pre>
-LDAPTLS_CACERT=/etc/ssl/ca-bundle.pem ldapsearch -LLL -H ldaps://demo.ae-dir.com -x -D "uid=zots,{{ aedir_suffix }}" -w CorrectHorseBatteryStaple -b "{{ aedir_suffix }}" "(uid=zots)"
+LDAPTLS_CACERT=/etc/ssl/ca-bundle.pem ldapsearch -LLL -H ldaps://{{ aedir_main_provider_hostname }} -x -D "uid=zots,{{ aedir_suffix }}" -w CorrectHorseBatteryStaple -b "{{ aedir_suffix }}" "(uid=zots)"
 dn: uid=zots,cn=test,{{ aedir_suffix }}
 uid: zots
 uidNumber: 30019
