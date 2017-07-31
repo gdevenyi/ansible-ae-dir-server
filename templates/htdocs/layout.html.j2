@@ -3,10 +3,10 @@
 
   <head>
 
-    <title>&AElig;-DIR | {{ head_title }}</title>
+    <title>&AElig;-DIR | {% block head_title %}{% endblock %}</title>
 
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <meta name="description" content="&AElig;-DIR -- {{ head_pagedescription }}">
+    <meta name="description" content="&AElig;-DIR -- {% block head_pagedescription %}{% endblock %}">
     <meta name="keywords" content="&AElig;-DIR, OpenLDAP, IAM, access control">
     <meta name="robots" content="INDEX,FOLLOW">
     <meta name="revisit-after" content="5 days">
@@ -47,18 +47,24 @@
 
 <div id="content">
 
-<p class="pagetitle">{{ head_title }}</p>
+<p class="pagetitle">{{ self.head_title() }}</p>
 
 {% block content %}
-{% endblock %}
+{% endblock content %}
 
 </div>
 
 <footer>
   <div id="footer">
-    <p class="contact">
-      <a href="#top">&uarr; TOP</a>
-      sponsored by <a href="https://stroeder.com">stroeder.com</a>
+    <p>
+      <a href="#top">&uarr; TOP</a> //
+      sponsored by <a href="https://stroeder.com">stroeder.com</a> //
+      <a href="https://{{ aedir_main_provider_hostname }}/web2ldap"
+         title="Access to administration UI (web2ldap)">Admin UI (web2ldap)</a> //
+      <a href="https://{{ aedir_main_provider_hostname }}/pwd/"
+         title="Access to &AElig;-DIR password self-service">Password self-service</a> //
+      <a href="https://{{ aedir_main_provider_hostname }}/oath/"
+         title="Access to OATH-LDAP Token Enrollment Service">OATH enrollment</a>
     </p>
   </div>
 </footer>

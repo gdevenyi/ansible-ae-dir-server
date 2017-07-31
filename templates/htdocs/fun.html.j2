@@ -1,7 +1,8 @@
-{% set head_title="Funny stuff" -%}
-{% set head_pagedescription="Funny stuff related to this" -%}
-
 {% extends aedir_htdocs_layout %}
+
+{% block head_title %}Funny stuff{% endblock %}
+{% block head_pagedescription %}Funny stuff related to this{% endblock %}
+
 {% block content %}
 <h1>xkcd</h1>
 
@@ -27,4 +28,4 @@
     <a href="https://xkcd.com/1319/">Automation</a>
   </li>
 </ul>
-{% endblock %}
+{% endblock content %}

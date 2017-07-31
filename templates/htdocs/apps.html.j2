@@ -1,8 +1,10 @@
-{% set head_title="Applications" -%}
-{% set head_pagedescription="Application integration examples" -%}
-
 {% extends aedir_htdocs_layout %}
+
+{% block head_title %}Applications{% endblock %}
+{% block head_pagedescription %}Application integration examples{% endblock %}
+
 {% block content %}
+
 <p>
   <strong>Intended Audience:</strong>
   System architects, developers and system administrators
@@ -323,4 +325,4 @@
     <a href="https://en.wikibooks.org/wiki/OpenSSH/Cookbook/Multiplexing">SSH Multiplexing</a>
   </li>
 </ul>
-{% endblock %}
+{% endblock content %}

@@ -1,7 +1,8 @@
-{% set head_title="User Guide -- web2ldap" -%}
-{% set head_pagedescription="Web administration user interface" -%}
-
 {% extends aedir_htdocs_layout %}
+
+{% block head_title %}User Guide -- web2ldap{% endblock %}
+{% block head_pagedescription %}Web administration user interface{% endblock %}
+
 {% block content %}
 <p>
   <strong>Intended Audience:</strong>
@@ -1443,4 +1444,4 @@
   Jump into
   <a href="/web2ldap/oid?ldapi:///{{ aedir_suffix }}????bindname=">schema browser</a>
 </p>
-{% endblock %}
+{% endblock content %}

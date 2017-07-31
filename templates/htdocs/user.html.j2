@@ -1,25 +1,53 @@
-{% set head_title="User Guide" -%}
-{% set head_pagedescription="User Guide" -%}
-
 {% extends aedir_htdocs_layout %}
+
+{% block head_title %}User Guide{% endblock %}
+{% block head_pagedescription %}User Guide{% endblock %}
+
 {% block content %}
-<dl>
-  <dt><a href="web2ldap.html">web2ldap</a></dt>
-  <dd>
-    Using the administrative web interface
-  </dd>
-  <dt><a href="pwd.html">Password self-service</a></dt>
-  <dd>
-    Using the password self-service web interface
-  </dd>
-  <dt><a href="oath.html">OATH-LDAP enrollment</a></dt>
-  <dd>
-    Using the OATH-LDAP enrollment web interface
-  </dd>
-  <dt><a href="cli.html">Command-line tools</a></dt>
-  <dd>
-    Using the command line tools (only for role
-    <a href="docs.html#role-ae-admin">&AElig; Admin</a>)
-  </dd>
-</dl>
-{% endblock %}
+
+<table>
+  <tr>
+    <th>
+      User guide
+    </th>
+    <th>
+      Access
+    </th>
+  </tr>
+  <tr>
+    <td>
+      <a href="web2ldap.html">web2ldap</a>
+    </td>
+    <td>
+      <a href="https://{{ aedir_main_provider_hostname }}/web2ldap"
+         title="Access to administration UI (web2ldap)">Admin UI (web2ldap)</a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a href="pwd.html">Password self-service</a>
+    </td>
+    <td>
+      <a href="https://{{ aedir_main_provider_hostname }}/pwd/"
+         title="Access to &AElig;-DIR password self-service">Password self-service</a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a href="oath.html">OATH-LDAP enrollment</a>
+    </td>
+    <td>
+      <a href="https://{{ aedir_main_provider_hostname }}/oath/"
+         title="Access to OATH-LDAP Token Enrollment Service">OATH enrollment</a>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <a href="cli.html">Command-line tools</a>
+    </td>
+    <td>
+      -
+    </td>
+  </tr>
+</table>
+{% endblock content %}

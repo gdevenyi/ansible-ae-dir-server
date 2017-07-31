@@ -1,7 +1,8 @@
-{% set head_title="User Guide -- command-line tools" -%}
-{% set head_pagedescription="User guide for command-line tools" -%}
-
 {% extends aedir_htdocs_layout %}
+
+{% block head_title %}User Guide -- command-line tools{% endblock %}
+{% block head_pagedescription %}User guide for command-line tools{% endblock %}
+
 {% block content %}
 <p>
   <strong>Intended Audience:</strong>
@@ -247,4 +248,4 @@ Added cn=test42-zone-auditors,cn=test42,{{ aedir_suffix }}
   <a href="https://www.openssl.org/docs/manmaster/man1/verify.html">verify(1)</a>
   is useful to validate a certificate (chain) against a locally CA certificate chain.
 </p>
-{% endblock %}
+{% endblock content %}

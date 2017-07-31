@@ -1,7 +1,8 @@
-{% set head_title="Demo" -%}
-{% set head_pagedescription="Online demonstration" -%}
-
 {% extends aedir_htdocs_layout %}
+
+{% block head_title %}Demo{% endblock %}
+{% block head_pagedescription %}Online demonstration{% endblock %}
+
 {% block content %}
 <h1>Demo accounts</h1>
 <table>
@@ -76,4 +77,4 @@ aePerson: uniqueIdentifier=INIT-PERSON-ID-42,cn=people,{{ aedir_suffix }}
 mail: horst@example.com
 &hellip;
 </pre>
-{% endblock %}
+{% endblock content %}
