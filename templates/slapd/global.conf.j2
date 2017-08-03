@@ -2,8 +2,52 @@
 # Global slapd configuration section
 #######################################################################
 
-# Include all the schema files (nested includes therein)
-include {{ openldap_schema_prefix }}/init.schema
+#---------------------------------------------------------------------------
+# Include schema files
+#---------------------------------------------------------------------------
+
+# Schema files shipped with OpenLDAP distribution
+include {{ openldap_schema_prefix }}/core.schema
+include {{ openldap_schema_prefix }}/cosine.schema
+include {{ openldap_schema_prefix }}/inetorgperson.schema
+include {{ openldap_schema_prefix }}/misc.schema
+include {{ openldap_schema_prefix }}/dyngroup.schema
+include {{ openldap_schema_prefix }}/openldap.schema
+include {{ openldap_schema_prefix }}/ppolicy.schema
+include {{ openldap_schema_prefix }}/nis.schema
+include {{ openldap_schema_prefix }}/duaconf.schema
+
+# For SSH keys
+include {{ openldap_schema_prefix }}/openssh-lpk_openldap.schema
+
+# sudoers schema, see sudoers.ldap(8)
+include {{ openldap_schema_prefix }}/sudoers.schema
+
+# automount schema
+include {{ openldap_schema_prefix }}/autofs.schema
+
+include {{ openldap_schema_prefix }}/draft-stroeder-mailboxrelatedobject.schema
+include {{ openldap_schema_prefix }}/draft-stroeder-namedobject.schema
+include {{ openldap_schema_prefix }}/draft-findlay-ldap-groupofentries.schema
+# OATH-LDAP
+include {{ openldap_schema_prefix }}/oath-ldap.schema
+
+# OID macros used in subsequent schema files
+include {{ openldap_schema_prefix }}/stroeder.com-oid-macros.schema
+include {{ openldap_schema_prefix }}/stroeder.com.schema
+
+# for webldappwd (password self-service)
+include {{ openldap_schema_prefix }}/mspwdreset.schema
+
+# AE-DIR -- Yet another LDAP User Management
+include {{ openldap_schema_prefix }}/ae-dir.schema
+{% if openldap_role=="provider" %}
+include {{ openldap_schema_prefix }}/ae-dir-session.schema
+{% endif %}
+
+#---------------------------------------------------------------------------
+# Process parameters
+#---------------------------------------------------------------------------
 
 # Where PID and arg files are stored
 pidfile {{ openldap_rundir }}/slapd.pid

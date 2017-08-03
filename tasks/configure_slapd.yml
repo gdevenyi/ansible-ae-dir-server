@@ -56,16 +56,6 @@
   notify:
   - restart slapd
 
-- name: "Create central schema including file from template"
-  template:
-    src: "slapd/init.schema.j2"
-    dest: "{{ openldap_schema_prefix }}/init.schema"
-    owner: root
-    group: ldap
-    mode: 0644
-  notify:
-  - restart slapd
-
 - name: "Create rootDSE.ldif"
   template:
     src: "slapd/rootDSE.ldif.j2"
