@@ -1,21 +1,28 @@
 galaxy_info:
   author: Michael Ströder
   description: AE-DIR servers
-  
+
   issue_tracker_url: https://ae-dir.com
-  
+
   license: Apache
-  
+
   min_ansible_version: 2.2
 
   platforms:
   - name: opensuse
     versions:
     - Tumbleweed
+    - 42.3
   - name: Debian
     versions:
     - jessie
-  
+  - name: SLES
+    versions:
+    - 12SP2
+  - name: EL
+    versions:
+    - 7
+
   galaxy_tags:
     - ae-dir
 
