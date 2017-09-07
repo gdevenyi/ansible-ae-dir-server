@@ -123,6 +123,18 @@ if __debug__:
 # Classes and functions
 #-----------------------------------------------------------------------
 
+def unicode_pwd(password):
+    """
+    returns password or random generated password as properly encoded
+    'unicodePwd' value for MS AD
+
+    see also:
+    https://msdn.microsoft.com/en-us/library/cc223248.aspx
+    https://support.microsoft.com/en-us/help/269190/how-to-change-a-windows-active-directory-and-lds-user-password-through-ldap
+    """
+    return u'"{}"'.format(password).encode('utf-16-le')
+
+
 class DictQueue(Queue.Queue):
     """
     modified Queue class which internally stores items in a dict
@@ -259,7 +271,11 @@ class PWSyncWorker(threading.Thread, LocalLDAPConn):
         """
         encode argument password for target system
         """
-        return password.decode('utf-8').encode(self.target_password_encoding)
+        pwu = password.decode('utf-8')
+        if self.target_password_attr.lower()=='unicodepwd':
+            return unicode_pwd(pwu)
+        else:
+            return pwu.encode(self.target_password_encoding)
 
     def update_target_password(self, target_id, old_passwd, new_passwd, req_time):
         """
