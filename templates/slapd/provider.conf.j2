@@ -184,15 +184,6 @@ access to
     by users read
     by * none
 
-{% if pwsync_enabled==True %}
-access to
-  dn.subtree="{{ aedir_suffix }}"
-  attrs=entry
-    by set="this & user" write
-    by * none break
-{% endif %}
-#  dn.subtree="^uid=({{ aedir_aeuser_uid_regex }}|{{ aedir_aeservice_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
-
 #---------------------------------------------------------------------------
 # The replica ACLs MUST be before secret attributes' ACLs
 #---------------------------------------------------------------------------
@@ -1524,13 +1515,13 @@ ppolicy_use_lockout
 
 {% include 'slapo-rwm.conf.j2' %}
 
-{% if pwsync_enabled==True %}
-# send modify requests to external listener process receiving the requests
-# on Unix Domain socket path {{ pwsync_socket_path }}
+{% if aedir_pwsync_enabled==True %}
+# send extended requests to external listener process receiving the requests
+# on Unix Domain socket path {{ aedir_pwsync_socket_path }}
 overlay sock
 extensions binddn peername ssf connid
-socketpath {{ pwsync_socket_path }}
-sockops modify
+socketpath {{ aedir_pwsync_socket_path }}
+sockops extended
 {% endif %}
 
 #---------------------------------------------------------------------------

@@ -16,9 +16,9 @@ After=local-fs.target remote-fs.target network.target
 [Service]
 Type=simple
 #PIDFile=
-ExecStart={{ aedir_python }} {{ aedir_sbin }}/passmod.py "{{ pwsync_socket_path }}" "{{ openldap_ldapi_uri }}????x-saslmech=EXTERNAL"
-User={{ pwsync_listener_user }}
-Group={{ pwsync_listener_user }}
+ExecStart={{ aedir_python }} {{ aedir_sbin }}/passmod.py "{{ aedir_pwsync_socket_path }}" "{{ openldap_ldapi_uri }}????x-saslmech=EXTERNAL"
+User={{ aedir_pwsync_listener_user }}
+Group={{ aedir_pwsync_listener_user }}
 
 [Install]
 WantedBy=multi-user.target

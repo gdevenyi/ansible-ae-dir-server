@@ -12,31 +12,30 @@ and exports the userPassword value
 #-----------------------------------------------------------------------
 
 # from Python's standard lib
-import datetime
 import logging
 import os
 import sys
-
-# passlib
-import passlib.context
-
-# from jwcrypto
-#from jwcrypto.jwk import JWK
-#from jwcrypto.jwe import JWE
+import Queue
+import threading
+import time
+from collections import OrderedDict
 
 # python-ldap
 import ldap
-from ldap import LDAPError
-from ldap.controls.simple import ProxyAuthzControl
+from ldap.dn import str2dn
+from ldap.functions import strf_secs as ldap_strf_secs
+
+# from pyasn1
+from pyasn1.type.univ import OctetString, Sequence
+from pyasn1.type.namedtype import NamedTypes, OptionalNamedType
+from pyasn1.type.tag import Tag, tagClassContext, tagFormatSimple
+from pyasn1.codec.ber import decoder as pyasn1_decoder
+from pyasn1.error import PyAsn1Error
 
 # local modules
-from slapdsock.ldaphelper import ldap_datetime
-from slapdsock.ldaphelper import MyLDAPUrl
-from slapdsock.loghelper import combined_logger
-from slapdsock.handler import SlapdSockHandler, SlapdSockHandlerError
-from slapdsock.message import RESULTResponse
-
-# run multi-threaded
+from slapdsock.ldaphelper import MyLDAPUrl, MyLDAPObject, LocalLDAPConn
+from slapdsock.loghelper import combined_logger, LoggerFileobj
+from slapdsock.handler import SlapdSockHandler
 from slapdsock.service import SlapdSockThreadingServer
 
 #-----------------------------------------------------------------------
@@ -97,36 +96,306 @@ LDAP_USERNAME_ATTR = 'uid'
 SOCKET_TIMEOUT = 2 * LDAP_TIMEOUT
 
 # Logging formats
-SYS_LOG_FORMAT = '%(levelname)s %(message)s'
-CONSOLE_LOG_FORMAT = '%(asctime)s %(levelname)s %(message)s'
+SYS_LOG_FORMAT = '%(name)s %(levelname)s %(message)s'
+CONSOLE_LOG_FORMAT = '%(name)s %(asctime)s %(levelname)s %(message)s'
 
 # Base number for floating average value of response delay
 AVERAGE_COUNT = 100
 
 # Default log level to use
-LOG_LEVEL = int(os.environ.get('LOG_LEVEL', logging.DEBUG))
+LOG_LEVEL = int(os.environ.get('LOG_LEVEL', logging.INFO))
 
 # Time (seconds) for assuming an userPassword+OTP value to be valid in cache
 CACHE_TTL = -1.0
 
 DEBUG_VARS = [
-    'pwd_changed_time',
-    'pwd_policy_subentry_dn',
-    'pwd_policy_subentry',
-    'user_class',
-    'user_entry',
+    'user_dn',
 ]
 
 # Error messages
 if __debug__:
     DEBUG_VARS.extend([
+        'old_passwd',
         'new_passwd',
-        'user_password_hash',
     ])
 
 #-----------------------------------------------------------------------
 # Classes and functions
 #-----------------------------------------------------------------------
+
+class DictQueue(Queue.Queue):
+    """
+    modified Queue class which internally stores items in a dict
+    """
+
+    def _init(self, maxsize):
+        self.queue = OrderedDict()
+
+    # Put a new item in the queue
+    def _put(self, item):
+        key, value = item
+        self.queue[key] = value
+
+    # Get an item from the queue
+    def _get(self):
+        key, value = self.queue.popitem()
+        return (key, value)
+
+
+class PWSyncWorker(threading.Thread, LocalLDAPConn):
+    """
+    Thread class for the password synchronization worker
+    """
+    passwd_update_delay = 1.0
+    source_id_attr = 'uid'
+    target_filter_format = '({0}={1})'
+    target_id_attr = 'uid'
+    target_password_attr = 'userPassword'
+    target_password_encoding = 'utf-8'
+    # MS AD
+    #target_password_attr = 'unicodePwd'
+
+    def __init__(
+            self,
+            target_ldap_url,
+            queue,
+        ):
+        self._target_ldap_url = target_ldap_url
+        if target_ldap_url.attrs is not None and \
+           len(target_ldap_url.attrs) == 2:
+            self.target_id_attr, self.target_password_attr = target_ldap_url.attrs
+        self.logger = combined_logger(
+            self.__class__.__name__,
+            LOG_LEVEL,
+            sys_log_format=SYS_LOG_FORMAT,
+            console_log_format=CONSOLE_LOG_FORMAT,
+        )
+        self._queue = queue
+        threading.Thread.__init__(self, name=self.__class__.__module__+self.__class__.__name__)
+        LocalLDAPConn.__init__(self, self.logger)
+        # open connection to target LDAP server
+        self.target_conn = MyLDAPObject(
+            target_ldap_url.initializeUrl(),
+            trace_level=PYLDAP_TRACELEVEL,
+            trace_file=LoggerFileobj(self.logger, logging.DEBUG),
+            retry_max=LDAP_MAXRETRYCOUNT,
+            retry_delay=LDAP_RETRYDELAY,
+            who=target_ldap_url.who or '',
+            cred=target_ldap_url.cred or '',
+            cache_time=LDAP_CACHE_TTL,
+        )
+        # end of PWSyncWorker.__init__()
+
+    def _check_password(self, user_dn, new_passwd):
+        password_correct = False
+        self.logger.debug('Check password of %r', user_dn)
+        checkpw_conn = None
+        try:
+            try:
+                # check whether user_dn, new_passwd is correct
+                # by new connect with simple bind
+                checkpw_conn = MyLDAPObject(
+                    self.ldapi_uri,
+                    trace_level=PYLDAP_TRACELEVEL,
+                    trace_file=LoggerFileobj(self.logger, logging.DEBUG),
+                    retry_max=LDAP_MAXRETRYCOUNT,
+                    retry_delay=LDAP_RETRYDELAY,
+                    who=user_dn,
+                    cred=new_passwd,
+                    cache_time=LDAP_CACHE_TTL,
+                )
+            except ldap.INVALID_CREDENTIALS:
+                self.logger.warn('Ignoring wrong password for %r', user_dn)
+                password_correct = False
+            else:
+                password_correct = True
+        finally:
+            if checkpw_conn is not None:
+                checkpw_conn.unbind_s()
+        return password_correct # end of _check_password()
+
+    def get_target_id(self, source_dn):
+        """
+        determine target identifier based on user's source DN
+        """
+        rdn_attr_type, uid, _ = str2dn(source_dn)[0][0]
+        if rdn_attr_type.lower() != self.source_id_attr:
+            # check accepted attribute in RDN
+            self.logger.warn(
+                'RDN attribute %r is not %r => ignore password change of %r',
+                rdn_attr_type,
+                self.source_id_attr,
+                source_dn,
+            )
+            return None
+        self.logger.debug('Extracted %s=%r from source_dn=%r', self.source_id_attr, uid, source_dn)
+        target_conn = self.target_conn
+        target_filter = self.target_filter_format.format(self.target_id_attr, uid)
+        ldap_result = target_conn.search_ext_s(
+            self._target_ldap_url.dn,
+            self._target_ldap_url.scope or ldap.SCOPE_SUBTREE,
+            target_filter,
+            attrlist=['1.1'],
+            sizelimit=8,
+        )
+        # strip LDAPv3 referrals received
+        ldap_result = [
+            (dn, entry)
+            for dn, entry in ldap_result
+            if dn is not None
+        ]
+        self.logger.debug('ldap_result=%r', ldap_result)
+        if len(ldap_result) != 1:
+            self.logger.warn(
+                'No unique ID found with %r => ignore password change of %r',
+                target_filter,
+                source_dn,
+            )
+            return None
+        target_id = ldap_result[0][0]
+        return target_id # end of PWSyncWorker.get_target_id()
+
+    def encode_target_password(self, password):
+        """
+        encode argument password for target system
+        """
+        return password.decode('utf-8').encode(self.target_password_encoding)
+
+    def update_target_password(self, target_id, old_passwd, new_passwd, req_time):
+        """
+        write new password to target
+        """
+        target_conn = self.target_conn
+        modlist = [(
+            ldap.MOD_REPLACE,
+            self.target_password_attr,
+            [self.encode_target_password(new_passwd)],
+        )]
+        target_conn.modify_s(
+            target_id,
+            modlist,
+        )
+        return # end of PWSyncWorker.update_target_password()
+
+    def run(self):
+        """
+        Thread runner function
+        """
+        while True:
+            user_dn, val = self._queue.get()
+            old_passwd, new_passwd, req_time = val
+            self.logger.debug(
+                'Received password change for %r (at %s)',
+                user_dn,
+                ldap_strf_secs(req_time),
+            )
+            try:
+                sleep_time = max(
+                    0,
+                    time.time()-req_time+self.passwd_update_delay
+                )
+                self.logger.debug('Deferring syncing password for %r for %f secs', user_dn, sleep_time)
+                time.sleep(sleep_time)
+                if not self._check_password(user_dn, new_passwd):
+                    # simply ignore wrong passwords
+                    self._queue.put((user_dn, (old_passwd, new_passwd, req_time)))
+                    continue
+                target_id = self.get_target_id(user_dn)
+                if target_id is None:
+                    # simply ignore non-existent targets
+                    continue
+                self.logger.debug('Try to sync password for %r to %r', user_dn, target_id)
+                self.update_target_password(target_id, old_passwd, new_passwd, req_time)
+            except Exception:
+                self.logger.error(
+                    'Error syncing password for %r:\n',
+                    user_dn,
+                    exc_info=True,
+                )
+                #self._queue.put((user_dn, (old_passwd, new_passwd, req_time)))
+            else:
+                self.logger.info('Synced password for %r to %r', user_dn, target_id)
+            self._queue.task_done()
+        # end of PWSyncWorker.run()
+
+
+class PasswdModifyRequestValue(Sequence):
+    """
+    PasswdModifyRequestValue ::= SEQUENCE {
+        userIdentity [0] OCTET STRING OPTIONAL
+        oldPasswd [1] OCTET STRING OPTIONAL
+        newPasswd [2] OCTET STRING OPTIONAL }
+    """
+
+    class UserIdentity(OctetString):
+        """
+        userIdentity [0] OCTET STRING OPTIONAL
+        """
+        tagSet = OctetString.tagSet.tagImplicitly(Tag(tagClassContext, tagFormatSimple, 0))
+
+    class OldPasswd(OctetString):
+        """
+        oldPasswd [1] OCTET STRING OPTIONAL
+        """
+        tagSet = OctetString.tagSet.tagImplicitly(Tag(tagClassContext, tagFormatSimple, 1))
+
+    class NewPasswd(OctetString):
+        """
+        newPasswd [2] OCTET STRING OPTIONAL
+        """
+        tagSet = OctetString.tagSet.tagImplicitly(Tag(tagClassContext, tagFormatSimple, 2))
+
+    componentType = NamedTypes(
+        OptionalNamedType('userIdentity', UserIdentity()),
+        OptionalNamedType('oldPasswd', OldPasswd('')),
+        OptionalNamedType('newPasswd', NewPasswd('')),
+    )
+
+
+class PassModHandler(SlapdSockHandler):
+
+    """
+    Handler class which extracts new userPassword value
+    from EXTENDED operation
+    """
+
+    def do_extended(self, request):
+        """
+        Handle EXTENDED operation
+        """
+        if request.oid != '1.3.6.1.4.1.4203.1.11.1':
+            # ignore all other extended operations
+            return 'CONTINUE'
+        try:
+            decoded_value, _ = pyasn1_decoder.decode(
+                request.value,
+                asn1Spec=PasswdModifyRequestValue(),
+            )
+            try:
+                user_dn = str(decoded_value.getComponentByName('userIdentity'))
+            except PyAsn1Error:
+                user_dn = request.binddn
+            self._log(
+                logging.INFO,
+                'Intercepted PASSMOD operation for %r',
+                user_dn,
+            )
+            old_passwd = str(decoded_value.getComponentByName('oldPasswd')) or None
+            new_passwd = str(decoded_value.getComponentByName('newPasswd')) or None
+        except Exception, err:
+            self._log(
+                logging.ERROR,
+                'Unhandled exception processing PASSMOD request: %r',
+                err,
+                exc_info=True
+            )
+        else:
+            # push the password change into queue
+            self.server.pwsync_queue.put((
+                user_dn,
+                (old_passwd, new_passwd, time.time()),
+            ))
+        return 'CONTINUE' # end of do_modify()
 
 
 class PassModServer(SlapdSockThreadingServer):
@@ -143,21 +412,27 @@ class PassModServer(SlapdSockThreadingServer):
             self,
             server_address,
             RequestHandlerClass,
-            logger,
             average_count,
             socket_timeout,
             socket_permissions,
             allowed_uids,
             allowed_gids,
+            pwsync_queue,
             bind_and_activate=True,
             log_vars=None,
         ):
         self._ldap_conn = None
+        self.pwsync_queue = pwsync_queue
         SlapdSockThreadingServer.__init__(
             self,
             server_address,
             RequestHandlerClass,
-            logger,
+            combined_logger(
+                self.__class__.__name__,
+                LOG_LEVEL,
+                sys_log_format=SYS_LOG_FORMAT,
+                console_log_format=CONSOLE_LOG_FORMAT,
+            ),
             average_count,
             socket_timeout,
             socket_permissions,
@@ -167,251 +442,6 @@ class PassModServer(SlapdSockThreadingServer):
             monitor_dn=None,
             log_vars=log_vars,
         )
-
-
-class PassModHandler(SlapdSockHandler):
-
-    """
-    Handler class which proxies some simple bind requests to remote server
-    """
-
-    def _read_user_entry(self, request):
-        # Try to read the user entry for the given request dn
-        try:
-            try:
-                local_ldap_conn = self.server.get_ldapi_conn()
-                ldap_result = local_ldap_conn.search_s(
-                    request.dn.encode('utf-8'),
-                    ldap.SCOPE_BASE,
-                    '(objectClass=*)',
-                    attrlist=[
-                        'objectClass',
-                        'structuralObjectClass',
-                        'pwdChangedTime',
-                        'pwdPolicySubentry',
-                        'uid',
-                        'uidNumber',
-                        'userPassword',
-                    ],
-                )
-            except ldap.SERVER_DOWN, ldap_error:
-                self.server.disable_ldapi_conn()
-                raise ldap_error
-        except LDAPError, ldap_error:
-            raise SlapdSockHandlerError(
-                ldap_error,
-                log_level=logging.WARN,
-                response=RESULTResponse(request.msgid, ldap_error),
-                log_vars=self.server._log_vars,
-            )
-        return ldap_result[0][1] # _read_user_entry()
-
-    def _compare_old_pwd(self, user_entry, new_passwd):
-        try:
-            user_password_hash = user_entry['userPassword'][0]
-        except KeyError:
-            self._log(logging.DEBUG, 'no old password hash to check')
-            return False
-        pw_context = passlib.context.CryptContext(schemes=['sha512_crypt'])
-        self._log(logging.DEBUG, 'will check old password hash')
-        try:
-            return pw_context.verify(new_passwd, user_password_hash[7:])
-        except ValueError:
-            return False
-
-    def _get_new_passwd(self, request):
-        """
-        Try to extract userPassword from request
-        """
-        for mod_op, mod_type, mod_vals in request.modops:
-            if mod_op in (ldap.MOD_REPLACE, ldap.MOD_ADD) and \
-               (mod_type.lower() == 'userpassword' or mod_type == '2.5.4.35'):
-                if len(set(mod_vals)) != 1:
-                    raise SlapdSockHandlerError(
-                        '%d != 1 different userPassword values in %s for %r' % (
-                            len(set(mod_vals)),
-                            request.__class__.__name__,
-                            request.dn,
-                        ),
-                        log_level=logging.ERROR,
-                        response=RESULTResponse(
-                            request.msgid,
-                            'constraintViolation',
-                            info='Multiple password values not allowed!',
-                        ),
-                        log_vars=self.server._log_vars,
-                    )
-                new_passwd = mod_vals[0]
-                if new_passwd.startswith(PWD_SCHEME):
-                    raise SlapdSockHandlerError(
-                        'userPassword value already begins with %r' % PWD_SCHEME,
-                        log_level=logging.DEBUG,
-                        response='CONTINUE\n',
-                        log_vars=self.server._log_vars,
-                    )
-                pw_context = passlib.context.CryptContext(schemes=[PWD_CRYPT_SCHEME])
-                # save hashed password into request
-                mod_vals[0] = '{0}{1}'.format(
-                    PWD_SCHEME,
-                    pw_context.hash(new_passwd, **PWD_CRYPT_SCHEME_ARGS),
-                )
-                return new_passwd
-        # nothing to do because there's no userPassword attribute in request
-        raise SlapdSockHandlerError(
-            'No userPassword value in %s for %r' % (
-                request.__class__.__name__,
-                request.dn,
-            ),
-            log_level=logging.DEBUG,
-            response='CONTINUE\n',
-            log_vars=self.server._log_vars,
-        )
-        # end of _get_new_passwd()
-
-    def _check_pwd_policy(self, request, new_passwd_len, pwd_policy_subentry_dn, pwd_changed_time):
-        if pwd_policy_subentry_dn is None:
-            self._log(logging.DEBUG, 'no password policy to check')
-            return
-        # Try to determine password policy
-        pwd_min_age = PWD_MIN_AGE
-        pwd_min_length = PWD_MIN_LENGTH
-        try:
-            try:
-                local_ldap_conn = self.server.get_ldapi_conn()
-                pwd_policy_subentry = local_ldap_conn.read_s(
-                    pwd_policy_subentry_dn,
-                    '(objectClass=pwdPolicy)',
-                    attrlist=[
-                        'pwdMinAge',
-                        'pwdMinLength',
-                    ],
-                    cache_time=LDAP_LONG_CACHE_TTL,
-                )
-            except ldap.SERVER_DOWN, ldap_error:
-                self.server.disable_ldapi_conn()
-                raise ldap_error
-        except LDAPError, ldap_error:
-            raise SlapdSockHandlerError(
-                ldap_error,
-                log_level=logging.WARN,
-                response=RESULTResponse(request.msgid, ldap_error),
-                log_vars=self.server._log_vars,
-            )
-        else:
-            pwd_min_age = int(pwd_policy_subentry.get('pwdMinAge', [PWD_MIN_AGE])[0])
-            pwd_min_length = int(pwd_policy_subentry.get('pwdMinLength', [PWD_MIN_LENGTH])[0])
-        # Check if minimum password length is ok
-        if new_passwd_len < pwd_min_length:
-            raise SlapdSockHandlerError(
-                'Password for %r too short!' % (request.dn),
-                log_level=logging.INFO,
-                response=RESULTResponse(
-                    request.msgid,
-                    'constraintViolation',
-                    info='Password too short! Required minimum length is %d.' % (
-                        pwd_min_length
-                    ),
-                ),
-                log_vars=self.server._log_vars,
-            )
-        # Check if next password change is already allowed
-        if pwd_changed_time is not None and \
-           (datetime.datetime.utcnow()-ldap_datetime(pwd_changed_time)).total_seconds < pwd_min_age:
-            raise SlapdSockHandlerError(
-                'Password of %r too young to change!' % (request.dn),
-                log_level=logging.INFO,
-                response=RESULTResponse(
-                    request.msgid,
-                    'constraintViolation',
-                    info='Password too young to change!',
-                ),
-                log_vars=self.server._log_vars,
-            )
-        return # end of _check_pwd_policy()
-
-    def _export_password(self, request, user_entry, password):
-        """
-        write reversible encrypted new password to sync queue
-        """
-        try:
-            # all export actions which could fail goes here
-            _ = user_entry
-            self._log(logging.ERROR, 'Exported password: %r', password)
-        except Exception, err:
-            raise SlapdSockHandlerError(
-                'Error exporting password of %r: %s' % (request.dn, err),
-                log_level=logging.ERROR,
-                response=RESULTResponse(
-                    request.msgid,
-                    'operationsError',
-                    info='export error',
-                ),
-                log_vars=self.server._log_vars,
-            )
-        else:
-            self._log(logging.INFO, 'Exported password of %r', request.dn)
-        return # end of _export_password()
-
-    def _update_user_entry(self, request):
-        """
-        write modifications of request to LDAP entry
-        """
-        try:
-            local_ldap_conn = self.server.get_ldapi_conn()
-            local_ldap_conn.modify_ext_s(
-                request.dn.encode('utf-8'),
-                request.modops,
-                serverctrls=[
-                    ProxyAuthzControl(
-                        True,
-                        'dn:{0}'.format(request.binddn.encode('utf-8')),
-                    ),
-                ],
-            )
-        except ldap.LDAPError, ldap_error:
-            raise SlapdSockHandlerError(
-                'LDAPError modifying entry %r: %s' % (request.dn, ldap_error),
-                log_level=logging.ERROR,
-                response=RESULTResponse(request.msgid, ldap_error),
-                log_vars=self.server._log_vars,
-            )
-        else:
-            self._log(
-                logging.INFO,
-                'Successfully modified userPassword for %r (from %r)',
-                request.dn,
-                request.peername,
-            )
-        return # end of _update_user_entry()
-
-    def do_modify(self, request):
-        """
-        Handle MODIFY operation
-        """
-        new_passwd = self._get_new_passwd(request)
-        user_entry = self._read_user_entry(request)
-        self._log(logging.DEBUG, 'user entry attributes: %r', user_entry.keys())
-        # Attributes from user entry
-        #user_class = user_entry.get('structuralObjectClass', [None])[0]
-        if self._compare_old_pwd(user_entry, new_passwd):
-            # setting old password again triggers export once more
-            self._log(logging.INFO, 'user entry already has password => re-export and return success')
-            self._export_password(request, user_entry, new_passwd)
-            return RESULTResponse(request.msgid, 'success')
-        pwd_changed_time = user_entry.get('pwdChangedTime', [None])[0]
-        pwd_policy_subentry_dn = user_entry.get(
-            'pwdPolicySubentry',
-            [PWD_POLICY_SUBENTRY_DEFAULT]
-        )[0]
-        self._check_pwd_policy(
-            request,
-            len(new_passwd),
-            pwd_policy_subentry_dn,
-            pwd_changed_time
-        )
-        self._update_user_entry(request)
-        self._export_password(request, user_entry, new_passwd)
-        return RESULTResponse(request.msgid, 'success') # end of do_modify()
 
 
 #-----------------------------------------------------------------------
@@ -424,6 +454,7 @@ def run_this():
     """
 
     script_name = os.path.abspath(sys.argv[0])
+    pwsync_queue = DictQueue()
 
     log_level = LOG_LEVEL
     console_log_format = None
@@ -455,20 +486,31 @@ def run_this():
     try:
         socket_path = sys.argv[1]
         local_ldap_uri = sys.argv[2]
+        target_ldap_url = sys.argv[3]
     except IndexError:
         my_logger.error('Not enough arguments => abort')
         sys.exit(1)
 
     local_ldap_uri_obj = MyLDAPUrl(local_ldap_uri)
+    target_ldap_url_obj = MyLDAPUrl(target_ldap_url)
+
+    # initialize password sync consumer thread
+    pwsync_worker = PWSyncWorker(
+        target_ldap_url_obj,
+        pwsync_queue,
+    )
+    pwsync_worker.ldapi_uri = local_ldap_uri_obj.initializeUrl()
+    pwsync_worker.setDaemon(True)
+    pwsync_worker.start()
 
     try:
         slapd_sock_listener = PassModServer(
             socket_path,
             PassModHandler,
-            my_logger,
             AVERAGE_COUNT,
             SOCKET_TIMEOUT, SOCKET_PERMISSIONS,
             ALLOWED_UIDS, ALLOWED_GIDS,
+            pwsync_queue,
             log_vars=DEBUG_VARS,
         )
         slapd_sock_listener.ldapi_uri = local_ldap_uri_obj.initializeUrl()

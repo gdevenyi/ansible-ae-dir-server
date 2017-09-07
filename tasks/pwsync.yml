@@ -1,29 +1,29 @@
 ---
 # tasks for password sync
 
-- name: "Add local system group {{ pwsync_listener_user }} for external PASSMOD listener"
+- name: "Add local system group {{ aedir_pwsync_listener_user }} for external PASSMOD listener"
   group:
-    name: "{{ pwsync_listener_user }}"
-    gid: "{{ aedir_ldapi_services[pwsync_listener_user].gid_number }}"
+    name: "{{ aedir_pwsync_listener_user }}"
+    gid: "{{ aedir_ldapi_services[aedir_pwsync_listener_user].gid_number }}"
     state: present
     system: yes
 
-- name: "Add local system account {{ pwsync_listener_user }} for external PASSMOD listener"
+- name: "Add local system account {{ aedir_pwsync_listener_user }} for external PASSMOD listener"
   user:
-    name: "{{ pwsync_listener_user }}"
-    comment: "{{ aedir_ldapi_services[pwsync_listener_user].description }}"
-    uid: "{{ aedir_ldapi_services[pwsync_listener_user].uid_number }}"
-    group: "{{ aedir_ldapi_services[pwsync_listener_user].gid_number }}"
+    name: "{{ aedir_pwsync_listener_user }}"
+    comment: "{{ aedir_ldapi_services[aedir_pwsync_listener_user].description }}"
+    uid: "{{ aedir_ldapi_services[aedir_pwsync_listener_user].uid_number }}"
+    group: "{{ aedir_ldapi_services[aedir_pwsync_listener_user].gid_number }}"
     shell: "/bin/true"
     state: present
     system: yes
     createhome: no
 
-- name: "Create socket directory {{ pwsync_socket_dir }}"
+- name: "Create socket directory {{ aedir_pwsync_socket_dir }}"
   file:
-    path: "{{ pwsync_socket_dir }}"
+    path: "{{ aedir_pwsync_socket_dir }}"
     state: directory
-    owner: "{{ pwsync_listener_user }}"
+    owner: "{{ aedir_pwsync_listener_user }}"
     group: root
     mode: u=rwx,g=rx,o=rx
 
@@ -32,7 +32,7 @@
     src: "passmod.py"
     dest: "{{ aedir_sbin }}/passmod.py"
     owner: root
-    group: "{{ pwsync_listener_user }}"
+    group: "{{ aedir_pwsync_listener_user }}"
     mode: 0750
   notify:
     - "restart passmod"

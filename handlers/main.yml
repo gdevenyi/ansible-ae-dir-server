@@ -37,4 +37,4 @@
 
 - name: restart passmod
   service: name=passmod state=restarted
-  when: openldap_role == 'provider' and pwsync_enabled == True
+  when: openldap_role == 'provider' and aedir_pwsync_enabled == True

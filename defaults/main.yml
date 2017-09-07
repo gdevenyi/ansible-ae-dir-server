@@ -430,16 +430,16 @@ openldap_syncrepl_providers: "{{ aedir_hosts['provider'] }}"
 #---------------------------------------------------------------------------
 
 # enable password clear-text syncing (rarely needed)
-pwsync_enabled: False
+aedir_pwsync_enabled: False
 
 # user account for running external PASSMOD listener
-pwsync_listener_user: ae-dir-pwsync
+aedir_pwsync_listener_user: ae-dir-pwsync
 
 # Directory path where Unix domain socket is created
-pwsync_socket_dir: "{{ aedir_rundir }}/passmod"
+aedir_pwsync_socket_dir: "{{ aedir_rundir }}/passmod"
 # Full pathname of Unix domain socket of bind listener
 # (set this to empty string for disabling the external bind listeners completely)
-pwsync_socket_path: "{{ pwsync_socket_dir }}/socket"
+aedir_pwsync_socket_path: "{{ aedir_pwsync_socket_dir }}/socket"
 
 #---------------------------------------------------------------------------
 # OATH-LDAP parameters
