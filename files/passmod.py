@@ -217,7 +217,6 @@ class PWSyncWorker(threading.Thread, LocalLDAPConn):
                     cache_time=LDAP_CACHE_TTL,
                 )
             except ldap.INVALID_CREDENTIALS:
-                self.logger.warn('Ignoring wrong password for %r', user_dn)
                 password_correct = False
             else:
                 password_correct = True
@@ -258,11 +257,6 @@ class PWSyncWorker(threading.Thread, LocalLDAPConn):
         ]
         self.logger.debug('ldap_result=%r', ldap_result)
         if len(ldap_result) != 1:
-            self.logger.warn(
-                'No unique ID found with %r => ignore password change of %r',
-                target_filter,
-                source_dn,
-            )
             return None
         target_id = ldap_result[0][0]
         return target_id # end of PWSyncWorker.get_target_id()
@@ -314,11 +308,16 @@ class PWSyncWorker(threading.Thread, LocalLDAPConn):
                 time.sleep(sleep_time)
                 if not self._check_password(user_dn, new_passwd):
                     # simply ignore wrong passwords
-                    self._queue.put((user_dn, (old_passwd, new_passwd, req_time)))
+                    self.logger.warn('Ignoring wrong password for %r', user_dn)
                     continue
                 target_id = self.get_target_id(user_dn)
                 if target_id is None:
                     # simply ignore non-existent targets
+                    self.logger.warn(
+                        'No unique ID found with %r => ignore password change of %r',
+                        target_filter,
+                        source_dn,
+                    )
                     continue
                 self.logger.debug('Try to sync password for %r to %r', user_dn, target_id)
                 self.update_target_password(target_id, old_passwd, new_passwd, req_time)
@@ -328,7 +327,6 @@ class PWSyncWorker(threading.Thread, LocalLDAPConn):
                     user_dn,
                     exc_info=True,
                 )
-                #self._queue.put((user_dn, (old_passwd, new_passwd, req_time)))
             else:
                 self.logger.info('Synced password for %r to %r', user_dn, target_id)
             self._queue.task_done()
