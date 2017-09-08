@@ -25,6 +25,9 @@ require strong
 rootdn "cn=root,{{ aedir_suffix }}"
 # rootpw not needed in production!
 #rootpw donotenable!!!
+access to
+  dn.base="cn=root,{{ aedir_suffix }}"
+    by * none
 
 lastmod on
 
