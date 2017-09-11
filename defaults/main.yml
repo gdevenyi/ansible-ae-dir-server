@@ -431,6 +431,8 @@ openldap_syncrepl_providers: "{{ aedir_hosts['provider'] }}"
 
 # Target URL for password synchronisation
 # If non-empty this enables password clear-text syncing (rarely needed)
+# Example:
+# aedir_pwsync_targeturl: "ldaps://msad.example.com/dc=example,dc=org?samaccountname,unicodePwd?sub??bindname=dom-admin@example.com"
 aedir_pwsync_targeturl: ""
 
 # password of sync target (should be ansible vault or similar)
@@ -571,7 +573,7 @@ web_document_root: "{{ aedir_prefix }}/htdocs"
 #---------------------------------------------------------------------------
 
 # the release to be installed
-web2ldap_version: "1.2.93"
+web2ldap_version: "1.2.94"
 
 # source filename
 web2ldap_filename: "web2ldap-{{ web2ldap_version }}.tar.gz"
