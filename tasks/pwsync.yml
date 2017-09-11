@@ -35,6 +35,7 @@
     group: "{{ aedir_pwsync_listener_user }}"
     mode: u=rwx,g=rx,o=
   when: aedir_pwsync_targetpassword != ""
+  no_log: True
 
 - name: "Create socket directory {{ aedir_pwsync_socket_dir }}"
   file:

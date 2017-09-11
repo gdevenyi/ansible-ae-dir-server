@@ -41,6 +41,7 @@
     group: root
     mode: 0644
   when: apache_key_filename and (apache_key_filename != openldap_key_filename and apache_key_pathname != openldap_key_pathname)
+  no_log: True
   notify:
   - "restart web server"
 
