@@ -164,8 +164,6 @@ class PWSyncWorker(threading.Thread, LocalLDAPConn):
     target_id_attr = 'uid'
     target_password_attr = 'userPassword'
     target_password_encoding = 'utf-8'
-    # MS AD
-    #target_password_attr = 'unicodePwd'
 
     def __init__(
             self,
@@ -266,10 +264,11 @@ class PWSyncWorker(threading.Thread, LocalLDAPConn):
         encode argument password for target system
         """
         pwu = password.decode('utf-8')
-        if self.target_password_attr.lower()=='unicodepwd':
-            return unicode_pwd(pwu)
+        if self.target_password_attr.lower() == 'unicodepwd':
+            result = unicode_pwd(pwu)
         else:
-            return pwu.encode(self.target_password_encoding)
+            result = pwu.encode(self.target_password_encoding)
+        return result
 
     def update_target_password(self, target_id, old_passwd, new_passwd, req_time):
         """
@@ -304,7 +303,11 @@ class PWSyncWorker(threading.Thread, LocalLDAPConn):
                     0,
                     time.time()-req_time+self.passwd_update_delay
                 )
-                self.logger.debug('Deferring syncing password for %r for %f secs', user_dn, sleep_time)
+                self.logger.debug(
+                    'Deferring syncing password for %r for %f secs',
+                    user_dn,
+                    sleep_time,
+                )
                 time.sleep(sleep_time)
                 if not self._check_password(user_dn, new_passwd):
                     # simply ignore wrong passwords
@@ -314,9 +317,8 @@ class PWSyncWorker(threading.Thread, LocalLDAPConn):
                 if target_id is None:
                     # simply ignore non-existent targets
                     self.logger.warn(
-                        'No unique ID found with %r => ignore password change of %r',
-                        target_filter,
-                        source_dn,
+                        'No target ID found for %r => ignore password change',
+                        user_dn,
                     )
                     continue
                 self.logger.debug('Try to sync password for %r to %r', user_dn, target_id)
@@ -501,12 +503,16 @@ def run_this():
         socket_path = sys.argv[1]
         local_ldap_uri = sys.argv[2]
         target_ldap_url = sys.argv[3]
+        target_password_filename = sys.argv[4]
     except IndexError:
         my_logger.error('Not enough arguments => abort')
         sys.exit(1)
 
     local_ldap_uri_obj = MyLDAPUrl(local_ldap_uri)
     target_ldap_url_obj = MyLDAPUrl(target_ldap_url)
+    # read target password from file
+    with open(target_password_filename, 'rb') as target_password_file:
+        target_ldap_url_obj.cred = target_password_file.read()
 
     # initialize password sync consumer thread
     pwsync_worker = PWSyncWorker(
