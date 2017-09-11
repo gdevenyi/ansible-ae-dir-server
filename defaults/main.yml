@@ -429,8 +429,15 @@ openldap_syncrepl_providers: "{{ aedir_hosts['provider'] }}"
 # password sync parameters
 #---------------------------------------------------------------------------
 
-# enable password clear-text syncing (rarely needed)
-aedir_pwsync_enabled: False
+# Target URL for password synchronisation
+# If non-empty this enables password clear-text syncing (rarely needed)
+aedir_pwsync_targeturl: ""
+
+# password of sync target (should be ansible vault or similar)
+aedir_pwsync_targetpassword: ""
+
+# pathname of file containing target's password
+aedir_pwsync_targetpwfile: "{{ aedir_etc }}/passmod/target_pw"
 
 # user account for running external PASSMOD listener
 aedir_pwsync_listener_user: ae-dir-pwsync

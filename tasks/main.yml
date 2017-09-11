@@ -82,7 +82,7 @@
 
 - name: "Password sync tasks on {{ openldap_role }}"
   include: "pwsync.yml"
-  when: openldap_role=="provider" and aedir_pwsync_enabled == True
+  when: openldap_role=="provider" and aedir_pwsync_targeturl
   tags:
      - pwsync
 

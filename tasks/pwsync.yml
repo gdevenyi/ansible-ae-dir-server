@@ -19,6 +19,23 @@
     system: yes
     createhome: no
 
+- name: "Create config directory {{ aedir_pwsync_targetpwfile|dirname }}"
+  file:
+    path: "{{ aedir_pwsync_targetpwfile|dirname }}"
+    state: directory
+    owner: root
+    group: "{{ aedir_pwsync_listener_user }}"
+    mode: u=rwx,g=rx,o=
+
+- name: "Create password file {{ aedir_pwsync_targetpwfile }}"
+  copy:
+    content: "{{ aedir_pwsync_targetpassword }}"
+    dest: "{{ aedir_pwsync_targetpwfile }}"
+    owner: root
+    group: "{{ aedir_pwsync_listener_user }}"
+    mode: u=rwx,g=rx,o=
+  when: aedir_pwsync_targetpassword != ""
+
 - name: "Create socket directory {{ aedir_pwsync_socket_dir }}"
   file:
     path: "{{ aedir_pwsync_socket_dir }}"
