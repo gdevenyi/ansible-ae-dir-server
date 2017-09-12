@@ -8,14 +8,11 @@
 
 [Unit]
 Description=aedirpwd - Password change interceptor listener
-Requires=network.target local-fs.target remote-fs.target
-After=local-fs.target remote-fs.target network.target
-#Wants=ldap.service
-#After=ldap.service
+Requires=network.target
+After=network.target
 
 [Service]
 Type=simple
-#PIDFile=
 Environment="LDAPTLS_CACERT={{ aedir_pwsync_cacert_pathname }}"
 ExecStart={{ aedir_python }} {{ aedir_sbin }}/passmod.py "{{ aedir_pwsync_socket_path }}" "{{ openldap_ldapi_uri }}????x-saslmech=EXTERNAL" "{{ aedir_pwsync_targeturl }}" "{{ aedir_pwsync_targetpwfile }}"
 User={{ aedir_pwsync_listener_user }}

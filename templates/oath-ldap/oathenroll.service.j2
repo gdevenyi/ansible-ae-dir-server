@@ -8,10 +8,8 @@
 
 [Unit]
 Description=oathenroll - OATH-LDAP enrollment web application
-Requires=network.target local-fs.target remote-fs.target
-After=local-fs.target remote-fs.target network.target
-#Wants=ldap.service
-#After=ldap.service
+Requires=network.target
+After=network.target
 
 [Service]
 Type=simple
