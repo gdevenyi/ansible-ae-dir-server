@@ -183,18 +183,55 @@ class PWSyncWorker(threading.Thread, LocalLDAPConn):
         self._queue = queue
         threading.Thread.__init__(self, name=self.__class__.__module__+self.__class__.__name__)
         LocalLDAPConn.__init__(self, self.logger)
-        # open connection to target LDAP server
-        self.target_conn = MyLDAPObject(
-            target_ldap_url.initializeUrl(),
-            trace_level=PYLDAP_TRACELEVEL,
-            trace_file=LoggerFileobj(self.logger, logging.DEBUG),
-            retry_max=LDAP_MAXRETRYCOUNT,
-            retry_delay=LDAP_RETRYDELAY,
-            who=target_ldap_url.who or '',
-            cred=target_ldap_url.cred or '',
-            cache_time=LDAP_CACHE_TTL,
+        self._target_conn = None
+        self._target_conn_lock = ldap.LDAPLock(
+            desc='target_conn() in %s' % (repr(self.__class__))
         )
         # end of PWSyncWorker.__init__()
+
+    def target_conn(self):
+        """
+        open and cache target connection
+        """
+        if isinstance(self._target_conn, MyLDAPObject):
+            self.logger.debug(
+                'Existing LDAP connection to %s (%s)',
+                repr(self._target_conn._uri),
+                repr(self._target_conn),
+            )
+            return self._target_conn
+        try:
+            self._target_conn_lock.acquire()
+            try:
+                self._target_conn = MyLDAPObject(
+                    self._target_ldap_url.initializeUrl(),
+                    trace_level=PYLDAP_TRACELEVEL,
+                    trace_file=LoggerFileobj(self.logger, logging.DEBUG),
+                    retry_max=LDAP_MAXRETRYCOUNT,
+                    retry_delay=LDAP_RETRYDELAY,
+                    who=self._target_ldap_url.who or '',
+                    cred=self._target_ldap_url.cred or '',
+                    cache_time=LDAP_CACHE_TTL,
+                )
+            except ldap.LDAPError, ldap_error:
+                self._target_conn = None
+                self.logger.error(
+                    'LDAPError during connecting to %s: %s',
+                    repr(self.ldapi_uri),
+                    str(ldap_error),
+                )
+                raise ldap_error
+            else:
+                self._target_conn.authz_id = self._target_conn.whoami_s()
+                self.logger.info(
+                    'Successfully bound to %s as %s (%s)',
+                    repr(self.ldapi_uri),
+                    repr(self._target_conn.authz_id),
+                    repr(self._target_conn),
+                )
+        finally:
+            self._target_conn_lock.release()
+        return self._target_conn # get_ldapi_conn()
 
     def _check_password(self, user_dn, new_passwd):
         password_correct = False
@@ -238,7 +275,7 @@ class PWSyncWorker(threading.Thread, LocalLDAPConn):
             )
             return None
         self.logger.debug('Extracted %s=%r from source_dn=%r', self.source_id_attr, uid, source_dn)
-        target_conn = self.target_conn
+        target_conn = self.target_conn()
         target_filter = self.target_filter_format.format(self.target_id_attr, uid)
         ldap_result = target_conn.search_ext_s(
             self._target_ldap_url.dn,
@@ -274,7 +311,7 @@ class PWSyncWorker(threading.Thread, LocalLDAPConn):
         """
         write new password to target
         """
-        target_conn = self.target_conn
+        target_conn = self.target_conn()
         modlist = [(
             ldap.MOD_REPLACE,
             self.target_password_attr,
