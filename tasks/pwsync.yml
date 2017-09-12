@@ -27,6 +27,16 @@
     group: "{{ aedir_pwsync_listener_user }}"
     mode: u=rwx,g=rx,o=
 
+- name: Install CA cert for target connection to {{ aedir_pwsync_cacert_pathname }}"
+  copy:
+    src: "{{ aedir_pwsync_cacert_filename }}"
+    dest: "{{ aedir_pwsync_cacert_pathname }}"
+    follow: no
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+    directory_mode: u=rwx,g=rx,o=rx
+
 - name: "Create password file {{ aedir_pwsync_targetpwfile }}"
   copy:
     content: "{{ aedir_pwsync_targetpassword }}"

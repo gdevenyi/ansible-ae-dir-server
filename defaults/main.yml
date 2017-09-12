@@ -435,8 +435,14 @@ openldap_syncrepl_providers: "{{ aedir_hosts['provider'] }}"
 # aedir_pwsync_targeturl: "ldaps://msad.example.com/dc=example,dc=org?samaccountname,unicodePwd?sub??bindname=dom-admin@example.com"
 aedir_pwsync_targeturl: ""
 
-# password of sync target (should be ansible vault or similar)
+# password of authenticating to sync target (should be ansible vault or similar)
 aedir_pwsync_targetpassword: ""
+
+# The CA certificate file bundle for connecting to sync target
+aedir_pwsync_cacert_filename:  "{{ openldap_cacert_filename }}"
+
+# The CA certificate file bundle for connecting to sync target
+aedir_pwsync_cacert_pathname: "{{ aedir_etc }}/passmod/{{ aedir_pwsync_cacert_filename|basename }}"
 
 # pathname of file containing target's password
 aedir_pwsync_targetpwfile: "{{ aedir_etc }}/passmod/target_pw"
