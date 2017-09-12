@@ -1,0 +1,22 @@
+#-----------------------------------------------------------------------
+# initiate:   systemctl enable ae-slapd.service
+# start:      systemctl start ae-slapd.service
+# get status: systemctl status ae-slapd.service
+#
+# {{ ansible_managed }}
+#-----------------------------------------------------------------------
+
+[Unit]
+Description=AE-DIR OpenLDAP server
+Requires=network.target
+After=network.target
+
+[Service]
+Type=simple
+PIDFile={{ openldap_rundir }}/slapd.pid
+ExecStart={{ openldap_slapd_exec }} -n ae-slapd -l {{ openldap_syslog_facility }} -s {{ openldap_syslog_level }} -f {{ openldap_slapd_conf }} -h '{{ openldap_listen_urls }}' -u {{ openldap_slapd_user }} -g {{ openldap_slapd_group }} -o slp=off
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target

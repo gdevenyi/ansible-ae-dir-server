@@ -14,16 +14,18 @@
   file:
     path: "{{ openldap_data }}"
     state: directory
-    owner: ldap
-    group: ldap
+    owner: "{{ openldap_slapd_user }}"
+    group: "{{ openldap_slapd_group }}"
     mode: 0750
+  notify:
+  - restart slapd
 
 - name: "Create database directories"
   file:
     path: "{{ openldap_data }}/{{ item }}"
     state: directory
-    owner: ldap
-    group: ldap
+    owner: "{{ openldap_slapd_user }}"
+    group: "{{ openldap_slapd_group }}"
     mode: 0750
   with_items:
     - accesslog
@@ -35,8 +37,8 @@
   file:
     path: "{{ openldap_data }}/session"
     state: directory
-    owner: ldap
-    group: ldap
+    owner: "{{ openldap_slapd_user }}"
+    group: "{{ openldap_slapd_group }}"
     mode: 0750
   notify:
   - restart slapd
@@ -45,12 +47,25 @@
 # slapd.conf and schema files
 #-----------------------------------------------------------------------
 
+- name: "Create OpenLDAP config directories"
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ openldap_slapd_user }}"
+    group: "{{ openldap_slapd_group }}"
+    mode: 0755
+  with_items:
+    - "{{ openldap_slapd_conf|dirname }}"
+    - "{{ aedir_schema_prefix }}"
+  notify:
+  - restart slapd
+
 - name: "Install various OpenLDAP schema files"
   copy:
     src: "schema/{{ item }}"
-    dest: "{{ openldap_schema_prefix }}/{{ item }}"
+    dest: "{{ aedir_schema_prefix }}/{{ item }}"
     owner: root
-    group: ldap
+    group: "{{ openldap_slapd_group }}"
     mode: 0644
   with_items: "{{ openldap_schema_files }}"
   notify:
@@ -59,20 +74,32 @@
 - name: "Create rootDSE.ldif"
   template:
     src: "slapd/rootDSE.ldif.j2"
-    dest: "{{ openldap_conf_prefix }}/rootDSE.ldif"
+    dest: "{{ openldap_slapd_conf|dirname }}/rootDSE.ldif"
     owner: root
-    group: ldap
-    mode: 0644
+    group: "{{ openldap_slapd_group }}"
+    mode: 0640
 
 - name: "Create role-specific slapd.conf for {{ openldap_role }}"
   template:
     src: "slapd/{{ openldap_role }}.conf.j2"
-    dest: "{{ openldap_conf_prefix }}/slapd.conf"
+    dest: "{{ openldap_slapd_conf }}"
     owner: root
-    group: ldap
+    group: "{{ openldap_slapd_group }}"
     mode: 0640
   notify:
   - restart slapd
+
+- name: "Install systemd unit file for ae-slapd"
+  template:
+    src: "ae-slapd.service.j2"
+    dest: "{{ aedir_systemd_dir }}/ae-slapd.service"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - reload systemd
+    - "restart slapd"
+  when: ansible_service_mgr=="systemd"
 
 - name: "Create client config file {{ openldap_conf_prefix }}/ldap.conf from template"
   template:

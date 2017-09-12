@@ -5,7 +5,7 @@
   command: systemctl daemon-reload
 
 - name: restart slapd
-  service: name=slapd state=restarted
+  service: name=ae-slapd state=restarted
 
 - name: restart aedirpwd
   service: name=aedirpwd state=restarted

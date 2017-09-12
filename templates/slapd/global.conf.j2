@@ -18,31 +18,31 @@ include {{ openldap_schema_prefix }}/nis.schema
 include {{ openldap_schema_prefix }}/duaconf.schema
 
 # For SSH keys
-include {{ openldap_schema_prefix }}/openssh-lpk_openldap.schema
+include {{ aedir_schema_prefix }}/openssh-lpk_openldap.schema
 
 # sudoers schema, see sudoers.ldap(8)
-include {{ openldap_schema_prefix }}/sudoers.schema
+include {{ aedir_schema_prefix }}/sudoers.schema
 
 # automount schema
-include {{ openldap_schema_prefix }}/autofs.schema
+include {{ aedir_schema_prefix }}/autofs.schema
 
-include {{ openldap_schema_prefix }}/draft-stroeder-mailboxrelatedobject.schema
-include {{ openldap_schema_prefix }}/draft-stroeder-namedobject.schema
-include {{ openldap_schema_prefix }}/draft-findlay-ldap-groupofentries.schema
+include {{ aedir_schema_prefix }}/draft-stroeder-mailboxrelatedobject.schema
+include {{ aedir_schema_prefix }}/draft-stroeder-namedobject.schema
+include {{ aedir_schema_prefix }}/draft-findlay-ldap-groupofentries.schema
 # OATH-LDAP
-include {{ openldap_schema_prefix }}/oath-ldap.schema
+include {{ aedir_schema_prefix }}/oath-ldap.schema
 
 # OID macros used in subsequent schema files
-include {{ openldap_schema_prefix }}/stroeder.com-oid-macros.schema
-include {{ openldap_schema_prefix }}/stroeder.com.schema
+include {{ aedir_schema_prefix }}/stroeder.com-oid-macros.schema
+include {{ aedir_schema_prefix }}/stroeder.com.schema
 
 # for webldappwd (password self-service)
-include {{ openldap_schema_prefix }}/mspwdreset.schema
+include {{ aedir_schema_prefix }}/mspwdreset.schema
 
 # AE-DIR -- Yet another LDAP User Management
-include {{ openldap_schema_prefix }}/ae-dir.schema
+include {{ aedir_schema_prefix }}/ae-dir.schema
 {% if openldap_role=="provider" %}
-include {{ openldap_schema_prefix }}/ae-dir-session.schema
+include {{ aedir_schema_prefix }}/ae-dir-session.schema
 {% endif %}
 
 #---------------------------------------------------------------------------
@@ -101,7 +101,7 @@ loglevel {{ openldap_log_level }}
 threads {{ openldap_threads }}
 
 # additional rootDSE attributes in external LDIF file
-rootDSE {{ openldap_conf_prefix }}/rootDSE.ldif
+rootDSE {{ openldap_slapd_conf|dirname }}/rootDSE.ldif
 
 #---------------------------------------------------------------------------
 # password hash parameters

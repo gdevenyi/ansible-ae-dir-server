@@ -17,12 +17,3 @@
     - openldap2-contrib
     - openldap2-ppolicy-check-password
 
-- name: Create /etc/sysconfig/openldap
-  template:
-    src: "{{ lsb_id }}/sysconfig_openldap.j2"
-    dest: "/etc/sysconfig/openldap"
-    owner: root
-    group: root
-    mode: 0644
-  notify:
-  - restart slapd

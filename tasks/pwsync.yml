@@ -76,4 +76,3 @@
     - reload systemd
     - "restart passmod"
   when: ansible_service_mgr=="systemd"
-

@@ -199,6 +199,12 @@ aedir_ldapi_services:
     uid_number: "{{ aedir_min_gid-7 }}"
     gid_number: "{{ aedir_min_gid-7 }}"
     description: The system user allowed to intercept password changes and set password
+  # system user for OpenLDAP's slapd service
+  ae-dir-slapd:
+    cn: OpenLDAP slapd service
+    uid_number: "{{ aedir_min_gid-8 }}"
+    gid_number: "{{ aedir_min_gid-8 }}"
+    description: The system user used for OpenLDAP server
 
 # POSIX UID and GID which is mapped to rootdn
 aedir_rootdn_uid_number: 0
@@ -322,6 +328,20 @@ openldap_rundir: "{{ os_openldap_paths[lsb_id].openldap_rundir }}"
 openldap_data: "{{ os_openldap_paths[lsb_id].openldap_data }}"
 openldap_ldapi_socket: "{{ openldap_rundir }}/ldapi"
 openldap_ldapi_uri: "ldapi://{{ openldap_ldapi_socket|urlencode|replace('/','%2F') }}"
+# where to place static config file for slapd (slapd.conf)
+openldap_slapd_conf: "{{ aedir_etc }}/openldap/slapd.conf"
+# where to find slapd executable
+openldap_slapd_exec: "{{ os_openldap_paths[lsb_id].openldap_slapd_exec }}"
+# URIs specifying on which interface slapd shall listen
+openldap_listen_urls: "{{ openldap_ldapi_uri }} ldap://*:389 ldaps://*:636"
+# system user/group to run slapd with
+openldap_slapd_user: "ldap"
+openldap_slapd_group: "ldap"
+# syslog(3) parameters used for slapd's logging
+openldap_syslog_facility: "LOCAL4"
+openldap_syslog_level: "7"
+
+aedir_schema_prefix: "{{ openldap_slapd_conf|dirname }}/schema"
 
 # All additional schema files needed
 openldap_schema_files:

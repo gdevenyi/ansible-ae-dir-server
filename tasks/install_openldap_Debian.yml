@@ -30,16 +30,6 @@
   - openldap-ltb-check-password
   - cracklib-runtime
 
-- name: "Create /etc/default/slapd"
-  template:
-    src: "{{ lsb_id }}/default_slapd.j2"
-    dest: "/etc/default/slapd"
-    owner: root
-    group: ldap
-    mode: 0644
-  notify:
-  - restart slapd
-
 - name: "Remove Debian package ldap-utils"
   apt:
     name: ldap-utils

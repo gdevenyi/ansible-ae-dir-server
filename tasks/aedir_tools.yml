@@ -9,7 +9,6 @@
     group: root
     mode: u=rwx,g=rx,o=rx
   with_items:
-    - "{{ aedir_prefix }}"
     - "{{ aedir_etc }}"
     - "{{ aedir_bin }}"
     - "{{ aedir_sbin }}"

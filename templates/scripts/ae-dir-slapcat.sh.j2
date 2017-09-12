@@ -21,6 +21,7 @@ umask 077
   cut -d' ' -f2 | \
   xargs -n1 -isuffix \
     {{ openldap_sbin }}/slapcat \
+      -f "{{ openldap_slapd_conf }}" \
       -b 'suffix' \
       -l "{{ openldap_backup_path }}/suffix-${DATETIME}.ldif"
 
