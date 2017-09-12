@@ -43,8 +43,8 @@
     src: "ae-dir-base.ldif.j2"
     dest: "{{ aedir_etc }}/ae-dir-base.ldif"
     owner: root
-    group: ldap
-    mode: 0644
+    group: root
+    mode: 0600
   when: aedir_init == True
 
 - name: "Specific installation for {{ lsb_id }}"
