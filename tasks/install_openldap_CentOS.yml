@@ -37,7 +37,6 @@
     path: /usr/local/openldap
     owner: root
     group: root
-    recurse: yes
 
 - name: "Fix ownership in LTB sub-directories"
   file:

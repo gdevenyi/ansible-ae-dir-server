@@ -71,6 +71,29 @@
   - restart slapd
   when: openldap_role == 'provider'
 
+- name: "Fix ownership database directories"
+  file:
+    path: "{{ openldap_data }}/{{ item }}"
+    owner: "{{ openldap_slapd_user }}"
+    group: "{{ openldap_slapd_group }}"
+    recurse: yes
+  with_items:
+    - accesslog
+    - um
+  notify:
+  - restart slapd
+
+- name: "Fix ownership session database directory on {{ openldap_role }}"
+  file:
+    path: "{{ openldap_data }}/session"
+    state: directory
+    owner: "{{ openldap_slapd_user }}"
+    group: "{{ openldap_slapd_group }}"
+    recurse: yes
+  notify:
+  - restart slapd
+  when: openldap_role == 'provider'
+
 # slapd.conf and schema files
 #-----------------------------------------------------------------------
 
