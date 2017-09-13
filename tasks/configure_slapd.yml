@@ -2,6 +2,15 @@
 # Apply AE-DIR configuration to OpenLDAP's slapd
 #-----------------------------------------------------------------------
 
+# basic stuff
+#-----------------------------------------------------------------------
+
+- name: "Disable and stop slapd"
+  service:
+    name: slapd
+    state: stopped
+    enabled: no
+
 - name: "Delete the package dynamic configuration directory {{ os_openldap_paths[lsb_id].openldap_conf_prefix }}/slapd.d"
   file:
     path: "{{ os_openldap_paths[lsb_id].openldap_conf_prefix }}/slapd.d"

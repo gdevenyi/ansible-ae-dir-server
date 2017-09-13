@@ -2,12 +2,6 @@
 
 # enable running services
 
-- name: "Disable and stop slapd"
-  service:
-    name: slapd
-    state: stopped
-    enabled: no
-
 - name: "Enable and start ae-slapd is running"
   service:
     name: ae-slapd
