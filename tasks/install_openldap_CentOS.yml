@@ -31,3 +31,25 @@
     - openldap-ltb-ppm
     - openldap-ltb-check-password
     - cracklib
+
+- name: "Fix ownership of LTB directory"
+  file:
+    path: /usr/local/openldap
+    owner: root
+    group: root
+    recurse: yes
+
+- name: "Fix ownership in LTB sub-directories"
+  file:
+    path: "{{ item }}"
+    owner: root
+    group: root
+    recurse: yes
+  with_items:
+    - /usr/local/openldap/bin
+    - /usr/local/openldap/etc
+    - /usr/local/openldap/include
+    - /usr/local/openldap/lib64
+    - /usr/local/openldap/libexec
+    - /usr/local/openldap/sbin
+    - /usr/local/openldap/share
