@@ -32,6 +32,8 @@
     - "{{ openldap_slapd_conf|dirname }}"
     - "{{ aedir_schema_prefix }}"
     - "{{ aedir_rundir }}"
+  notify:
+  - restart slapd
 
 # database directory structure
 #-----------------------------------------------------------------------

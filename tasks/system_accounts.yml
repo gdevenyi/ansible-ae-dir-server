@@ -1,7 +1,9 @@
 ---
-# Add system accounts
 
-- name: "Add local system groups for services running accessing AE-DIR providers via LDAPI"
+# Add system accounts/groups
+#---------------------------------------------------------------------------
+
+- name: "Add local system groups needed on {{ openldap_role }}"
   group:
     name: "{{ item.key }}"
     gid: "{{ item.value.gid_number }}"
@@ -9,8 +11,9 @@
     system: yes
   with_dict:
     "{{ aedir_ldapi_services }}"
+  when: openldap_role in item.value.roles
 
-- name: "Add local system accounts for services running accessing AE-DIR providers via LDAPI"
+- name: "Add local system accounts needed on {{ openldap_role }}"
   user:
     name: "{{ item.key }}"
     comment: "{{ item.value.description }}"
@@ -22,3 +25,23 @@
     createhome: no
   with_dict:
     "{{ aedir_ldapi_services }}"
+  when: openldap_role in item.value.roles
+
+# Remove system accounts/groups
+#---------------------------------------------------------------------------
+
+- name: "Remove local system accounts not needed on {{ openldap_role }}"
+  user:
+    name: "{{ item.key }}"
+    state: absent
+  with_dict:
+    "{{ aedir_ldapi_services }}"
+  when: openldap_role not in item.value.roles
+
+- name: "Remove local system groups not needed on {{ openldap_role }}"
+  group:
+    name: "{{ item.key }}"
+    state: absent
+  with_dict:
+    "{{ aedir_ldapi_services }}"
+  when: openldap_role not in item.value.roles

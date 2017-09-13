@@ -147,13 +147,6 @@ aedir_aenwdevice_visibility_set: "user & this/-1"
 # - special care needed for usernames used in OpenLDAP ACLs
 
 aedir_ldapi_services:
-#
-#  # system user which must match UID/GID slapd is running as
-#  - uid: ldap
-#    cn: OpenLDAP slapd demon user
-#    uid_number: 108
-#    gid_number: 113
-#    description: The system user for running OpenLDAP server process (slapd)
   # system user for password self-service web application
   # uid is referenced in OpenLDAP ACLs!
   ae-dir-pwd:
@@ -161,12 +154,16 @@ aedir_ldapi_services:
     uid_number: "{{ aedir_min_gid-1 }}"
     gid_number: "{{ aedir_min_gid-1 }}"
     description: The system user allowed to set attributes during user password reset (msPwdResetObject) over LDAPI
+    roles:
+      - provider
   # system user for sync processes
   ae-dir-peoplesync:
     cn: Personnel data sync process
     uid_number: "{{ aedir_min_gid-2 }}"
     gid_number: "{{ aedir_min_gid-2 }}"
     description: The system user allowed to maintain aePerson entries over LDAPI
+    roles:
+      - provider
   # system user for OTP registration/enrollment web application
   # uid is referenced in OpenLDAP ACLs!
   ae-dir-otpenroll:
@@ -174,6 +171,8 @@ aedir_ldapi_services:
     uid_number: "{{ aedir_min_gid-3 }}"
     gid_number: "{{ aedir_min_gid-3 }}"
     description: The system user allowed to init OATH token entries over LDAPI
+    roles:
+      - provider
   # system user for OTP verification listener
   # uid is referenced in OpenLDAP ACLs!
   ae-dir-otpverify:
@@ -181,30 +180,41 @@ aedir_ldapi_services:
     uid_number: "{{ aedir_min_gid-4 }}"
     gid_number: "{{ aedir_min_gid-4 }}"
     description: The system user allowed to read shared secrets (OATH-LDAP)
+    roles:
+      - provider
   # system user for bind proxy listener
   ae-dir-bind-proxy:
     cn: OATH-LDAP bind proxy
     uid_number: "{{ aedir_min_gid-5 }}"
     gid_number: "{{ aedir_min_gid-5 }}"
     description: The system user used for simple bind proxy
+    roles:
+      - consumer
   # system user for WebSSO component
   ae-dir-web-sso:
     cn: WebSSO component
     uid_number: "{{ aedir_min_gid-6 }}"
     gid_number: "{{ aedir_min_gid-6 }}"
     description: The system user used for WebSSO
+    roles:
+      - provider
   # system user for PASSMOD listener
   ae-dir-pwsync:
     cn: Password sync listener
     uid_number: "{{ aedir_min_gid-7 }}"
     gid_number: "{{ aedir_min_gid-7 }}"
     description: The system user allowed to intercept password changes and set password
-  # system user for OpenLDAP's slapd service
+    roles:
+      - provider
+  # system user which must match UID/GID OpenLDAP's slapd service is running as
   ae-dir-slapd:
-    cn: OpenLDAP slapd service
+    cn: OpenLDAP slapd demon user
     uid_number: "{{ aedir_min_gid-8 }}"
     gid_number: "{{ aedir_min_gid-8 }}"
-    description: The system user used for OpenLDAP server
+    description: The system user for running OpenLDAP server process (slapd)
+    roles:
+      - provider
+      - consumer
 
 # POSIX UID and GID which is mapped to rootdn
 aedir_rootdn_uid_number: 0
@@ -335,8 +345,8 @@ openldap_slapd_exec: "{{ os_openldap_paths[lsb_id].openldap_slapd_exec }}"
 # URIs specifying on which interface slapd shall listen
 openldap_listen_urls: "{{ openldap_ldapi_uri }} ldap://*:389 ldaps://*:636"
 # system user/group to run slapd with
-openldap_slapd_user: "ldap"
-openldap_slapd_group: "ldap"
+openldap_slapd_user: "ae-dir-slapd"
+openldap_slapd_group: "ae-dir-slapd"
 # syslog(3) parameters used for slapd's logging
 openldap_syslog_facility: "LOCAL4"
 openldap_syslog_level: "7"

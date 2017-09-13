@@ -21,14 +21,13 @@
   include: "install_apache2_{{ lsb_id }}.yml"
   when: openldap_role == 'provider'
 
+- name: "Add system accounts on {{ openldap_role }}"
+  include: system_accounts.yml
+
 - name: "Configure OpenLDAP slapd for AE-DIR"
   include: configure_slapd.yml
   tags:
      - slapd_conf
-
-- name: "Add system accounts on {{ openldap_role }}"
-  include: system_accounts.yml
-  when: openldap_role == 'provider'
 
 - name: "Install various AE-DIR tools"
   include: aedir_tools.yml
