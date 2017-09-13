@@ -2,13 +2,40 @@
 # Apply AE-DIR configuration to OpenLDAP's slapd
 #-----------------------------------------------------------------------
 
-- name: "Delete the dynamic configuration directory"
+- name: "Delete the package dynamic configuration directory {{ os_openldap_paths[lsb_id].openldap_conf_prefix }}/slapd.d"
   file:
-    path: "{{ openldap_conf_prefix }}/slapd.d"
+    path: "{{ os_openldap_paths[lsb_id].openldap_conf_prefix }}/slapd.d"
     state: absent
+
+- name: "Delete the package static config file {{ os_openldap_paths[lsb_id].openldap_conf_prefix }}/slapd.conf"
+  file:
+    path: "{{ os_openldap_paths[lsb_id].openldap_conf_prefix }}/slapd.conf"
+    state: absent
+
+- name: "Create OpenLDAP config directories"
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - "{{ openldap_slapd_conf|dirname }}"
+    - "{{ aedir_schema_prefix }}"
+    - "{{ aedir_rundir }}"
 
 # database directory structure
 #-----------------------------------------------------------------------
+
+- name: "Create OpenLDAP run directory {{ openldap_rundir }}"
+  file:
+    path: "{{ openldap_rundir }}"
+    state: directory
+    owner: root
+    group: "{{ openldap_slapd_group }}"
+    mode: 0775
+  notify:
+  - restart slapd
 
 - name: "Create OpenLDAP database root directory"
   file:
@@ -47,19 +74,6 @@
 # slapd.conf and schema files
 #-----------------------------------------------------------------------
 
-- name: "Create OpenLDAP config directories"
-  file:
-    path: "{{ item }}"
-    state: directory
-    owner: "{{ openldap_slapd_user }}"
-    group: "{{ openldap_slapd_group }}"
-    mode: 0755
-  with_items:
-    - "{{ openldap_slapd_conf|dirname }}"
-    - "{{ aedir_schema_prefix }}"
-  notify:
-  - restart slapd
-
 - name: "Install various OpenLDAP schema files"
   copy:
     src: "schema/{{ item }}"
@@ -70,6 +84,12 @@
   with_items: "{{ openldap_schema_files }}"
   notify:
   - restart slapd
+
+- name: "Uninstall outdated OpenLDAP schema files"
+  file:
+    path: "{{ os_openldap_paths[lsb_id].openldap_conf_prefix }}/schema/{{ item }}"
+    state: absent
+  with_items: "{{ openldap_schema_files }}"
 
 - name: "Create rootDSE.ldif"
   template:
