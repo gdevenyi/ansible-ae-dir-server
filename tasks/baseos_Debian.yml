@@ -17,3 +17,13 @@
     - openssl
     - python
     - tar
+
+- name: "Install alternative malloc package {{ aedir_malloc_package }}"
+  apt:
+    name: "{{ aedir_malloc_package }}"
+    state: installed
+    update_cache: yes
+    cache_valid_time: 3600
+    install_recommends: no
+    dpkg_options: 'force-confold,force-confdef'
+  when: aedir_malloc_package!=""

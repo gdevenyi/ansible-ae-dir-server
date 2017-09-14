@@ -12,6 +12,14 @@
   - "{{ web2ldap_fcgi_script }}"
   - "{{ web2ldap_prefix }}/sbin/checkinst.py"
 
+- name: "Install web2ldap start wrapper script"
+  template:
+    src: "web2ldap/start-web2ldap.j2"
+    dest: "{{ aedir_sbin }}/start-web2ldap"
+    owner: root
+    group: root
+    mode: 0755
+
 - name: Create web2ldapcnf/local.py for AE-DIR
   template:
     src: "{{ item }}"

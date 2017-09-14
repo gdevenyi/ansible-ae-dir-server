@@ -15,3 +15,10 @@
     - python
     - libxml2-python
     - polkit
+
+- name: "Install alternative malloc package {{ aedir_malloc_package }}"
+  yum:
+    name: "{{ aedir_malloc_package }}"
+    state: present
+    update_cache: yes
+  when: aedir_malloc_package!=""

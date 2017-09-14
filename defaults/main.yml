@@ -314,6 +314,14 @@ aedir_htdocs_templates:
 # relative filename of Jinja2 base layout template for all web pages
 aedir_htdocs_layout: "layout.html.j2"
 
+# If non-empty this triggers installation and pre-loading of alternative
+# malloc lib in all systemd unit files for all services.
+# Example for using jemalloc on Debian Jessie:
+# aedir_malloc_package: "libjemalloc1"
+# aedir_malloc_ld_preload: "/usr/lib/x86_64-linux-gnu/libjemalloc.so.1"
+aedir_malloc_package: ""
+aedir_malloc_ld_preload: ""
+
 #---------------------------------------------------------------------------
 # OpenLDAP parameters
 #---------------------------------------------------------------------------

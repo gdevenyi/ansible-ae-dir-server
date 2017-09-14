@@ -14,6 +14,9 @@ After=network.target
 [Service]
 Type=simple
 Environment="LDAPTLS_CACERT={{ aedir_pwsync_cacert_pathname }}"
+{% if aedir_malloc_ld_preload %}
+Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
+{% endif %}
 ExecStart={{ aedir_python }} {{ aedir_sbin }}/passmod.py "{{ aedir_pwsync_socket_path }}" "{{ openldap_ldapi_uri }}????x-saslmech=EXTERNAL" "{{ aedir_pwsync_targeturl }}" "{{ aedir_pwsync_targetpwfile }}"
 User={{ aedir_pwsync_listener_user }}
 Group={{ aedir_pwsync_listener_user }}

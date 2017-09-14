@@ -135,7 +135,7 @@ ProxyPreserveHost On
   # web2ldap
   #---------------------------------------------------------------------
 
-  ScriptAlias /web2ldap {{ web2ldap_fcgi_script }}
+  ScriptAlias /web2ldap {{ aedir_sbin }}/start-web2ldap
 
   Alias /web2ldap-doc {{ web2ldap_prefix }}/htdocs
 

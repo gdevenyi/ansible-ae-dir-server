@@ -1,0 +1,6 @@
+#!/bin/sh
+{% if aedir_malloc_ld_preload %}
+LD_PRELOAD={{ aedir_malloc_ld_preload }}
+export LD_PRELOAD
+{% endif %}
+{{ web2ldap_fcgi_script }}

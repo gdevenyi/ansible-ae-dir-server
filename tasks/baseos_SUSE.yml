@@ -15,3 +15,11 @@
     - ca-certificates
     - python
     - python-xml
+
+- name: "Install alternative malloc package {{ aedir_malloc_package }}"
+  zypper:
+    name: "{{ aedir_malloc_package }}"
+    state: present
+    disable_recommends: yes
+    type: package
+  when: aedir_malloc_package!=""
