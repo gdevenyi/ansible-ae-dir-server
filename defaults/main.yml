@@ -335,7 +335,7 @@ openldap_schema_prefix: "{{ openldap_conf_prefix }}/schema"
 openldap_sbin: "{{ openldap_prefix }}/sbin"
 openldap_defaults: "/etc/default/slapd"
 openldap_rundir: "{{ aedir_rundir }}/slapd"
-openldap_data: "{{ os_openldap_paths[lsb_id].openldap_data }}"
+openldap_data: "{{ aedir_prefix }}/slapd-db"
 openldap_ldapi_socket: "{{ openldap_rundir }}/ldapi"
 openldap_ldapi_uri: "ldapi://{{ openldap_ldapi_socket|urlencode|replace('/','%2F') }}"
 # where to place static config file for slapd (slapd.conf)
