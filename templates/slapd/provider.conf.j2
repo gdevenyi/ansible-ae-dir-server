@@ -1508,6 +1508,16 @@ socketpath {{ oath_ldap_socket_path }}
 sockops bind
 {% endif %}
 
+{% if aedir_pwsync_targeturl %}
+# send extended requests to external listener process receiving the requests
+# on Unix Domain socket path {{ aedir_pwsync_socket_path }}
+# (after password policy check in slapo-ppolicy)
+overlay sock
+extensions binddn peername ssf connid
+socketpath {{ aedir_pwsync_socket_path }}
+sockops extended
+{% endif %}
+
 # password policy overlay
 # (after bind-DN rewriting with slapo-rwm)
 overlay ppolicy
@@ -1517,15 +1527,6 @@ ppolicy_hash_cleartext
 ppolicy_use_lockout
 
 {% include 'slapo-rwm.conf.j2' %}
-
-{% if aedir_pwsync_targeturl %}
-# send extended requests to external listener process receiving the requests
-# on Unix Domain socket path {{ aedir_pwsync_socket_path }}
-overlay sock
-extensions binddn peername ssf connid
-socketpath {{ aedir_pwsync_socket_path }}
-sockops extended
-{% endif %}
 
 #---------------------------------------------------------------------------
 # replication of {{ aedir_suffix }}
