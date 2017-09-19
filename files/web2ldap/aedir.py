@@ -1114,7 +1114,7 @@ class AEEntryDNAESrvGroup(DistinguishedName):
             u'(&(|(objectClass=aeHost)(objectClass=aeService))(|(entryDN:dnSubordinateMatch:={0})(aeSrvGroup={0})))'.format(attr_value_u)
           ),
         ),
-        title=u'Search all host entries which are member in this server group {0}'.format(attr_value_u),
+        title=u'Search all service and host entries which are member in this service/host group {0}'.format(attr_value_u),
       )
     )
     return r
