@@ -505,6 +505,9 @@ aedir_pwsync_socket_path: "{{ aedir_pwsync_socket_dir }}/socket"
 # set to True to enable (default is False=disabled)
 oath_ldap_enabled: False
 
+# regex pattern for limiting the entries for which bind requests are sent to external OATH-LDAP listener
+oath_ldap_dn_regex: ""
+
 # map slapd role to bind listener parameters
 oath_dict:
   provider:

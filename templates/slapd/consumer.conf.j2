@@ -539,6 +539,9 @@ overlay sock
 extensions binddn peername ssf connid
 socketpath {{ oath_ldap_socket_path }}
 sockops bind
+{% if oath_ldap_dn_regex %}
+sockdnpat "{{ oath_ldap_dn_regex }}"
+{% endif %}
 {% endif %}
 
 # password policy overlay
