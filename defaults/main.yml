@@ -473,6 +473,9 @@ openldap_syncrepl_providers: "{{ aedir_hosts['provider'] }}"
 # aedir_pwsync_targeturl: "ldaps://msad.example.com/dc=example,dc=org?samaccountname,unicodePwd?sub??bindname=dom-admin@example.com"
 aedir_pwsync_targeturl: ""
 
+# regex pattern for limiting the entries for which password changes are exported
+aedir_pwsync_dn_regex: ""
+
 # password of authenticating to sync target (should be ansible vault or similar)
 aedir_pwsync_targetpassword: ""
 

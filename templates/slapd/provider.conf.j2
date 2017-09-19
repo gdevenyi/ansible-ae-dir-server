@@ -1516,6 +1516,9 @@ overlay sock
 extensions binddn peername ssf connid
 socketpath {{ aedir_pwsync_socket_path }}
 sockops extended
+{% if aedir_pwsync_dn_regex %}
+sockdnpat "{{ aedir_pwsync_dn_regex }}"
+{% endif %}
 {% endif %}
 
 # password policy overlay
