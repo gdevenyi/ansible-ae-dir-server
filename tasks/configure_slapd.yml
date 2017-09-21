@@ -11,6 +11,15 @@
     state: stopped
     enabled: no
 
+- name: "Overwrite package init script"
+  template:
+    src: "exit0.j2"
+    dest: "/etc/init.d/slapd"
+    owner: root
+    group: root
+    mode: 0755
+  when: lsb_id=="Debian" or lsb_id=="CentOS"
+
 - name: "Delete the package dynamic configuration directory {{ os_openldap_paths[lsb_id].openldap_conf_prefix }}/slapd.d"
   file:
     path: "{{ os_openldap_paths[lsb_id].openldap_conf_prefix }}/slapd.d"
