@@ -20,7 +20,7 @@
 - name: Install OpenLDAP packages and dependencies
   yum:
     name: "{{ item }}"
-    state: present
+    state: latest
     update_cache: yes
   notify:
     - restart slapd
