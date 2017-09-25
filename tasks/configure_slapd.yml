@@ -119,12 +119,6 @@
   notify:
   - restart slapd
 
-- name: "Uninstall outdated OpenLDAP schema files"
-  file:
-    path: "{{ os_openldap_paths[lsb_id].openldap_conf_prefix }}/schema/{{ item }}"
-    state: absent
-  with_items: "{{ openldap_schema_files }}"
-
 - name: "Create rootDSE.ldif"
   template:
     src: "slapd/rootDSE.ldif.j2"
