@@ -1,13 +1,39 @@
 ---
 # configuration for web server apache2
 
+- name: "Ensure {{ apache2_config[lsb_id].service_name }} is stopped"
+  service:
+    name: "{{ apache2_config[lsb_id].service_name }}"
+    state: stopped
+    enabled: no
+
 - name: "Create config for Apache from template"
   template:
     src: 'apache2.conf.j2'
-    dest: "{{ apache2_config[lsb_id].conf_pathname }}"
+    dest: "{{ apache_conf }}"
     owner: root
     group: root
     mode: 0644
+  notify:
+    - "restart web server"
+
+- name: "Create Apache run directory {{ apache_rundir }}"
+  file:
+    path: "{{ apache_rundir }}"
+    state: directory
+    owner: root
+    group: "{{ apache_group }}"
+    mode: 0775
+  notify:
+    - "restart web server"
+
+- name: "Create FastCGI socket directory {{ apache_rundir }}"
+  file:
+    path: "{{ apache_rundir }}/fcgid-sock"
+    state: directory
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
+    mode: 0750
   notify:
     - "restart web server"
 
@@ -20,7 +46,7 @@
     mode: 0644
   when: apache_cacert_filename != openldap_cacert_filename and apache_cacert_pathname != openldap_cacert_pathname
   notify:
-  - "restart web server"
+    - "restart web server"
 
 - name: "Install apache2 server cert {{ apache_cert_filename }} to {{ apache_cert_pathname }}"
   copy:
@@ -31,7 +57,7 @@
     mode: 0644
   when: apache_cert_filename != openldap_cert_filename and apache_cert_pathname != openldap_cert_pathname
   notify:
-  - "restart web server"
+    - "restart web server"
 
 - name: "Install apache2 server key {{ apache_key_filename }} to {{ apache_key_pathname }}"
   copy:
@@ -43,7 +69,7 @@
   when: apache_key_filename and (apache_key_filename != openldap_key_filename and apache_key_pathname != openldap_key_pathname)
   no_log: True
   notify:
-  - "restart web server"
+    - "restart web server"
 
 - name: "Set ownership/permissions of apache2 server key {{ apache_key_pathname }}"
   file:
@@ -53,4 +79,16 @@
     mode: 0640
   when: apache_key_pathname != openldap_key_pathname
   notify:
-  - "restart web server"
+    - "restart web server"
+
+- name: "Install systemd unit file for ae-apache"
+  template:
+    src: "ae-apache.service.j2"
+    dest: "{{ aedir_systemd_dir }}/ae-apache.service"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - reload systemd
+    - "restart web server"
+  when: ansible_service_mgr=="systemd"

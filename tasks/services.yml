@@ -15,9 +15,9 @@
     enabled: yes
   when: openldap_role=="provider"
 
-- name: "Ensure {{ web_server }} is running"
+- name: "Ensure ae-apache is running"
   service:
-    name: "{{ web_server }}"
+    name: "ae-apache"
     state: started
     enabled: yes
   when: openldap_role=="provider"

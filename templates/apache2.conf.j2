@@ -25,8 +25,8 @@ ErrorLog {{ apache_error_log }}
 # applications to stderr (e.g. web2ldap)
 LogLevel {{ apache_log_level }}
 
-{% if apache2_config[lsb_id].pid_file!="" %}
-PidFile {{ apache2_config[lsb_id].pid_file }}
+{% if apache_pid_file!="" %}
+PidFile {{ apache_pid_file }}
 {% endif %}
 
 Timeout 300
@@ -45,8 +45,8 @@ MaxSpareServers 10
 MaxRequestWorkers 50
 MaxConnectionsPerChild 10000
 
-User {{ apache2_config[lsb_id].user }}
-Group {{ apache2_config[lsb_id].group }}
+User {{ apache_user }}
+Group {{ apache_group }}
 Suexec Off
 
 HostnameLookups Off
@@ -66,9 +66,9 @@ FcgidZombieScanInterval 10
 FcgidProcessLifeTime 86400
 FcgidConnectTimeout 60
 FcgidIOTimeout 600
-#FcgidIPCDir /var/lib/apache2/fcgid/sock
+FcgidIPCDir {{ apache_rundir }}/fcgid-sock
 
-FcgidCmdOptions {{ web2ldap_fcgi_script }} MaxProcesses 1
+FcgidCmdOptions {{ aedir_sbin }}/start-web2ldap MaxProcesses 1
 
 # SSL Session Resumption
 SSLSessionCache        {{ apache2_config[lsb_id].ssl_session_cache }}

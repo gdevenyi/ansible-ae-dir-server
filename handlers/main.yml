@@ -25,7 +25,7 @@
 
 - name: "restart web server"
   service:
-    name: "{{ web_server }}"
+    name: "ae-apache"
     state: restarted
   when: openldap_role == 'provider'
 

@@ -1,0 +1,29 @@
+#-----------------------------------------------------------------------
+# initiate:   systemctl enable ae-slapd.service
+# start:      systemctl start ae-slapd.service
+# get status: systemctl status ae-slapd.service
+#
+# {{ ansible_managed }}
+#-----------------------------------------------------------------------
+
+[Unit]
+Description=AE-DIR web server
+Requires=network.target
+After=network.target
+
+[Service]
+Type=simple
+PrivateTmp=true
+{% if aedir_malloc_ld_preload %}
+Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
+{% endif %}
+Environment=APACHE_PID_FILE={{ apache_pid_file }}
+PIDFile={{ apache_pid_file }}
+ExecStart={{ apache2_config[lsb_id].apache_ctl }} -DSYSTEMD -DFOREGROUND -f {{ apache_conf }} -k start       
+ExecReload={{ apache2_config[lsb_id].apache_ctl }} -DSYSTEMD -DFOREGROUND -f {{ apache_conf }} -k graceful
+ExecStop={{ apache2_config[lsb_id].apache_ctl }} -DSYSTEMD -DFOREGROUND -f {{ apache_conf }} -k graceful-stop
+KillMode=mixed
+NotifyAccess=all
+
+[Install]
+WantedBy=multi-user.target

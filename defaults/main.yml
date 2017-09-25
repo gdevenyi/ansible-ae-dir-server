@@ -215,6 +215,14 @@ aedir_ldapi_services:
     roles:
       - provider
       - consumer
+  # system user which must match UID/GID Apache service is running as
+  ae-dir-httpd:
+    cn: Web server demon user
+    uid_number: "{{ aedir_min_gid-9 }}"
+    gid_number: "{{ aedir_min_gid-9 }}"
+    description: The system user for running Apache server process (httpd)
+    roles:
+      - provider
 
 # POSIX UID and GID which is mapped to rootdn
 aedir_rootdn_uid_number: 0
@@ -685,6 +693,20 @@ web2ldap_service: web2ldap-fcgi
 #---------------------------------------------------------------------------
 # apache2 parameters
 #---------------------------------------------------------------------------
+
+# where to place static config file for slapd (slapd.conf)
+#apache_conf: "{{ apache2_config[lsb_id].conf_pathname }}"
+apache_conf: "{{ aedir_etc }}/apache2.conf"
+
+# directory used as rundir (for PID etc.)
+apache_rundir: "{{ aedir_rundir }}/apache"
+
+# PID filename of Apache
+apache_pid_file: "{{ apache_rundir }}/apache.pid"
+
+# system user/group to run web server with
+apache_user: "ae-dir-httpd"
+apache_group: "ae-dir-httpd"
 
 # Apache ErrorLog value
 apache_error_log: "syslog:daemon"
