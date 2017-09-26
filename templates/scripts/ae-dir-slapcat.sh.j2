@@ -25,7 +25,7 @@ umask 077
       -b 'suffix' \
       -l "{{ openldap_backup_path }}/suffix-${DATETIME}.ldif"
 
-# Remove old backup directories
+# Remove old backup files
 find "{{ openldap_backup_path }}" -type f -name "*.ldif*" -mtime +{{ openldap_backup_max_days }} -delete
 
 {% if openldap_backup_compressor %}
