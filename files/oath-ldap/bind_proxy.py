@@ -31,8 +31,8 @@ LDAP_PROXY_BINDDN_PATTERN = ur'^uid=[a-z]+,(|cn=[a-z0-9]+,){suffix}$'
 
 # UIDs and peer GIDS of peers which are granted access
 # (list of int/strings)
-ALLOWED_UIDS = [0, 'ldap', os.getuid()]
-ALLOWED_GIDS = [0, 'ldap']
+ALLOWED_UIDS = [0, 'ae-dir-slapd']
+ALLOWED_GIDS = [0]
 
 # String with octal representation of socket permissions
 SOCKET_PERMISSIONS = '0666'

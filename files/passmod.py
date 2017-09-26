@@ -60,7 +60,7 @@ PWD_CRYPT_SCHEME_ARGS = {
 
 # UIDs and peer GIDS of peers which are granted access
 # (list of int/strings)
-ALLOWED_UIDS = [0, 'ldap', os.getuid()]
+ALLOWED_UIDS = [0, 'ae-dir-slapd']
 ALLOWED_GIDS = [0]
 
 # String with octal representation of socket permissions
