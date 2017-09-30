@@ -13,8 +13,19 @@
   - "restart web server"
   with_items:
   - apache2
-  - apache2-mpm-prefork
   - libapache2-mod-fcgid
+
+- name: "Install packages needed for running Apache 2.4 on {{ lsb_id }}"
+  apt:
+    name: apache2-mpm-prefork
+    state: installed
+    update_cache: yes
+    cache_valid_time: 3600
+    install_recommends: no
+    dpkg_options: 'force-confold,force-confdef'
+  notify:
+  - "restart web server"
+  when: ansible_distribution_release == "jessie"
 
 # Debian package seems to be buggy and does not create this
 - name: "Create mod_fcgid directory"
