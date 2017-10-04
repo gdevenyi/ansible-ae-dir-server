@@ -854,7 +854,12 @@ class RequestPasswordReset(BaseApp):
                     user_entry,
                     temp_pwd_clear,
                 )
-            except (socket.error, smtplib.SMTPException):
+            except (socket.error, smtplib.SMTPException), mail_error:
+                self.logger.error(
+                    'Error sending reset e-mail to user %r: %s',
+                    self.form.d.username,
+                    mail_error,
+                )
                 res = self.GET(message=u'Error sending e-mail via SMTP!')
             else:
                 res = RENDER.requestpw_action(
