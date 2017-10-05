@@ -52,15 +52,15 @@ index uidNumber eq
 index gidNumber eq
 index member eq
 index memberUID eq
-index rfc822MailMember eq
+index rfc822MailMember sub,eq
 index memberURL pres
 index memberOf eq
 index sudoUser pres,eq
 index seeAlso eq
 index modifyTimestamp eq
 index nickName eq
-index mailLocalAddress eq
-index mailRoutingAddress eq
+index mailLocalAddress sub,eq
+index mailRoutingAddress sub,eq
 # mainly for syncrepl
 index entryCSN eq
 index entryUUID eq
