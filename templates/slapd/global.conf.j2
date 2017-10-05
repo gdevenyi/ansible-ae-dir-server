@@ -10,12 +10,14 @@
 include {{ openldap_schema_prefix }}/core.schema
 include {{ openldap_schema_prefix }}/cosine.schema
 include {{ openldap_schema_prefix }}/inetorgperson.schema
-include {{ openldap_schema_prefix }}/misc.schema
 include {{ openldap_schema_prefix }}/dyngroup.schema
 include {{ openldap_schema_prefix }}/openldap.schema
 include {{ openldap_schema_prefix }}/ppolicy.schema
 include {{ openldap_schema_prefix }}/nis.schema
 include {{ openldap_schema_prefix }}/duaconf.schema
+
+# mail stuff
+include {{ aedir_schema_prefix }}/mail.schema
 
 # For SSH keys
 include {{ aedir_schema_prefix }}/openssh-lpk_openldap.schema
