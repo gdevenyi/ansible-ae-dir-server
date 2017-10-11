@@ -152,6 +152,11 @@ authz-regexp
 authz-regexp
   "gidnumber=([0-9]+)\\+uidnumber=([0-9]+),cn=peercred,cn=external,cn=auth"
   "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=posixAccount)(uidNumber=$2)(aeStatus=0))"
+# Map user/group to existing account entry when SASL/EXTERNAL is used with LDAPI
+# and SASL proxy authz is used with "u:foo"
+authz-regexp
+  "uid=({{ aedir_aeuser_uid_regex }}|{{ aedir_aeservice_uid_regex }}),cn=external,cn=auth"
+  "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=account)(uid=$1)(aeStatus=0))"
 
 {% for cert_suffix in openldap_tls_cert_suffixes %}
 # Rewrite any cert with subject-DN suffix "{{ cert_suffix }}" by searching it in attribute seeAlso
