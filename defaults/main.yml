@@ -79,6 +79,7 @@ aedir_prefix: "/opt/ae-dir"
 aedir_bin: "{{ aedir_prefix }}/bin"
 aedir_sbin: "{{ aedir_prefix }}/sbin"
 aedir_etc: "{{ aedir_prefix }}/etc"
+aedir_etc_openldap: "{{ aedir_etc }}/openldap"
 aedir_rundir: "{{ aedir_prefix }}/run"
 
 # where to install systemd files
@@ -355,7 +356,7 @@ openldap_data: "{{ aedir_prefix }}/slapd-db"
 openldap_ldapi_socket: "{{ openldap_rundir }}/ldapi"
 openldap_ldapi_uri: "ldapi://{{ openldap_ldapi_socket|urlencode|replace('/','%2F') }}"
 # where to place static config file for slapd (slapd.conf)
-openldap_slapd_conf: "{{ aedir_etc }}/openldap/slapd.conf"
+openldap_slapd_conf: "{{ aedir_etc_openldap }}/slapd.conf"
 # where to find slapd executable
 openldap_slapd_exec: "{{ os_openldap_paths[lsb_id].openldap_slapd_exec }}"
 # URIs specifying on which interface slapd shall listen

@@ -103,7 +103,7 @@ loglevel {{ openldap_log_level }}
 threads {{ openldap_threads }}
 
 # additional rootDSE attributes in external LDIF file
-rootDSE {{ openldap_slapd_conf|dirname }}/rootDSE.ldif
+rootDSE {{ aedir_etc_openldap }}/rootDSE.ldif
 
 #---------------------------------------------------------------------------
 # password hash parameters
