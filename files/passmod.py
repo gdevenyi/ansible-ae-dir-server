@@ -231,7 +231,7 @@ class PWSyncWorker(threading.Thread, LocalLDAPConn):
                 )
         finally:
             self._target_conn_lock.release()
-        return self._target_conn # get_ldapi_conn()
+        return self._target_conn # target_conn()
 
     def _check_password(self, user_dn, new_passwd):
         password_correct = False
