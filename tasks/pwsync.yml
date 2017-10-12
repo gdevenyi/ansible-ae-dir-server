@@ -7,6 +7,8 @@
     gid: "{{ aedir_ldapi_services[aedir_pwsync_listener_user].gid_number }}"
     state: present
     system: yes
+  notify:
+    - "restart passmod"
 
 - name: "Add local system account {{ aedir_pwsync_listener_user }} for external PASSMOD listener"
   user:
@@ -18,6 +20,8 @@
     state: present
     system: yes
     createhome: no
+  notify:
+    - "restart passmod"
 
 - name: "Create config directory {{ aedir_pwsync_targetpwfile|dirname }}"
   file:
@@ -26,6 +30,8 @@
     owner: root
     group: "{{ aedir_pwsync_listener_user }}"
     mode: u=rwx,g=rx,o=
+  notify:
+    - "restart passmod"
 
 - name: Install CA cert for target connection to {{ aedir_pwsync_cacert_pathname }}"
   copy:
@@ -36,6 +42,8 @@
     group: root
     mode: u=rw,g=r,o=r
     directory_mode: u=rwx,g=rx,o=rx
+  notify:
+    - "restart passmod"
 
 - name: "Create password file {{ aedir_pwsync_targetpwfile }}"
   copy:
@@ -44,6 +52,8 @@
     owner: root
     group: "{{ aedir_pwsync_listener_user }}"
     mode: u=rwx,g=rx,o=
+  notify:
+    - "restart passmod"
   when: aedir_pwsync_targetpassword != ""
   no_log: True
 
@@ -54,6 +64,8 @@
     owner: "{{ aedir_pwsync_listener_user }}"
     group: root
     mode: u=rwx,g=rx,o=rx
+  notify:
+    - "restart passmod"
 
 - name: "Install passmod.py"
   copy:
