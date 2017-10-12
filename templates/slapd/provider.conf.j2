@@ -217,6 +217,19 @@ access to
 # Access control for various password attributes
 #---------------------------------------------------------------------------
 
+{% if aedir_pwsync_targeturl %}
+# grant read access to userPassword to password sync process
+access to
+{% if aedir_pwsync_dn_regex %}
+  dn.regex="{{ aedir_pwsync_dn_regex }}"
+{% else %}
+  dn.subtree="{{ aedir_suffix }}"
+{% endif %}
+  attrs=userPassword
+    by dn.base="uid={{ aedir_pwsync_listener_user }},cn=ae,{{ aedir_suffix }}" read
+    by * none break
+{% endif %}
+
 # Password of active token entries may be
 # 1. searched but not read or written(!) by AE-DIR admins
 # 2. written but not read(!) by enrollment service

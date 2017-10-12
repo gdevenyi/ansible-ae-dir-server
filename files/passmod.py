@@ -20,6 +20,9 @@ import threading
 import time
 from collections import OrderedDict
 
+# passlib
+import passlib.context
+
 # python-ldap
 import ldap
 from ldap.dn import str2dn
@@ -234,31 +237,26 @@ class PWSyncWorker(threading.Thread, LocalLDAPConn):
         return self._target_conn # target_conn()
 
     def _check_password(self, user_dn, new_passwd):
-        password_correct = False
         self.logger.debug('Check password of %r', user_dn)
-        checkpw_conn = None
+        ldapi_conn = self.get_ldapi_conn()
         try:
-            try:
-                # check whether user_dn, new_passwd is correct
-                # by new connect with simple bind
-                checkpw_conn = MyLDAPObject(
-                    self.ldapi_uri,
-                    trace_level=PYLDAP_TRACELEVEL,
-                    trace_file=LoggerFileobj(self.logger, logging.DEBUG),
-                    retry_max=LDAP_MAXRETRYCOUNT,
-                    retry_delay=LDAP_RETRYDELAY,
-                    who=user_dn,
-                    cred=new_passwd,
-                    cache_time=LDAP_CACHE_TTL,
-                )
-            except ldap.INVALID_CREDENTIALS:
-                password_correct = False
-            else:
-                password_correct = True
-        finally:
-            if checkpw_conn is not None:
-                checkpw_conn.unbind_s()
-        return password_correct # end of _check_password()
+            user_entry = ldap.cidict.cidict(
+                ldapi_conn.read_s(user_dn, attrlist=['userPassword']) or {}
+            )
+        except ldap.LDAPError, ldap_error:
+            self.logger.warn('LDAPError checking password of %r: %s', user_dn, ldap_error)
+            return False
+        try:
+            user_password_hash = user_entry['userPassword'][0][7:]
+        except (KeyError, IndexError):
+            self.logger.warn('No userPassword in %r', user_dn)
+            return False
+        if __debug__:
+            self.logger.debug('user_password_hash = %r', user_password_hash)
+        # Compare password with local hash in attribute userPassword
+        pw_context = passlib.context.CryptContext(schemes=['sha512_crypt'])
+        return pw_context.verify(new_passwd, user_password_hash)
+        # end of _check_password()
 
     def get_target_id(self, source_dn):
         """
