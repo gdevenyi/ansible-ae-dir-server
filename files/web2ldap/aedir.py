@@ -1948,8 +1948,10 @@ class AEStatus(SelectList,Integer):
     except (KeyError, ValueError):
       pass
     else:
-      if ae_status<=0 and current_time > ae_not_after:
-        ae_status = 1
+      if current_time > ae_not_after:
+        ae_expiry_status = int(self._entry.get('aeExpiryStatus',['1'])[0])
+        if ae_status<=ae_expiry_status:
+          ae_status = ae_expiry_status
     return [str(ae_status)]
 
   def displayValue(self,valueindex=0,commandbutton=0):
