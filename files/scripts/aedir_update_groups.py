@@ -27,6 +27,7 @@ import os
 # set LDAPRC env var *before* importing ldap
 os.environ['LDAPRC'] = '/opt/ae-dir/etc/ldap.conf'
 import ldap
+from ldap.filter import escape_filter_chars
 from ldap.controls.deref import DereferenceControl
 import ldapurl
 import aedir
@@ -214,6 +215,9 @@ class AEGroupUpdater(aedir.process.AEProcess):
             ldap.SCOPE_SUBTREE,
             '({0}=*)'.format(MEMBERURL_ATTR),
             attrlist=[
+                'aeDept',
+                'aeLocation',
+                'aeMemberZone',
                 'structuralObjectClass',
                 MEMBER_ATTR,
                 MEMBERURL_ATTR,
@@ -223,6 +227,21 @@ class AEGroupUpdater(aedir.process.AEProcess):
 
             group_object_class = dyn_group_entry['structuralObjectClass'][0]
             member_map_attr, member_user_attr = MEMBER_ATTRS_MAP[group_object_class]
+
+            try:
+                member_zones = dyn_group_entry['aeMemberZone']
+            except KeyError:
+                member_zones_filter = ''
+            else:
+                member_zones_filter = '(|{})'.format(
+                    ''.join([
+                        '(entryDN:dnSubordinateMatch:={})'.format(
+                            escape_filter_chars(zone_dn)
+                        )
+                        for zone_dn in member_zones
+                    ])
+                )
+
             self.logger.debug(
                 'group_object_class=%r member_map_attr=%r member_user_attr=%r',
                 group_object_class, member_map_attr, member_user_attr
@@ -236,12 +255,20 @@ class AEGroupUpdater(aedir.process.AEProcess):
             for member_url in dyn_group_entry[MEMBERURL_ATTR]:
 
                 member_url_obj = ldapurl.LDAPUrl(member_url)
+                dyn_group_filter = '(&{0}(!(entryDN={1})){2})'.format(
+                    member_url_obj.filterstr,
+                    dyn_group_dn,
+                    member_zones_filter,
+                )
+                self.logger.debug('dyn_group_filter=%r', dyn_group_filter)
+
                 if member_url_obj.attrs:
                     server_ctrls = [DereferenceControl(
                         True,
                         {
                             member_url_obj.attrs[0]:[
                                 'aeStatus',
+                                'aePerson',
                                 member_user_attr,
                             ],
                         }
@@ -253,10 +280,7 @@ class AEGroupUpdater(aedir.process.AEProcess):
                     msg_id = ldap_member_users = self.ldap_conn.search_ext(
                         member_url_obj.dn,
                         member_url_obj.scope or ldap.SCOPE_SUBTREE,
-                        '(&{0}(!(entryDN={1})))'.format(
-                            member_url_obj.filterstr,
-                            dyn_group_dn,
-                        ),
+                        dyn_group_filter,
                         attrlist=[
                             'cn',
                             'aeStatus',
@@ -287,9 +311,10 @@ class AEGroupUpdater(aedir.process.AEProcess):
 
                 except ldap.LDAPError, ldap_error:
                     self.logger.error(
-                        u'LDAPError searching members for %r with %r: %s',
+                        u'LDAPError searching members for %r with %r and %r: %s',
                         dyn_group_dn,
                         member_url,
+                        dyn_group_filter,
                         ldap_error,
                     )
                     continue
