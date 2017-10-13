@@ -8,11 +8,6 @@ This script performs two tasks:
 It is designed to run as a CRON job.
 
 Author: Michael Ströder <michael@stroeder.com>
-
-Requires:
-- Python 2.6+
-- python-ldap 2.4.27+
-- python-aedir 0.0.10+
 """
 
 __version__ = '0.2.0'
