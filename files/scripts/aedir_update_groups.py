@@ -288,7 +288,7 @@ class AEGroupUpdater(aedir.process.AEProcess):
                 except ldap.LDAPError, ldap_error:
                     self.logger.error(
                         u'LDAPError searching members for %r with %r: %s',
-                        ldap_group_dn,
+                        dyn_group_dn,
                         member_url,
                         ldap_error,
                     )
