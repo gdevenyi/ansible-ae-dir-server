@@ -10,13 +10,12 @@ It is designed to run as a CRON job.
 Author: Michael Ströder <michael@stroeder.com>
 """
 
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 
 #-----------------------------------------------------------------------
 # Imports
 #-----------------------------------------------------------------------
 
-import sys
 import os
 
 # set LDAPRC env var *before* importing ldap
@@ -269,10 +268,10 @@ class AEGroupUpdater(aedir.process.AEProcess):
                         }
                     )]
                 else:
-                    server_ctrls =None                
+                    server_ctrls = None
 
                 try:
-                    msg_id = ldap_member_users = self.ldap_conn.search_ext(
+                    msg_id = self.ldap_conn.search_ext(
                         member_url_obj.dn,
                         member_url_obj.scope or ldap.SCOPE_SUBTREE,
                         dyn_group_filter,
@@ -284,10 +283,15 @@ class AEGroupUpdater(aedir.process.AEProcess):
                     )
                     for _, ldap_results, _, _ in self.ldap_conn.allresults(msg_id, add_ctrls=1):
                         for groupmember_dn, groupmember_entry, ldap_resp_controls in ldap_results:
-                            if not member_url_obj.attrs or member_url_obj.attrs[0].lower()=='entrydn':
+                            if not member_url_obj.attrs or \
+                               member_url_obj.attrs[0].lower() == 'entrydn':
                                 member_deref_result = [(groupmember_dn, groupmember_entry)]
                             elif member_url_obj.attrs and not ldap_resp_controls:
-                                self.logger.debug('ignoring empty %r: %r', groupmember_dn, groupmember_entry)
+                                self.logger.debug(
+                                    'ignoring empty %r: %r',
+                                    groupmember_dn,
+                                    groupmember_entry
+                                )
                                 continue
                             else:
                                 member_deref_result = ldap_resp_controls[0].derefRes[MEMBER_ATTR]
