@@ -279,19 +279,19 @@ attributetype ( ae-dir-at:31
   NAME 'aeZoneAdmins'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: DN of groups of users entitled zone admin'
-  SUP aeObjectReference )
+  SUP aeGroupReference )
 
 attributetype ( ae-dir-at:32
   NAME 'aeZoneAuditors'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: DN of groups of users entitled zone auditor'
-  SUP aeObjectReference )
+  SUP aeGroupReference )
 
 attributetype ( ae-dir-at:33
   NAME 'aePasswordAdmins'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: DN of groups of users allowed to set personal user account passwords'
-  SUP aeObjectReference )
+  SUP aeGroupReference )
 
 objectclass ( ae-dir-oc:20
   NAME 'aeZone'
@@ -402,19 +402,19 @@ attributetype ( ae-dir-at:4
   NAME 'aeLoginGroups'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: DN of groups of users allowed to do SSH login'
-  SUP aeObjectReference )
+  SUP aeGroupReference )
 
 attributetype ( ae-dir-at:6
   NAME 'aeSetupGroups'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: DN of groups of users allowed to deploy machine'
-  SUP aeObjectReference )
+  SUP aeGroupReference )
 
 attributetype ( ae-dir-at:7
   NAME 'aeLogStoreGroups'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: DN of groups of users allowed to deploy machine'
-  SUP aeObjectReference )
+  SUP aeGroupReference )
 
 attributetype ( ae-dir-at:15
   NAME 'aeLogStorePeriod'
@@ -443,13 +443,13 @@ attributetype ( ae-dir-at:20
   NAME 'aeVisibleGroups'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: DN(s) of group entries usable with a certain server group, server, or service'
-  SUP aeObjectReference )
+  SUP aeGroupReference )
 
 attributetype ( ae-dir-at:30
   NAME 'aeDisplayNameGroups'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: DN(s) of group entries for which member personalnames are displayed'
-  SUP aeObjectReference )
+  SUP aeGroupReference )
 
 attributetype ( ae-dir-at:21
   NAME 'aeVisibleSudoers'
