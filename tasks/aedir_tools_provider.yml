@@ -74,6 +74,7 @@
   with_items:
     - aeperson2aeuser.py
     - aedir_update_groups.py
+    - aedir_update_status.py
 
 - name: "Install backup script from template"
   template:
@@ -109,6 +110,15 @@
     cron_file: aedir_tools
     minute: "*/3"
     job: "{{ aedir_python }} {{ aedir_sbin }}/aedir_update_groups.py"
+
+- name: Run aedir_update_status.py as CRON job
+  cron:
+    name: "aedir_update_status"
+    state: present
+    user: root
+    cron_file: aedir_tools
+    minute: "*/13"
+    job: "{{ aedir_python }} {{ aedir_sbin }}/aedir_update_status.py"
 
 - name: Run aeperson2aeuser.py as CRON job
   cron:
