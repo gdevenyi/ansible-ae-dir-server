@@ -45,6 +45,7 @@
   command: "openssl verify -purpose sslserver -CAfile {{ openldap_cacert_filename }} {{ openldap_cert_filename }}"
   ignore_errors: yes
   delegate_to: 127.0.0.1
+  become: no
   register: openssl_verify_result
   changed_when: False
 
@@ -52,6 +53,7 @@
   command: "openssl x509 -in {{ openldap_cert_filename }} -noout -modulus"
   ignore_errors: yes
   delegate_to: 127.0.0.1
+  become: no
   register: openldap_cert_modulus
   changed_when: False
 
