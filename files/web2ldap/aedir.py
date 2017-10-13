@@ -1965,6 +1965,22 @@ syntax_registry.registerAttrType(
 )
 
 
+class AEExpiryStatus(SelectList):
+  oid = 'AEExpiryStatus-oid'
+  desc = 'AE-DIR: Expiry status of object'
+  attr_value_dict = {
+    u'-/-':u'',
+    u'1':u'deactivated',
+    u'2':u'archived',
+  }
+
+syntax_registry.registerAttrType(
+  AEStatus.oid,[
+    AE_OID_PREFIX+'.4.46', # aeExpiryStatus
+  ]
+)
+
+
 class AESudoUser(w2lapp.schema.plugins.sudoers.SudoUserGroup):
   oid = 'AESudoUser-oid'
   desc = 'AE-DIR: sudoUser'

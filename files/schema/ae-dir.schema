@@ -40,6 +40,15 @@ attributetype ( ae-dir-at:3
   SUBSTR caseIgnoreIA5SubstringsMatch
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{20} )
 
+attributetype ( ae-dir-at:46
+  NAME 'aeExpiryStatus'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Enforced status of an entry after expiration (-1, 0, 1, 2)'
+  SINGLE-VALUE
+  EQUALITY integerMatch
+  ORDERING integerOrderingMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 )
+
 attributetype ( ae-dir-at:5
   NAME 'aeStatus'
   X-ORIGIN 'AE-DIR'
@@ -128,7 +137,7 @@ objectclass ( ae-dir-oc:21
   DESC 'AE-DIR: Managed object'
   SUP top
   MUST ( aeStatus )
-  MAY ( description $ aeNotBefore $ aeNotAfter $ aeTicketId $ aeTag ) )
+  MAY ( description $ aeNotBefore $ aeNotAfter $ aeTicketId $ aeTag $ aeExpiryStatus ) )
 
 # UID and GID number pools
 #-----------------------------------------------------------------------
