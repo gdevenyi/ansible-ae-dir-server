@@ -21,11 +21,15 @@ attributetype ( ae-dir-at:43
   SUP distinguishedName
   SINGLE-VALUE )
 
-attributetype ( ae-dir-at:1
-  NAME 'aeOwnerGroup'
-  X-ORIGIN 'AE-DIR'
-  DESC 'AE-DIR: DN of owner group entry'
-  SUP owner )
+attributetype ( ae-dir-at:44
+  NAME 'aeObjectReference'
+  DESC 'DN of a referenced aeObject entry (not directly used)'
+  SUP distinguishedName )
+
+attributetype ( ae-dir-at:45
+  NAME 'aeGroupReference'
+  DESC 'DN of a referenced aeGroup entry (not directly used)'
+  SUP aeObjectReference )
 
 attributetype ( ae-dir-at:3
   NAME 'aeTicketId'
@@ -50,7 +54,7 @@ attributetype ( ae-dir-at:16
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: DN of referenced person entry'
   SINGLE-VALUE
-  SUP distinguishedName )
+  SUP aeObjectReference )
 
 attributetype ( ae-dir-at:22
   NAME 'aeNotBefore'
@@ -225,7 +229,7 @@ attributetype ( ae-dir-at:29
   NAME 'aeDept'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: Associated department of aePerson, aeZone, etc.'
-  SUP distinguishedName )
+  SUP aeObjectReference )
 
 objectclass ( ae-dir-oc:29
   NAME 'aeDept'
@@ -251,7 +255,7 @@ attributetype ( ae-dir-at:35
   NAME 'aeLocation'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: Associated location of aePerson, aeZone, etc.'
-  SUP distinguishedName )
+  SUP aeObjectReference )
 
 objectclass ( ae-dir-oc:35
   NAME 'aeLocation'
@@ -275,19 +279,19 @@ attributetype ( ae-dir-at:31
   NAME 'aeZoneAdmins'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: DN of groups of users entitled zone admin'
-  SUP distinguishedName )
+  SUP aeObjectReference )
 
 attributetype ( ae-dir-at:32
   NAME 'aeZoneAuditors'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: DN of groups of users entitled zone auditor'
-  SUP distinguishedName )
+  SUP aeObjectReference )
 
 attributetype ( ae-dir-at:33
   NAME 'aePasswordAdmins'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: DN of groups of users allowed to set personal user account passwords'
-  SUP distinguishedName )
+  SUP aeObjectReference )
 
 objectclass ( ae-dir-oc:20
   NAME 'aeZone'
@@ -311,7 +315,7 @@ attributetype ( ae-dir-at:36
   NAME 'aeMemberZone'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: DN(s) of valid member zone(s)'
-  SUP distinguishedName )
+  SUP aeObjectReference )
 
 # This allows mixed group schema
 # also "dynamic groups" based on groupOfURLs/memberURL
@@ -398,19 +402,19 @@ attributetype ( ae-dir-at:4
   NAME 'aeLoginGroups'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: DN of groups of users allowed to do SSH login'
-  SUP distinguishedName )
+  SUP aeObjectReference )
 
 attributetype ( ae-dir-at:6
   NAME 'aeSetupGroups'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: DN of groups of users allowed to deploy machine'
-  SUP distinguishedName )
+  SUP aeObjectReference )
 
 attributetype ( ae-dir-at:7
   NAME 'aeLogStoreGroups'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: DN of groups of users allowed to deploy machine'
-  SUP distinguishedName )
+  SUP aeObjectReference )
 
 attributetype ( ae-dir-at:15
   NAME 'aeLogStorePeriod'
@@ -425,7 +429,7 @@ attributetype ( ae-dir-at:25
   NAME 'aeProxyFor'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: DN of server groups this server group is proxy for'
-  SUP distinguishedName )
+  SUP aeObjectReference )
 
 attributetype ( ae-dir-at:26
   NAME 'aeSSHProxyCommand'
@@ -439,19 +443,19 @@ attributetype ( ae-dir-at:20
   NAME 'aeVisibleGroups'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: DN(s) of group entries usable with a certain server group, server, or service'
-  SUP distinguishedName )
+  SUP aeObjectReference )
 
 attributetype ( ae-dir-at:30
   NAME 'aeDisplayNameGroups'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: DN(s) of group entries for which member personalnames are displayed'
-  SUP distinguishedName )
+  SUP aeObjectReference )
 
 attributetype ( ae-dir-at:21
   NAME 'aeVisibleSudoers'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: DN(s) of sudoer entries usable with a certain server group or server'
-  SUP distinguishedName )
+  SUP aeObjectReference )
 
 objectclass ( ae-dir-oc:13
   NAME 'aeSrvGroup'
@@ -490,13 +494,13 @@ attributetype ( ae-dir-at:28
   NAME 'aeHost'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: DN of aeHost entry'
-  SUP distinguishedName )
+  SUP aeObjectReference )
 
 attributetype ( ae-dir-at:27
   NAME 'aeSrvGroup'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: DN of server group this server also is member of'
-  SUP distinguishedName )
+  SUP aeObjectReference )
 
 # Unique inventory number
 attributetype ( ae-dir-at:11
@@ -533,7 +537,7 @@ attributetype ( ae-dir-at:34
   NAME 'aeNwDevice'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: (Physical) device(s) for e.g. bridge interfaces'
-  SUP distinguishedName )
+  SUP aeObjectReference )
 
 # Generic base object class for a device mounted into a single case
 # not directly used
