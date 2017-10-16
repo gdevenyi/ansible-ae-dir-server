@@ -10,7 +10,7 @@ It is designed to run as a CRON job.
 Author: Michael Ströder <michael@stroeder.com>
 """
 
-__version__ = '0.2.1'
+__version__ = '0.3.0'
 
 #-----------------------------------------------------------------------
 # Imports
@@ -52,12 +52,53 @@ USER_ATTRS = [attr[1] for attr in MEMBER_ATTRS_MAP.values()]
 # Classes and functions
 #-----------------------------------------------------------------------
 
+def map_filter_parts(assertion_type, assertion_values, escape_mode=0):
+    """
+    return a list of (assertion_type=assertion_value) filters
+    """
+    assert assertion_values, ValueError("'assertion_values' must be non-zero iterator")
+    return [
+        '(%s=%s)' % (
+            assertion_type,
+            escape_filter_chars(assertion_value, escape_mode=escape_mode),
+        )
+        for assertion_value in assertion_values
+    ]
+
+
+def compose_filter(operand, filter_parts):
+    """
+    combine filter list with operand
+    """
+    assert operand in '&|', ValueError("Invalid 'operand': %r" % operand)
+    assert filter_parts, ValueError("'filter_parts' must be non-zero iterator")
+    if len(filter_parts) == 1:
+        res = filter_parts[0]
+    elif len(filter_parts) > 1:
+        res = '(%s%s)' % (operand, ''.join(filter_parts))
+    return res
+
+
+def member_zones_filter(aegroup_entry):
+    """
+    construct a filter from attribute 'aeMemberZone' if present in aegroup_entry
+    """
+    try:
+        member_zones = aegroup_entry['aeMemberZone']
+    except KeyError:
+        res = ''
+    else:
+        res = compose_filter('|', map_filter_parts('entryDN:dnSubordinateMatch:', member_zones))
+    return res
+
+
 class AEGroupUpdater(aedir.process.AEProcess):
     """
     Group update process class
     """
     script_version = __version__
     pyldap_tracelevel = PYLDAP_TRACELEVEL
+    deref_person_attrs = ('aeDept', 'aeLocation')
 
     def _update_members(
             self,
@@ -200,6 +241,37 @@ class AEGroupUpdater(aedir.process.AEProcess):
 
         return # end of fix_static_groups()
 
+    def _constrained_persons(self, aegroup_entry):
+        """
+        return list of DNs of valid aePerson entries
+        """
+        person_filter_parts = ['(objectClass=aePerson)(aeStatus=0)']
+        for deref_attr_type in self.deref_person_attrs:
+            try:
+                deref_attr_values = aegroup_entry[deref_attr_type]
+            except KeyError:
+                pass
+            else:
+                person_filter_parts.append(
+                    compose_filter(
+                        '|',
+                        map_filter_parts(deref_attr_type, deref_attr_values),
+                    )
+                )
+        if not person_filter_parts:
+            return None
+        ldap_result = self.ldap_conn.search_s(
+            self.ldap_conn.find_search_base(),
+            ldap.SCOPE_SUBTREE,
+            '(&{0})'.format(''.join(person_filter_parts)),
+            attrlist=['1.1'],
+        ) or []
+        res = set([
+            dn.lower()
+            for dn, _ in ldap_result
+        ])
+        return res # end of _constrained_persons()
+
     def update_memberurl_groups(self):
         """
         2. Update all static aeGroup entries which contain attribute 'memberURL'
@@ -221,21 +293,6 @@ class AEGroupUpdater(aedir.process.AEProcess):
 
             group_object_class = dyn_group_entry['structuralObjectClass'][0]
             member_map_attr, member_user_attr = MEMBER_ATTRS_MAP[group_object_class]
-
-            try:
-                member_zones = dyn_group_entry['aeMemberZone']
-            except KeyError:
-                member_zones_filter = ''
-            else:
-                member_zones_filter = '(|{})'.format(
-                    ''.join([
-                        '(entryDN:dnSubordinateMatch:={})'.format(
-                            escape_filter_chars(zone_dn)
-                        )
-                        for zone_dn in member_zones
-                    ])
-                )
-
             self.logger.debug(
                 'group_object_class=%r member_map_attr=%r member_user_attr=%r',
                 group_object_class, member_map_attr, member_user_attr
@@ -246,15 +303,24 @@ class AEGroupUpdater(aedir.process.AEProcess):
             new_members = set()
             new_member_attr_values = set()
 
+            person_dn_set = self._constrained_persons(dyn_group_entry)
+            self.logger.debug('person_dn_set = %r', person_dn_set)
+            if person_dn_set is None:
+                person_filter_part = ''
+            else:
+                person_filter_part = '(&(objectClass=aeUser)(aePerson=*))'
+            self.logger.debug('person_filter_part = %r', person_filter_part)
+
             for member_url in dyn_group_entry[MEMBERURL_ATTR]:
 
                 member_url_obj = ldapurl.LDAPUrl(member_url)
-                dyn_group_filter = '(&{0}(!(entryDN={1})){2})'.format(
+                dyn_group_filter = '(&{0}(!(entryDN={1})){2}{3})'.format(
                     member_url_obj.filterstr,
                     dyn_group_dn,
-                    member_zones_filter,
+                    member_zones_filter(dyn_group_entry),
+                    person_filter_part,
                 )
-                self.logger.debug('dyn_group_filter=%r', dyn_group_filter)
+                self.logger.debug('dyn_group_filter = %r', dyn_group_filter)
 
                 if member_url_obj.attrs:
                     server_ctrls = [DereferenceControl(
@@ -278,11 +344,15 @@ class AEGroupUpdater(aedir.process.AEProcess):
                         attrlist=[
                             'cn',
                             'aeStatus',
+                            'aePerson',
                         ]+(member_url_obj.attrs or [])+USER_ATTRS,
                         serverctrls=server_ctrls,
                     )
                     for _, ldap_results, _, _ in self.ldap_conn.allresults(msg_id, add_ctrls=1):
                         for groupmember_dn, groupmember_entry, ldap_resp_controls in ldap_results:
+                            if person_dn_set is not None and \
+                               groupmember_entry['aePerson'][0].lower() not in person_dn_set:
+                                continue
                             if not member_url_obj.attrs or \
                                member_url_obj.attrs[0].lower() == 'entrydn':
                                 member_deref_result = [(groupmember_dn, groupmember_entry)]
