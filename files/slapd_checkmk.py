@@ -154,7 +154,7 @@ class LocalCheck(object):
         CHECK_RESULT_ERROR: 'ERROR',
         CHECK_RESULT_UNKNOWN: 'UNKNOWN',
     }
-    item_name_special_chars = set('!:$%=/\\')
+    item_name_special_chars = set(',!:$%=/\\')
     item_names = None
     output_encoding = 'ascii'
 
@@ -464,6 +464,9 @@ class OpenLDAPMonitorCache(object):
     def __init__(self, monitor_dict, monitor_context):
         self._ctx = monitor_context
         self._data = monitor_dict
+
+    def __len__(self):
+        return len(self._data)
 
     def get_value(self, dn_prefix, attribute):
         """
@@ -859,8 +862,37 @@ class SlapdCheck(LocalCheck):
         LocalCheck.__init__(self, output_file, state_filename)
         # make pylint happy
         self._ldapi_conn = None
-        self._config_attrs = None
-        self._monitor_cache = None
+        self._config_attrs = {}
+        self._monitor_cache = {}
+
+    def _check_sasl_hostname(self, config_attrs):
+        """
+        check whether SASL hostname is resolvable
+        """
+        try:
+            olc_sasl_host = config_attrs['olcSaslHost'][0]
+        except (KeyError, IndexError):
+            self.result(
+                CHECK_RESULT_OK,
+                'SlapdSASLHostname',
+                check_output='olcSaslHost not set'
+            )
+        else:
+            try:
+                _ = socket.getaddrinfo(olc_sasl_host, None)
+            except socket.gaierror, socket_err:
+                self.result(
+                    CHECK_RESULT_WARNING,
+                    'SlapdSASLHostname',
+                    check_output='olcSaslHost %r not found: %r' % (olc_sasl_host, socket_err),
+                )
+            else:
+                self.result(
+                    CHECK_RESULT_OK,
+                    'SlapdSASLHostname',
+                    check_output='olcSaslHost %r found' % (olc_sasl_host),
+                )
+        return # end of _check_sasl_hostname()
 
     def _check_cert_validity(self, config_attrs):
         server_cert_pathname = config_attrs['olcTLSCertificateFile'][0]
@@ -1064,20 +1096,65 @@ class SlapdCheck(LocalCheck):
                     )
         return # end of _check_slapd_sock()
 
-    def _check_slapd_start(self):
+    def _get_slapd_pid(self, config_attrs):
+        """
+        read slapd's PID from file
+        """
+        pid_filename = config_attrs['olcPidFile'][0]
+        try:
+            pid_file = open(pid_filename, 'rb')
+        except IOError:
+            self._slapd_pid = None
+        else:
+            self._slapd_pid = pid_file.read().strip()
+        return # end of _get_slapd_pid()
+
+    def _check_slapd_start(self, config_attrs):
         """
         check whether slapd should be restarted
         """
         start_time = self._monitor_cache.get_value('cn=Start,cn=Time', 'monitorTimestamp')
         utc_now = datetime.datetime.now()
-        self.result(
-            CHECK_RESULT_OK,
-            'SlapdStart',
-            check_output='Slapd started at %s, %s ago' % (
-                start_time,
-                utc_now-start_time,
+        newer_files = []
+        for fattr in (
+                'olcConfigDir',
+                'olcConfigFile',
+                'olcTLSCACertificateFile',
+                'olcTLSCertificateFile',
+                'olcTLSCertificateKeyFile',
+                'olcTLSDHParamFile',
+            ):
+            if not fattr in config_attrs:
+                continue
+            check_filename = config_attrs[fattr][0]
+            try:
+                check_file_mtime = datetime.datetime.utcfromtimestamp(os.stat(check_filename).st_mtime)
+            except OSError:
+                pass
+            else:
+                if check_file_mtime > start_time:
+                    newer_files.append('%r (%s)' % (check_filename, check_file_mtime))
+        if newer_files:
+            self.result(
+                CHECK_RESULT_WARNING,
+                'SlapdStart',
+                check_output='slapd[%s] needs restart! Started at %s, %s ago, now newer config: %s' % (
+                    self._slapd_pid,
+                    start_time,
+                    utc_now-start_time,
+                    ' / '.join(newer_files),
+                )
             )
-        )
+        else:
+            self.result(
+                CHECK_RESULT_OK,
+                'SlapdStart',
+                check_output='slapd[%s] started at %s, %s ago' % (
+                    self._slapd_pid,
+                    start_time,
+                    utc_now-start_time,
+                )
+            )
         return # end of _check_slapd_start()
 
     def _get_local_csns(self, syncrepl_list):
@@ -1499,9 +1576,9 @@ class SlapdCheck(LocalCheck):
             for db_num, db_suffix, _ in syncrepl_topology[syncrepl_target_uri]:
                 item_name = '_'.join((
                     'SlapdContextCSN',
-                    self.subst_item_name_chars(syncrepl_target_hostport),
                     str(db_num),
                     self.subst_item_name_chars(db_suffix),
+                    self.subst_item_name_chars(syncrepl_target_hostport),
                 ))
                 self.add_item(item_name)
                 try:
@@ -1578,11 +1655,28 @@ class SlapdCheck(LocalCheck):
 
         local_wai = self._open_ldapi_conn(sys.argv[1] or 'ldapi:///')
 
-        # read cn=config and cn=monitor
-        #----------------------------------------------------------------------
-
+        # read cn=config
+        #---------------
         try:
             _ = self._ldapi_conn.get_naming_context_attrs()
+            _, self._config_attrs = self._ldapi_conn.search_ext_s(
+                self._ldapi_conn.configContext[0],
+                ldap.SCOPE_BASE,
+                '(objectClass=*)',
+                [
+                    'olcArgsFile',
+                    'olcConfigDir',
+                    'olcConfigFile',
+                    'olcPidFile',
+                    'olcSaslHost',
+                    'olcServerID',
+                    'olcThreads',
+                    'olcTLSCACertificateFile',
+                    'olcTLSCertificateFile',
+                    'olcTLSCertificateKeyFile',
+                    'olcTLSDHParamFile',
+                ],
+            )[0]
         except CATCH_ALL_EXC, exc:
             self.result(
                 CHECK_RESULT_ERROR,
@@ -1603,43 +1697,10 @@ class SlapdCheck(LocalCheck):
                     self._ldapi_conn.monitorContext[0],
                 )
             )
-            _, self._config_attrs = self._ldapi_conn.search_ext_s(
-                self._ldapi_conn.configContext[0],
-                ldap.SCOPE_BASE,
-                '(objectClass=*)',
-                [
-                    'olcSaslHost',
-                    'olcTLSCACertificateFile',
-                    'olcTLSCertificateFile',
-                    'olcTLSCertificateKeyFile',
-                ],
-            )[0]
 
-            try:
-                olc_sasl_host = self._config_attrs['olcSaslHost'][0]
-            except (KeyError, IndexError):
-                self.result(
-                    CHECK_RESULT_OK,
-                    'SlapdSASLHostname',
-                    check_output='olcSaslHost not set'
-                )
-            else:
-                try:
-                    _ = socket.getaddrinfo(olc_sasl_host, None)
-                except socket.gaierror, socket_err:
-                    self.result(
-                        CHECK_RESULT_WARNING,
-                        'SlapdSASLHostname',
-                        check_output='olcSaslHost %r not found: %r' % (olc_sasl_host, socket_err),
-                    )
-                else:
-                    self.result(
-                        CHECK_RESULT_OK,
-                        'SlapdSASLHostname',
-                        check_output='olcSaslHost %r found' % (olc_sasl_host),
-                    )
-
+            self._check_sasl_hostname(self._config_attrs)
             self._check_cert_validity(self._config_attrs)
+            self._get_slapd_pid(self._config_attrs)
 
         syncrepl_topology = {}
         try:
@@ -1663,15 +1724,11 @@ class SlapdCheck(LocalCheck):
                 )
             )
 
-        # 1. Read several data from cn=Monitor
+        # read cn=Monitor
         #----------------------------------------------------------------------
-
-        monitor_dict = {}
         try:
-            monitor_dict = self._ldapi_conn.get_monitor_entries()
-
             self._monitor_cache = OpenLDAPMonitorCache(
-                monitor_dict,
+                self._ldapi_conn.get_monitor_entries(),
                 self._ldapi_conn.monitorContext[0],
             )
         except CATCH_ALL_EXC, exc:
@@ -1688,13 +1745,13 @@ class SlapdCheck(LocalCheck):
                 CHECK_RESULT_OK,
                 'SlapdMonitor',
                 check_output='Successfully retrieved %d entries from %r on %r' % (
-                    len(monitor_dict),
+                    len(self._monitor_cache),
                     self._ldapi_conn.monitorContext[0],
                     self._ldapi_conn._uri,
                 ),
             )
 
-        self._check_slapd_start()
+        self._check_slapd_start(self._config_attrs)
         self._check_conns()
         self._check_threads()
         self._check_slapd_sock()
