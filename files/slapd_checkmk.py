@@ -392,6 +392,9 @@ class SyncReplDesc(object):
                 val = val[1:-1]
             setattr(self, key.replace('-', '_'), val)
 
+    def __repr__(self):
+        return '%s(rid=%s)' % (self.__class__.__name__, self.rid)
+
     def ldap_url(self):
         """
         Return ldapurl.LDAPUrl object representing some syncrepl parameters
