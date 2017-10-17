@@ -1,21 +1,25 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-check_mk script for OpenLDAP (local check)
+monitoring check script for OpenLDAP
 
-Needs read access to rootDSE and cn=config and cn=monitor
+Needs full read access to rootDSE and cn=config and cn=monitor
 (or whereever rootDSE attributes 'configContext' and 'monitorContext'
 are pointing to)
 
-Steps:
-- Connect and bind to local slapd via LDAPI
-- Determine naming, config and monitor contexts
-- Read and parse syncrepl topology from cn=config
-- Read performance data from cn=Monitor
-- Read local contextCSN attribute(s)
-- Connect and bind to local slapd via LDAPS to check server cert
-- Connect and bind to all replicas to check whether they are reachable
-- Read and compare attribute contextCSN of all replicas
+Copyright 2015-2017 Michael Ströder <michael@stroeder.com>
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may
+not use files and content provided on this web site except in compliance
+with the License. You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 """
 
 #-----------------------------------------------------------------------
@@ -69,7 +73,7 @@ from pyasn1.codec.ber import decoder
 # Configuration constants
 #-----------------------------------------------------------------------
 
-__version__ = '1.3.1'
+__version__ = '1.4.0'
 
 STATE_FILENAME = 'slapd_checkmk.state'
 
