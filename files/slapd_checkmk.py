@@ -1285,140 +1285,7 @@ class SlapdCheck(LocalCheck):
             )
         return # end of _get_slapd_perfstats()
 
-    def checks(self):
-
-        # Get command-line arguments
-        ldaps_uri = sys.argv[2] or 'ldaps://%s' % socket.getfqdn()
-        my_authz_id = sys.argv[3]
-
-        local_wai = self._open_ldapi_conn(sys.argv[1] or 'ldapi:///')
-
-        # read cn=config and cn=monitor
-        #----------------------------------------------------------------------
-
-        try:
-            _ = self._ldapi_conn.get_naming_context_attrs()
-        except CATCH_ALL_EXC, exc:
-            self.result(
-                CHECK_RESULT_ERROR,
-                'SlapdConfig',
-                check_output='Error getting local configuration on %r: %s' % (
-                    self._ldapi_conn._uri,
-                    exc,
-                ),
-            )
-            self.result(
-                CHECK_RESULT_UNKNOWN,
-                'SlapdCert',
-                check_output='Server cert not known => cannot determine validity',
-            )
-        else:
-            self.result(
-                CHECK_RESULT_OK,
-                'SlapdConfig',
-                check_output='Successfully connected to %r as %r found %r and %r' % (
-                    self._ldapi_conn._uri,
-                    local_wai,
-                    self._ldapi_conn.configContext[0],
-                    self._ldapi_conn.monitorContext[0],
-                )
-            )
-            _, self._config_attrs = self._ldapi_conn.search_ext_s(
-                self._ldapi_conn.configContext[0],
-                ldap.SCOPE_BASE,
-                '(objectClass=*)',
-                [
-                    'olcSaslHost',
-                    'olcTLSCACertificateFile',
-                    'olcTLSCertificateFile',
-                    'olcTLSCertificateKeyFile',
-                ],
-            )[0]
-
-            try:
-                olc_sasl_host = self._config_attrs['olcSaslHost'][0]
-            except (KeyError, IndexError):
-                self.result(
-                    CHECK_RESULT_OK,
-                    'SlapdSASLHostname',
-                    check_output='olcSaslHost not set'
-                )
-            else:
-                try:
-                    _ = socket.getaddrinfo(olc_sasl_host, None)
-                except socket.gaierror, socket_err:
-                    self.result(
-                        CHECK_RESULT_WARNING,
-                        'SlapdSASLHostname',
-                        check_output='olcSaslHost %r not found: %r' % (olc_sasl_host, socket_err),
-                    )
-                else:
-                    self.result(
-                        CHECK_RESULT_OK,
-                        'SlapdSASLHostname',
-                        check_output='olcSaslHost %r found' % (olc_sasl_host),
-                    )
-
-            self._check_cert_validity(self._config_attrs)
-
-        syncrepl_topology = {}
-        try:
-            syncrepl_list, syncrepl_topology = self._ldapi_conn.get_syncrepl_topology()
-        except CATCH_ALL_EXC, exc:
-            self.result(
-                CHECK_RESULT_ERROR,
-                'SlapdReplTopology',
-                check_output='Error getting syncrepl topology on %r: %s' % (
-                    self._ldapi_conn._uri,
-                    exc,
-                ),
-            )
-        else:
-            self.result(
-                CHECK_RESULT_OK,
-                'SlapdReplTopology',
-                check_output='successfully retrieved syncrepl topology with %d items: %s' % (
-                    len(syncrepl_topology),
-                    syncrepl_topology,
-                )
-            )
-
-        # 1. Read several data from cn=Monitor
-        #----------------------------------------------------------------------
-
-        monitor_dict = {}
-        try:
-            monitor_dict = self._ldapi_conn.get_monitor_entries()
-
-            self._monitor_cache = OpenLDAPMonitorCache(
-                monitor_dict,
-                self._ldapi_conn.monitorContext[0],
-            )
-        except CATCH_ALL_EXC, exc:
-            self.result(
-                CHECK_RESULT_ERROR,
-                'SlapdMonitor',
-                check_output='Error getting local monitor data on %r: %s' % (
-                    self._ldapi_conn._uri,
-                    exc,
-                ),
-            )
-        else:
-            self.result(
-                CHECK_RESULT_OK,
-                'SlapdMonitor',
-                check_output='Successfully retrieved %d entries from %r on %r' % (
-                    len(monitor_dict),
-                    self._ldapi_conn.monitorContext[0],
-                    self._ldapi_conn._uri,
-                ),
-            )
-
-        self._check_slapd_start()
-        self._check_conns()
-        self._check_threads()
-        self._check_slapd_sock()
-
+    def _check_databases(self):
         try:
             db_suffixes = self._ldapi_conn.db_suffixes()
         except CATCH_ALL_EXC, exc:
@@ -1566,22 +1433,12 @@ class SlapdCheck(LocalCheck):
                                     noop_response_time,
                                 )
                             )
+        return # end of _check_databases()
 
-        self._get_slapd_perfstats()
-
-        local_csn_dict = self._get_local_csns(syncrepl_list)
-
-        # Close LDAPI connection
-        self._ldapi_conn.unbind_s()
-
-        self._check_local_ldaps(ldaps_uri, my_authz_id)
-
-        # Write current state to disk
-        self._state.write_state(self._next_state)
-
-        # 2. Connect and bind to all replicas to check whether they are reachable
-        #----------------------------------------------------------------------
-
+    def _check_providers(self, syncrepl_topology):
+        """
+        test connection to each provider
+        """
         remote_csn_dict = {}
         syncrepl_target_fail_msgs = []
 
@@ -1631,16 +1488,14 @@ class SlapdCheck(LocalCheck):
                 remote_csn_dict[ldap_conn._uri.lower()] = {}
                 syncrepl_target_uri = ldap_conn._uri.lower()
 
-            item_name = '_'.join((
-                'SlapdContextCSN',
-                self.subst_item_name_chars(syncrepl_target_hostport),
-                str(db_num),
-                self.subst_item_name_chars(db_suffix),
-            ))
-            self.add_item(item_name)
-
             for db_num, db_suffix, _ in syncrepl_topology[syncrepl_target_uri]:
-
+                item_name = '_'.join((
+                    'SlapdContextCSN',
+                    self.subst_item_name_chars(syncrepl_target_hostport),
+                    str(db_num),
+                    self.subst_item_name_chars(db_suffix),
+                ))
+                self.add_item(item_name)
                 try:
                     remote_csn_dict[syncrepl_target_uri][db_suffix] = \
                         ldap_conn.get_context_csn(db_suffix)
@@ -1675,7 +1530,6 @@ class SlapdCheck(LocalCheck):
                                 ldap_conn._uri,
                             )
                         )
-
             # Close the LDAP connection to the remote replica
             try:
                 ldap_conn.unbind_s()
@@ -1706,6 +1560,153 @@ class SlapdCheck(LocalCheck):
                     len(syncrepl_topology),
                 ),
             )
+        return remote_csn_dict # end of _check_providers()
+
+    def checks(self):
+
+        # Get command-line arguments
+        ldaps_uri = sys.argv[2] or 'ldaps://%s' % socket.getfqdn()
+        my_authz_id = sys.argv[3]
+
+        local_wai = self._open_ldapi_conn(sys.argv[1] or 'ldapi:///')
+
+        # read cn=config and cn=monitor
+        #----------------------------------------------------------------------
+
+        try:
+            _ = self._ldapi_conn.get_naming_context_attrs()
+        except CATCH_ALL_EXC, exc:
+            self.result(
+                CHECK_RESULT_ERROR,
+                'SlapdConfig',
+                check_output='Error getting local configuration on %r: %s' % (
+                    self._ldapi_conn._uri,
+                    exc,
+                ),
+            )
+        else:
+            self.result(
+                CHECK_RESULT_OK,
+                'SlapdConfig',
+                check_output='Successfully connected to %r as %r found %r and %r' % (
+                    self._ldapi_conn._uri,
+                    local_wai,
+                    self._ldapi_conn.configContext[0],
+                    self._ldapi_conn.monitorContext[0],
+                )
+            )
+            _, self._config_attrs = self._ldapi_conn.search_ext_s(
+                self._ldapi_conn.configContext[0],
+                ldap.SCOPE_BASE,
+                '(objectClass=*)',
+                [
+                    'olcSaslHost',
+                    'olcTLSCACertificateFile',
+                    'olcTLSCertificateFile',
+                    'olcTLSCertificateKeyFile',
+                ],
+            )[0]
+
+            try:
+                olc_sasl_host = self._config_attrs['olcSaslHost'][0]
+            except (KeyError, IndexError):
+                self.result(
+                    CHECK_RESULT_OK,
+                    'SlapdSASLHostname',
+                    check_output='olcSaslHost not set'
+                )
+            else:
+                try:
+                    _ = socket.getaddrinfo(olc_sasl_host, None)
+                except socket.gaierror, socket_err:
+                    self.result(
+                        CHECK_RESULT_WARNING,
+                        'SlapdSASLHostname',
+                        check_output='olcSaslHost %r not found: %r' % (olc_sasl_host, socket_err),
+                    )
+                else:
+                    self.result(
+                        CHECK_RESULT_OK,
+                        'SlapdSASLHostname',
+                        check_output='olcSaslHost %r found' % (olc_sasl_host),
+                    )
+
+            self._check_cert_validity(self._config_attrs)
+
+        syncrepl_topology = {}
+        try:
+            syncrepl_list, syncrepl_topology = self._ldapi_conn.get_syncrepl_topology()
+        except CATCH_ALL_EXC, exc:
+            self.result(
+                CHECK_RESULT_ERROR,
+                'SlapdReplTopology',
+                check_output='Error getting syncrepl topology on %r: %s' % (
+                    self._ldapi_conn._uri,
+                    exc,
+                ),
+            )
+        else:
+            self.result(
+                CHECK_RESULT_OK,
+                'SlapdReplTopology',
+                check_output='successfully retrieved syncrepl topology with %d items: %s' % (
+                    len(syncrepl_topology),
+                    syncrepl_topology,
+                )
+            )
+
+        # 1. Read several data from cn=Monitor
+        #----------------------------------------------------------------------
+
+        monitor_dict = {}
+        try:
+            monitor_dict = self._ldapi_conn.get_monitor_entries()
+
+            self._monitor_cache = OpenLDAPMonitorCache(
+                monitor_dict,
+                self._ldapi_conn.monitorContext[0],
+            )
+        except CATCH_ALL_EXC, exc:
+            self.result(
+                CHECK_RESULT_ERROR,
+                'SlapdMonitor',
+                check_output='Error getting local monitor data on %r: %s' % (
+                    self._ldapi_conn._uri,
+                    exc,
+                ),
+            )
+        else:
+            self.result(
+                CHECK_RESULT_OK,
+                'SlapdMonitor',
+                check_output='Successfully retrieved %d entries from %r on %r' % (
+                    len(monitor_dict),
+                    self._ldapi_conn.monitorContext[0],
+                    self._ldapi_conn._uri,
+                ),
+            )
+
+        self._check_slapd_start()
+        self._check_conns()
+        self._check_threads()
+        self._check_slapd_sock()
+        self._check_databases()
+        self._get_slapd_perfstats()
+
+        local_csn_dict = self._get_local_csns(syncrepl_list)
+
+        # Close LDAPI connection
+        self._ldapi_conn.unbind_s()
+
+        self._check_local_ldaps(ldaps_uri, my_authz_id)
+
+        # Write current state to disk
+        self._state.write_state(self._next_state)
+
+        # 2. Connect and bind to all replicas to check whether they are reachable
+        #----------------------------------------------------------------------
+
+        remote_csn_dict = self._check_providers(syncrepl_topology)
 
         state = CHECK_RESULT_WARNING
 
