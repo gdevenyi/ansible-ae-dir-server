@@ -1682,9 +1682,14 @@ class SlapdCheck(LocalCheck):
             except CATCH_ALL_EXC, exc:
                 pass
 
-        if syncrepl_target_fail_msgs:
+        if syncrepl_target_fail_msgs or \
+           len(remote_csn_dict) < len(syncrepl_topology):
+            if float(len(remote_csn_dict))/float(len(syncrepl_topology)) >= 0.5:
+                check_result = CHECK_RESULT_WARNING
+            else:
+                check_result = CHECK_RESULT_ERROR
             self.result(
-                CHECK_RESULT_OK,
+                check_result,
                 'SlapdProviders',
                 check_output='Only connected to %d of %d providers: %s' % (
                     len(remote_csn_dict),
