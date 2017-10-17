@@ -466,7 +466,12 @@ class OpenLDAPMonitorCache(object):
         """
         Get a single monitoring value from entry cache
         """
-        return int(self._data[','.join((dn_prefix, self._ctx))][attribute][0])
+        attr_value = self._data[','.join((dn_prefix, self._ctx))][attribute][0]
+        if attribute == 'monitorTimestamp':
+            res = datetime.datetime.strptime(attr_value, '%Y%m%d%H%M%SZ')
+        else:
+            res = int(attr_value)
+        return res # end of get_value()
 
     def bdb_caches(self):
         """
@@ -561,6 +566,7 @@ class OpenLDAPObject:
         'monitoredInfo',
         'monitorOpCompleted',
         'monitorOpInitiated',
+        'monitorTimestamp',
         'namingContexts'
         'seeAlso',
     ]
@@ -830,12 +836,12 @@ class SlapdCheck(LocalCheck):
     Check class for OpenLDAP's slapd
     """
     item_names = (
-        'SlapdBdbCaches',
         'SlapdCert',
         'SlapdConfig',
         'SlapdMonitor',
         'SlapdConns',
         'SlapdDatabases',
+        'SlapdStart',
         'SlapdOps',
         'SlapdProviders',
         'SlapdReplTopology',
@@ -848,8 +854,10 @@ class SlapdCheck(LocalCheck):
 
     def __init__(self, output_file, state_filename=None):
         LocalCheck.__init__(self, output_file, state_filename)
+        # make pylint happy
         self._ldapi_conn = None
         self._config_attrs = None
+        self._monitor_cache = None
 
     def _check_cert_validity(self, config_attrs):
         server_cert_pathname = config_attrs['olcTLSCertificateFile'][0]
@@ -1042,6 +1050,22 @@ class SlapdCheck(LocalCheck):
                     )
         return # end of _check_slapd_sock()
 
+    def _check_slapd_start(self):
+        """
+        check whether slapd should be restarted
+        """
+        start_time = self._monitor_cache.get_value('cn=Start,cn=Time', 'monitorTimestamp')
+        utc_now = datetime.datetime.now()
+        self.result(
+            CHECK_RESULT_OK,
+            'SlapdStart',
+            check_output='Slapd started at %s, %s ago' % (
+                start_time,
+                utc_now-start_time,
+            )
+        )
+        return # end of _check_slapd_start()
+
     def _get_local_csns(self, syncrepl_list):
         local_csn_dict = {}
         for db_num, db_suffix, _ in syncrepl_list:
@@ -1093,6 +1117,189 @@ class SlapdCheck(LocalCheck):
             )
             sys.exit(1)
         return local_wai # end of _open_ldapi_conn()
+
+    def _check_conns(self):
+        """
+        check whether current connection count is healthy
+        """
+        current_connections = self._monitor_cache.get_value(
+            'cn=Current,cn=Connections',
+            'monitorCounter',
+        )
+        # We expect one per existing machine, plus a low number for web2ldap,
+        # equally distributed over the nodes:
+        state = CHECK_RESULT_WARNING * int(
+            current_connections < CONNECTIONS_WARN_LOWER or
+            current_connections > CONNECTIONS_WARN_UPPER
+        )
+        self.result(
+            state,
+            'SlapdConns',
+            performance_data='count=%d' % (current_connections),
+            check_output='%d open connections' % (current_connections),
+        )
+        return # end of _check_conns()
+
+    def _check_threads(self):
+        """
+        check whether current thread count is healthy
+        """
+        threads_active = self._monitor_cache.get_value(
+            'cn=Active,cn=Threads',
+            'monitoredInfo',
+        )
+        threads_pending = self._monitor_cache.get_value(
+            'cn=Pending,cn=Threads',
+            'monitoredInfo',
+        )
+        state = int(
+            threads_active < THREADS_ACTIVE_WARN_LOWER or
+            threads_active > THREADS_ACTIVE_WARN_UPPER or
+            threads_pending > THREADS_PENDING_WARN
+        )
+        self.result(
+            state,
+            'SlapdThreads',
+            performance_data='threads_active=%d|threads_pending=%d' % (
+                threads_active, threads_pending),
+            check_output='Thread counts active:%d pending: %d' % (
+                threads_active, threads_pending)
+        )
+        return # end of _check_threads()
+
+    def _get_slapd_perfstats(self):
+        """
+        Get operation counters
+        """
+        # For rate calculation we need the timespan since last run
+        ops_counter_time = time.time()
+        last_ops_counter_time = float(
+            self._state.data.get(
+                'ops_counter_time',
+                ops_counter_time-60.0
+            )
+        )
+        last_time_span = ops_counter_time - last_ops_counter_time
+        self._next_state['ops_counter_time'] = ops_counter_time
+        try:
+            stats_bytes = self._monitor_cache.get_value(
+                'cn=Bytes,cn=Statistics', 'monitorCounter')
+            stats_entries = self._monitor_cache.get_value(
+                'cn=Entries,cn=Statistics', 'monitorCounter')
+            stats_pdu = self._monitor_cache.get_value(
+                'cn=PDU,cn=Statistics', 'monitorCounter')
+            stats_referrals = self._monitor_cache.get_value(
+                'cn=Referrals,cn=Statistics', 'monitorCounter')
+        except CATCH_ALL_EXC, exc:
+            self.result(
+                CHECK_RESULT_ERROR,
+                'SlapdStats',
+                check_output='Error while retrieving stats counters: %s' % (exc)
+            )
+        else:
+            stats_bytes_rate = (stats_bytes - int(self._state.data.get('stats_bytes', '0'))) / last_time_span
+            stats_entries_rate = (stats_entries - int(self._state.data.get('stats_entries', '0'))) / last_time_span
+            stats_pdu_rate = (stats_pdu - int(self._state.data.get('stats_pdu', '0'))) / last_time_span
+            stats_referrals_rate = (stats_referrals - int(self._state.data.get('stats_referrals', '0'))) / last_time_span
+            self._next_state['stats_bytes'] = stats_bytes
+            self._next_state['stats_entries'] = stats_entries
+            self._next_state['stats_pdu'] = stats_pdu
+            self._next_state['stats_referrals'] = stats_referrals
+            self.result(
+                CHECK_RESULT_OK,
+                'SlapdStats',
+                performance_data='bytes=%d|entries=%d|pdu=%d|referrals=%d' % (
+                    stats_bytes_rate,
+                    stats_entries_rate,
+                    stats_pdu_rate,
+                    stats_referrals_rate,
+                ),
+                check_output='Stats: %d bytes (%0.1f bytes/sec) / %d entries (%0.1f entries/sec) / %d PDUs (%0.1f PDUs/sec) / %d referrals (%0.1f referrals/sec)' % (
+                    stats_bytes,
+                    stats_bytes_rate,
+                    stats_entries,
+                    stats_entries_rate,
+                    stats_pdu,
+                    stats_pdu_rate,
+                    stats_referrals,
+                    stats_referrals_rate,
+                )
+            )
+        try:
+            monitor_ops_counters = self._monitor_cache.operation_counters()
+        except CATCH_ALL_EXC, exc:
+            self.result(
+                CHECK_RESULT_ERROR,
+                'SlapdOps',
+                check_output='error retrieving operation counters: %s' % (exc)
+            )
+        else:
+            if monitor_ops_counters:
+                ops_all_initiated = 0
+                ops_all_completed = 0
+                old_ops_all_initiated = 0
+                old_ops_all_completed = 0
+                ops_all_waiting = 0
+                for ops_name, ops_initiated, ops_completed in monitor_ops_counters:
+                    item_name = 'SlapdOps_%s' % (ops_name)
+                    self.add_item(item_name)
+                    old_ops_initiated = int(self._state.data.get(ops_name+'_ops_initiated', '0'))
+                    old_ops_all_initiated += old_ops_initiated
+                    old_ops_completed = int(self._state.data.get(ops_name+'_ops_completed', '0'))
+                    old_ops_all_completed += old_ops_completed
+                    self._next_state[ops_name+'_ops_initiated'] = ops_initiated
+                    self._next_state[ops_name+'_ops_completed'] = ops_completed
+                    ops_waiting = ops_initiated - ops_completed
+                    ops_all_waiting += ops_waiting
+                    ops_all_completed += ops_completed
+                    ops_all_initiated += ops_initiated
+                    ops_initiated_rate = max(0, ops_initiated - old_ops_initiated) / last_time_span
+                    ops_completed_rate = max(0, ops_completed - old_ops_completed) / last_time_span
+                    self.result(
+                        CHECK_RESULT_OK,
+                        item_name,
+                        performance_data='ops_completed_rate=%0.2f|ops_initiated_rate=%0.2f|ops_waiting=%d' % (
+                            ops_completed_rate,
+                            ops_initiated_rate,
+                            ops_waiting,
+                        ),
+                        check_output='completed %d of %d operations (%0.2f/s completed, %0.2f/s initiated, %d waiting)' % (
+                            ops_completed,
+                            ops_initiated,
+                            ops_completed_rate,
+                            ops_initiated_rate,
+                            ops_waiting,
+                        ),
+                    )
+                ops_all_initiated_rate = max(0, ops_all_initiated-old_ops_all_initiated) / last_time_span
+                ops_all_completed_rate = max(0, ops_all_completed-old_ops_all_completed) / last_time_span
+                if OPS_WAITING_CRIT != None and ops_all_waiting > OPS_WAITING_CRIT:
+                    state = CHECK_RESULT_ERROR
+                elif OPS_WAITING_WARN != None and ops_all_waiting > OPS_WAITING_WARN:
+                    state = CHECK_RESULT_WARNING
+                else:
+                    state = CHECK_RESULT_OK
+                self.result(
+                    state, 'SlapdOps',
+                    performance_data='ops_completed_rate=%0.2f|ops_initiated_rate=%0.2f|ops_waiting=%d' % (
+                        ops_all_completed_rate, ops_all_initiated_rate, ops_all_waiting,
+                    ),
+                    check_output='%d operation types / completed %d of %d operations (%0.2f/s completed, %0.2f/s initiated, %d waiting)' % (
+                        len(monitor_ops_counters),
+                        ops_all_completed,
+                        ops_all_initiated,
+                        ops_all_completed_rate,
+                        ops_all_initiated_rate,
+                        ops_all_waiting,
+                    ),
+                )
+            else:
+                self.result(
+                    CHECK_RESULT_UNKNOWN,
+                    'SlapdOps',
+                    check_output='empty operation counter list',
+                )
+        return # end of _get_slapd_perfstats()
 
     def checks(self):
 
@@ -1198,6 +1405,11 @@ class SlapdCheck(LocalCheck):
         monitor_dict = {}
         try:
             monitor_dict = self._ldapi_conn.get_monitor_entries()
+
+            self._monitor_cache = OpenLDAPMonitorCache(
+                monitor_dict,
+                self._ldapi_conn.monitorContext[0],
+            )
         except CATCH_ALL_EXC, exc:
             self.result(
                 CHECK_RESULT_ERROR,
@@ -1218,100 +1430,9 @@ class SlapdCheck(LocalCheck):
                 ),
             )
 
-        try:
-            monitor_cache = OpenLDAPMonitorCache(
-                monitor_dict,
-                self._ldapi_conn.monitorContext[0],
-            )
-            current_connections = monitor_cache.get_value(
-                'cn=Current,cn=Connections',
-                'monitorCounter',
-            )
-            # We expect one per existing machine, plus a low number for web2ldap,
-            # equally distributed over the nodes:
-            state = CHECK_RESULT_WARNING * int(
-                current_connections < CONNECTIONS_WARN_LOWER or
-                current_connections > CONNECTIONS_WARN_UPPER
-            )
-            self.result(
-                state,
-                'SlapdConns',
-                performance_data='count=%d' % (current_connections),
-                check_output='%d open connections' % (current_connections),
-            )
-        except CATCH_ALL_EXC, exc:
-            self.result(
-                CHECK_RESULT_ERROR,
-                'SlapdConns',
-                check_output='error retrieving connection counter: %s' % (exc)
-            )
-
-        try:
-            threads_active = monitor_cache.get_value(
-                'cn=Active,cn=Threads',
-                'monitoredInfo',
-            )
-            threads_pending = monitor_cache.get_value(
-                'cn=Pending,cn=Threads',
-                'monitoredInfo',
-            )
-        except CATCH_ALL_EXC, exc:
-            self.result(
-                CHECK_RESULT_ERROR,
-                'SlapdThreads',
-                check_output='Error while retrieving thread counters: %s' % (exc),
-            )
-        else:
-            state = int(
-                threads_active < THREADS_ACTIVE_WARN_LOWER or
-                threads_active > THREADS_ACTIVE_WARN_UPPER or
-                threads_pending > THREADS_PENDING_WARN
-            )
-            self.result(
-                state,
-                'SlapdThreads',
-                performance_data='threads_active=%d|threads_pending=%d' % (
-                    threads_active, threads_pending),
-                check_output='Thread counts active:%d pending: %d' % (
-                    threads_active, threads_pending)
-            )
-
-        try:
-            hdb_caches = monitor_cache.bdb_caches()
-        except CATCH_ALL_EXC, exc:
-            self.result(
-                CHECK_RESULT_ERROR,
-                'SlapdBdbCaches',
-                check_output='error retrieving HDB caches: %s' % (exc)
-            )
-        else:
-            self.result(
-                CHECK_RESULT_OK,
-                'SlapdBdbCaches',
-                check_output='Found %d BDB/HDB database entries.' % (len(hdb_caches))
-            )
-            for db_num, db_suffix, bdb_dn_cache, bdb_entry_cache, bdb_idl_cache in hdb_caches:
-                item_name = '_'.join((
-                    'SlapdBdbCache',
-                    str(db_num),
-                    self.subst_item_name_chars(db_suffix),
-                ))
-                self.add_item(item_name)
-                self.result(
-                    CHECK_RESULT_OK,
-                    item_name,
-                    performance_data='bdb_dn_cache=%d|bdb_entry_cache=%d|bdb_idl_cache=%d' % (
-                        bdb_dn_cache, bdb_entry_cache, bdb_idl_cache,
-                    ),
-                    check_output='BDB %d cache %r: DN=%d entry=%d IDL=%d' % (
-                        db_num,
-                        db_suffix,
-                        bdb_dn_cache,
-                        bdb_entry_cache,
-                        bdb_idl_cache,
-                    )
-                )
-
+        self._check_slapd_start()
+        self._check_conns()
+        self._check_threads()
         self._check_slapd_sock()
 
         try:
@@ -1462,137 +1583,7 @@ class SlapdCheck(LocalCheck):
                                 )
                             )
 
-        # For rate calculation we need the timespan since last run
-        ops_counter_time = time.time()
-        last_ops_counter_time = float(
-            self._state.data.get(
-                'ops_counter_time',
-                ops_counter_time-60.0
-            )
-        )
-        last_time_span = ops_counter_time - last_ops_counter_time
-        self._next_state['ops_counter_time'] = ops_counter_time
-
-        try:
-            stats_bytes = monitor_cache.get_value(
-                'cn=Bytes,cn=Statistics', 'monitorCounter')
-            stats_entries = monitor_cache.get_value(
-                'cn=Entries,cn=Statistics', 'monitorCounter')
-            stats_pdu = monitor_cache.get_value(
-                'cn=PDU,cn=Statistics', 'monitorCounter')
-            stats_referrals = monitor_cache.get_value(
-                'cn=Referrals,cn=Statistics', 'monitorCounter')
-        except CATCH_ALL_EXC, exc:
-            self.result(
-                CHECK_RESULT_ERROR,
-                'SlapdStats',
-                check_output='Error while retrieving stats counters: %s' % (exc)
-            )
-        else:
-            stats_bytes_rate = (stats_bytes - int(self._state.data.get('stats_bytes', '0'))) / last_time_span
-            stats_entries_rate = (stats_entries - int(self._state.data.get('stats_entries', '0'))) / last_time_span
-            stats_pdu_rate = (stats_pdu - int(self._state.data.get('stats_pdu', '0'))) / last_time_span
-            stats_referrals_rate = (stats_referrals - int(self._state.data.get('stats_referrals', '0'))) / last_time_span
-            self._next_state['stats_bytes'] = stats_bytes
-            self._next_state['stats_entries'] = stats_entries
-            self._next_state['stats_pdu'] = stats_pdu
-            self._next_state['stats_referrals'] = stats_referrals
-            self.result(
-                CHECK_RESULT_OK,
-                'SlapdStats',
-                performance_data='bytes=%d|entries=%d|pdu=%d|referrals=%d' % (
-                    stats_bytes_rate,
-                    stats_entries_rate,
-                    stats_pdu_rate,
-                    stats_referrals_rate,
-                ),
-                check_output='Stats: %d bytes (%0.1f bytes/sec) / %d entries (%0.1f entries/sec) / %d PDUs (%0.1f PDUs/sec) / %d referrals (%0.1f referrals/sec)' % (
-                    stats_bytes,
-                    stats_bytes_rate,
-                    stats_entries,
-                    stats_entries_rate,
-                    stats_pdu,
-                    stats_pdu_rate,
-                    stats_referrals,
-                    stats_referrals_rate,
-                )
-            )
-
-        try:
-            monitor_ops_counters = monitor_cache.operation_counters()
-        except CATCH_ALL_EXC, exc:
-            self.result(
-                CHECK_RESULT_ERROR,
-                'SlapdOps',
-                check_output='error retrieving operation counters: %s' % (exc)
-            )
-        else:
-            if monitor_ops_counters:
-                ops_all_initiated = 0
-                ops_all_completed = 0
-                old_ops_all_initiated = 0
-                old_ops_all_completed = 0
-                ops_all_waiting = 0
-                for ops_name, ops_initiated, ops_completed in monitor_ops_counters:
-                    item_name = 'SlapdOps_%s' % (ops_name)
-                    self.add_item(item_name)
-                    old_ops_initiated = int(self._state.data.get(ops_name+'_ops_initiated', '0'))
-                    old_ops_all_initiated += old_ops_initiated
-                    old_ops_completed = int(self._state.data.get(ops_name+'_ops_completed', '0'))
-                    old_ops_all_completed += old_ops_completed
-                    self._next_state[ops_name+'_ops_initiated'] = ops_initiated
-                    self._next_state[ops_name+'_ops_completed'] = ops_completed
-                    ops_waiting = ops_initiated - ops_completed
-                    ops_all_waiting += ops_waiting
-                    ops_all_completed += ops_completed
-                    ops_all_initiated += ops_initiated
-                    ops_initiated_rate = max(0, ops_initiated - old_ops_initiated) / last_time_span
-                    ops_completed_rate = max(0, ops_completed - old_ops_completed) / last_time_span
-                    self.result(
-                        CHECK_RESULT_OK,
-                        item_name,
-                        performance_data='ops_completed_rate=%0.2f|ops_initiated_rate=%0.2f|ops_waiting=%d' % (
-                            ops_completed_rate,
-                            ops_initiated_rate,
-                            ops_waiting,
-                        ),
-                        check_output='completed %d of %d operations (%0.2f/s completed, %0.2f/s initiated, %d waiting)' % (
-                            ops_completed,
-                            ops_initiated,
-                            ops_completed_rate,
-                            ops_initiated_rate,
-                            ops_waiting,
-                        ),
-                    )
-                ops_all_initiated_rate = max(0, ops_all_initiated-old_ops_all_initiated) / last_time_span
-                ops_all_completed_rate = max(0, ops_all_completed-old_ops_all_completed) / last_time_span
-                if OPS_WAITING_CRIT != None and ops_all_waiting > OPS_WAITING_CRIT:
-                    state = CHECK_RESULT_ERROR
-                elif OPS_WAITING_WARN != None and ops_all_waiting > OPS_WAITING_WARN:
-                    state = CHECK_RESULT_WARNING
-                else:
-                    state = CHECK_RESULT_OK
-                self.result(
-                    state, 'SlapdOps',
-                    performance_data='ops_completed_rate=%0.2f|ops_initiated_rate=%0.2f|ops_waiting=%d' % (
-                        ops_all_completed_rate, ops_all_initiated_rate, ops_all_waiting,
-                    ),
-                    check_output='%d operation types / completed %d of %d operations (%0.2f/s completed, %0.2f/s initiated, %d waiting)' % (
-                        len(monitor_ops_counters),
-                        ops_all_completed,
-                        ops_all_initiated,
-                        ops_all_completed_rate,
-                        ops_all_initiated_rate,
-                        ops_all_waiting,
-                    ),
-                )
-
-            else:
-                self.result(
-                    CHECK_RESULT_UNKNOWN,
-                    'SlapdOps',
-                    check_output='empty operation counter list',
-                )
+        self._get_slapd_perfstats()
 
         local_csn_dict = self._get_local_csns(syncrepl_list)
 
@@ -1608,22 +1599,14 @@ class SlapdCheck(LocalCheck):
         #----------------------------------------------------------------------
 
         remote_csn_dict = {}
+        syncrepl_target_fail_msgs = []
 
         for syncrepl_target_uri in syncrepl_topology.keys():
 
             syncrepl_target_lu_obj = LDAPUrl(syncrepl_target_uri)
-            # FIX ME! Does not hurt here, but in theory TLS options could
-            # differ for each syncrepl statement!
             syncrepl_obj = syncrepl_topology[syncrepl_target_uri][0][2]
             syncrepl_target_hostport = syncrepl_target_lu_obj.hostport.lower()
-            syncrepl_target_hostname = syncrepl_target_hostport.rsplit(
-                ':', 1)[0]
-            item_name = 'SlapdConn_%s' % (
-                self.subst_item_name_chars(syncrepl_target_hostport)
-            )
-            self.add_item(item_name)
-
-            remote_csn_dict[syncrepl_target_uri] = {}
+            syncrepl_target_hostname = syncrepl_target_hostport.rsplit(':', 1)[0]
 
             # Resolve hostname separately for fine-grained error message
             try:
@@ -1631,14 +1614,10 @@ class SlapdCheck(LocalCheck):
                     syncrepl_target_hostname
                 )
             except CATCH_ALL_EXC, exc:
-                self.result(
-                    CHECK_RESULT_ERROR,
-                    item_name,
-                    check_output='Error resolving hostname %r: %s' % (
-                        syncrepl_target_hostname,
-                        exc,
-                    ),
-                )
+                syncrepl_target_fail_msgs.append('Error resolving hostname %r: %s' % (
+                    syncrepl_target_hostname,
+                    exc,
+                ))
                 continue
 
             try:
@@ -1658,26 +1637,13 @@ class SlapdCheck(LocalCheck):
                     timeout=float(syncrepl_obj.timeout) or LDAP_TIMEOUT,
                 )
             except CATCH_ALL_EXC, exc:
-                self.result(
-                    CHECK_RESULT_ERROR,
-                    item_name,
-                    check_output='Error initializing connection to %r (%s): %s' % (
-                        syncrepl_target_uri,
-                        syncrepl_target_ipaddr,
-                        exc,
-                    ),
-                )
+                syncrepl_target_fail_msgs.append('Error connecting to %r (%s): %s' % (
+                    syncrepl_target_uri,
+                    syncrepl_target_ipaddr,
+                    exc,
+                ))
                 continue
             else:
-                self.result(
-                    CHECK_RESULT_OK,
-                    item_name,
-                    check_output='Successfully connected to provider %r (%s) as %r' % (
-                        syncrepl_target_uri,
-                        syncrepl_target_ipaddr,
-                        ldap_conn.whoami_s(),
-                    ),
-                )
                 remote_csn_dict[ldap_conn._uri.lower()] = {}
                 syncrepl_target_uri = ldap_conn._uri.lower()
 
@@ -1731,6 +1697,27 @@ class SlapdCheck(LocalCheck):
                 ldap_conn.unbind_s()
             except CATCH_ALL_EXC, exc:
                 pass
+
+        if syncrepl_target_fail_msgs:
+            self.result(
+                CHECK_RESULT_OK,
+                'SlapdProviders',
+                check_output='Only connected to %d of %d providers: %s' % (
+                    len(remote_csn_dict),
+                    len(syncrepl_topology),
+                    ' / '.join(syncrepl_target_fail_msgs),
+                ),
+            )
+        else:
+            self.result(
+                CHECK_RESULT_OK,
+                'SlapdProviders',
+                check_output='Successfully connected to %d of %d providers: %s' % (
+                    len(remote_csn_dict),
+                    len(syncrepl_topology),
+                    ','.join(remote_csn_dict.keys()),
+                ),
+            )
 
         state = CHECK_RESULT_WARNING
 
