@@ -514,7 +514,7 @@ class OpenLDAPObject:
     mix-in class for LDAPObject and friends which provides methods useful
     for OpenLDAP's slapd
     """
-    syncrepl_filter=(
+    syncrepl_filter = (
         '(&'
           '(objectClass=olcDatabaseConfig)'
           '(olcDatabase=*)'
@@ -548,14 +548,14 @@ class OpenLDAPObject:
             '(olcSuffix=*)'
         ')'
     )
-    all_monitor_entries_filter=(
+    all_monitor_entries_filter = (
         '(|'
           '(objectClass=monitorOperation)'
           '(objectClass=monitoredObject)'
           '(objectClass=monitorCounterObject)'
         ')'
     )
-    all_monitor_entries_attrs=[
+    all_monitor_entries_attrs = [
         'cn',
         'monitorCounter',
         'monitoredInfo',
@@ -837,6 +837,7 @@ class SlapdCheck(LocalCheck):
         'SlapdConns',
         'SlapdDatabases',
         'SlapdOps',
+        'SlapdProviders',
         'SlapdReplTopology',
         'SlapdSASLHostname',
         'SlapdSelfConn',
@@ -845,6 +846,11 @@ class SlapdCheck(LocalCheck):
         'SlapdThreads',
     )
 
+    def __init__(self, output_file, state_filename=None):
+        LocalCheck.__init__(self, output_file, state_filename)
+        self._ldapi_conn = None
+        self._config_attrs = None
+
     def _check_cert_validity(self, config_attrs):
         server_cert_pathname = config_attrs['olcTLSCertificateFile'][0]
         if not CRYPTOGRAPHY_AVAIL and not M2CRYPTO_AVAIL:
@@ -852,7 +858,9 @@ class SlapdCheck(LocalCheck):
             self.result(
                 CHECK_RESULT_UNKNOWN,
                 'SlapdCert',
-                check_output='no crypto modules present => could not check validity of %r' % (server_cert_pathname),
+                check_output='no crypto modules present => could not check validity of %r' % (
+                    server_cert_pathname
+                ),
             )
             return
         server_cert_pem = open(server_cert_pathname, 'rb').read()
@@ -955,6 +963,44 @@ class SlapdCheck(LocalCheck):
         return # end of _check_local_ldaps()
 
     def _check_slapd_sock(self):
+        """
+        Send MONITOR request to all back-sock listeners
+        """
+        def _read_sock_monitor(sock_path):
+            """
+            Send MONITOR request to Unix domain socket in `sock_path'
+            """
+            _sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            _sock.connect(sock_path)
+            _sock.settimeout(SLAPD_SOCK_TIMEOUT)
+            _sock_f = _sock.makefile()
+            _sock_f.write('MONITOR\n')
+            _sock_f.flush()
+            return _sock_f.read() # end of _read_sock_monitor
+
+        def _parse_sock_response(sock_response):
+            # strip ENTRY\n from response and parse the rest as LDIF
+            _, sock_monitor_entry = ParseLDIF(
+                StringIO(sock_response[6:]),
+                ignore_attrs=['sockLogLevel'],
+                maxentries=1
+            )[0]
+            sock_perf_data = []
+            # only add numeric monitor data to performance metrics
+            for metric_key in sorted(sock_monitor_entry.keys()):
+                try:
+                    float(sock_monitor_entry[metric_key][0])
+                except ValueError:
+                    continue
+                else:
+                    sock_perf_data.append(
+                        u'%s=%s' % (
+                            metric_key,
+                            sock_monitor_entry[metric_key][0],
+                        )
+                    )
+            return sock_perf_data # end of _parse_sock_response()
+
         try:
             sock_listeners = self._ldapi_conn.get_sock_listeners()
         except CATCH_ALL_EXC, exc:
@@ -969,17 +1015,11 @@ class SlapdCheck(LocalCheck):
                 'SlapdSock',
                 check_output='Found %d back-sock listeners' % (len(sock_listeners))
             )
-            for item_name in sock_listeners.keys():
+            for item_name, sock_listener in sock_listeners.items():
                 self.add_item(item_name)
-                sock_path, sock_ops = sock_listeners[item_name]
+                sock_path, sock_ops = sock_listener
                 try:
-                    _sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-                    _sock.connect(sock_path)
-                    _sock.settimeout(SLAPD_SOCK_TIMEOUT)
-                    _sock_f = _sock.makefile()
-                    _sock_f.write('MONITOR\n')
-                    _sock_f.flush()
-                    sock_response = _sock_f.read()
+                    sock_response = _read_sock_monitor(sock_path)
                 except CATCH_ALL_EXC, exc:
                     self.result(
                         CHECK_RESULT_ERROR,
@@ -989,26 +1029,7 @@ class SlapdCheck(LocalCheck):
                         ),
                     )
                 else:
-                    # strip ENTRY\n from response and parse the rest as LDIF
-                    _, sock_monitor_entry = ParseLDIF(
-                        StringIO(sock_response[6:]),
-                        ignore_attrs=['sockLogLevel'],
-                        maxentries=1
-                    )[0]
-                    sock_perf_data = []
-                    # only add numeric monitor data to performance metrics
-                    for metric_key in sorted(sock_monitor_entry.keys()):
-                        try:
-                            float(sock_monitor_entry[metric_key][0])
-                        except ValueError:
-                            continue
-                        else:
-                            sock_perf_data.append(
-                                u'%s=%s' % (
-                                    metric_key,
-                                    sock_monitor_entry[metric_key][0],
-                                )
-                            )
+                    sock_perf_data = _parse_sock_response(sock_response)
                     self.result(
                         CHECK_RESULT_OK,
                         item_name,
@@ -1053,16 +1074,10 @@ class SlapdCheck(LocalCheck):
                     )
         return local_csn_dict # end of _get_local_csns()
 
-    def checks(self):
-
-        # Get command-line arguments
-        local_ldapi_url = sys.argv[1] or 'ldapi:///'
-        ldaps_uri = sys.argv[2] or 'ldaps://%s' % socket.getfqdn()
-        my_authz_id = sys.argv[3]
-
-        # Connect and bind with LDAPI mainly to read cn=config and cn=monitor later
-        #----------------------------------------------------------------------
-
+    def _open_ldapi_conn(self, local_ldapi_url):
+        """
+        Open local LDAPI connection, exits on error
+        """
         try:
             self._ldapi_conn = SlapdCheckLDAPObject(local_ldapi_url)
             # Find out whether bind worked
@@ -1077,6 +1092,18 @@ class SlapdCheck(LocalCheck):
                 )
             )
             sys.exit(1)
+        return local_wai # end of _open_ldapi_conn()
+
+    def checks(self):
+
+        # Get command-line arguments
+        ldaps_uri = sys.argv[2] or 'ldaps://%s' % socket.getfqdn()
+        my_authz_id = sys.argv[3]
+
+        local_wai = self._open_ldapi_conn(sys.argv[1] or 'ldapi:///')
+
+        # read cn=config and cn=monitor
+        #----------------------------------------------------------------------
 
         try:
             _ = self._ldapi_conn.get_naming_context_attrs()
