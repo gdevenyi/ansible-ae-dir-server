@@ -896,12 +896,17 @@ class SlapdCheck(LocalCheck):
             cert_check_result = CHECK_RESULT_WARNING
         else:
             cert_check_result = CHECK_RESULT_OK
-        # less exact usage of .days because of older Python versions without timedelta.total_seconds()
+        # less exact usage of .days because of older
+        # Python versions without timedelta.total_seconds()
         elapsed_percentage = 100-100*float(cert_validity_rest.days)/float((cert_not_after-cert_not_before).days)
         self.result(
             cert_check_result,
             'SlapdCert',
-            check_output='Server cert valid until %s UTC (%d days ahead, %0.1f %% elapsed), path name %r (via module %s)' % (
+            check_output=(
+                'Server cert valid until %s UTC'
+                '(%d days ahead, %0.1f %% elapsed),'
+                'path name %r (via module %s)'
+            ) % (
                 cert_not_after,
                 cert_validity_rest.days,
                 elapsed_percentage,
