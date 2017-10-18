@@ -459,6 +459,16 @@ openldap_log_level: "stats"
 openldap_syncrepl_network_timeout: 5
 openldap_syncrepl_timeout: 5
 
+# Maximum number of pending requests for anonymous sessions
+openldap_conn_max_pending: 100
+
+# Maximum number of pending requests for authenticated sessions
+openldap_conn_max_pending_auth: 1000
+
+# how many listener threads are started (should be power of 2)
+# rule-of-thumb: 1 for up to 16 cores
+openldap_listener_threads: 1
+
 # how many worker threads are started
 # RAM needed per thread: 4MB on 32 bit systems, 8MB on 64 bit systems
 # rule-of-thumb: 4 per real CPU core

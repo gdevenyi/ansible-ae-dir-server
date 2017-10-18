@@ -96,8 +96,17 @@ moduleload unique
 serverID {{ openldap_server_id }}
 {% endif %}
 
+# Maximum number of pending requests for anonymous sessions
+conn_max_pending {{ openldap_conn_max_pending }}
+
+# Maximum number of pending requests for authenticated sessions
+conn_max_pending_auth {{ openldap_conn_max_pending_auth }}
+
 # which messages to send to syslog
 loglevel {{ openldap_log_level }}
+
+# number of listener threads used (should be power of 2)
+listener-threads {{ openldap_listener_threads }}
 
 # number of worker threads used
 threads {{ openldap_threads }}
