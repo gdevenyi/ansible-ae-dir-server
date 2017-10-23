@@ -183,7 +183,6 @@ ProxyPreserveHost On
 
   #----------------------------------------------------------------------
   # Æ-DIR password self-service web application (reverse proxy)
-  # {{ ansible_managed }}
   #----------------------------------------------------------------------
 
   RedirectPermanent /pwd /pwd/
@@ -200,7 +199,6 @@ ProxyPreserveHost On
 {% if oath_ldap_enabled==True %}
   #----------------------------------------------------------------------
   # OATH-LDAP enrollment web application (reverse proxy)
-  # {{ ansible_managed }}
   #----------------------------------------------------------------------
 
   RedirectPermanent /oath /oath/
