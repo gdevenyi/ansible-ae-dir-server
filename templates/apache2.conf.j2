@@ -53,6 +53,9 @@ HostnameLookups Off
 
 LogFormat "{{ apache_log_format }}" apache_log_format
 
+AllowEncodedSlashes Off
+AddDefaultCharset Off
+
 # for non-SSL vhost
 Listen 0.0.0.0:80
 # for SSL vhost
