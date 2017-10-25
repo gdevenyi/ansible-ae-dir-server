@@ -2085,6 +2085,26 @@ class AERFC822MailMember(DynamicValueSelectList):
   desc = 'AE-DIR: rfc822MailMember'
   ldap_url = 'ldap:///_?mail,displayName?sub?(&(|(objectClass=inetLocalMailRecipient)(objectClass=aeContact))(mail=*)(aeStatus=0))'
   html_tmpl = RFC822Address.html_tmpl
+  showValueButton = False
+
+  def transmute(self, attrValues):
+    if 'member' not in self._entry:
+      return []
+    entrydn_filter = compose_filter(
+      '|',
+      map_filter_parts('entryDN',self._entry['member']),
+    )
+    ldap_result = self._ls.l.search_s(
+      self._determineSearchDN(self._dn,self.lu_obj.dn),
+      ldap.SCOPE_SUBTREE,
+      entrydn_filter,
+      attrlist=['mail'],
+    )
+    mail_addresses = [
+      entry['mail'][0]
+      for dn, entry in ldap_result
+    ]
+    return sorted(mail_addresses)
 
   def formField(self):
     input_field = HiddenInput(
