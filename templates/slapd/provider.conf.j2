@@ -1332,7 +1332,8 @@ constraint_attribute aeSrvGroup
   uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeHost)(aeStatus=0))"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeService)"
 
-# 'mail' the same in personal user accounts and referenced person entries
+# Force 'mail' in non-mailbox personal user accounts to match
+# 'mail' in referenced person entry
 constraint_attribute aePerson,mail
   set "this/aePerson/mail & this/mail"
   restrict="ldap:///{{ aedir_suffix }}??sub?(&(objectClass=aeUser)(!(objectClass=inetLocalMailRecipient)))"
