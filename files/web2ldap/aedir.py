@@ -563,6 +563,9 @@ class AEGroupMember(DynamicDNSelectList,AEObjectUtil):
     return attr_value_dict # _get_attr_value_dict()
 
   def _validate(self,attrValue):
+    if 'memberURL' in self._entry:
+      # reduce to simple DN syntax check for dynamic groups
+      return DistinguishedName._validate(self,attrValue)
     return SelectList._validate(self,attrValue)
 
 syntax_registry.registerAttrType(
