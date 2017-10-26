@@ -299,7 +299,7 @@ access to
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=nisMailAlias)"
-  attrs=rfc822MailMember
+  attrs=mail,rfc822MailMember
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeDisplayNameGroups & this" read
     by set="user/-1/aeProxyFor/aeDisplayNameGroups & this" read
