@@ -1338,6 +1338,12 @@ constraint_attribute aePerson,mail
   set "this/aePerson/mail & this/mail"
   restrict="ldap:///{{ aedir_suffix }}??sub?(&(objectClass=aeUser)(!(objectClass=inetLocalMailRecipient)))"
 
+# Force 'mail' in mailbox-related personal user accounts to match
+# one of the 'mailLocalAddress' attribute values
+constraint_attribute aePerson,mail
+  set "this/mail & this/mailLocalAddress"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(&(objectClass=aeUser)(objectClass=inetLocalMailRecipient))"
+
 # 'givenName' the same in personal user accounts and referenced person entries
 constraint_attribute aePerson,givenName
   set "this/aePerson/givenName & this/givenName"
