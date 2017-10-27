@@ -10,7 +10,7 @@ It is designed to run as a CRON job.
 Author: Michael Ströder <michael@stroeder.com>
 """
 
-__version__ = '0.3.0'
+__version__ = '0.3.1'
 
 #-----------------------------------------------------------------------
 # Imports
@@ -245,6 +245,7 @@ class AEGroupUpdater(aedir.process.AEProcess):
         """
         return list of DNs of valid aePerson entries
         """
+        deref_attrs = []
         person_filter_parts = ['(objectClass=aePerson)(aeStatus=0)']
         for deref_attr_type in self.deref_person_attrs:
             try:
@@ -252,13 +253,14 @@ class AEGroupUpdater(aedir.process.AEProcess):
             except KeyError:
                 pass
             else:
+                deref_attrs.append(deref_attr_type)
                 person_filter_parts.append(
                     compose_filter(
                         '|',
                         map_filter_parts(deref_attr_type, deref_attr_values),
                     )
                 )
-        if not person_filter_parts:
+        if not deref_attrs:
             return None
         ldap_result = self.ldap_conn.search_s(
             self.ldap_conn.find_search_base(),
@@ -291,6 +293,8 @@ class AEGroupUpdater(aedir.process.AEProcess):
         )
         for dyn_group_dn, dyn_group_entry in dynamic_groups:
 
+            self.logger.debug('Processing group entry %r ...', dyn_group_dn)
+
             group_object_class = dyn_group_entry['structuralObjectClass'][0]
             member_map_attr, member_user_attr = MEMBER_ATTRS_MAP[group_object_class]
             self.logger.debug(
@@ -313,6 +317,7 @@ class AEGroupUpdater(aedir.process.AEProcess):
 
             for member_url in dyn_group_entry[MEMBERURL_ATTR]:
 
+                self.logger.debug('member_url = %r', member_url)
                 member_url_obj = ldapurl.LDAPUrl(member_url)
                 dyn_group_filter = '(&{0}(!(entryDN={1})){2}{3})'.format(
                     member_url_obj.filterstr,
