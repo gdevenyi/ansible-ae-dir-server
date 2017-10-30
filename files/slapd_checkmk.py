@@ -41,6 +41,7 @@ M2CRYPTO_AVAIL = False
 try:
     import cryptography.x509
     from cryptography.hazmat.backends import default_backend as crypto_default_backend
+    import cryptography.hazmat.primitives.asymmetric.rsa
 except ImportError:
     try:
         import M2Crypto
@@ -73,7 +74,7 @@ from pyasn1.codec.ber import decoder
 # Configuration constants
 #-----------------------------------------------------------------------
 
-__version__ = '1.4.0'
+__version__ = '1.4.1'
 
 STATE_FILENAME = 'slapd_checkmk.state'
 
@@ -898,8 +899,35 @@ class SlapdCheck(LocalCheck):
                 )
         return # end of _check_sasl_hostname()
 
-    def _check_cert_validity(self, config_attrs):
-        server_cert_pathname = config_attrs['olcTLSCertificateFile'][0]
+    def _check_tls_file(self, config_attrs):
+        # try to read CA and server cert/key files
+        file_read_errors = []
+        tls_pem = {}
+        for tls_attr_name in (
+            'olcTLSCACertificateFile',
+            'olcTLSCertificateFile',
+            'olcTLSCertificateKeyFile',
+        ):
+            try:
+                fname = config_attrs[tls_attr_name][0]
+            except KeyError:
+                file_read_errors.append(
+                  'Attribute %r not set' % (tls_attr_name)
+                )
+            try:
+                tls_pem[tls_attr_name] = open(fname, 'rb').read()
+            except CATCH_ALL_EXC, exc:
+                file_read_errors.append(
+                  'Error reading %r: %s' % (fname, exc)
+                )
+        if file_read_errors:
+            # no crypto modules present => abort
+            self.result(
+                CHECK_RESULT_ERROR,
+                'SlapdCert',
+                check_output=' / '.join(file_read_errors)
+            )
+            return
         if not CRYPTOGRAPHY_AVAIL and not M2CRYPTO_AVAIL:
             # no crypto modules present => abort
             self.result(
@@ -910,26 +938,32 @@ class SlapdCheck(LocalCheck):
                 ),
             )
             return
-        server_cert_pem = open(server_cert_pathname, 'rb').read()
         if CRYPTOGRAPHY_AVAIL:
             server_cert_obj = cryptography.x509.load_pem_x509_certificate(
-                server_cert_pem,
+                tls_pem['olcTLSCertificateFile'],
+                crypto_default_backend(),
+            )
+            server_key_obj = cryptography.hazmat.primitives.serialization.load_pem_private_key(
+                tls_pem['olcTLSCertificateKeyFile'],
+                None,
                 crypto_default_backend(),
             )
             cert_not_after = server_cert_obj.not_valid_after
             cert_not_before = server_cert_obj.not_valid_before
+            modulus_match = server_cert_obj.public_key().public_numbers().n==server_key_obj.public_key().public_numbers().n
             crypto_module = 'cryptography'
         elif M2CRYPTO_AVAIL:
             server_cert_obj = M2Crypto.X509.load_cert_string(
-                server_cert_pem,
+                tls_pem['olcTLSCertificateFile'],
                 M2Crypto.X509.FORMAT_PEM,
             )
             cert_not_after = server_cert_obj.get_not_after().get_datetime()
             cert_not_before = server_cert_obj.get_not_before().get_datetime()
+            modulus_match = None
             crypto_module = 'M2Crypto'
         utc_now = datetime.datetime.now(cert_not_after.tzinfo)
         cert_validity_rest = cert_not_after - utc_now
-        if cert_validity_rest.days <= CERT_ERROR_DAYS:
+        if modulus_match==False or cert_validity_rest.days <= CERT_ERROR_DAYS:
             cert_check_result = CHECK_RESULT_ERROR
         elif cert_validity_rest.days <= CERT_WARN_DAYS:
             cert_check_result = CHECK_RESULT_WARNING
@@ -942,18 +976,20 @@ class SlapdCheck(LocalCheck):
             cert_check_result,
             'SlapdCert',
             check_output=(
-                'Server cert valid until %s UTC'
-                '(%d days ahead, %0.1f %% elapsed),'
-                'path name %r (via module %s)'
+                'Server cert %r valid until %s UTC '
+                '(%d days left, %0.1f %% elapsed), '
+                'modulus_match==%r, '
+                '(via module %s)'
             ) % (
+                config_attrs['olcTLSCertificateFile'][0],
                 cert_not_after,
                 cert_validity_rest.days,
                 elapsed_percentage,
-                server_cert_pathname,
+                modulus_match,
                 crypto_module,
             ),
         )
-        return # end of _check_cert_validity()
+        return # end of _check_tls_file()
 
     def _check_local_ldaps(self, ldaps_uri, my_authz_id):
         """
@@ -1703,7 +1739,7 @@ class SlapdCheck(LocalCheck):
             )
 
             self._check_sasl_hostname(self._config_attrs)
-            self._check_cert_validity(self._config_attrs)
+            self._check_tls_file(self._config_attrs)
             self._get_slapd_pid(self._config_attrs)
 
         syncrepl_topology = {}
