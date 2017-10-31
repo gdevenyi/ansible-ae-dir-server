@@ -1409,17 +1409,73 @@ syntax_registry.registerAttrType(
 )
 
 
-class AEUserMailaddress(AEPersonAttribute,RFC822Address):
+class AEMailLocalAddress(RFC822Address):
+  oid = 'AEMailLocalAddress-oid'
+  simpleSanitizers = (
+    str.strip,
+    str.lower,
+  )
+
+syntax_registry.registerAttrType(
+  AEMailLocalAddress.oid,[
+    '2.16.840.1.113730.3.1.13', # mailLocalAddress
+  ],
+  structural_oc_oids=[
+    AE_USER_OID,    # aeUser
+    AE_SERVICE_OID, # aeService
+  ],
+)
+
+
+class AEUserMailaddress(AEPersonAttribute,SelectList):
   oid = 'AEUserMailaddress-oid'
   html_tmpl = RFC822Address.html_tmpl
   maxValues = 1
+  input_fallback = False
+  simpleSanitizers = AEMailLocalAddress.simpleSanitizers
+
+  def _get_attr_value_dict(self):
+    attr_value_dict = {
+      u'':u'-/-',
+    }
+    attr_value_dict.update([
+      (addr.decode(self._ls.charset),addr.decode(self._ls.charset))
+      for addr in self._entry.get('mailLocalAddress',['foobar@stroeder.com'])
+    ])
+    return attr_value_dict
+
+  def _is_mail_account(self):
+    return 'inetLocalMailRecipient' in self._entry['objectClass']
+
+  def _validate(self,attrValue):
+    if self._is_mail_account():
+      return SelectList._validate(self,attrValue)
+    else:
+      return AEPersonAttribute._validate(self,attrValue)
+
+  def formValue(self):
+    if self._is_mail_account():
+      return SelectList.formValue(self)
+    else:
+      return AEPersonAttribute.formValue(self)
 
   def transmute(self,attrValues):
-    try:
-      attrValues = [self._entry['mailLocalAddress'][0]]
-    except KeyError:
+    if self._is_mail_account():
+      # make sure only non-empty strings are in attribute value list
+      if not filter(None,map(str.strip,attrValues)):
+        try:
+          attrValues = [self._entry['mailLocalAddress'][0]]
+        except KeyError:
+          attrValues = []
+    else:
       attrValues = AEPersonAttribute.transmute(self,attrValues)
     return attrValues
+
+  def formField(self):
+    if self._is_mail_account():
+      return SelectList.formField(self)
+    else:
+      return AEPersonAttribute.formField(self)
 
 syntax_registry.registerAttrType(
   AEUserMailaddress.oid,[
@@ -1431,42 +1487,22 @@ syntax_registry.registerAttrType(
 )
 
 
-class AEPersonMailaddress(RFC822Address):
+class AEPersonMailaddress(DynamicValueSelectList):
   oid = 'AEPersonMailaddress-oid'
   maxValues = 1
+  ldap_url = 'ldap:///_?mail,mail?sub?'
+  input_fallback = True
 
-  def _search_base_user_mail(self):
-    result = None
-    try:
-      ldap_result = self._ls.l.search_ext_s(
-        self._ls.currentSearchRoot,
-        ldap.SCOPE_SUBTREE,
-        '(&'
-          '(objectClass=aeUser)'
-          '(objectClass=inetLocalMailRecipient)'
-          '(aeStatus=0)'
-          '(aePerson=%s)'
-          '(mailLocalAddress=*)'
-        ')' % (self._dn),
-        attrlist=[
-          'mailLocalAddress',
-        ],
-        sizelimit=2,
-      )
-    except ldap.LDAPError:
-      pass
-    else:
-      if ldap_result and len(ldap_result)==1:
-        result = ldap_result[0][1]['mailLocalAddress'][0]
-    return result
-
-  def transmute(self,attrValues):
-    mail_local_address = self._search_base_user_mail()
-    if mail_local_address:
-      attrValues = [mail_local_address]
-    else:
-      attrValues = RFC822Address.transmute(self,attrValues)
-    return attrValues
+  def _determineFilter(self):
+    return (
+      '(&'
+        '(objectClass=aeUser)'
+        '(objectClass=inetLocalMailRecipient)'
+        '(aeStatus=0)'
+        '(aePerson=%s)'
+        '(mailLocalAddress=*)'
+      ')'
+    ) % (self._dn)
 
 syntax_registry.registerAttrType(
   AEPersonMailaddress.oid,[
