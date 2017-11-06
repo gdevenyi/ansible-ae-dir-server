@@ -19,7 +19,7 @@
     system: yes
     createhome: no
 
-- name: "Create master key directory {{ aedir_etc }}/oath-master-keys"
+- name: "Create OATH master key directory {{ aedir_etc }}/oath-master-keys"
   file:
     path: "{{ aedir_etc }}/oath-master-keys"
     state: directory
@@ -29,6 +29,25 @@
   when: openldap_role=="provider"
   notify:
     - "restart {{ oath_bind_listener }}"
+
+- name: "List OATH master key file(s)"
+  shell: "ls -1 {{ aedir_etc }}/oath-master-keys/*"
+  ignore_errors: yes
+  when: openldap_role=="provider"
+  register: master_key_files
+  changed_when: False
+
+- name: "Fix OATH master key file(s) ownership/permissions"
+  file:
+    path: "{{ item }}"
+    owner: root
+    group: "{{ oath_listener_user }}"
+    mode: 0640
+  when: master_key_files.rc==0 and openldap_role=="provider"
+  notify:
+    - "restart {{ oath_bind_listener }}"
+  with_items:
+    - "{{ master_key_files.stdout.split('\n') }}"
 
 - name: "Create socket directory {{ oath_ldap_socket_dir }}"
   file:
