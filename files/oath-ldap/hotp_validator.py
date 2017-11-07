@@ -5,7 +5,7 @@ slapd-sock listener demon which performs password checking and
 HOTP validation on intercepted BIND requests
 """
 
-__version__ = '0.5.4'
+__version__ = '0.6.0'
 __author__ = u'Michael Ströder <michael@stroeder.com>'
 
 #-----------------------------------------------------------------------
@@ -21,7 +21,10 @@ import datetime
 import json
 import glob
 
-import oath
+# from cryptography
+import cryptography.hazmat.backends
+import cryptography.hazmat.primitives.twofactor.hotp
+import cryptography.hazmat.primitives.hashes
 
 # passlib
 import passlib.context
@@ -137,7 +140,6 @@ DEBUG_VARS = [
     'oath_otp_length',
     'oath_secret_expired',
     'oath_secret_max_age',
-    'oath_token_failure_count',
     'oath_token_identifier',
     'oath_token_identifier_length',
     'oath_token_identifier_req',
@@ -145,7 +147,6 @@ DEBUG_VARS = [
     'otp_compare',
     'otp_compare1',
     'otp_compare2',
-    'otp_format',
     'otp_params_dn',
     'otp_params_entry',
     'otp_token_dn',
@@ -188,6 +189,36 @@ else:
 #-----------------------------------------------------------------------
 # Classes and functions
 #-----------------------------------------------------------------------
+
+def accept_hotp(
+        shared_secret,
+        otp_value,
+        counter,
+        length=6,
+        drift=0,
+    ):
+    """
+    this function validates HOTP value
+    """
+    if drift < 0:
+        raise ValueError('OATH counter drift must be >= 0, but was %d' % drift)
+    otp_instance = cryptography.hazmat.primitives.twofactor.hotp.HOTP(
+        shared_secret,
+        length,
+        cryptography.hazmat.primitives.hashes.SHA1(),
+        backend=cryptography.hazmat.backends.default_backend(),
+    )
+    result = None
+    max_counter = counter + drift
+    while counter <= max_counter:
+        try:
+            otp_instance.verify(otp_value, counter)
+        except cryptography.hazmat.primitives.twofactor.hotp.InvalidToken:
+            counter += 1
+        else:
+            result = counter + 1
+            break
+    return result
 
 
 class HOTPValidationServer(SlapdSockServer):
@@ -332,7 +363,7 @@ class HOTPValidationHandler(SlapdSockHandler):
         except KeyError:
             raise KeyError('OATH master key with key-id %r not found' % key_id)
         jwe_decrypter.deserialize(oath_secret, oath_master_secret)
-        return jwe_decrypter.plaintext.encode('hex')
+        return jwe_decrypter.plaintext
 
     def do_bind(self, request):
         """
@@ -566,10 +597,9 @@ class HOTPValidationHandler(SlapdSockHandler):
 
         # Attributes from password policy subentry
         # Attributes from token entry
-        oath_hotp_current_counter = otp_token_entry.get('oathHOTPCounter', [None])[0]
+        oath_hotp_current_counter = int(otp_token_entry['oathHOTPCounter'][0])
         oath_token_identifier = otp_token_entry.get('oathTokenIdentifier', [''])[0]
         oath_token_identifier_length = len(oath_token_identifier)
-        oath_token_failure_count = int(otp_token_entry.get('oathFailureCount', ['0'])[0])
         oath_token_secret_time = otp_token_entry.get(
             'oathSecretTime',
             otp_token_entry.get(
@@ -616,12 +646,13 @@ class HOTPValidationHandler(SlapdSockHandler):
                 user_password_hash
             )
 
-        otp_format = 'dec%d' % (oath_otp_length)
+        otp_token_mods = []
+        otp_token_mod_ctrls = []
 
         # Check OTP value
         if not otp_value:
             # An empty OTP value is always considered wrong here
-            otp_compare, oath_hotp_next_counter = (False, 0)
+            otp_compare, oath_hotp_next_counter = False, None
             self._log(
                 logging.WARN,
                 'Empty OTP value sent for %r',
@@ -630,40 +661,31 @@ class HOTPValidationHandler(SlapdSockHandler):
             # Do not(!) exit here because we need to update
             # failure attributes later
         else:
-            otp_compare1, oath_hotp_next_counter = (
-                oath_hotp_current_counter != None and
-                oath.accept_hotp(
-                    oath_secret,
-                    otp_value,
-                    int(oath_hotp_current_counter),
-                    format=otp_format,
-                    drift=oath_hotp_lookahead,
-                    backward_drift=0,  # don't change this!!!
-                )
+            oath_hotp_next_counter = accept_hotp(
+                oath_secret,
+                otp_value,
+                oath_hotp_current_counter,
+                length=oath_otp_length,
+                drift=oath_hotp_lookahead,
             )
+            otp_compare1 = (oath_hotp_next_counter is not None)
             otp_compare2 = (oath_token_identifier == oath_token_identifier_req)
             otp_compare = otp_compare1 and otp_compare2
-
-        # Update largest drift seen
-        if oath_hotp_current_counter != None:
-            self.server.max_lookahead_seen = max(
-                self.server.max_lookahead_seen,
-                oath_hotp_next_counter - int(oath_hotp_current_counter)
-            )
-
-        otp_token_mods = []
-        otp_token_mod_ctrls = []
-
-        # In any case try to update counter
-        # but let slapd assert old value <= new value
-        if oath_hotp_current_counter != None and \
-           int(oath_hotp_current_counter) < oath_hotp_next_counter:
-            otp_token_mods.append(
-                (ldap.MOD_REPLACE, 'oathHOTPCounter', [str(oath_hotp_next_counter)])
-            )
-            otp_token_mod_ctrls.append(
-                AssertionControl(True, '(oathHOTPCounter<=%d)' % oath_hotp_next_counter)
-            )
+            if oath_hotp_next_counter is not None:
+                # Update largest drift seen
+                self.server.max_lookahead_seen = max(
+                    self.server.max_lookahead_seen,
+                    oath_hotp_next_counter - oath_hotp_current_counter
+                )
+                # In any case try to update counter
+                # but let slapd assert old value <= new value
+                if oath_hotp_current_counter < oath_hotp_next_counter:
+                    otp_token_mods.append(
+                        (ldap.MOD_REPLACE, 'oathHOTPCounter', [str(oath_hotp_next_counter)])
+                    )
+                    otp_token_mod_ctrls.append(
+                        AssertionControl(True, '(oathHOTPCounter<=%d)' % oath_hotp_next_counter)
+                    )
 
         # Update failure counter
         if otp_compare:
@@ -674,15 +696,7 @@ class HOTPValidationHandler(SlapdSockHandler):
             ])
         else:
             otp_token_mods.extend([
-                # MOD_INCREMENT let slapd prior release 2.4.43 seg fault
-                #(ldap.MOD_INCREMENT, 'oathFailureCount', ['1']),
-                # work-around:
-                # second best solution to increment 'oathFailureCount'
-                (
-                    ldap.MOD_REPLACE,
-                    'oathFailureCount',
-                    [str(oath_token_failure_count+1)]
-                ),
+                (ldap.MOD_INCREMENT, 'oathFailureCount', ['1']),
                 (ldap.MOD_REPLACE, 'oathLastFailure', [str(now_str)]),
             ])
 

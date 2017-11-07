@@ -91,7 +91,6 @@
     extra_args: "{{ aedir_pip_extra_args }}"
   with_items:
     - mailutil
-    - oath
     - paramiko
     - passlib
     - pyExcelerator
