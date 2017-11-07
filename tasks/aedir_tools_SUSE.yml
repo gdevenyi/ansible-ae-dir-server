@@ -40,7 +40,6 @@
     - python-paramiko
     - python-mailutil
     - python-web.py
-    - python-oath
     - python-passlib
     - python-pyweblib
   when: openldap_role == 'provider'
