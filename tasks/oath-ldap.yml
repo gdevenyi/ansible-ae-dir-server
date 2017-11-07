@@ -43,7 +43,7 @@
     owner: root
     group: "{{ oath_listener_user }}"
     mode: 0640
-  when: master_key_files.rc==0 and openldap_role=="provider"
+  when: openldap_role=="provider" and master_key_files.rc==0
   notify:
     - "restart {{ oath_bind_listener }}"
   with_items:
