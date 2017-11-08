@@ -535,6 +535,7 @@ overlay lastbind
 {% if oath_ldap_enabled==True %}
 # pass bind requests to external listener process receiving the requests
 # on Unix Domain socket path {{ oath_ldap_socket_path }}
+# (after password policy check in slapo-ppolicy)
 overlay sock
 extensions binddn peername ssf connid
 socketpath {{ oath_ldap_socket_path }}
