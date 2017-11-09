@@ -396,7 +396,7 @@ access to
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=oathUser)"
-  attrs=authTimestamp,pwdFailureTime
+  attrs=pwdFailureTime
     by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" manage
     by * none break
 
