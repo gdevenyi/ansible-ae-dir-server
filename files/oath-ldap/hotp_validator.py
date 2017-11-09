@@ -5,7 +5,7 @@ slapd-sock listener demon which performs password checking and
 HOTP validation on intercepted BIND requests
 """
 
-__version__ = '0.6.0'
+__version__ = '0.7.0'
 __author__ = u'Michael Ströder <michael@stroeder.com>'
 
 #-----------------------------------------------------------------------
@@ -43,12 +43,11 @@ from ldap.controls.simple import RelaxRulesControl
 from ldap.controls.libldap import AssertionControl
 
 # local modules
-from slapdsock.ldaphelper import RESULT_CODE
 from slapdsock.ldaphelper import ldap_datetime, ldap_datetime_str
 from slapdsock.ldaphelper import MyLDAPUrl, is_expired
 from slapdsock.loghelper import combined_logger
-from slapdsock.handler import SlapdSockHandler
-from slapdsock.message import RESULTResponse
+from slapdsock.handler import SlapdSockHandler, SlapdSockHandlerError
+from slapdsock.message import RESULTResponse, SuccessResponse, InvalidCredentialsResponse
 
 # run single-threaded
 from slapdsock.service import SlapdSockServer
@@ -70,6 +69,16 @@ USER_FILTER_TMPL = u'(&(objectClass=aeUser)(objectClass=oathHOTPUser)(oathHOTPTo
 OTP_TOKEN_FILTER_TMPL = u'(&(objectClass=oathHOTPToken)(oathHOTPCounter=*)(oathSecret=*))'
 # Attribute for saving the last login timestamp
 LOGIN_TIMESTAMP_ATTR = 'authTimestamp'
+
+# DN of default password policy entry
+# in effect if attribute 'pwdPolicySubentry' is not present in user's entry
+# set to None to disable default
+PWD_POLICY_DEFAULT = None
+
+# Set to True if you are 100% sure to have slapo-ppolicy correctly configured.
+# If True 'success' is returned in case of expired password to let
+# slapo-ppolicy generate a correct password policy response control.
+SLAPO_PPOLICY_ENABLED = True
 
 # Timestamp attributes which, if present, limit the
 # validity period of user entries
@@ -145,19 +154,10 @@ DEBUG_VARS = [
     'oath_token_identifier_req',
     'oath_token_secret_time',
     'otp_compare',
-    'otp_compare1',
-    'otp_compare2',
     'otp_params_dn',
     'otp_params_entry',
     'otp_token_dn',
-    'otp_token_mods',
     'otp_value',
-    'pwd_changed_time',
-    'pwd_expired',
-    'pwd_max_age',
-    'pwd_policy_dn',
-    'pwd_policy_subentry',
-    'request_dn_utf8',
     'user_password_compare',
     'user_password_length',
 ]
@@ -172,6 +172,8 @@ if __debug__:
         '/'
         'otp_compare={otp_compare}'
     )
+    MSG_HOTP_WRONG_TOKEN_ID = 'wrong token identifier'
+    MSG_ENTRY_NOT_VALID = 'not within validity period {not_before}..{not_after}'
     # Only log credentials if DEBUG=yes and in Python debug mode
     DEBUG_VARS.extend([
         'oath_secret',
@@ -185,6 +187,8 @@ else:
     MSG_HOTP_VALUE_WRONG = ''
     MSG_OTP_TOKEN_EXPIRED = ''
     MSG_VERIFICATION_FAILED = ''
+    MSG_HOTP_WRONG_TOKEN_ID = ''
+    MSG_ENTRY_NOT_VALID = ''
 
 #-----------------------------------------------------------------------
 # Classes and functions
@@ -268,9 +272,7 @@ class HOTPValidationServer(SlapdSockServer):
         # list of user attributes to be requested
         self.user_attr_list = [
             'oathHOTPToken',
-            'pwdChangedTime',
             'pwdFailureTime',
-            'pwdPolicySubentry',
             'userPassword',
         ]
         if USER_NOTBEFORE_ATTR is not None:
@@ -333,6 +335,171 @@ class HOTPValidationHandler(SlapdSockHandler):
     user_filter_tmpl = USER_FILTER_TMPL
     token_filter_tmpl = OTP_TOKEN_FILTER_TMPL
 
+    def _check_validity_period(
+            self,
+            request,
+            entry,
+            now,
+            not_before_attr=USER_NOTBEFORE_ATTR,
+            not_after_attr=USER_NOTAFTER_ATTR,
+        ):
+        """
+        Check validity period, returns True if within period, else False.
+        """
+        not_before = entry.get(not_before_attr, [None])[0]
+        not_after = entry.get(not_after_attr, [None])[0]
+        valid = \
+            (not_before is None or ldap_datetime(not_before) <= now) and \
+            (not_after is None or ldap_datetime(not_after) >= now)
+        if not valid:
+            raise SlapdSockHandlerError(
+                Exception('Entry %r not within validity period %r..%r' % (
+                    request.dn,
+                    not_before,
+                    not_after,
+                )),
+                log_level=logging.WARN,
+                response=InvalidCredentialsResponse(
+                    request.msgid,
+                    info=MSG_ENTRY_NOT_VALID.format(
+                        not_before=not_before,
+                        not_after=not_after,
+                    ),
+                ),
+                log_vars=self.server._log_vars,
+            )
+        return # end of _check_validity_period()
+
+    def _update_token_entry(self, request, token_dn, now_str, success, oath_hotp_next_counter):
+        """
+        update OATH token entry
+        """
+        mod_ctrls = None
+        if success:
+            # Success case
+            mods = [
+                # Reset failure counter
+                (ldap.MOD_REPLACE, 'oathFailureCount', ['0']),
+                # Store last login
+                (ldap.MOD_REPLACE, 'oathLastLogin', [str(now_str)]),
+            ]
+            # let slapd assert old value <= new value
+        else:
+            # Update failure counter and timestamp
+            mods = [
+                (ldap.MOD_INCREMENT, 'oathFailureCount', ['1']),
+                (ldap.MOD_REPLACE, 'oathLastFailure', [str(now_str)]),
+            ]
+        if oath_hotp_next_counter is not None:
+            # Update HOTP counter value!
+            mods.append(
+                (ldap.MOD_REPLACE, 'oathHOTPCounter', [str(oath_hotp_next_counter)]),
+            )
+            mod_ctrls = [
+                AssertionControl(True, '(oathHOTPCounter<=%d)' % oath_hotp_next_counter),
+            ]
+        # Update the token entry
+        ldap_conn = self.server.get_ldapi_conn()
+        try:
+            ldap_conn.modify_ext_s(
+                token_dn,
+                mods,
+                serverctrls=mod_ctrls,
+            )
+        except LDAPError, err:
+            # Return unwillingToPerform to let clients fail hard
+            # so they hopefully not present login form again
+            self._log(
+                logging.ERROR,
+                'LDAPError updating token entry %r with %r: %s => unwillingToPerform',
+                token_dn,
+                mods,
+                err,
+            )
+            raise SlapdSockHandlerError(
+                err,
+                log_level=logging.ERROR,
+                response=RESULTResponse(
+                    request.msgid,
+                    'unwillingToPerform',
+                    info='internal error'
+                ),
+                log_vars=self.server._log_vars,
+            )
+        else:
+            self._log(
+                logging.DEBUG,
+                'Updated token entry %r with %r',
+                token_dn,
+                mods,
+            )
+        return # end of _update_token_entry()
+
+    def _update_login_attrs(self, user_dn, user_entry, now_str, success):
+        """
+        update user's entry after successful login
+        """
+        if success:
+            # successful login
+            mods = [
+                (ldap.MOD_REPLACE, LOGIN_TIMESTAMP_ATTR, [str(now_str)]),
+            ]
+            if 'pwdFailureTime' in user_entry:
+                mods.append(
+                    (ldap.MOD_DELETE, 'pwdFailureTime', None),
+                )
+        else:
+            # failed login
+            mods = [(ldap.MOD_ADD, 'pwdFailureTime', [str(now_str)])]
+        # Update the login attribute in user's entry
+        ldap_conn = self.server.get_ldapi_conn()
+        try:
+            ldap_conn.modify_ext_s(
+                user_dn.encode('utf-8'),
+                mods,
+                serverctrls=[RelaxRulesControl(True)],
+            )
+        except LDAPError, err:
+            self._log(
+                logging.ERROR,
+                'LDAPError updating user entry %r with %r: %s',
+                user_dn,
+                mods,
+                err,
+            )
+        else:
+            self._log(
+                logging.DEBUG,
+                'Updated user entry %r with %r',
+                user_dn,
+                mods,
+            )
+        return # end of _update_login_attrs()
+
+    def _check_userpassword(self, user_dn, user_entry, user_password_clear):
+        """
+        validate user's clear-text password against {CRYPT} password hash
+        in attribute 'userPassword' of user's entry
+        """
+        try:
+            # Strip scheme prefix {CRYPT} from password hash
+            user_password_hash = user_entry['userPassword'][0][7:]
+        except KeyError:
+            self._log(
+                logging.WARN,
+                'No userPassword attribute found %r',
+                user_dn,
+            )
+            result = False
+        else:
+            # Compare password with local hash in attribute userPassword
+            pw_context = passlib.context.CryptContext(schemes=['sha512_crypt'])
+            result = pw_context.verify(
+                user_password_clear,
+                user_password_hash
+            )
+        return result # _check_userpassword()
+
     def _get_oath_secret(self, token_entry):
         """
         This methods extracts and decrypts the token's OATH shared
@@ -386,17 +553,15 @@ class HOTPValidationHandler(SlapdSockHandler):
         now_dt = datetime.datetime.utcnow()
         now_str = unicode(ldap_datetime_str(now_dt))
 
-        # We need UTF-8 encoded DN several times later
-        request_dn_utf8 = request.dn.encode('utf-8')
-
         # Get LDAPObject instance for local LDAPI access
         ldap_conn = self.server.get_ldapi_conn()
 
+        # Prepare LDAP filter for reading user's entry
         user_filterstr = self.user_filter_tmpl.format(now=now_str).encode('utf-8')
         # First try to read a user entry for the given request dn
         try:
             user_entry = ldap_conn.read_s(
-                request_dn_utf8,
+                request.dn.encode('utf-8'),
                 user_filterstr,
                 attrlist=self.server.user_attr_list,
             )
@@ -411,95 +576,29 @@ class HOTPValidationHandler(SlapdSockHandler):
             )
             return 'CONTINUE\n'
         except LDAPError, err:
-            ldap_result_code = 'invalidCredentials'
             self._log(
                 logging.WARN,
-                'Exception %s.%s reading %r: %s => return %s',
+                'Exception %s.%s reading %r: %s => %s',
                 err.__class__.__module__,
                 err.__class__.__name__,
                 request.dn,
                 err,
-                ldap_result_code,
+                InvalidCredentialsResponse.__name__,
             )
-            return RESULTResponse(
-                request.msgid,
-                ldap_result_code,
-                info='',
-            )
+            return InvalidCredentialsResponse(request.msgid)
 
         # Check whether we want handle this
         if not user_entry:
             self._log(
                 logging.INFO,
                 'No result reading %r with filter %r => let slapd continue',
-                request_dn_utf8,
+                request.dn,
                 user_filterstr,
             )
             return 'CONTINUE\n'
 
-        # Attributes from user entry
-        pwd_changed_time = user_entry.get('pwdChangedTime', [None])[0]
-        pwd_failure_times = user_entry.get('pwdFailureTime', [])
-        pwd_policy_dn = user_entry['pwdPolicySubentry'][0]
-        otp_token_dn = user_entry.get('oathHOTPToken', [request_dn_utf8])[0]
-        # Check validity period
-        user_not_before = user_entry.get(USER_NOTBEFORE_ATTR, [None])[0]
-        user_not_after = user_entry.get(USER_NOTAFTER_ATTR, [None])[0]
-        user_within_validity_period = \
-            (user_not_before is None or ldap_datetime(user_not_before) <= now_dt) and \
-            (user_not_after is None or ldap_datetime(user_not_after) >= now_dt)
-        if not user_within_validity_period:
-            ldap_result_code = 'invalidCredentials'
-            self._log(
-                logging.WARN,
-                'User entry %r invalid (outside %r..%r) => return %s',
-                request.dn,
-                user_not_before,
-                user_not_after,
-                ldap_result_code,
-            )
-            return RESULTResponse(
-                request.msgid,
-                ldap_result_code,
-                info='',
-            )
-
-        # Try to read password policy subentry
-        try:
-            pwd_policy_subentry = ldap_conn.read_s(
-                pwd_policy_dn,
-                '(objectClass=pwdPolicy)',
-                attrlist=[
-                    'pwdAttribute',
-                    'pwdFailureCountInterval',
-                    'pwdMaxAge',
-                    'pwdMaxFailure',
-                ],
-                cache_time=LDAP_LONG_CACHE_TTL,
-            )
-        except (LDAPError, KeyError):
-            pwd_policy_subentry = {}
-
-        pwd_max_age = pwd_policy_subentry.get('pwdMaxAge', ['-1'])[0]
-
-        # Check whether OATH secret exceeds max age (is expired)
-        pwd_expired = is_expired(
-            pwd_changed_time,
-            pwd_max_age,
-            now_dt
-        )
-        if pwd_expired:
-            self._log(
-                logging.INFO,
-                (
-                    'Password of %r is expired (pwd_changed_time=%r, pwd_max_age=%r) '
-                    '=> let slapd continue'
-                ),
-                request.dn,
-                pwd_changed_time,
-                pwd_max_age,
-            )
-            return 'CONTINUE\n'
+        # Pointer to OATH token entry
+        otp_token_dn = user_entry.get('oathHOTPToken', [request.dn.encode('utf-8')])[0]
 
         # Try to read the token entry
         # (disable caching because of oathHOTPCounter)
@@ -520,54 +619,39 @@ class HOTPValidationHandler(SlapdSockHandler):
                 nocache=1,
             )
         except LDAPError, err:
-            ldap_result_code = 'invalidCredentials'
             self._log(
                 logging.WARN,
-                'Exception %s.%s reading token %r: %s => return %s',
+                'Exception %s.%s reading token %r: %s => %s',
                 err.__class__.__module__,
                 err.__class__.__name__,
                 otp_token_dn,
                 err,
-                ldap_result_code,
+                InvalidCredentialsResponse.__name__,
             )
-            return RESULTResponse(
-                request.msgid,
-                ldap_result_code,
-                info='',
-            )
+            return InvalidCredentialsResponse(request.msgid)
 
         if not otp_token_entry:
             # No available token entry => invalidCredentials
-            ldap_result_code = 'invalidCredentials'
             self._log(
                 logging.WARN,
-                'No result reading token %r => return %s',
+                'No result reading token %r => %s',
                 otp_token_dn,
-                ldap_result_code,
+                InvalidCredentialsResponse.__name__,
             )
-            return RESULTResponse(
-                request.msgid,
-                ldap_result_code,
-                info='',
-            )
+            return InvalidCredentialsResponse(request.msgid)
 
         # Try to extract/decrypt OATH secret
         try:
             oath_secret = self._get_oath_secret(otp_token_entry)
         except KeyError, err:
-            ldap_result_code = 'invalidCredentials'
             self._log(
                 logging.ERROR,
-                'Error extracting OATH secret from %r: %s => return %s',
+                'Error extracting OATH secret from %r: %s => %s',
                 otp_token_dn,
                 err,
-                ldap_result_code,
+                InvalidCredentialsResponse.__name__,
             )
-            return RESULTResponse(
-                request.msgid,
-                ldap_result_code,
-                info='',
-            )
+            return InvalidCredentialsResponse(request.msgid)
 
         otp_params_dn = otp_token_entry['oathHOTPParams'][0]
         # Try to read the parameter entry
@@ -627,32 +711,17 @@ class HOTPValidationHandler(SlapdSockHandler):
             request.cred[user_password_length:-oath_otp_length],
             request.cred[-oath_otp_length:]
         )
-
-        try:
-            # Strip scheme prefix {CRYPT} from password hash
-            user_password_hash = user_entry['userPassword'][0][7:]
-        except KeyError:
-            self._log(
-                logging.WARN,
-                'No userPassword attribute found %r',
-                request.dn,
-            )
-            user_password_compare = False
-        else:
-            # Compare password with local hash in attribute userPassword
-            pw_context = passlib.context.CryptContext(schemes=['sha512_crypt'])
-            user_password_compare = pw_context.verify(
-                user_password_clear,
-                user_password_hash
-            )
-
-        otp_token_mods = []
-        otp_token_mod_ctrls = []
+        # check the password hash
+        user_password_compare = self._check_userpassword(
+            request.dn,
+            user_entry,
+            user_password_clear
+        )
 
         # Check OTP value
         if not otp_value:
+            oath_hotp_next_counter = None
             # An empty OTP value is always considered wrong here
-            otp_compare, oath_hotp_next_counter = False, None
             self._log(
                 logging.WARN,
                 'Empty OTP value sent for %r',
@@ -668,84 +737,77 @@ class HOTPValidationHandler(SlapdSockHandler):
                 length=oath_otp_length,
                 drift=oath_hotp_lookahead,
             )
-            otp_compare1 = (oath_hotp_next_counter is not None)
-            otp_compare2 = (oath_token_identifier == oath_token_identifier_req)
-            otp_compare = otp_compare1 and otp_compare2
             if oath_hotp_next_counter is not None:
+                oath_hotp_drift = oath_hotp_next_counter - oath_hotp_current_counter
+                self._log(
+                    logging.DEBUG,
+                    'OTP value valid (drift %d) for %r',
+                    oath_hotp_drift,
+                    otp_token_dn,
+                )
                 # Update largest drift seen
                 self.server.max_lookahead_seen = max(
                     self.server.max_lookahead_seen,
-                    oath_hotp_next_counter - oath_hotp_current_counter
+                    oath_hotp_drift
                 )
-                # In any case try to update counter
-                # but let slapd assert old value <= new value
-                if oath_hotp_current_counter < oath_hotp_next_counter:
-                    otp_token_mods.append(
-                        (ldap.MOD_REPLACE, 'oathHOTPCounter', [str(oath_hotp_next_counter)])
-                    )
-                    otp_token_mod_ctrls.append(
-                        AssertionControl(True, '(oathHOTPCounter<=%d)' % oath_hotp_next_counter)
-                    )
-
-        # Update failure counter
-        if otp_compare:
-            # Reset failure counter
-            otp_token_mods.extend([
-                (ldap.MOD_REPLACE, 'oathFailureCount', ['0']),
-                (ldap.MOD_REPLACE, 'oathLastLogin', [str(now_str)]),
-            ])
-        else:
-            otp_token_mods.extend([
-                (ldap.MOD_INCREMENT, 'oathFailureCount', ['1']),
-                (ldap.MOD_REPLACE, 'oathLastFailure', [str(now_str)]),
-            ])
-
-        if otp_token_mods:
-
-            # Modify the token entry
-            try:
-                ldap_conn.modify_ext_s(
-                    otp_token_dn,
-                    otp_token_mods,
-                    serverctrls=otp_token_mod_ctrls,
-                )
-            except LDAPError, err:
-                # Hard fail for OTP validation because otherwise OTP would be re-usable
-                ldap_result_code = 'unwillingToPerform'
+            else:
                 self._log(
-                    logging.ERROR,
-                    'LDAPError updating token entry %r from %d to %d: %s => %s',
+                    logging.DEBUG,
+                    'OTP value invalid for %r',
                     otp_token_dn,
-                    oath_hotp_current_counter,
-                    oath_hotp_next_counter,
-                    err,
-                    ldap_result_code,
                 )
-                return RESULTResponse(
-                    request.msgid,
-                    ldap_result_code,
-                    info='internal error'
-                )
+
+        otp_compare = (oath_hotp_next_counter is not None)
+
+        self._update_token_entry(
+            request,
+            otp_token_dn,
+            now_str,
+            otp_compare and oath_token_identifier == oath_token_identifier_req,
+            oath_hotp_next_counter,
+        )
+
+        # Check validity period
+        self._check_validity_period(
+            request,
+            user_entry,
+            now_dt,
+            not_before_attr=USER_NOTBEFORE_ATTR,
+            not_after_attr=USER_NOTAFTER_ATTR,
+        )
+
+        self._update_login_attrs(
+            request.dn,
+            user_entry,
+            now_str,
+            user_password_compare and otp_compare,
+        )
+
+        if oath_token_identifier != oath_token_identifier_req:
+            # compare the stored and requested token identifiers
+            self._log(
+                logging.WARN,
+                'Token ID mismatch! oath_token_identifier=%r / oath_token_identifier_req=%r => %s',
+                oath_token_identifier,
+                oath_token_identifier_req,
+                InvalidCredentialsResponse.__name__,
+            )
+            return InvalidCredentialsResponse(request.msgid, info=MSG_HOTP_WRONG_TOKEN_ID)
 
         if oath_max_usage_count >= 0 and \
            oath_hotp_current_counter > oath_max_usage_count:
-            ldap_result_code = 'invalidCredentials'
-            # Let slapd process the bind failure triggering slapo-ppolicy
+            # fail because token counter exceeded
             self._log(
                 logging.INFO,
                 'counter limit %d exceeded for %r => %s',
                 oath_max_usage_count,
                 request.dn,
-                ldap_result_code,
+                InvalidCredentialsResponse.__name__,
             )
-            return RESULTResponse(
-                request.msgid,
-                ldap_result_code,
-                info=MSG_HOTP_COUNTER_EXCEEDED
-            )
+            return InvalidCredentialsResponse(request.msgid, info=MSG_HOTP_COUNTER_EXCEEDED)
 
-        elif oath_secret_expired:
-            ldap_result_code = 'invalidCredentials'
+        if oath_secret_expired:
+            # fail because token's shared secret too old
             self._log(
                 logging.INFO,
                 (
@@ -756,83 +818,37 @@ class HOTPValidationHandler(SlapdSockHandler):
                 request.dn,
                 oath_token_secret_time,
                 oath_secret_max_age,
-                ldap_result_code,
+                InvalidCredentialsResponse.__name__,
             )
-            return RESULTResponse(
-                request.msgid,
-                ldap_result_code,
-                info=MSG_OTP_TOKEN_EXPIRED
-            )
+            return InvalidCredentialsResponse(request.msgid, info=MSG_OTP_TOKEN_EXPIRED)
 
-        elif user_password_compare and otp_compare:
-            # Prepare the sucess result returned
-            ldap_result_code = RESULT_CODE['success']
-            self._log(
-                logging.INFO,
-                'Validation ok for %r => return success(%d)',
-                request.dn,
-                ldap_result_code,
-            )
-            user_mods_successful = [
-                (ldap.MOD_REPLACE, LOGIN_TIMESTAMP_ATTR, [str(now_str)]),
-            ]
-            if pwd_failure_times:
-                user_mods_successful.append(
-                    (ldap.MOD_DELETE, 'pwdFailureTime', None),
-                )
-            # Update the login timestamp attribute
-            try:
-                ldap_conn.modify_ext_s(
-                    request_dn_utf8,
-                    user_mods_successful,
-                    serverctrls=[RelaxRulesControl(True)],
-                )
-            except LDAPError, err:
-                self._log(
-                    logging.WARN,
-                    'LDAPError updating user entry %r with %r: %s',
-                    request.dn,
-                    user_mods_successful,
-                    err,
-                )
-            return RESULTResponse(request.msgid, 'success')
-
-        else:
-            ldap_result_code = RESULT_CODE['invalidCredentials']
-            ldap_diagnostic_message = MSG_VERIFICATION_FAILED.format(
-                user_password_compare=user_password_compare,
-                otp_compare=otp_compare,
-            )
+        if not user_password_compare or not otp_compare:
+            # user password or OTP value wrong
             self._log(
                 logging.INFO,
                 (
-                    'Verification failed for %r (user_password_compare=%s / otp_compare=%s)'
-                    ' => invalidCredentials(%d)'
+                    'Verification failed for %r (user_password_compare=%s / otp_compare=%s) => %s'
                 ),
                 request.dn,
                 user_password_compare,
                 otp_compare,
-                ldap_result_code,
+                InvalidCredentialsResponse.__name__,
             )
-            # Update the login timestamp attribute
-            try:
-                ldap_conn.modify_ext_s(
-                    request_dn_utf8,
-                    [(ldap.MOD_ADD, 'pwdFailureTime', [str(now_str)])],
-                    serverctrls=[RelaxRulesControl(True)],
-                )
-            except LDAPError, err:
-                self._log(
-                    logging.ERROR,
-                    'LDAPError updating pwdFailureTime in user entry %r: %s',
-                    request.dn,
-                    err,
-                )
-            return RESULTResponse(
+            return InvalidCredentialsResponse(
                 request.msgid,
-                ldap_result_code,
-                info=ldap_diagnostic_message,
+                info=MSG_VERIFICATION_FAILED.format(
+                    user_password_compare=user_password_compare,
+                    otp_compare=otp_compare,
+                )
             )
+
+        # Finally! Success!
+        self._log(
+            logging.INFO,
+            'Validation ok for %r => return success',
+            request.dn,
+        )
+        return SuccessResponse(request.msgid)
 
         # end of HOTPValidationHandler.do_bind()
 
