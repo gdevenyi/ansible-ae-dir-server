@@ -21,13 +21,15 @@ __author__ = u'Michael Ströder <michael@stroeder.com>'
 # 2. BIND request's 'dn' matches LDAP_PROXY_BINDDN_PATTERN
 # then bind request must be validated by upstream provider replica
 LDAP_PROXY_PEER_ADDRS = (
-#    '/tmp/ldapi-c',
-#    '127.0.0.1',
+    '/opt/ae-dir/run/slapd/ldapi',
+    '127.0.0.1',
 )
 LDAP_PROXY_PEER_NETS = (
     '0.0.0.0/0',
 )
-LDAP_PROXY_BINDDN_PATTERN = ur'^uid=[a-z]+,(|cn=[a-z0-9]+,){suffix}$'
+# Regex pattern for HOTP user DNs
+# If bind-DN does not match this pattern, request will be continued by slapd
+LDAP_PROXY_BINDDN_PATTERN = u'^uid=[a-z]+,cn=[a-z]+,dc=ae-dir,dc=example,dc=org$'
 
 # UIDs and peer GIDS of peers which are granted access
 # (list of int/strings)
