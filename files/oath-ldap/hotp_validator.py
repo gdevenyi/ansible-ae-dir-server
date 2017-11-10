@@ -5,7 +5,7 @@ slapd-sock listener demon which performs password checking and
 HOTP validation on intercepted BIND requests
 """
 
-__version__ = '0.9.0'
+__version__ = '0.10.0'
 __author__ = u'Michael Ströder <michael@stroeder.com>'
 
 #-----------------------------------------------------------------------
@@ -46,8 +46,14 @@ from slapdsock.ldaphelper import ldap_datetime
 from slapdsock.ldaphelper import MyLDAPUrl, is_expired
 from slapdsock.loghelper import combined_logger
 from slapdsock.handler import SlapdSockHandler, SlapdSockHandlerError
-from slapdsock.message import CONTINUE_RESPONSE, RESULTResponse
-from slapdsock.message import SuccessResponse, InvalidCredentialsResponse
+from slapdsock.message import \
+    CONTINUE_RESPONSE, \
+    InternalErrorResponse, \
+    SuccessResponse, \
+    InvalidCredentialsResponse, \
+    CompareFalseResponse, \
+    CompareTrueResponse
+
 
 # run single-threaded
 from slapdsock.service import SlapdSockServer
@@ -303,6 +309,7 @@ class HOTPValidationHandler(SlapdSockHandler):
     not_before_attr = USER_NOTBEFORE_ATTR
     not_after_attr = USER_NOTAFTER_ATTR
     oath_params_cache_ttl = OATH_PARAMS_CACHE_TTL
+    compare_assertion_type = 'oathHOTPValue'
 
     def _check_validity_period(
             self,
@@ -368,11 +375,7 @@ class HOTPValidationHandler(SlapdSockHandler):
             raise SlapdSockHandlerError(
                 err,
                 log_level=logging.ERROR,
-                response=RESULTResponse(
-                    request.msgid,
-                    'unwillingToPerform',
-                    info='internal error'
-                ),
+                response=InternalErrorResponse(request.msgid),
                 log_vars=self.server._log_vars,
             )
         else:
@@ -441,7 +444,7 @@ class HOTPValidationHandler(SlapdSockHandler):
             )
         return result # _check_userpassword()
 
-    def _get_user_entry(self, request, failure_response_class=InvalidCredentialsResponse):
+    def _get_user_entry(self, request, failure_response_class):
         """
         Read user entry
         """
@@ -651,7 +654,7 @@ class HOTPValidationHandler(SlapdSockHandler):
         self.ldap_conn = self.server.get_ldapi_conn()
 
         # Read user's entry
-        user_entry, response = self._get_user_entry(request)
+        user_entry, response = self._get_user_entry(request, InvalidCredentialsResponse)
         if user_entry is None:
             return response
 
@@ -849,6 +852,209 @@ class HOTPValidationHandler(SlapdSockHandler):
 
         return response # end of HOTPValidationHandler.do_bind()
 
+    def do_compare(self, request):
+        """
+        This method checks whether the request DN is a oathHOTPUser entry
+        and whether assertion type is oathHOTPValue.
+        If yes, OATH/HOTP validation is performed against assertion value.
+        If no, CONTINUE is returned to let slapd handle the compare request.
+        """
+
+        if request.atype != self.compare_assertion_type:
+            self._log(
+                logging.DEBUG,
+                'Assertion type %r does not match %r => CONTINUE',
+                request.atype,
+                self.compare_assertion_type,
+            )
+            return CONTINUE_RESPONSE
+
+        # Preliminary request DN pattern check
+        if not self.user_dn_regex.match(request.dn):
+            self._log(
+                logging.DEBUG,
+                'Request DN %r does not match %r => CONTINUE',
+                request.dn,
+                self.user_dn_regex.pattern,
+            )
+            return CONTINUE_RESPONSE
+
+        # Get LDAPObject instance for local LDAPI access
+        self.ldap_conn = self.server.get_ldapi_conn()
+
+        # Read user's entry
+        user_entry, response = self._get_user_entry(request, InternalErrorResponse)
+        if user_entry is None:
+            return response
+
+        # Read OTP token entry
+        oath_token_dn, otp_token_entry = self. _get_oath_token_entry(request.dn, user_entry)
+        if not otp_token_entry:
+            # we have to insist on existing/readable OTP token entry
+            return InvalidCredentialsResponse(request.msgid, self.infomsg.OTP_TOKEN_ERROR)
+
+        # Attributes from token entry
+        oath_token_identifier = otp_token_entry.get('oathTokenIdentifier', [''])[0]
+        oath_token_secret_time = otp_token_entry.get(
+            'oathSecretTime',
+            otp_token_entry.get(
+                'createTimestamp',
+                [None]
+            )
+        )[0]
+
+        # Try to extract/decrypt OATH counter and secret
+        try:
+            oath_hotp_current_counter = int(otp_token_entry['oathHOTPCounter'][0])
+            oath_secret = otp_token_entry['oathSecret'][0]
+        except KeyError, err:
+            self._log(
+                logging.ERROR,
+                'Missing OATH attributes in %r: %s => %s',
+                oath_token_dn,
+                err,
+                InvalidCredentialsResponse.__name__,
+            )
+            return InvalidCredentialsResponse(request.msgid)
+
+        oath_otp_length, oath_hotp_lookahead, oath_max_usage_count, oath_secret_max_age = \
+            self._get_oath_token_params(otp_token_entry)
+
+        #-------------------------------------------------------------------
+        # from here on we don't exit with a return-statement
+        # and set only a result if policy checks fail
+
+        oath_token_identifier_req, otp_value = (
+            request.avalue[0:-oath_otp_length],
+            request.avalue[-oath_otp_length:]
+        )
+
+        # Check OTP value
+        if not otp_value:
+            oath_hotp_next_counter = None
+            # An empty OTP value is always considered wrong here
+            self._log(
+                logging.WARN,
+                'Empty OTP value sent for %r',
+                request.dn,
+            )
+            # Do not(!) exit here because we need to update
+            # failure attributes later
+        else:
+            oath_hotp_next_counter = self._check_hotp(
+                oath_secret,
+                otp_value,
+                oath_hotp_current_counter,
+                length=oath_otp_length,
+                drift=oath_hotp_lookahead,
+            )
+            if oath_hotp_next_counter is not None:
+                oath_hotp_drift = oath_hotp_next_counter - oath_hotp_current_counter
+                self._log(
+                    logging.DEBUG,
+                    'OTP value valid (drift %d) for %r',
+                    oath_hotp_drift,
+                    oath_token_dn,
+                )
+                # Update largest drift seen
+                self.server.max_lookahead_seen = max(
+                    self.server.max_lookahead_seen,
+                    oath_hotp_drift
+                )
+            else:
+                self._log(
+                    logging.DEBUG,
+                    'OTP value invalid for %r',
+                    oath_token_dn,
+                )
+
+        otp_compare = (oath_hotp_next_counter is not None)
+
+        # updating counter in token entry has highest priority!
+        # => do it now!
+        self._update_token_entry(
+            request,
+            oath_token_dn,
+            otp_compare and oath_token_identifier == oath_token_identifier_req,
+            oath_hotp_next_counter,
+        )
+
+        # now do all the additional policy checks
+
+        if not self._check_validity_period(
+                user_entry,
+                self.not_before_attr,
+                self.not_after_attr,
+            ):
+            # fail because user account validity period violated
+            self._log(
+                logging.WARN,
+                'Validity period of %r violated! => %s',
+                request.dn,
+                InvalidCredentialsResponse.__name__,
+            )
+            response = CompareFalseResponse(request.msgid, self.infomsg.ENTRY_NOT_VALID)
+
+        elif oath_token_identifier != oath_token_identifier_req:
+            # fail because stored and requested token identifiers different
+            self._log(
+                logging.WARN,
+                'Token ID mismatch! oath_token_identifier=%r / oath_token_identifier_req=%r => %s',
+                oath_token_identifier,
+                oath_token_identifier_req,
+                InvalidCredentialsResponse.__name__,
+            )
+            response = CompareFalseResponse(request.msgid, self.infomsg.HOTP_WRONG_TOKEN_ID)
+
+        elif oath_max_usage_count >= 0 and \
+           oath_hotp_current_counter > oath_max_usage_count:
+            # fail because token counter exceeded
+            self._log(
+                logging.INFO,
+                'counter limit %d exceeded for %r => %s',
+                oath_max_usage_count,
+                request.dn,
+                InvalidCredentialsResponse.__name__,
+            )
+            response = CompareFalseResponse(request.msgid, self.infomsg.HOTP_COUNTER_EXCEEDED)
+
+        elif is_expired(oath_token_secret_time, oath_secret_max_age, self.now_dt):
+            # fail because token's shared secret too old (is expired)
+            self._log(
+                logging.INFO,
+                (
+                    'Token %r of %r is expired '
+                    '(oath_token_secret_time=%r, oath_secret_max_age=%r) => %s'
+                ),
+                oath_token_dn,
+                request.dn,
+                oath_token_secret_time,
+                oath_secret_max_age,
+                InvalidCredentialsResponse.__name__,
+            )
+            response = CompareFalseResponse(request.msgid, self.infomsg.OTP_TOKEN_EXPIRED)
+
+        elif not otp_compare:
+            # OTP value wrong
+            self._log(
+                logging.INFO,
+                'HOTP verification failed for %r => %s',
+                request.dn,
+                InvalidCredentialsResponse.__name__,
+            )
+            response = CompareFalseResponse(request.msgid)
+
+        else:
+            # Finally! Success!
+            self._log(
+                logging.INFO,
+                'Validation ok for %r => response = success',
+                request.dn,
+            )
+            response = CompareTrueResponse(request.msgid)
+
+        return response # end of HOTPValidationHandler.do_compare()
+
 
 #-----------------------------------------------------------------------
 # Main
@@ -924,7 +1130,7 @@ def run_this():
         except OSError:
             pass
 
-    return # end of main()
+    return # run_this()
 
 
 if __name__ == '__main__':
