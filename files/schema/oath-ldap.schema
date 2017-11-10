@@ -1,6 +1,6 @@
 ############################################################################
 # Schema for OATH-LDAP
-# Revision: 1.7
+# Revision: 1.9
 #
 # Author: Michael Ströder <michael@stroeder.com>
 #
@@ -188,6 +188,48 @@ attributetype ( oath-ldap-at:14
   SUBSTR octetStringSubstringsMatch
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.40{2000} )
 
+attributetype ( oath-ldap-at:13
+  NAME 'oathResultCode'
+  DESC 'OATH-LDAP: LDAP resultCode to use in response'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  EQUALITY integerMatch
+  ORDERING integerOrderingMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 )
+
+attributetype ( oath-ldap-at:13.1
+  NAME 'oathSuccessResultCode'
+  DESC 'OATH-LDAP: success resultCode to use in bind/compare response'
+  X-ORIGIN 'OATH-LDAP'
+  SUP oathResultCode )
+
+attributetype ( oath-ldap-at:13.2
+  NAME 'oathFailureResultCode'
+  DESC 'OATH-LDAP: failure resultCode to use in bind/compare response'
+  X-ORIGIN 'OATH-LDAP'
+  SUP oathResultCode )
+
+attributetype ( oath-ldap-at:15
+  NAME 'oathMessage'
+  DESC 'OATH-LDAP: success diagnosticMessage to use in bind/compare response'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  EQUALITY caseIgnoreMatch
+  SUBSTR caseIgnoreSubstringsMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{1024} )
+
+attributetype ( oath-ldap-at:15.1
+  NAME 'oathSuccessMessage'
+  DESC 'OATH-LDAP: success diagnosticMessage to use in bind/compare response'
+  X-ORIGIN 'OATH-LDAP'
+  SUP oathMessage )
+
+attributetype ( oath-ldap-at:15.2
+  NAME 'oathFailureMessage'
+  DESC 'OATH-LDAP: failure diagnosticMessage to use in bind/compare response'
+  X-ORIGIN 'OATH-LDAP'
+  SUP oathMessage )
+
 # Object classes
 #---------------
 
@@ -206,7 +248,9 @@ objectclass ( oath-ldap-oc:2
   ABSTRACT
   MUST ( oathOTPLength $ oathHMACAlgorithm )
   MAY ( oathSecretMaxAge $ oathSecretLength $
-        oathMaxUsageCount $ oathThrottleLimit $ oathEncCert ) )
+        oathMaxUsageCount $ oathThrottleLimit $ oathEncCert $
+        oathSuccessResultCode $ oathSuccessMessage $
+        oathFailureResultCode $ oathFailureMessage ) )
 
 objectclass ( oath-ldap-oc:3
   NAME 'oathToken'
@@ -216,6 +260,17 @@ objectclass ( oath-ldap-oc:3
   MAY ( oathSecret $ oathSecretTime $
         oathLastLogin $ oathFailureCount $ oathLastFailure $
         oathTokenSerialNumber $ oathTokenIdentifier $ oathTokenPIN ) )
+
+attributetype ( oath-ldap-at:16
+  NAME 'oathOTPValue'
+  DESC 'OATH-LDAP: currently valid OTP value of a token or associated user entry (not directly used)'
+  X-ORIGIN 'OATH-LDAP'
+  EQUALITY caseIgnoreIA5Match
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{20}
+  SINGLE-VALUE )
+# OpenLDAP currently does not allow to define operational attributes
+#  NO-USER-MODIFICATION
+#  USAGE dSAOperation )
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # HOTP (see RFC 4226)
@@ -258,6 +313,11 @@ attributetype ( oath-ldap-at:5.2
   X-ORIGIN 'OATH-LDAP'
   SINGLE-VALUE
   SUP oathParamsEntry )
+
+attributetype ( oath-ldap-at:16.1
+  NAME 'oathHOTPValue'
+  DESC 'OATH-LDAP: currently valid HOTP value of a token or associated user entry'
+  SUP oathOTPValue )
 
 # Object classes
 #---------------
@@ -316,6 +376,11 @@ attributetype ( oath-ldap-at:10.6
   X-ORIGIN 'OATH-LDAP'
   SINGLE-VALUE
   SUP oathCounter )
+
+attributetype ( oath-ldap-at:16.2
+  NAME 'oathTOTPValue'
+  DESC 'OATH-LDAP: currently valid TOTP value of a token or associated user entry'
+  SUP oathOTPValue )
 
 # Object classes
 #---------------
