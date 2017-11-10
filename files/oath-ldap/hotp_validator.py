@@ -5,7 +5,7 @@ slapd-sock listener demon which performs password checking and
 HOTP validation on intercepted BIND requests
 """
 
-__version__ = '0.8.0'
+__version__ = '0.9.0'
 __author__ = u'Michael Ströder <michael@stroeder.com>'
 
 #-----------------------------------------------------------------------
@@ -66,19 +66,9 @@ USER_DN_PATTERN = u'^uid=[a-z]+,cn=[a-z]+,dc=ae-dir,dc=example,dc=org$'
 USER_FILTER = u'(&(objectClass=oathHOTPUser)(oathHOTPToken=*))'
 
 # LDAP filter string for reading fully initialized HOTP token entry
-OTP_TOKEN_FILTER = u'(&(objectClass=oathHOTPToken)(oathHOTPCounter=*)(oathSecret=*))'
+OATH_TOKEN_FILTER = u'(&(objectClass=oathHOTPToken)(oathHOTPCounter=*)(oathSecret=*))'
 # Attribute for saving the last login timestamp
 LOGIN_TIMESTAMP_ATTR = 'authTimestamp'
-
-# DN of default password policy entry
-# in effect if attribute 'pwdPolicySubentry' is not present in user's entry
-# set to None to disable default
-PWD_POLICY_DEFAULT = None
-
-# Set to True if you are 100% sure to have slapo-ppolicy correctly configured.
-# If True 'success' is returned in case of expired password to let
-# slapo-ppolicy generate a correct password policy response control.
-SLAPO_PPOLICY_ENABLED = True
 
 # Timestamp attributes which, if present, limit the
 # validity period of user entries
@@ -109,10 +99,10 @@ LDAP_RETRYDELAY = 0.1
 LDAP_SASL_AUTHZID = None
 
 # Time in seconds for which normal LDAP searches will be valid in cache
-LDAP_CACHE_TTL = 5.0
+LDAP_CACHE_TTL = 3.0
 # Time in seconds for which pwdPolicy and oathHOTPParams entries will be
 # valid in cache
-LDAP_LONG_CACHE_TTL = 20 * LDAP_CACHE_TTL
+OATH_PARAMS_CACHE_TTL = 30 * LDAP_CACHE_TTL
 
 # Timeout in seconds when connecting to local and remote LDAP servers
 # used for ldap.OPT_NETWORK_TIMEOUT and ldap.OPT_TIMEOUT
@@ -141,88 +131,69 @@ LOG_LEVEL = logging.INFO
 # Time (seconds) for assuming an userPassword+OTP value to be valid in cache
 CACHE_TTL = -1.0
 
+# Set to True to return more information about what went wrong
+# in the response to the LDAP client
+RESPONSE_INFO = __debug__
+
 DEBUG_VARS = [
-    'oath_max_usage_count',
     'oath_hotp_current_counter',
     'oath_hotp_lookahead',
     'oath_hotp_next_counter',
+    'oath_max_usage_count',
     'oath_otp_length',
+    'oath_params_dn',
+    'oath_params_entry',
     'oath_secret_max_age',
+    'oath_token_dn',
     'oath_token_identifier',
     'oath_token_identifier_length',
     'oath_token_identifier_req',
     'oath_token_secret_time',
     'otp_compare',
-    'otp_params_dn',
-    'otp_params_entry',
-    'otp_token_dn',
     'otp_value',
     'user_password_compare',
     'user_password_length',
 ]
-
-# Error messages
 if __debug__:
-    MSG_HOTP_COUNTER_EXCEEDED = 'HOTP counter limit exceeded'
-    MSG_OTP_TOKEN_EXPIRED = 'HOTP token expired'
-    MSG_VERIFICATION_FAILED = (
-        'user_password_compare={user_password_compare}'
-        '/'
-        'otp_compare={otp_compare}'
-    )
-    MSG_HOTP_WRONG_TOKEN_ID = 'wrong token identifier'
-    MSG_ENTRY_NOT_VALID = 'not within validity period'
-    MSG_OTP_TOKEN_ERROR = 'Error reading OTP token'
-    # Only log credentials if DEBUG=yes and in Python debug mode
+    # Only some sensitive variables if DEBUG=yes and in Python debug mode
     DEBUG_VARS.extend([
-        'oath_secret',
         'otp_token_entry',
         'user_entry',
-        'user_password_clear',
+        #'user_password_clear',
         'user_password_hash',
     ])
+
+# Error messages
+if RESPONSE_INFO:
+    class ResponseInfo(object):
+        """
+        message catalog with informative messages
+        """
+        HOTP_COUNTER_EXCEEDED = 'HOTP counter limit exceeded'
+        OTP_TOKEN_EXPIRED = 'HOTP token expired'
+        VERIFICATION_FAILED = (
+            'user_password_compare={user_password_compare}'
+            '/'
+            'otp_compare={otp_compare}'
+        )
+        HOTP_WRONG_TOKEN_ID = 'wrong token identifier'
+        ENTRY_NOT_VALID = 'not within validity period'
+        OTP_TOKEN_ERROR = 'Error reading OTP token'
 else:
-    MSG_HOTP_COUNTER_EXCEEDED = ''
-    MSG_OTP_TOKEN_EXPIRED = ''
-    MSG_VERIFICATION_FAILED = ''
-    MSG_HOTP_WRONG_TOKEN_ID = ''
-    MSG_ENTRY_NOT_VALID = ''
-    MSG_OTP_TOKEN_ERROR = ''
+    class ResponseInfo(object):
+        """
+        message catalog with no messages to avoid giving hints to attackers
+        """
+        HOTP_COUNTER_EXCEEDED = ''
+        OTP_TOKEN_EXPIRED = ''
+        VERIFICATION_FAILED = ''
+        HOTP_WRONG_TOKEN_ID = ''
+        ENTRY_NOT_VALID = ''
+        OTP_TOKEN_ERROR = ''
 
 #-----------------------------------------------------------------------
 # Classes and functions
 #-----------------------------------------------------------------------
-
-def accept_hotp(
-        shared_secret,
-        otp_value,
-        counter,
-        length=6,
-        drift=0,
-    ):
-    """
-    this function validates HOTP value
-    """
-    if drift < 0:
-        raise ValueError('OATH counter drift must be >= 0, but was %d' % drift)
-    otp_instance = cryptography.hazmat.primitives.twofactor.hotp.HOTP(
-        shared_secret,
-        length,
-        cryptography.hazmat.primitives.hashes.SHA1(),
-        backend=cryptography.hazmat.backends.default_backend(),
-    )
-    result = None
-    max_counter = counter + drift
-    while counter <= max_counter:
-        try:
-            otp_instance.verify(otp_value, counter)
-        except cryptography.hazmat.primitives.twofactor.hotp.InvalidToken:
-            counter += 1
-        else:
-            result = counter + 1
-            break
-    return result
-
 
 class HOTPValidationServer(SlapdSockServer):
 
@@ -231,10 +202,10 @@ class HOTPValidationServer(SlapdSockServer):
 
     By purpose this is a single-threaded listener serializing all requests!
     """
-    jwk_key_files = JWK_KEY_FILES
     ldapi_authz_id = LDAP_SASL_AUTHZID
     ldap_retry_max = LDAP_MAXRETRYCOUNT
     ldap_retry_delay = LDAP_RETRYDELAY
+    ldap_timeout = LDAP_TIMEOUT
     ldap_cache_ttl = LDAP_CACHE_TTL
 
     def __init__(
@@ -243,52 +214,39 @@ class HOTPValidationServer(SlapdSockServer):
             RequestHandlerClass,
             logger,
             average_count,
-            socket_timeout,
-            socket_permissions,
-            allowed_uids,
-            allowed_gids,
+            socket_timeout, socket_permissions,
+            allowed_uids, allowed_gids,
             bind_and_activate=True,
             log_vars=None,
+            key_files=None,
         ):
-        self.max_lookahead_seen = 0
         SlapdSockServer.__init__(
             self,
             server_address,
             RequestHandlerClass,
             logger,
             average_count,
-            socket_timeout,
-            socket_permissions,
-            allowed_uids,
-            allowed_gids,
-            bind_and_activate,
+            socket_timeout, socket_permissions,
+            allowed_uids, allowed_gids,
+            bind_and_activate=bind_and_activate,
             monitor_dn=None,
             log_vars=log_vars,
         )
+        self.max_lookahead_seen = 0
         if JWK:
-            self._load_keys(self.jwk_key_files, reset=True)
-        # list of user attributes to be requested
-        self.user_attr_list = [
-            'oathHOTPToken',
-            'pwdFailureTime',
-            'userPassword',
-        ]
-        if USER_NOTBEFORE_ATTR is not None:
-            self.user_attr_list.append(USER_NOTBEFORE_ATTR)
-        if USER_NOTAFTER_ATTR is not None:
-            self.user_attr_list.append(USER_NOTAFTER_ATTR)
+            self._load_keys(key_files, reset=True)
         # end of HOTPValidationServer.__init__()
 
-    def _load_keys(self, jwk_key_files, reset=False):
+    def _load_keys(self, key_files, reset=False):
         """
-        Load JWE keys defined by globbing pattern in :jwk_key_files:
+        Load JWE keys defined by globbing pattern in :key_files:
         """
         if reset:
             self.master_keys = {}
-        if not jwk_key_files:
+        if not key_files:
             return
-        self.logger.debug('Read JWK files with glob pattern %r', jwk_key_files)
-        for private_key_filename in glob.glob(jwk_key_files):
+        self.logger.debug('Read JWK files with glob pattern %r', key_files)
+        for private_key_filename in glob.glob(key_files):
             try:
                 privkey_json = open(private_key_filename, 'rb').read()
                 private_key = JWK(**json.loads(privkey_json))
@@ -325,13 +283,13 @@ class HOTPValidationHandler(SlapdSockHandler):
     """
     Handler class which validates user's password and HOTP value
     """
-
+    infomsg = ResponseInfo
     cache_ttl = {
         'BIND': CACHE_TTL,
     }
     user_dn_regex = re.compile(USER_DN_PATTERN)
     user_filter = USER_FILTER
-    token_filter = OTP_TOKEN_FILTER
+    token_filter = OATH_TOKEN_FILTER
     token_attr_list = [
         'createTimestamp',
         'oathHOTPCounter',
@@ -342,12 +300,15 @@ class HOTPValidationHandler(SlapdSockHandler):
         'oathTokenSerialNumber',
         'oathFailureCount',
     ]
+    not_before_attr = USER_NOTBEFORE_ATTR
+    not_after_attr = USER_NOTAFTER_ATTR
+    oath_params_cache_ttl = OATH_PARAMS_CACHE_TTL
 
     def _check_validity_period(
             self,
             entry,
-            not_before_attr=USER_NOTBEFORE_ATTR,
-            not_after_attr=USER_NOTAFTER_ATTR,
+            not_before_attr,
+            not_after_attr,
         ):
         """
         Check validity period, returns True if within period, else False.
@@ -489,7 +450,16 @@ class HOTPValidationHandler(SlapdSockHandler):
             user_entry = self.ldap_conn.read_s(
                 request.dn.encode('utf-8'),
                 self.user_filter.encode('utf-8'),
-                attrlist=self.server.user_attr_list,
+                attrlist=filter(
+                    None,
+                    [
+                        'oathHOTPToken',
+                        'pwdFailureTime',
+                        'userPassword',
+                        self.not_before_attr,
+                        self.not_after_attr,
+                    ]
+                )
             )
         except ldap.NO_SUCH_OBJECT, err:
             self._log(
@@ -530,13 +500,13 @@ class HOTPValidationHandler(SlapdSockHandler):
         """
         # Pointer to OATH token entry, default is user entry's DN
         try:
-            otp_token_dn = user_entry['oathHOTPToken'][0]
+            oath_token_dn = user_entry['oathHOTPToken'][0]
         except KeyError:
-            otp_token_dn = user_dn.encode('utf-8')
+            oath_token_dn = user_dn.encode('utf-8')
         # Try to read the token entry
         try:
             otp_token_entry = self.ldap_conn.read_s(
-                otp_token_dn,
+                oath_token_dn,
                 self.token_filter.encode('utf-8'),
                 attrlist=self.token_attr_list,
                 nocache=1, # caching disabled! (because of counter or similar)
@@ -545,7 +515,7 @@ class HOTPValidationHandler(SlapdSockHandler):
             self._log(
                 logging.ERROR,
                 'Error reading token %r: %s',
-                otp_token_dn,
+                oath_token_dn,
                 err,
             )
             otp_token_entry = None
@@ -555,21 +525,21 @@ class HOTPValidationHandler(SlapdSockHandler):
                 self._log(
                     logging.ERROR,
                     'Empty result reading token %r',
-                    otp_token_dn,
+                    oath_token_dn,
                 )
-        return otp_token_dn, otp_token_entry # end of _get_oath_token_entry()
+        return oath_token_dn, otp_token_entry # end of _get_oath_token_entry()
 
     def _get_oath_token_params(self, otp_token_entry):
         """
         Read OATH token parameters from referenced oathHOTPParams entry
         """
-        otp_params_entry = {}
+        oath_params_entry = {}
         if 'oathHOTPParams' in otp_token_entry:
-            otp_params_dn = otp_token_entry['oathHOTPParams'][0]
+            oath_params_dn = otp_token_entry['oathHOTPParams'][0]
             # Try to read the parameter entry
             try:
-                otp_params_entry = self.ldap_conn.read_s(
-                    otp_params_dn,
+                oath_params_entry = self.ldap_conn.read_s(
+                    oath_params_dn,
                     '(objectClass=oathHOTPParams)',
                     attrlist=[
                         'oathMaxUsageCount',
@@ -577,24 +547,24 @@ class HOTPValidationHandler(SlapdSockHandler):
                         'oathOTPLength',
                         'oathSecretMaxAge',
                     ],
-                    cache_time=LDAP_LONG_CACHE_TTL,
+                    cache_time=self.oath_params_cache_ttl,
                 )
             except LDAPError, err:
                 self._log(
                     logging.ERROR,
                     'Error reading OATH params from %r: %s => use defaults',
-                    otp_params_dn,
+                    oath_params_dn,
                     err,
                 )
             else:
-                otp_params_entry = otp_params_entry or {}
+                oath_params_entry = oath_params_entry or {}
         # Attributes from referenced parameter entry
-        if not otp_params_entry:
+        if not oath_params_entry:
             self._log(logging.WARN, 'No OATH params! Using defaults.')
-        oath_otp_length = int(otp_params_entry.get('oathOTPLength', ['6'])[0])
-        oath_hotp_lookahead = int(otp_params_entry.get('oathHOTPLookAhead', ['5'])[0])
-        oath_max_usage_count = int(otp_params_entry.get('oathMaxUsageCount', ['-1'])[0])
-        oath_secret_max_age = otp_params_entry.get('oathSecretMaxAge', ['-1'])[0]
+        oath_otp_length = int(oath_params_entry.get('oathOTPLength', ['6'])[0])
+        oath_hotp_lookahead = int(oath_params_entry.get('oathHOTPLookAhead', ['5'])[0])
+        oath_max_usage_count = int(oath_params_entry.get('oathMaxUsageCount', ['-1'])[0])
+        oath_secret_max_age = oath_params_entry.get('oathSecretMaxAge', ['-1'])[0]
         return oath_otp_length, oath_hotp_lookahead, oath_max_usage_count, oath_secret_max_age
         # end of _get_oath_token_params()
 
@@ -629,6 +599,37 @@ class HOTPValidationHandler(SlapdSockHandler):
         jwe_decrypter.deserialize(oath_secret, oath_master_secret)
         return jwe_decrypter.plaintext
 
+    def _check_hotp(
+            self,
+            oath_secret,
+            otp_value,
+            counter,
+            length=6,
+            drift=0,
+        ):
+        """
+        this function validates HOTP value
+        """
+        if drift < 0:
+            raise ValueError('OATH counter drift must be >= 0, but was %d' % drift)
+        otp_instance = cryptography.hazmat.primitives.twofactor.hotp.HOTP(
+            self._decrypt_oath_secret(oath_secret),
+            length,
+            cryptography.hazmat.primitives.hashes.SHA1(),
+            backend=cryptography.hazmat.backends.default_backend(),
+        )
+        result = None
+        max_counter = counter + drift
+        while counter <= max_counter:
+            try:
+                otp_instance.verify(otp_value, counter)
+            except cryptography.hazmat.primitives.twofactor.hotp.InvalidToken:
+                counter += 1
+            else:
+                result = counter + 1
+                break
+        return result # end of _check_hotp()
+
     def do_bind(self, request):
         """
         This method checks whether the request DN is a oathHOTPUser entry.
@@ -655,10 +656,10 @@ class HOTPValidationHandler(SlapdSockHandler):
             return response
 
         # Read OTP token entry
-        otp_token_dn, otp_token_entry = self. _get_oath_token_entry(request.dn, user_entry)
+        oath_token_dn, otp_token_entry = self. _get_oath_token_entry(request.dn, user_entry)
         if not otp_token_entry:
             # we have to insist on existing/readable OTP token entry
-            return InvalidCredentialsResponse(request.msgid, MSG_OTP_TOKEN_ERROR)
+            return InvalidCredentialsResponse(request.msgid, self.infomsg.OTP_TOKEN_ERROR)
 
         # Attributes from token entry
         oath_token_identifier = otp_token_entry.get('oathTokenIdentifier', [''])[0]
@@ -674,12 +675,12 @@ class HOTPValidationHandler(SlapdSockHandler):
         # Try to extract/decrypt OATH counter and secret
         try:
             oath_hotp_current_counter = int(otp_token_entry['oathHOTPCounter'][0])
-            oath_secret = self._decrypt_oath_secret(otp_token_entry['oathSecret'][0])
+            oath_secret = otp_token_entry['oathSecret'][0]
         except KeyError, err:
             self._log(
                 logging.ERROR,
                 'Missing OATH attributes in %r: %s => %s',
-                otp_token_dn,
+                oath_token_dn,
                 err,
                 InvalidCredentialsResponse.__name__,
             )
@@ -718,7 +719,7 @@ class HOTPValidationHandler(SlapdSockHandler):
             # Do not(!) exit here because we need to update
             # failure attributes later
         else:
-            oath_hotp_next_counter = accept_hotp(
+            oath_hotp_next_counter = self._check_hotp(
                 oath_secret,
                 otp_value,
                 oath_hotp_current_counter,
@@ -731,7 +732,7 @@ class HOTPValidationHandler(SlapdSockHandler):
                     logging.DEBUG,
                     'OTP value valid (drift %d) for %r',
                     oath_hotp_drift,
-                    otp_token_dn,
+                    oath_token_dn,
                 )
                 # Update largest drift seen
                 self.server.max_lookahead_seen = max(
@@ -742,7 +743,7 @@ class HOTPValidationHandler(SlapdSockHandler):
                 self._log(
                     logging.DEBUG,
                     'OTP value invalid for %r',
-                    otp_token_dn,
+                    oath_token_dn,
                 )
 
         otp_compare = (oath_hotp_next_counter is not None)
@@ -751,7 +752,7 @@ class HOTPValidationHandler(SlapdSockHandler):
         # => do it now!
         self._update_token_entry(
             request,
-            otp_token_dn,
+            oath_token_dn,
             otp_compare and oath_token_identifier == oath_token_identifier_req,
             oath_hotp_next_counter,
         )
@@ -760,8 +761,8 @@ class HOTPValidationHandler(SlapdSockHandler):
 
         if not self._check_validity_period(
                 user_entry,
-                not_before_attr=USER_NOTBEFORE_ATTR,
-                not_after_attr=USER_NOTAFTER_ATTR,
+                self.not_before_attr,
+                self.not_after_attr,
             ):
             # fail because user account validity period violated
             self._log(
@@ -770,7 +771,7 @@ class HOTPValidationHandler(SlapdSockHandler):
                 request.dn,
                 InvalidCredentialsResponse.__name__,
             )
-            response = InvalidCredentialsResponse(request.msgid, info=MSG_ENTRY_NOT_VALID)
+            response = InvalidCredentialsResponse(request.msgid, self.infomsg.ENTRY_NOT_VALID)
 
         elif oath_token_identifier != oath_token_identifier_req:
             # fail because stored and requested token identifiers different
@@ -781,7 +782,7 @@ class HOTPValidationHandler(SlapdSockHandler):
                 oath_token_identifier_req,
                 InvalidCredentialsResponse.__name__,
             )
-            response = InvalidCredentialsResponse(request.msgid, info=MSG_HOTP_WRONG_TOKEN_ID)
+            response = InvalidCredentialsResponse(request.msgid, self.infomsg.HOTP_WRONG_TOKEN_ID)
 
         elif oath_max_usage_count >= 0 and \
            oath_hotp_current_counter > oath_max_usage_count:
@@ -793,7 +794,7 @@ class HOTPValidationHandler(SlapdSockHandler):
                 request.dn,
                 InvalidCredentialsResponse.__name__,
             )
-            response = InvalidCredentialsResponse(request.msgid, info=MSG_HOTP_COUNTER_EXCEEDED)
+            response = InvalidCredentialsResponse(request.msgid, self.infomsg.HOTP_COUNTER_EXCEEDED)
 
         elif is_expired(oath_token_secret_time, oath_secret_max_age, self.now_dt):
             # fail because token's shared secret too old (is expired)
@@ -803,13 +804,13 @@ class HOTPValidationHandler(SlapdSockHandler):
                     'Token %r of %r is expired '
                     '(oath_token_secret_time=%r, oath_secret_max_age=%r) => %s'
                 ),
-                otp_token_dn,
+                oath_token_dn,
                 request.dn,
                 oath_token_secret_time,
                 oath_secret_max_age,
                 InvalidCredentialsResponse.__name__,
             )
-            response = InvalidCredentialsResponse(request.msgid, info=MSG_OTP_TOKEN_EXPIRED)
+            response = InvalidCredentialsResponse(request.msgid, self.infomsg.OTP_TOKEN_EXPIRED)
 
         elif not user_password_compare or not otp_compare:
             # user password or OTP value wrong
@@ -825,7 +826,7 @@ class HOTPValidationHandler(SlapdSockHandler):
             )
             response = InvalidCredentialsResponse(
                 request.msgid,
-                info=MSG_VERIFICATION_FAILED.format(
+                info=self.infomsg.VERIFICATION_FAILED.format(
                     user_password_compare=user_password_compare,
                     otp_compare=otp_compare,
                 )
@@ -907,6 +908,7 @@ def run_this():
             SOCKET_TIMEOUT, SOCKET_PERMISSIONS,
             ALLOWED_UIDS, ALLOWED_GIDS,
             log_vars=DEBUG_VARS,
+            key_files=JWK_KEY_FILES,
         )
         slapd_sock_listener.ldapi_uri = local_ldap_uri_obj.initializeUrl()
         slapd_sock_listener.ldap_trace_level = \
