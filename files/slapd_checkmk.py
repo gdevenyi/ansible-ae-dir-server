@@ -74,7 +74,7 @@ from pyasn1.codec.ber import decoder
 # Configuration constants
 #-----------------------------------------------------------------------
 
-__version__ = '1.4.1'
+__version__ = '1.4.2'
 
 STATE_FILENAME = 'slapd_checkmk.state'
 
@@ -934,7 +934,7 @@ class SlapdCheck(LocalCheck):
                 CHECK_RESULT_UNKNOWN,
                 'SlapdCert',
                 check_output='no crypto modules present => could not check validity of %r' % (
-                    server_cert_pathname
+                    config_attrs['olcTLSCertificateFile'][0],
                 ),
             )
             return
@@ -1123,16 +1123,24 @@ class SlapdCheck(LocalCheck):
                         ),
                     )
                 else:
-                    sock_perf_data = _parse_sock_response(sock_response)
+                    check_msgs = ['Connected to %s listener %r and received %d bytes' % (
+                        sock_ops,
+                        sock_path,
+                        len(sock_response),
+                    )]
+                    try:
+                        sock_perf_data = _parse_sock_response(sock_response)
+                    except (IndexError, ValueError), err:
+                        sock_perf_data = {}
+                        check_result = CHECK_RESULT_ERROR
+                        check_msgs.append('parsing error: %s' % (err))
+                    else:
+                        check_result = CHECK_RESULT_OK
                     self.result(
-                        CHECK_RESULT_OK,
+                        check_result,
                         item_name,
                         performance_data=u'|'.join(sock_perf_data),
-                        check_output='Successfully connected to %s listener %r and received %d bytes' % (
-                            sock_ops,
-                            sock_path,
-                            len(sock_response),
-                        ),
+                        check_output=', '.join(check_msgs),
                     )
         return # end of _check_slapd_sock()
 
