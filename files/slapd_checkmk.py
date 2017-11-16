@@ -74,7 +74,7 @@ from pyasn1.codec.ber import decoder
 # Configuration constants
 #-----------------------------------------------------------------------
 
-__version__ = '1.4.2'
+__version__ = '1.4.3'
 
 STATE_FILENAME = 'slapd_checkmk.state'
 
@@ -108,6 +108,10 @@ SYNCREPL_TIMEDELTA_CRIT = 300.0
 # hysteresis for syncrepl conditions
 SYNCREPL_HYSTERESIS_WARN = 0.0
 SYNCREPL_HYSTERESIS_CRIT = 10.0
+
+# maximum percentage of failed syncrepl providers when to report error
+SYNCREPL_PROVIDER_ERROR_PERCENTAGE = 50.0
+
 
 # acceptable count of all outstanding operations
 # Using None disables checking the warn/critical level
@@ -1671,28 +1675,28 @@ class SlapdCheck(LocalCheck):
 
         if syncrepl_target_fail_msgs or \
            len(remote_csn_dict) < len(syncrepl_topology):
-            if float(len(remote_csn_dict))/float(len(syncrepl_topology)) >= 0.5:
+            slapd_provider_percentage = float(len(remote_csn_dict))/float(len(syncrepl_topology))*100
+            if slapd_provider_percentage >= SYNCREPL_PROVIDER_ERROR_PERCENTAGE:
                 check_result = CHECK_RESULT_WARNING
             else:
                 check_result = CHECK_RESULT_ERROR
-            self.result(
-                check_result,
-                'SlapdProviders',
-                check_output='Only connected to %d of %d providers: %s' % (
-                    len(remote_csn_dict),
-                    len(syncrepl_topology),
-                    ' / '.join(syncrepl_target_fail_msgs),
-                ),
-            )
         else:
-            self.result(
-                CHECK_RESULT_OK,
-                'SlapdProviders',
-                check_output='Successfully connected to %d of %d providers' % (
-                    len(remote_csn_dict),
-                    len(syncrepl_topology),
-                ),
-            )
+            slapd_provider_percentage = 100.0
+            check_result = CHECK_RESULT_OK
+        self.result(
+            check_result,
+            'SlapdProviders',
+            performance_data='count=%d|percent=%0.1f|' % (
+                len(remote_csn_dict),
+                slapd_provider_percentage,
+            ),
+            check_output='Connected to %d of %d (%0.1f%%) providers: %s' % (
+                len(remote_csn_dict),
+                len(syncrepl_topology),
+                slapd_provider_percentage,
+                ' / '.join(syncrepl_target_fail_msgs),
+            ),
+        )
         return remote_csn_dict # end of _check_providers()
 
     def checks(self):
