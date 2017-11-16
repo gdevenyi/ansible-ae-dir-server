@@ -12,85 +12,85 @@
     - aedir_files_dirs
 
 - name: "OS base configuration"
-  include: "baseos_{{ lsb_id }}.yml"
+  include_tasks: "baseos_{{ lsb_id }}.yml"
 
 - name: "Install OpenLDAP packages"
-  include: "install_openldap_{{ lsb_id }}.yml"
+  include_tasks: "install_openldap_{{ lsb_id }}.yml"
 
 - name: "Install apache2 on {{ lsb_id }}"
-  include: "install_apache2_{{ lsb_id }}.yml"
+  include_tasks: "install_apache2_{{ lsb_id }}.yml"
   when: openldap_role == 'provider'
 
 - name: "Add system accounts on {{ openldap_role }}"
-  include: system_accounts.yml
+  include_tasks: system_accounts.yml
 
 - name: "Configure OpenLDAP slapd for AE-DIR"
-  include: configure_slapd.yml
+  include_tasks: configure_slapd.yml
   tags:
      - slapd_conf
 
 - name: "Install various AE-DIR tools"
-  include: aedir_tools.yml
+  include_tasks: aedir_tools.yml
   tags:
     - aedir_tools
 
 - name: "TLS configuration for OpenLDAP slapd"
-  include: tls_files.yml
+  include_tasks: tls_files.yml
   tags:
     - openldap_tls_files
 
 - name: "Specific AE-DIR tool tasks on {{ lsb_id }}"
-  include: "aedir_tools_{{ lsb_id }}.yml"
+  include_tasks: "aedir_tools_{{ lsb_id }}.yml"
   tags:
     - aedir_tools
 
 - name: "Specific AE-DIR tool tasks on {{ openldap_role }}"
-  include: "aedir_tools_{{ openldap_role }}.yml"
+  include_tasks: "aedir_tools_{{ openldap_role }}.yml"
   tags:
     - aedir_tools
 
 - name: "Install web2ldap on {{ openldap_role }}"
-  include: "web2ldap.yml"
+  include_tasks: "web2ldap.yml"
   when: openldap_role=="provider"
   tags:
     - web2ldap
 
 - name: "Configure apache2"
-  include: "configure_apache2.yml"
+  include_tasks: "configure_apache2.yml"
   when: openldap_role == 'provider'
   tags:
      - apache_conf
 
 - name: "Install AE-DIR password service (aedirpwd)"
-  include: "aedirpwd.yml"
+  include_tasks: "aedirpwd.yml"
   when: openldap_role=="provider"
   tags:
     - aedirpwd
 
 - name: "Customize web2ldap for AE-DIR on {{ openldap_role }}"
-  include: configure_web2ldap.yml
+  include_tasks: configure_web2ldap.yml
   when: openldap_role=="provider"
   tags:
     - web2ldap
 
 - name: "OATH-LDAP tasks on {{ openldap_role }}"
-  include: "oath-ldap.yml"
+  include_tasks: "oath-ldap.yml"
   when: oath_ldap_enabled == True
   tags:
     - oath
 
 - name: "Password sync tasks on {{ openldap_role }}"
-  include: "pwsync.yml"
+  include_tasks: "pwsync.yml"
   when: openldap_role=="provider" and aedir_pwsync_targeturl
   tags:
      - pwsync
 
 - name: "Monitoring scripts on {{ openldap_role }}"
-  include: "slapd_monitoring.yml"
+  include_tasks: "slapd_monitoring.yml"
   tags:
     - monitoring
 
 - name: "Services on {{ openldap_role }}"
-  include: "services.yml"
+  include_tasks: "services.yml"
   tags:
     - services

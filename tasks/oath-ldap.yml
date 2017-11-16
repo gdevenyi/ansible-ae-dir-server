@@ -79,5 +79,5 @@
   when: aedir_service_manager=="systemd"
 
 - name: "OATH-LDAP enrollment web app on {{ openldap_role }}"
-  include: "oathenroll.yml"
+  include_tasks: "oathenroll.yml"
   when: openldap_role=="provider"

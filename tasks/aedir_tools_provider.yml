@@ -48,7 +48,7 @@
   when: aedir_init == True
 
 - name: "Specific installation for {{ lsb_id }}"
-  include: "aedir_tools_{{ lsb_id }}.yml"
+  include_tasks: "aedir_tools_{{ lsb_id }}.yml"
 
 - name: "Install tool scripts"
   template:
