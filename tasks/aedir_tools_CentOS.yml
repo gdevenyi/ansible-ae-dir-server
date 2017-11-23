@@ -37,6 +37,7 @@
     state: latest
     virtualenv: "{{ aedir_prefix }}"
     virtualenv_site_packages: no
+    virtualenv_python: python2.7
     extra_args: "{{ aedir_pip_extra_args }}"
   with_items:
     - pip
@@ -48,6 +49,7 @@
     state: present
     virtualenv: "{{ aedir_prefix }}"
     virtualenv_site_packages: no
+    virtualenv_python: python2.7
     extra_args: "{{ aedir_pip_extra_args }}"
   with_items:
     - pyasn1
