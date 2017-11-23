@@ -8,9 +8,9 @@
     type: package
   with_items:
     - python-aedir
-    - python-ldap
-    - python-pyasn1
-    - python-pyasn1-modules
+    - python-ldap=2.5.2
+    - python-pyasn1>=0.3.7
+    - python-pyasn1-modules>=0.1.5
     - python-netaddr
     - python-jwcrypto
   notify:

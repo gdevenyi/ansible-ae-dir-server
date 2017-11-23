@@ -1,0 +1,88 @@
+---
+
+- name: "Prepare virtualenv {{ aedir_prefix }} needed for PIP installation"
+  pip:
+    name: "{{ item }}"
+    state: latest
+    virtualenv: "{{ aedir_prefix }}"
+    virtualenv_site_packages: no
+    virtualenv_python: python2.7
+    extra_args: "{{ aedir_pip_extra_args }}"
+  with_items:
+    - pip
+    - setuptools
+
+- name: "Additional PIP packages in virtualenv {{ aedir_prefix }}"
+  pip:
+    name: "{{ item }}"
+    state: present
+    virtualenv: "{{ aedir_prefix }}"
+    virtualenv_site_packages: no
+    virtualenv_python: python2.7
+    extra_args: "{{ aedir_pip_extra_args }}"
+  with_items:
+    - aedir
+    - netaddr
+    - cryptography
+    - jwcrypto
+  notify:
+    - restart aedirpwd
+    - restart hotp_validator
+    - restart oathenroll
+    - restart bind_proxy
+    - restart web2ldap
+
+- name: "Additional version-pinned PIP packages in virtualenv {{ aedir_prefix }}"
+  pip:
+    name: "{{ item.name }}"
+    version: "{{ item.version }}"
+    state: present
+    virtualenv: "{{ aedir_prefix }}"
+    virtualenv_site_packages: no
+    virtualenv_python: python2.7
+    extra_args: "{{ aedir_pip_extra_args }}"
+  with_items:
+    - name: pyasn1
+      version: "0.3.7"
+    - name: pyasn1_modules
+      version: "0.1.5"
+    - name: python-ldap
+      version: "2.5.2"
+  notify:
+    - restart aedirpwd
+    - restart hotp_validator
+    - restart oathenroll
+    - restart bind_proxy
+    - restart web2ldap
+
+- name: "PIP package slapdsock in virtualenv {{ aedir_prefix }}"
+  pip:
+    name: slapdsock
+    state: present
+    virtualenv: "{{ aedir_prefix }}"
+    virtualenv_site_packages: no
+    extra_args: "{{ aedir_pip_extra_args }}"
+  notify:
+    - restart hotp_validator
+    - restart bind_proxy
+
+- name: "PIP install additional modules in virtualenv {{ aedir_prefix }} on {{ openldap_role }} on {{ lsb_id }}"
+  pip:
+    name: "{{ item }}"
+    state: present
+    virtualenv: "{{ aedir_prefix }}"
+    virtualenv_site_packages: yes
+    extra_args: "{{ aedir_pip_extra_args }}"
+  with_items:
+    - mailutil
+    - paramiko
+    - passlib
+    - pyExcelerator
+    - pyweblib
+    - web.py
+  when: openldap_role == 'provider'
+  notify:
+    - restart aedirpwd
+    - restart oathenroll
+    - restart hotp_validator
+    - restart web2ldap
