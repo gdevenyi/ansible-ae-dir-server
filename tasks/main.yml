@@ -79,6 +79,13 @@
   tags:
     - oath
 
+- name: "OATH-LDAP enrollment web app on {{ openldap_role }}"
+  include_tasks: "oathenroll.yml"
+  when: oath_ldap_enabled == True and openldap_role=="provider"
+  tags:
+     - oath
+     - oathenroll
+
 - name: "Password sync tasks on {{ openldap_role }}"
   include_tasks: "pwsync.yml"
   when: openldap_role=="provider" and aedir_pwsync_targeturl

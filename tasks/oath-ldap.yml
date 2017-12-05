@@ -77,7 +77,3 @@
     - reload systemd
     - "restart {{ oath_bind_listener }}"
   when: aedir_service_manager=="systemd"
-
-- name: "OATH-LDAP enrollment web app on {{ openldap_role }}"
-  include_tasks: "oathenroll.yml"
-  when: openldap_role=="provider"
