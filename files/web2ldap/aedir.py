@@ -2241,6 +2241,7 @@ class AEOathHOTPToken(OathHOTPToken):
   ref_attrs = (
     (None,u'Users',None,None),
   )
+  input_fallback = False
 
   def _determineFilter(self):
     return '(&{0}(aePerson={1}))'.format(
