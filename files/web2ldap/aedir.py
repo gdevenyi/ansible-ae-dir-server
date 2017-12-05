@@ -34,6 +34,7 @@ from w2lapp.schema.plugins.nis import UidNumber,GidNumber,MemberUID,Shell
 from w2lapp.schema.plugins.ppolicy import PwdExpireWarning,PwdMaxAge
 from w2lapp.schema.plugins.inetorgperson import DisplayNameInetOrgPerson
 from w2lapp.schema.plugins.groups import GroupEntryDN
+from w2lapp.schema.plugins.oath import OathHOTPToken
 try:
   from w2lapp.schema.plugins.opensshlpk import ParamikoSshPublicKey as SshPublicKey
 except ImportError:
@@ -2232,6 +2233,26 @@ syntax_registry.registerAttrType(
     AE_USER_OID,    # aeUser
     AE_SERVICE_OID, # aeService
   ]
+)
+
+class AEOathHOTPToken(OathHOTPToken):
+  oid = 'AEOathHOTPToken-oid'
+  desc = 'DN of the associated oathHOTPToken entry in aeUser entry'
+  ref_attrs = (
+    (None,u'Users',None,None),
+  )
+
+  def _determineFilter(self):
+    return '(&{0}(aePerson={1}))'.format(
+      OathHOTPToken._determineFilter(self),
+      self._entry['aePerson'][0],
+    )
+
+syntax_registry.registerAttrType(
+  AEOathHOTPToken.oid,[
+    '1.3.6.1.4.1.5427.1.389.4226.4.9.1', # oathHOTPToken
+  ],
+  structural_oc_oids=[AE_USER_OID], # aeUser
 )
 
 
