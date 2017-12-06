@@ -1142,6 +1142,7 @@ unique_uri "ldap:///cn={{ aedir_base_zone }},{{ aedir_suffix }}?aePerson?sub"
 unique_uri "ldap:///{{ aedir_suffix }}?cn?sub?(!(|(objectClass=aePerson)(objectClass=aeUser)(objectClass=aeNwDevice)))"
 unique_uri "ldap:///{{ aedir_suffix }}?gidNumber?sub"
 unique_uri "ldap:///{{ aedir_suffix }}?aeRemoteHost?sub?(!(objectClass=aeUser))"
+unique_uri "ldap:///{{ aedir_suffix }}?serialNumber?sub?(objectClass=*)"
 
 # Enforce constraints on attribute values
 overlay constraint
