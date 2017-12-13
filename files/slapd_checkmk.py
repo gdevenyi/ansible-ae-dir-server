@@ -58,24 +58,17 @@ else:
 os.environ['LDAPNOINIT'] = '0'
 
 # from python-ldap
-import ldap
-import ldap.sasl
-from ldap.ldapobject import LDAPObject
-from ldap.controls.simple import ValueLessRequestControl, ResponseControl
-import ldapurl
+import ldap0
+from ldap0.ldapobject import LDAPObject
+from ldap0.openldap import SyncReplDesc
 from ldapurl import LDAPUrl
 from ldif import ParseLDIF
-
-# from pyasn1
-from pyasn1.type import univ
-from pyasn1.codec.ber import decoder
-
 
 #-----------------------------------------------------------------------
 # Configuration constants
 #-----------------------------------------------------------------------
 
-__version__ = '1.5.0'
+__version__ = '2.0.0'
 
 STATE_FILENAME = 'slapd_checkmk.state'
 
@@ -86,12 +79,12 @@ CHECK_RESULT_ERROR = 2
 CHECK_RESULT_UNKNOWN = 3
 
 # which check result to return in case server responds with
-# ldap.UNAVAILABLE_CRITICAL_EXTENSION for no-op search control
+# ldap0.UNAVAILABLE_CRITICAL_EXTENSION for no-op search control
 # set this to CHECK_RESULT_ERROR if certain your server supports the control
 CHECK_RESULT_NOOP_SRCH_UNAVAILABLE = CHECK_RESULT_OK
 
 # Timeout in seconds when connecting to local and remote LDAP servers
-# used for ldap.OPT_NETWORK_TIMEOUT and ldap.OPT_TIMEOUT
+# used for ldap0.OPT_NETWORK_TIMEOUT and ldap0.OPT_TIMEOUT
 LDAP_TIMEOUT = 4.0
 
 # Timeout in seconds when connecting to slapd-sock listener
@@ -112,7 +105,6 @@ SYNCREPL_HYSTERESIS_CRIT = 10.0
 
 # maximum percentage of failed syncrepl providers when to report error
 SYNCREPL_PROVIDER_ERROR_PERCENTAGE = 50.0
-
 
 # acceptable count of all outstanding operations
 # Using None disables checking the warn/critical level
@@ -135,7 +127,7 @@ THREADS_ACTIVE_WARN_UPPER = 6
 # Too many pending threads should not occur
 THREADS_PENDING_WARN = 5
 
-CATCH_ALL_EXC = (Exception, ldap.LDAPError)
+CATCH_ALL_EXC = (Exception, ldap0.LDAPError)
 #CATCH_ALL_EXC = None
 
 # days to warn/error when checking server cert validity
@@ -145,12 +137,12 @@ CERT_WARN_DAYS = 50
 # set debug parameters for development (normally not needed)
 PYLDAP_TRACE_LEVEL = int(os.environ.get('PYLDAP_TRACE_LEVEL', '0'))
 PYLDAP_TRACE_FILE = sys.stderr
-ldap._trace_level = PYLDAP_TRACE_LEVEL
-ldap._trace_file = PYLDAP_TRACE_FILE
-# ldap.set_option(ldap.OPT_DEBUG_LEVEL,255)
+ldap0._trace_level = PYLDAP_TRACE_LEVEL
+ldap0._trace_file = PYLDAP_TRACE_FILE
+# ldap0.set_option(ldap0.OPT_DEBUG_LEVEL,255)
 
 #-----------------------------------------------------------------------
-# Classes
+# Functions
 #-----------------------------------------------------------------------
 
 def slapd_pid_fromfile(config_attrs):
@@ -166,11 +158,9 @@ def slapd_pid_fromfile(config_attrs):
         slapd_pid = pid_file.read().strip()
     return slapd_pid # end of _get_slapd_pid()
 
-
 #-----------------------------------------------------------------------
 # Classes
 #-----------------------------------------------------------------------
-
 
 class LocalCheck(object):
     """
@@ -352,146 +342,10 @@ class CheckStateFile(object):
         state_file.close()
 
 
-class SyncReplDesc(object):
-    """
-    Parser class for OpenLDAP syncrepl directives
-    """
-    known_keywords = (
-        'attrs',
-        'attrsonly',
-        'authcid',
-        'authzid',
-        'binddn',
-        'bindmethod',
-        'credentials',
-        'exattrs',
-        'filter',
-        'interval',
-        'keepalive',
-        'logbase',
-        'logfilter',
-        'network-timeout',
-        'provider',
-        'realm',
-        'retry',
-        'rid',
-        'saslmech',
-        'schemachecking',
-        'scope',
-        'searchbase',
-        'secprops',
-        'sizelimit',
-        'starttls',
-        'suffixmassage',
-        'syncdata',
-        'timelimit',
-        'timeout',
-        'tls_cacert',
-        'tls_cacertdir',
-        'tls_cert',
-        'tls_ciphersuite',
-        'tls_crlcheck',
-        'tls_key',
-        'tls_reqcert',
-        'type',
-    )
-
-    def __init__(self, syncrepl_statement):
-        """
-        syncrepl_statement
-           syncrepl statement without any line breaks
-        """
-        # strip all white spaces from syncrepl statement parameters
-        syncrepl_statement = syncrepl_statement.strip()
-        # Set class attributes for all known keywords
-        for keyword in self.known_keywords:
-            setattr(self, keyword.replace('-', '_'), None)
-
-        parts = []
-        for keyword in self.known_keywords:
-            k_pos = syncrepl_statement.find(keyword)
-            if k_pos == 0 or (k_pos > 0 and syncrepl_statement[k_pos-1] == ' '):
-                parts.append(k_pos)
-        parts.sort()
-        for k_pos in range(len(parts) - 1):
-            key, val = syncrepl_statement[parts[k_pos]:parts[k_pos+1]].split('=', 1)
-            key = key.strip()
-            val = val.strip()
-            if val[0] == '"' and val[-1] == '"':
-                val = val[1:-1]
-            setattr(self, key.replace('-', '_'), val)
-
-    def __repr__(self):
-        return '%s(rid=%s)' % (self.__class__.__name__, self.rid)
-
-    def ldap_url(self):
-        """
-        Return ldapurl.LDAPUrl object representing some syncrepl parameters
-        as close as possible.
-        """
-        ldap_url = ldapurl.LDAPUrl(self.provider)
-        ldap_url.dn = self.searchbase
-        ldap_url.scope = {
-            'sub': ldapurl.LDAP_SCOPE_SUBTREE,
-            'one': ldapurl.LDAP_SCOPE_ONELEVEL,
-            'base': ldapurl.LDAP_SCOPE_BASE,
-            # FIX ME: this is a work-around
-            'subord': ldapurl.LDAP_SCOPE_SUBTREE,
-        }[self.scope]
-        ldap_url.filterstr = self.filter
-        ldap_url.who = self.authcid or self.binddn
-        ldap_url.cred = self.credentials
-        ldap_url.attrs = split_attrs(self.attrs) or ['*', '+']
-        return ldap_url
-
-
-class SearchNoOpControl(ValueLessRequestControl, ResponseControl):
-
-    """
-    No-op control attached to search operations implementing sort of a
-    count operation
-
-    see https://www.openldap.org/its/index.cgi?findid=6598
-    """
-    controlType = '1.3.6.1.4.1.4203.666.5.18'
-
-    def __init__(self, criticality=False):
-        ValueLessRequestControl.__init__(
-            self,
-            SearchNoOpControl.controlType,
-            criticality=criticality
-        )
-        self.resultCode = None
-        self.numSearchResults = None
-        self.numSearchContinuations = None
-
-    class SearchNoOpControlValue(univ.Sequence):
-        """
-        Sequence class wrapper for no-op search control value
-        """
-        pass
-
-    def decodeControlValue(self, encodedControlValue):
-        """
-        decode no-op search control value
-        """
-        decodedValue, _ = decoder.decode(
-            encodedControlValue,
-            asn1Spec=self.SearchNoOpControlValue()
-        )
-        self.resultCode = int(decodedValue[0])
-        self.numSearchResults = int(decodedValue[1])
-        self.numSearchContinuations = int(decodedValue[2])
-
-# register the control class with python-ldap
-ldap.controls.KNOWN_RESPONSE_CONTROLS[SearchNoOpControl.controlType] = SearchNoOpControl
-
-
 class OpenLDAPMonitorCache(object):
     """
     Cache object for data read from back-monitor
     """
-    BDB_BACKENDS = set(('bdb', 'hdb'))
 
     def __init__(self, monitor_dict, monitor_context):
         self._ctx = monitor_context
@@ -510,30 +364,6 @@ class OpenLDAPMonitorCache(object):
         else:
             res = int(attr_value)
         return res # end of get_value()
-
-    def bdb_caches(self):
-        """
-        returns list of BDB cache information
-        """
-        database_suffix_lower = ','.join((
-            '',
-            'cn=Databases',
-            self._ctx,
-        )).lower()
-        result = [
-            (
-                int(entry['cn'][0].split(' ')[1]),
-                entry['namingContexts'][0],
-                int(entry['olmBDBDNCache'][0]),
-                int(entry['olmBDBEntryCache'][0]),
-                int(entry['olmBDBIDLCache'][0]),
-            )
-            for dn, entry in self._data.items()
-            if dn.lower().endswith(database_suffix_lower) and
-            entry['cn'][0].startswith('Database ') and
-            entry['monitoredInfo'][0] in self.BDB_BACKENDS
-        ]
-        return result  # bdb_caches()
 
     def operation_counters(self):
         """
@@ -621,31 +451,20 @@ class OpenLDAPObject:
         """
         return dict(self.search_s(
             self.monitorContext[0],
-            ldap.SCOPE_SUBTREE,
+            ldap0.SCOPE_SUBTREE,
             self.all_monitor_entries_filter,
             attrlist=self.all_monitor_entries_attrs,
         ))
-
-    def get_rootdse_attrs(self, attrlist=None):
-        """
-        returns dict of rootDSE attributes listed in `attrlist'
-        """
-        _, ldap_rootdse = self.search_s(
-            '',
-            ldap.SCOPE_BASE,
-            '(objectClass=*)',
-            attrlist=attrlist or ['*', '+'],
-        )[0]
-        for nc_attr in self.naming_context_attrs:
-            if nc_attr in ldap_rootdse:
-                self.__setattr__(nc_attr, ldap_rootdse[nc_attr])
-        return ldap_rootdse  # get_rootdse_attrs()
 
     def get_naming_context_attrs(self):
         """
         returns all naming contexts including special backends
         """
-        return self.get_rootdse_attrs(attrlist=self.naming_context_attrs)
+        rootdse = self.read_rootdse_s(attrlist=self.naming_context_attrs)
+        for nc_attr in self.naming_context_attrs:
+            if nc_attr in rootdse:
+                self.__setattr__(nc_attr, rootdse[nc_attr])
+        return rootdse
 
     def get_sock_listeners(self):
         """
@@ -653,7 +472,7 @@ class OpenLDAPObject:
         """
         ldap_result = self.search_s(
             self.configContext[0],
-            ldap.SCOPE_SUBTREE,
+            ldap0.SCOPE_SUBTREE,
             self.slapd_sock_filter,
             attrlist=['olcDbSocketPath', 'olcOvSocketOps'],
         )
@@ -671,15 +490,14 @@ class OpenLDAPObject:
         read the contextCSN values from the backends root entry specified
         by `naming_context'
         """
-        ldap_result = self.search_s(
+        ldap_result = self.read_s(
             naming_context,
-            ldap.SCOPE_BASE,
             '(contextCSN=*)',
             attrlist=['objectClass', 'contextCSN'],
         )
         csn_dict = {}
         try:
-            context_csn_vals = ldap_result[0][1]['contextCSN']
+            context_csn_vals = ldap_result['contextCSN']
         except (KeyError, IndexError):
             pass
         else:
@@ -696,7 +514,7 @@ class OpenLDAPObject:
         """
         ldap_result = self.search_s(
             self.configContext[0],
-            ldap.SCOPE_ONELEVEL,
+            ldap0.SCOPE_ONELEVEL,
             self.syncrepl_filter,
             attrlist=['olcDatabase', 'olcSuffix', 'olcSyncrepl'],
         )
@@ -732,7 +550,7 @@ class OpenLDAPObject:
         """
         ldap_result = self.search_s(
             self.configContext[0],
-            ldap.SCOPE_ONELEVEL,
+            ldap0.SCOPE_ONELEVEL,
             self.all_real_db_filter,
             attrlist=['olcDatabase', 'olcSuffix', 'olcDbDirectory'],
         )
@@ -745,57 +563,15 @@ class OpenLDAPObject:
             result.append((db_num, db_suffix, db_type, db_dir))
         return result  # db_suffixes()
 
-    def noop_search_st(
-            self,
-            base,
-            scope=ldap.SCOPE_SUBTREE,
-            filterstr='(objectClass=*)',
-            timeout=-1,
-        ):
-        """
-        no-op search with timeout
-        """
-        try:
-            msg_id = self.search_ext(
-                base,
-                scope,
-                filterstr=filterstr,
-                attrlist=['1.1'],
-                timeout=timeout,
-                serverctrls=[SearchNoOpControl(criticality=True)],
-            )
-            _, _, _, search_response_ctrls = self.result3(
-                msg_id, all=1, timeout=timeout)
-        except (
-                ldap.TIMEOUT,
-                ldap.TIMELIMIT_EXCEEDED,
-                ldap.SIZELIMIT_EXCEEDED,
-                ldap.ADMINLIMIT_EXCEEDED
-            ), ldap_error:
-            self.abandon(msg_id)
-            raise ldap_error
-        else:
-            noop_srch_ctrl = [
-                c
-                for c in search_response_ctrls
-                if c.controlType == SearchNoOpControl.controlType
-            ]
-            if noop_srch_ctrl:
-                return (
-                    noop_srch_ctrl[0].numSearchResults,
-                    noop_srch_ctrl[0].numSearchContinuations,
-                )
-            return None
-
 
 class SlapdConnection(LDAPObject, OpenLDAPObject):
     """
     LDAPObject derivation especially for accesing OpenLDAP's slapd
     """
     tls_fileoptions = set((
-        ldap.OPT_X_TLS_CACERTFILE,
-        ldap.OPT_X_TLS_CERTFILE,
-        ldap.OPT_X_TLS_KEYFILE,
+        ldap0.OPT_X_TLS_CACERTFILE,
+        ldap0.OPT_X_TLS_CERTFILE,
+        ldap0.OPT_X_TLS_KEYFILE,
     ))
 
     def __init__(
@@ -805,8 +581,12 @@ class SlapdConnection(LDAPObject, OpenLDAPObject):
             trace_file=PYLDAP_TRACE_FILE,
             trace_stack_limit=8,
             tls_options=None,
-            network_timeout=LDAP_TIMEOUT,
-            timeout=LDAP_TIMEOUT,
+            network_timeout=None,
+            timeout=None,
+            bind_method='sasl',
+            sasl_mech='EXTERNAL',
+            who=None,
+            cred=None,
         ):
         LDAPObject.__init__(
             self,
@@ -815,38 +595,22 @@ class SlapdConnection(LDAPObject, OpenLDAPObject):
             trace_file=trace_file,
             trace_stack_limit=trace_stack_limit,
         )
-        # Switch of automatic referral chasing
-        self.set_option(ldap.OPT_REFERRALS, 0)
-        # Switch of automatic alias dereferencing
-        self.set_option(ldap.OPT_DEREF, ldap.DEREF_NEVER)
         # Set timeout values
-        self.set_option(ldap.OPT_NETWORK_TIMEOUT, network_timeout)
-        self.set_option(ldap.OPT_TIMEOUT, timeout)
-        # Force server cert validation
-        self.set_option(
-            ldap.OPT_X_TLS_REQUIRE_CERT,
-            ldap.OPT_X_TLS_DEMAND,
-        )
-        for opt_key, opt_value in tls_options or []:
-            if opt_key in self.tls_fileoptions:
-                # provoke IOError if non-existing file is referenced
-                open(opt_value, 'rb')
-            self.set_option(opt_key, opt_value)
-        # Force reinitializing SSL context
-        self.set_option(ldap.OPT_X_TLS_NEWCTX, 0)
+        if network_timeout is None:
+            network_timeout = LDAP_TIMEOUT
+        if timeout is None:
+            timeout = LDAP_TIMEOUT
+        self.set_option(ldap0.OPT_NETWORK_TIMEOUT, network_timeout)
+        self.set_option(ldap0.OPT_TIMEOUT, timeout)
+        tls_options = tls_options or {}
+        self.set_tls_options(**tls_options)
         # Send SASL/EXTERNAL bind which opens connection
-        self._sasl_external_bind_s()
+        if bind_method=='sasl':
+            self.sasl_non_interactive_bind_s(sasl_mech)
+        elif bind_method=='simple':
+            self.simple_bind_s(who or '', cred or '')
         # for outside access
         self.uri = self._uri
-
-    def _sasl_external_bind_s(self):
-        """
-        Send SASL bind request using SASL mech EXTERNAL
-        """
-        return self.sasl_interactive_bind_s(
-            '',
-            ldap.sasl.sasl({}, 'EXTERNAL'),
-        )
 
 
 class SyncreplProviderTask(threading.Thread):
@@ -903,18 +667,22 @@ class SyncreplProviderTask(threading.Thread):
         try:
             ldap_conn = SlapdConnection(
                 self.syncrepl_target_uri,
-                tls_options=(
+                tls_options={
                     # Set TLS connection options from TLS attribute read from
                     # configuration context
                     # path name of file containing all trusted CA certificates
-                    (ldap.OPT_X_TLS_CACERTFILE, syncrepl_obj.tls_cacert),
+                    'cacert_filename': syncrepl_obj.tls_cacert,
                     # Use slapd server cert/key for client authentication
                     # just like used for syncrepl
-                    (ldap.OPT_X_TLS_CERTFILE, syncrepl_obj.tls_cert),
-                    (ldap.OPT_X_TLS_KEYFILE, syncrepl_obj.tls_key),
-                ),
-                network_timeout=float(syncrepl_obj.network_timeout) or LDAP_TIMEOUT,
-                timeout=float(syncrepl_obj.timeout) or LDAP_TIMEOUT,
+                    'client_cert_filename': syncrepl_obj.tls_cert,
+                    'client_key_filename': syncrepl_obj.tls_key,
+                },
+                network_timeout=syncrepl_obj.network_timeout,
+                timeout=syncrepl_obj.timeout,
+                bind_method=syncrepl_obj.bindmethod,
+                sasl_mech=syncrepl_obj.saslmech,
+                who=syncrepl_obj.binddn,
+                cred=syncrepl_obj.credentials,
             )
         except CATCH_ALL_EXC, exc:
             self.err_msgs.append('Error connecting to %r (%s): %s' % (
@@ -974,24 +742,6 @@ class SyncreplProviderTask(threading.Thread):
         except CATCH_ALL_EXC, exc:
             pass
         return # end of SyncreplProviderTask.run()
-
-
-#-----------------------------------------------------------------------
-# Functions
-#-----------------------------------------------------------------------
-
-
-def split_attrs(attrs):
-    """
-    Return splitted list of space or comma-separated list of attribute names
-    """
-    return filter(
-        None,
-        [
-            attr.strip()
-            for attr in (attrs or '').strip().replace(' ', ',').split(',')
-        ]
-    )
 
 
 class SlapdCheck(LocalCheck):
@@ -1151,16 +901,16 @@ class SlapdCheck(LocalCheck):
         try:
             ldaps_conn = SlapdConnection(
                 ldaps_uri,
-                tls_options=(
+                tls_options={
                     # Set TLS connection options from TLS attribute read from
                     # configuration context
                     # path name of file containing all trusted CA certificates
-                    (ldap.OPT_X_TLS_CACERTFILE, self._config_attrs['olcTLSCACertificateFile'][0]),
+                    'cacert_filename': self._config_attrs['olcTLSCACertificateFile'][0],
                     # Use slapd server cert/key for client authentication
                     # just like used for syncrepl
-                    (ldap.OPT_X_TLS_CERTFILE, self._config_attrs['olcTLSCertificateFile'][0]),
-                    (ldap.OPT_X_TLS_KEYFILE, self._config_attrs['olcTLSCertificateKeyFile'][0]),
-                ),
+                    'client_cert_filename': self._config_attrs['olcTLSCertificateFile'][0],
+                    'client_key_filename': self._config_attrs['olcTLSCertificateKeyFile'][0],
+                },
             )
         except CATCH_ALL_EXC, exc:
             self.result(
@@ -1622,11 +1372,11 @@ class SlapdCheck(LocalCheck):
                 self.add_item(item_name)
                 try:
                     noop_start_timestamp = time.time()
-                    noop_result = self._ldapi_conn.noop_search_st(
+                    noop_result = self._ldapi_conn.noop_search(
                         db_suffix,
                         timeout=NOOP_SEARCH_TIMEOUT,
                     )
-                except ldap.TIMEOUT:
+                except ldap0.TIMEOUT:
                     self.result(
                         CHECK_RESULT_WARNING,
                         item_name,
@@ -1635,7 +1385,7 @@ class SlapdCheck(LocalCheck):
                             db_suffix,
                         )
                     )
-                except ldap.TIMELIMIT_EXCEEDED:
+                except ldap0.TIMELIMIT_EXCEEDED:
                     self.result(
                         CHECK_RESULT_WARNING,
                         item_name,
@@ -1644,7 +1394,7 @@ class SlapdCheck(LocalCheck):
                             db_suffix,
                         )
                     )
-                except ldap.UNAVAILABLE_CRITICAL_EXTENSION:
+                except ldap0.UNAVAILABLE_CRITICAL_EXTENSION:
                     self.result(
                         CHECK_RESULT_NOOP_SRCH_UNAVAILABLE,
                         item_name,
@@ -1771,11 +1521,9 @@ class SlapdCheck(LocalCheck):
         #---------------
         try:
             _ = self._ldapi_conn.get_naming_context_attrs()
-            _, self._config_attrs = self._ldapi_conn.search_ext_s(
+            self._config_attrs = self._ldapi_conn.read_s(
                 self._ldapi_conn.configContext[0],
-                ldap.SCOPE_BASE,
-                '(objectClass=*)',
-                [
+                attrlist=[
                     'olcArgsFile',
                     'olcConfigDir',
                     'olcConfigFile',
@@ -1788,7 +1536,7 @@ class SlapdCheck(LocalCheck):
                     'olcTLSCertificateKeyFile',
                     'olcTLSDHParamFile',
                 ],
-            )[0]
+            )
         except CATCH_ALL_EXC, exc:
             self.result(
                 CHECK_RESULT_ERROR,
