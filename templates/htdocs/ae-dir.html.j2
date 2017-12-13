@@ -21,13 +21,18 @@
   implements a Privileged Identity &amp; Access Management (IAM/PIM/PAM)
 </p>
 
-<p>
-  For a longer introduction you can check out various
-  <a href="https://stroeder.com/publications.html">
-  &AElig;-DIR conference presentations</a>.
+{% if aedir_news %}
+<p id="news">
+  News:
 </p>
+<ul>
+{% for news_item in aedir_news %}
+    <li>{{ news_item }}</li>
+{% endfor %}
+</ul>
+{% endif %}
 
-<p>
+<p id="objectives">
   Objectives:
 </p>
 <ul>
@@ -54,4 +59,10 @@
   <li>Only encrypted network traffic</li>
   <li>Well-defined semantics for all object classes and attributes (better no data than bad data)</li>
 </ul>
+
+<p>
+  For a longer introduction you can check out various
+  <a href="https://stroeder.com/publications.html">
+  &AElig;-DIR conference presentations</a>.
+</p>
 {% endblock content %}

@@ -519,6 +519,9 @@ aedir_pwsync_socket_dir: "{{ aedir_rundir }}/passmod"
 # (set this to empty string for disabling the external bind listeners completely)
 aedir_pwsync_socket_path: "{{ aedir_pwsync_socket_dir }}/socket"
 
+# list of HTML snippets to be put as news on the entry web page
+aedir_news: []
+
 #---------------------------------------------------------------------------
 # OATH-LDAP parameters
 #---------------------------------------------------------------------------
