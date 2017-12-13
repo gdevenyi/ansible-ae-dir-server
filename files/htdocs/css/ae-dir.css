@@ -119,6 +119,10 @@ p,dl,ul,ol,dd,li,table {
   line-height:1.2em;
 }
 
+ul {
+  list-style-type:square;
+}
+
 pre.cli {
   padding:0.4em;
   margin-left:2em;
