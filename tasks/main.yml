@@ -49,6 +49,12 @@
   tags:
     - aedir_tools
 
+- name: "AE-DIR web pages {{ openldap_role }}"
+  include_tasks: "aedir_htdocs.yml"
+  when: openldap_role=="provider"
+  tags:
+    - htdocs
+
 - name: "Install web2ldap on {{ openldap_role }}"
   include_tasks: "web2ldap.yml"
   when: openldap_role=="provider"
