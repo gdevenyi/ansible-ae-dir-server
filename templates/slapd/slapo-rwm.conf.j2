@@ -15,7 +15,7 @@ rwm-rewriteMap slapd host2dn "ldap:///{{ aedir_suffix }}?entryDN?sub?"
 rwm-rewriteContext bindDN
 rwm-rewriteRule "^(host=[^,]+),{{ aedir_suffix }}$" "${host2dn($1)}" ":@I"
 
-{% if openldap_role=="provider" %}
+{% if oath_ldap_enabled==True and openldap_role=="provider" %}
 # serialNumber=foo,{{ aedir_suffix }} -> entryDN of entry within {{ aedir_suffix }} matching (serialNumber=foo)
 rwm-rewriteMap slapd serial2dn "ldap:///{{ aedir_suffix }}?entryDN?sub?"
 rwm-rewriteContext bindDN
