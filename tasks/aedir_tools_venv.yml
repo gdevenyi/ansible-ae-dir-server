@@ -12,7 +12,7 @@
     - pip
     - setuptools
 
-- name: "Additional PIP packages in virtualenv {{ aedir_prefix }}"
+- name: "Additional PIP packages in virtualenv {{ aedir_prefix }} on {{ lsb_id }}"
   pip:
     name: "{{ item }}"
     state: present
@@ -25,6 +25,8 @@
     - netaddr
     - cryptography
     - jwcrypto
+    - pyasn1
+    - pyasn1_modules
   notify:
     - restart aedirpwd
     - restart hotp_validator
@@ -42,10 +44,6 @@
     virtualenv_python: python2.7
     extra_args: "{{ aedir_pip_extra_args }}"
   with_items:
-    - name: pyasn1
-      version: "0.3.7"
-    - name: pyasn1_modules
-      version: "0.1.5"
     - name: python-ldap
       version: "2.5.2"
   notify:
