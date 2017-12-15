@@ -8,6 +8,8 @@ This CRON script performs two tasks:
 Author: Michael Ströder <michael@stroeder.com>
 """
 
+from __future__ import absolute_import
+
 __version__ = '0.3.0'
 
 # from Python's standard lib
@@ -19,7 +21,8 @@ import email.utils
 from socket import getfqdn
 
 # from python-ldap
-import ldap
+import ldap0
+import ldap0.functions
 
 # the separate mailutil module
 import mailutil
@@ -35,6 +38,8 @@ import aedir.process
 sys.path.append(sys.argv[1])
 from aedirpwd_cnf import *
 
+ldap0._trace_level = int(os.environ.get('PYLDAP_TRACELEVEL', '0'))
+
 #-----------------------------------------------------------------------
 # Classes and functions
 #-----------------------------------------------------------------------
@@ -44,6 +49,7 @@ class AEDIRPwdJob(aedir.process.AEProcess):
     Job instance
     """
     script_version = __version__
+    ldap_url = PWD_LDAP_URL
     pyldap_tracelevel = int(os.environ.get('PYLDAP_TRACELEVEL', '0'))
     notify_oldest_timespan = NOTIFY_OLDEST_TIMESPAN
     user_attrs = [
@@ -78,8 +84,8 @@ class AEDIRPwdJob(aedir.process.AEProcess):
         """
         current_time = time.time()
         return (
-            ldap.strf_secs(current_time-self.notify_oldest_timespan),
-            ldap.strf_secs(current_time)
+            ldap0.functions.strf_secs(current_time-self.notify_oldest_timespan),
+            ldap0.functions.strf_secs(current_time)
         )
 
     def _expire_pwd_reset(self, last_run_timestr, current_run_timestr):
@@ -93,9 +99,9 @@ class AEDIRPwdJob(aedir.process.AEProcess):
                 serverid=self.server_id,
             )
         ).encode('utf-8')
-        ldap_results = self.ldap_conn.search_ext_s(
+        ldap_results = self.ldap_conn.search_s(
             self.ldap_conn.find_search_base(),
-            ldap.SCOPE_SUBTREE,
+            ldap0.SCOPE_SUBTREE,
             filterstr=expiration_filterstr,
             attrlist=[
                 'objectClass',
@@ -110,32 +116,32 @@ class AEDIRPwdJob(aedir.process.AEProcess):
             ldap_mod_list = [
                 # explictly delete by value
                 (
-                    ldap.MOD_DELETE,
+                    ldap0.MOD_DELETE,
                     'objectClass',
                     ['msPwdResetObject']
                 ),
                 (
-                    ldap.MOD_DELETE,
+                    ldap0.MOD_DELETE,
                     'msPwdResetTimestamp',
                     [ldap_entry['msPwdResetTimestamp'][0]]
                 ),
                 (
-                    ldap.MOD_DELETE,
+                    ldap0.MOD_DELETE,
                     'msPwdResetExpirationTime',
                     [ldap_entry['msPwdResetExpirationTime'][0]]
                 ),
                 # delete whole value no matter what
-                (ldap.MOD_DELETE, 'msPwdResetEnabled', None),
-                (ldap.MOD_DELETE, 'msPwdResetPasswordHash', None),
+                (ldap0.MOD_DELETE, 'msPwdResetEnabled', None),
+                (ldap0.MOD_DELETE, 'msPwdResetPasswordHash', None),
             ]
             if PWD_ADMIN_LEN or 'msPwdResetAdminPw' in ldap_entry:
                 ldap_mod_list.append(
-                    (ldap.MOD_DELETE, 'msPwdResetAdminPw', None),
+                    (ldap0.MOD_DELETE, 'msPwdResetAdminPw', None),
                 )
             # Actually perform the modify operation
             try:
                 self.ldap_conn.modify_s(ldap_dn, ldap_mod_list)
-            except ldap.LDAPError, ldap_error:
+            except ldap0.LDAPError as ldap_error:
                 self.logger.warn(
                     'LDAPError removing msPwdResetObject attrs in %r: %s',
                     ldap_dn,
@@ -206,9 +212,9 @@ class AEDIRPwdJob(aedir.process.AEProcess):
             'User search filter: %r',
             nopassword_filterstr,
         )
-        ldap_results = self.ldap_conn.search_ext_s(
+        ldap_results = self.ldap_conn.search_s(
             self.ldap_conn.find_search_base(),
-            ldap.SCOPE_SUBTREE,
+            ldap0.SCOPE_SUBTREE,
             filterstr=nopassword_filterstr,
             attrlist=self.user_attrs,
         )
@@ -253,7 +259,7 @@ class AEDIRPwdJob(aedir.process.AEProcess):
                     filterstr=FILTERSTR_USER.encode('utf-8'),
                     attrlist=self.admin_attrs,
                 )
-            except ldap.NO_SUCH_OBJECT:
+            except ldap0.NO_SUCH_OBJECT:
                 admin_entry = {}
             admin_entry = admin_entry or {}
             if not admin_entry:

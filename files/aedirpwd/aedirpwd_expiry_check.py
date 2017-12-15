@@ -9,6 +9,8 @@ user entries.
 Author: Michael Ströder <michael@stroeder.com>
 """
 
+from __future__ import absolute_import
+
 __version__ = '0.1.1'
 
 # from Python's standard lib
@@ -22,8 +24,9 @@ from email.header import Header as email_Header
 # the separate python-aedir module
 import aedir.process
 
-# from python-ldap
-import ldap
+# from ldap0
+import ldap0
+import ldap0.functions
 
 #-----------------------------------------------------------------------
 # Configuration constants
@@ -69,6 +72,8 @@ PWD_EXPIRYWARN_MAIL_SUBJECT = u'Password of Æ-DIR account "{user_uid}" will exp
 # E-Mail body template file for notification message
 PWD_EXPIRYWARN_MAIL_TEMPLATE = os.path.join(TEMPLATES_DIRNAME, 'pwd_expiry_warning.txt')
 
+ldap0._trace_level = int(os.environ.get('PYLDAP_TRACELEVEL', '0'))
+
 #-----------------------------------------------------------------------
 # Classes and functions
 #-----------------------------------------------------------------------
@@ -79,6 +84,7 @@ class AEDIRPwdJob(aedir.process.AEProcess):
     Job instance
     """
     script_version = __version__
+    ldap_url = PWD_LDAP_URL
     pyldap_tracelevel = int(os.environ.get('PYLDAP_TRACELEVEL', '0'))
     notify_oldest_timespan = NOTIFY_OLDEST_TIMESPAN
     user_attrs = [
@@ -111,8 +117,8 @@ class AEDIRPwdJob(aedir.process.AEProcess):
         """
         current_time = time.time()
         return (
-            ldap.strf_secs(current_time-self.notify_oldest_timespan),
-            ldap.strf_secs(current_time)
+            ldap0.functions.strf_secs(current_time-self.notify_oldest_timespan),
+            ldap0.functions.strf_secs(current_time)
         )
 
     def run_worker(self, state):
@@ -127,9 +133,9 @@ class AEDIRPwdJob(aedir.process.AEProcess):
         """
         Search all pwdPolicy entries with expiring passwords (pwdMaxAge set)
         """
-        ldap_pwdpolicy_results = self.ldap_conn.search_ext_s(
+        ldap_pwdpolicy_results = self.ldap_conn.search_s(
             self.ldap_conn.find_search_base(),
-            ldap.SCOPE_SUBTREE,
+            ldap0.SCOPE_SUBTREE,
             filterstr=PWDPOLICY_FILTER,
             attrlist=[
                 'cn',
@@ -150,16 +156,16 @@ class AEDIRPwdJob(aedir.process.AEProcess):
         """
         send password expiry warning e-mails
         """
-        current_time = ldap.strp_secs(current_run_timestr)
+        current_time = ldap0.functions.strp_secs(current_run_timestr)
 
         pwd_policy_list = self._get_pwd_policy_entries()
         pwd_expire_warning_list = []
 
         for pwd_policy, pwd_max_age, pwd_expire_warning in pwd_policy_list:
             filterstr_inputs_dict = {
-                'pwdpolicy':pwd_policy,
-                'pwdchangedtime_ge':ldap.strf_secs(current_time-pwd_max_age),
-                'pwdchangedtime_le':ldap.strf_secs(current_time-(pwd_max_age-pwd_expire_warning)),
+                'pwdpolicy': pwd_policy,
+                'pwdchangedtime_ge': ldap0.functions.strf_secs(current_time-pwd_max_age),
+                'pwdchangedtime_le': ldap0.functions.strf_secs(current_time-(pwd_max_age-pwd_expire_warning)),
             }
             self.logger.debug('filterstr_inputs_dict = %s', filterstr_inputs_dict)
 
@@ -169,9 +175,9 @@ class AEDIRPwdJob(aedir.process.AEProcess):
                 'Search users for password expiry warning with %r',
                 pwd_expirywarn_filter
             )
-            ldap_results = self.ldap_conn.search_ext_s(
+            ldap_results = self.ldap_conn.search_s(
                 self.ldap_conn.find_search_base(),
-                ldap.SCOPE_SUBTREE,
+                ldap0.SCOPE_SUBTREE,
                 filterstr=pwd_expirywarn_filter,
                 attrlist=self.user_attrs,
             )
@@ -198,13 +204,13 @@ class AEDIRPwdJob(aedir.process.AEProcess):
                 user_data['admin_mail'] = u'unknown'
                 for admin_dn_attr in ('modifiersName', 'creatorsName'):
                     try:
-                        _, admin_entry = self.ldap_conn.search_ext_s(
+                        _, admin_entry = self.ldap_conn.search_s(
                             ldap_entry[admin_dn_attr][0],
-                            ldap.SCOPE_BASE,
+                            ldap0.SCOPE_BASE,
                             filterstr=FILTERSTR_USER.encode('utf-8'),
                             attrlist=self.admin_attrs,
                         )[0]
-                    except ldap.LDAPError, ldap_err:
+                    except ldap0.LDAPError as ldap_err:
                         self.logger.debug(
                             'LDAPError reading %r: %r: %s',
                             admin_dn_attr,
