@@ -5,6 +5,8 @@ web2ldap plugin classes for
 Æ-DIR -- Yet another LDAP user and systems management
 """
 
+from __future__ import absolute_import
+
 # Python's standard lib
 import re,time,calendar,socket
 

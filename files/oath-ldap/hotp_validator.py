@@ -5,6 +5,8 @@ slapd-sock listener demon which performs password checking and
 HOTP validation on intercepted BIND requests
 """
 
+from __future__ import absolute_import
+
 __version__ = '0.10.0'
 __author__ = u'Michael Ströder <michael@stroeder.com>'
 

@@ -11,6 +11,8 @@ and exports the userPassword value
 # Imports
 #-----------------------------------------------------------------------
 
+from __future__ import absolute_import
+
 # from Python's standard lib
 import logging
 import os

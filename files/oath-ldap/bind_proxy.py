@@ -6,7 +6,10 @@ to a remote LDAP server in case the request 'dn' and 'peername'
 information matches
 """
 
-import os, logging
+from __future__ import absolute_import
+
+import os
+import logging
 
 __version__ = '0.4.0'
 __author__ = u'Michael Ströder <michael@stroeder.com>'
