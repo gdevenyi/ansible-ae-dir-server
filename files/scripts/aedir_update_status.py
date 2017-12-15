@@ -8,6 +8,8 @@ It is designed to run as a CRON job.
 Author: Michael Ströder <michael@stroeder.com>
 """
 
+from __future__ import absolute_import
+
 __version__ = '0.1.0'
 
 #-----------------------------------------------------------------------
@@ -19,7 +21,7 @@ import time
 
 # set LDAPRC env var *before* importing ldap
 os.environ['LDAPRC'] = '/opt/ae-dir/etc/ldap.conf'
-import ldap
+import ldap0
 import aedir
 import aedir.process
 
@@ -61,7 +63,7 @@ class AEStatusUpdater(aedir.process.AEProcess):
         """
         the main program
         """
-        current_time_str = ldap.strf_secs(time.time())
+        current_time_str = ldap0.functions.strf_secs(time.time())
         self.logger.debug('current_time_str = %r', current_time_str)
         expiry_filter = (
           '(&'
@@ -77,30 +79,30 @@ class AEStatusUpdater(aedir.process.AEProcess):
         try:
             msg_id = self.ldap_conn.search(
                 self.ldap_conn.find_search_base(),
-                ldap.SCOPE_SUBTREE,
+                ldap0.SCOPE_SUBTREE,
                 expiry_filter,
                 attrlist=['aeStatus', 'aeExpiryStatus'],
             )
-        except ldap.LDAPError, ldap_error:
+        except ldap0.LDAPError as ldap_error:
             self.logger.warn('LDAPError searching %r: %s', expiry_filter, ldap_error)
             return
         # process LDAP results
-        for _, res_data, _, _ in self.ldap_conn.allresults(msg_id):
+        for _, res_data, _, _ in self.ldap_conn.results(msg_id):
             for aeobj_dn, aeobj_entry in res_data:
                 self.aeobject_counter += 1
                 modlist = [
-                    (ldap.MOD_DELETE, 'aeStatus', aeobj_entry['aeStatus']),
-                    (ldap.MOD_ADD, 'aeStatus', aeobj_entry['aeExpiryStatus']),
+                    (ldap0.MOD_DELETE, 'aeStatus', aeobj_entry['aeStatus']),
+                    (ldap0.MOD_ADD, 'aeStatus', aeobj_entry['aeExpiryStatus']),
                 ]
                 try:
                     self.ldap_conn.modify_s(
                         aeobj_dn,
                         [
-                            (ldap.MOD_DELETE, 'aeStatus', aeobj_entry['aeStatus']),
-                            (ldap.MOD_ADD, 'aeStatus', aeobj_entry['aeExpiryStatus']),
+                            (ldap0.MOD_DELETE, 'aeStatus', aeobj_entry['aeStatus']),
+                            (ldap0.MOD_ADD, 'aeStatus', aeobj_entry['aeExpiryStatus']),
                         ]
                     )
-                except ldap.LDAPError, ldap_error:
+                except ldap0.LDAPError as ldap_error:
                     self.logger.warn('LDAPError modifying %r: %s', aeobj_dn, ldap_error)
                     self.error_counter += 1
                 else:

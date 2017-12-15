@@ -6,6 +6,8 @@ Sets next GID number to highest GID found + 1
 This script must run locally on a Æ-DIR provider
 """
 
+from __future__ import absolute_import
+
 __version__ = '0.0.6'
 
 import sys
@@ -13,9 +15,9 @@ import os
 
 # set LDAPRC env var *before* importing ldap
 os.environ['LDAPRC'] = '/opt/ae-dir/etc/ldap.conf'
-import ldap
+import ldap0
 import aedir
-from ldap.controls.sss import SSSRequestControl
+from ldap0.controls.sss import SSSRequestControl
 
 GID_ATTR = 'gidNumber'
 
@@ -41,9 +43,9 @@ def max_id_searcher(ldap_conn, logger, aedir_searchbase):
         # reverse sorting request control
         sss_control = SSSRequestControl(criticality=True, ordering_rules=['-'+id_attr])
         # send search request
-        msg_id = ldap_conn.search_ext(
+        msg_id = ldap_conn.search(
             aedir_searchbase,
-            ldap.SCOPE_SUBTREE,
+            ldap0.SCOPE_SUBTREE,
             '(&(!(objectClass=aePosixIdRanges))({0}=*))'.format(id_attr),
             attrlist=[id_attr],
             sizelimit=1,
@@ -52,12 +54,12 @@ def max_id_searcher(ldap_conn, logger, aedir_searchbase):
         # collect result
         ldap_result = []
         try:
-            for _, res_data, _, res_controls in ldap_conn.allresults(
+            for _, res_data, _, res_controls in ldap_conn.results(
                     msg_id,
                     add_ctrls=0
                 ):
                 ldap_result.extend(res_data)
-        except ldap.SIZELIMIT_EXCEEDED:
+        except ldap0.SIZELIMIT_EXCEEDED:
             pass
 
         if not ldap_result:
@@ -81,7 +83,7 @@ def main():
     logger.info('Starting %s %s', sys.argv[0], __version__)
     logger.debug('Imported aedir %s', aedir.__version__)
 
-    ldap._trace_level = PYLDAP_TRACE_LEVEL
+    ldap0._trace_level = PYLDAP_TRACE_LEVEL
 
     ldap_conn = aedir.AEDirObject(None, trace_level=PYLDAP_TRACE_LEVEL)
     aedir_searchbase = ldap_conn.find_search_base()
@@ -111,11 +113,11 @@ def main():
     # first add modifications for next GID attribute
     if current_next_gid != highest_gid_number+1:
         modlist.append(
-            (ldap.MOD_ADD, GID_ATTR, [str(highest_gid_number+1)])
+            (ldap0.MOD_ADD, GID_ATTR, [str(highest_gid_number+1)])
         )
         if current_next_gid is not None:
             modlist.append(
-                (ldap.MOD_DELETE, GID_ATTR, [str(current_next_gid)])
+                (ldap0.MOD_DELETE, GID_ATTR, [str(current_next_gid)])
             )
     else:
         logger.debug('Current %r value %d seems ok => no change.', GID_ATTR, current_next_gid)
@@ -130,11 +132,11 @@ def main():
 
         if current_next_uid != highest_uid_number+1:
             modlist.append(
-                (ldap.MOD_ADD, UID_ATTR, [str(highest_uid_number+1)])
+                (ldap0.MOD_ADD, UID_ATTR, [str(highest_uid_number+1)])
             )
             if current_next_uid is not None:
                 modlist.append(
-                    (ldap.MOD_DELETE, UID_ATTR, [str(current_next_uid)])
+                    (ldap0.MOD_DELETE, UID_ATTR, [str(current_next_uid)])
                 )
         else:
             logger.debug('Current %r value %d seems ok => no change.', UID_ATTR, current_next_uid)

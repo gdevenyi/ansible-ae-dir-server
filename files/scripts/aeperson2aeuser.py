@@ -9,6 +9,8 @@ from aePerson to aeUser entries
 # Imports
 #-----------------------------------------------------------------------
 
+from __future__ import absolute_import
+
 # Modules from Python's standard library
 import sys
 import os
@@ -16,12 +18,14 @@ import time
 import logging
 from logging.handlers import SysLogHandler
 
-# set LDAPRC env var *before* importing ldap
+# set LDAPRC env var *before* importing ldap0
 os.environ['LDAPRC'] = '/opt/ae-dir/etc/ldap.conf'
-# Import python-ldap modules/classes
-import ldap
-import ldap.modlist
-from ldap.filter import time_span_filter
+
+# from ldap0 package
+import ldap0
+import ldap0.modlist
+import ldap0.functions
+from ldap0.filter import time_span_filter
 
 import aedir
 import aedir.process
@@ -85,7 +89,7 @@ class SyncProcess(aedir.process.TimestampStateMixin, aedir.process.AEProcess):
         the main worker part
         """
 
-        current_time_str = ldap.strf_secs(time.time())
+        current_time_str = ldap0.functions.strf_secs(time.time())
         self.logger.debug(
             'current_time_str=%r last_run_timestr=%r',
             current_time_str,
@@ -109,12 +113,12 @@ class SyncProcess(aedir.process.TimestampStateMixin, aedir.process.AEProcess):
         )
         msg_id = self.ldap_conn.search(
             self.ldap_conn.find_search_base(),
-            ldap.SCOPE_SUBTREE,
+            ldap0.SCOPE_SUBTREE,
             aeperson_filterstr,
             attrlist=AEDIR_AEPERSON_ATTRS,
         )
 
-        for _, res_data, _, _ in self.ldap_conn.allresults(msg_id):
+        for _, res_data, _, _ in self.ldap_conn.results(msg_id):
 
             for aeperson_dn, aeperson_entry in res_data:
 
@@ -122,7 +126,7 @@ class SyncProcess(aedir.process.TimestampStateMixin, aedir.process.AEProcess):
 
                 aeuser_result = self.ldap_conn.search_s(
                     self.ldap_conn.find_search_base(),
-                    ldap.SCOPE_SUBTREE,
+                    ldap0.SCOPE_SUBTREE,
                     '(&(objectClass=aeUser)(aePerson=%s))' % (aeperson_dn),
                     attrlist=AEDIR_AEPERSON_ATTRS+['uid', 'uidNumber', 'displayName'],
                 )
@@ -150,7 +154,7 @@ class SyncProcess(aedir.process.TimestampStateMixin, aedir.process.AEProcess):
                         new_aeuser_entry['aeStatus'] = aeuser_entry['aeStatus']
 
                     # Generate diff of general person attributes
-                    modlist = ldap.modlist.modifyModlist(
+                    modlist = ldap0.modlist.modify_modlist(
                         aeuser_entry,
                         new_aeuser_entry,
                         ignore_attr_types=['uid', 'uidNumber']
@@ -169,7 +173,7 @@ class SyncProcess(aedir.process.TimestampStateMixin, aedir.process.AEProcess):
                         )
                         try:
                             self.ldap_conn.modify_s(aeuser_dn, modlist)
-                        except ldap.LDAPError, ldap_err:
+                        except ldap0.LDAPError as ldap_err:
                             self.logger.error(
                                 'LDAP error modifying %r: %s',
                                 aeuser_dn,

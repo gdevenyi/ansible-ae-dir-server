@@ -4,6 +4,8 @@
 Generates a report of active aeUser entries and their aePerson attributes
 """
 
+from __future__ import absolute_import
+
 __version__ = '0.0.2'
 
 import sys
@@ -12,9 +14,9 @@ import csv
 
 # set LDAPRC env var *before* importing ldap
 os.environ['LDAPRC'] = '/opt/ae-dir/etc/ldap.conf'
-import ldap
+import ldap0
 import aedir
-from ldap.controls.deref import DereferenceControl
+from ldap0.controls.deref import DereferenceControl
 
 PYLDAP_TRACE_LEVEL = 0
 
@@ -66,15 +68,15 @@ VIRTUAL_ATTRS = [
 # main()
 #---------------------------------------------------------------------------
 
-ldap._trace_level = PYLDAP_TRACE_LEVEL
+ldap0._trace_level = PYLDAP_TRACE_LEVEL
 
 ldap_conn = aedir.AEDirObject(None, trace_level=PYLDAP_TRACE_LEVEL)
 
 aedir_search_base = ldap_conn.find_search_base()
 
-msg_id = ldap_conn.search_ext(
+msg_id = ldap_conn.search(
     aedir_search_base,
-    ldap.SCOPE_SUBTREE,
+    ldap0.SCOPE_SUBTREE,
     '(&(objectClass=aeUser)(aeStatus=0))',
     attrlist=USER_ATTRS,
     serverctrls = [DEREF_CONTROL],
@@ -82,7 +84,7 @@ msg_id = ldap_conn.search_ext(
 
 user_dict = {}
 
-for res_type, res_data, res_msgid, res_controls in ldap_conn.allresults(
+for res_type, res_data, res_msgid, res_controls in ldap_conn.results(
     msg_id,
     add_ctrls=1
 ):

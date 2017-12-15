@@ -4,15 +4,17 @@
 Generates a report of aePerson entries referenced by active aeUser entries
 """
 
+from __future__ import absolute_import
+
 __version__ = '0.0.2'
 
 import sys, os, csv, pprint
 
 # set LDAPRC env var *before* importing ldap
 os.environ['LDAPRC'] = '/opt/ae-dir/etc/ldap.conf'
-import ldap
+import ldap0
 import aedir
-from ldap.controls.deref import DereferenceControl
+from ldap0.controls.deref import DereferenceControl
 
 PYLDAP_TRACE_LEVEL = 0
 
@@ -50,13 +52,13 @@ DEREF_CONTROL = DereferenceControl(
 # main()
 #---------------------------------------------------------------------------
 
-ldap._trace_level = PYLDAP_TRACE_LEVEL
+ldap0._trace_level = PYLDAP_TRACE_LEVEL
 
 ldap_conn = aedir.AEDirObject(None, trace_level=PYLDAP_TRACE_LEVEL)
 
-msg_id = ldap_conn.search_ext(
+msg_id = ldap_conn.search(
     ldap_conn.find_search_base(),
-    ldap.SCOPE_SUBTREE,
+    ldap0.SCOPE_SUBTREE,
     '(&(objectClass=aeUser)(aeStatus=0))',
     attrlist=USER_ATTRS,
     serverctrls = [DEREF_CONTROL],
@@ -64,7 +66,7 @@ msg_id = ldap_conn.search_ext(
 
 person_dict = {}
 
-for res_type, res_data, res_msgid, res_controls in ldap_conn.allresults(
+for res_type, res_data, res_msgid, res_controls in ldap_conn.results(
     msg_id,
     add_ctrls=1
 ):

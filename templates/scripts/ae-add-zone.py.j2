@@ -1,13 +1,15 @@
 #!{{ aedir_python }}
 # -*- coding: utf-8 -*-
 """
-Adds a zone with the two role groups for zone admins and zone auditors and 
+Adds a zone with the two role groups for zone admins and zone auditors and
 an init tag
 
 This script must run locally on a Æ-DIR provider
 """
 
-__version__ = '0.0.2'
+from __future__ import absolute_import
+
+__version__ = '0.0.3'
 
 import sys
 import os
@@ -15,7 +17,7 @@ import random
 
 # set LDAPRC env var *before* importing ldap
 os.environ['LDAPRC'] = '/opt/ae-dir/etc/ldap.conf'
-import ldap
+import ldap0
 import aedir
 
 PYLDAP_TRACE_LEVEL = int(os.environ.get('PYLDAP_TRACE_LEVEL', '0'))
@@ -29,7 +31,7 @@ logger = aedir.init_logger(log_name=sys.argv[0])
 logger.info('Starting %s %s', sys.argv[0], __version__)
 logger.debug('Imported aedir %s', aedir.__version__)
 
-ldap._trace_level = PYLDAP_TRACE_LEVEL
+ldap0._trace_level = PYLDAP_TRACE_LEVEL
 
 try:
     zone_cn, ticket_id, zone_desc = [
@@ -52,7 +54,7 @@ try:
     ldap_result = ldap_conn.read_s(
         'cn={zone_cn},{aedir_searchbase}'.format(**vars()),
     )
-except ldap.NO_SUCH_OBJECT:
+except ldap0.NO_SUCH_OBJECT:
     pass
 else:
     logger.error('Zone %r already exists', zone_cn)
@@ -62,13 +64,13 @@ else:
 zone_dn = 'cn={zone_cn},{aedir_searchbase}'.format(**vars())
 ldap_conn.add_s(
     zone_dn,
-    [
-        ('objectClass', ['namedObject', 'aeObject', 'aeZone']),
-        ('aeStatus', ['0']),
-        ('cn', [zone_cn]),
-        ('aeTicketId', [ticket_id]),
-        ('description', [zone_desc]),
-    ]
+    {
+        'objectClass': ['namedObject', 'aeObject', 'aeZone'],
+        'aeStatus': ['0'],
+        'cn': [zone_cn],
+        'aeTicketId': [ticket_id],
+        'description': [zone_desc],
+    }
 )
 logger.info('Added %r', zone_dn)
 
@@ -76,12 +78,12 @@ logger.info('Added %r', zone_dn)
 tag_dn = 'cn={zone_cn}-init,{zone_dn}'.format(**vars())
 ldap_conn.add_s(
     tag_dn,
-    [
-        ('objectClass', ['namedObject', 'aeTag']),
-        ('aeStatus', ['0']),
-        ('cn', [zone_cn+'-init']),
-        ('description', ['Initialization of "{zone_desc}"'.format(**vars())]),
-    ]
+    {
+        'objectClass': ['namedObject', 'aeTag'],
+        'aeStatus': ['0'],
+        'cn': [zone_cn+'-init'],
+        'description': ['Initialization of "{zone_desc}"'.format(**vars())],
+    }
 )
 logger.info('Added %r', tag_dn)
 
@@ -89,25 +91,22 @@ logger.info('Added %r', tag_dn)
 zone_admins_dn = 'cn={zone_cn}-zone-admins,{zone_dn}'.format(**vars())
 ldap_conn.add_s(
     zone_admins_dn,
-    [
-        (
-            'objectClass',
-            [
-                'aeObject',
-                'groupOfEntries',
-                'posixGroup',
-                'aeGroup'
-            ]
-        ),
-        ('aeStatus', ['0']),
-        ('aeTag', [zone_cn+'-init']),
-        ('cn', [zone_cn+'-zone-admins']),
-        ('aeTicketId', [ticket_id]),
-        ('description', [
+    {
+        'objectClass': [
+            'aeObject',
+            'groupOfEntries',
+            'posixGroup',
+            'aeGroup'
+        ],
+        'aeStatus': ['0'],
+        'aeTag': [zone_cn+'-init'],
+        'cn': [zone_cn+'-zone-admins'],
+        'aeTicketId': [ticket_id],
+        'description': [
             "Group members are zone admins who can manage zone '{zone_cn}'".format(**vars())
-        ]),
-        ('gidNumber', [str(ldap_conn.get_next_id(id_pool_dn=aedir_searchbase, id_pool_attr='gidNumber'))]),
-    ]
+        ],
+        'gidNumber': [str(ldap_conn.get_next_id(id_pool_dn=aedir_searchbase, id_pool_attr='gidNumber'))],
+    }
 )
 logger.info('Added %r', zone_admins_dn)
 
@@ -115,23 +114,20 @@ logger.info('Added %r', zone_admins_dn)
 zone_auditors_dn = 'cn={zone_cn}-zone-auditors,{zone_dn}'.format(**vars())
 ldap_conn.add_s(
     zone_auditors_dn,
-    [
-        (
-            'objectClass',
-            [
-                'aeObject',
-                'groupOfEntries',
-                'posixGroup',
-                'aeGroup'
-            ]
-        ),
-        ('aeStatus', ['0']),
-        ('aeTag', [zone_cn+'-init']),
-        ('cn', [zone_cn+'-zone-auditors']),
-        ('aeTicketId', [ticket_id]),
-        ('description', ["Group members are zone auditors who can read zone '{zone_cn}'".format(**vars())]),
-        ('gidNumber', [str(ldap_conn.get_next_id(id_pool_dn=aedir_searchbase, id_pool_attr='gidNumber'))]),
-    ]
+    {
+        'objectClass': [
+            'aeObject',
+            'groupOfEntries',
+            'posixGroup',
+            'aeGroup'
+        ],
+        'aeStatus': ['0'],
+        'aeTag': [zone_cn+'-init'],
+        'cn': [zone_cn+'-zone-auditors'],
+        'aeTicketId': [ticket_id],
+        'description': ["Group members are zone auditors who can read zone '{zone_cn}'".format(**vars())],
+        'gidNumber': [str(ldap_conn.get_next_id(id_pool_dn=aedir_searchbase, id_pool_attr='gidNumber'))],
+    }
 )
 logger.info('Added %r', zone_auditors_dn)
 
@@ -139,9 +135,9 @@ logger.info('Added %r', zone_auditors_dn)
 ldap_conn.modify_s(
     zone_dn,
     [
-        (ldap.MOD_ADD, 'aeTag', [zone_cn+'-init']),
-        (ldap.MOD_ADD, 'aeZoneAdmins', [zone_admins_dn]),
-        (ldap.MOD_ADD, 'aeZoneAuditors', [zone_auditors_dn]),
+        (ldap0.MOD_ADD, 'aeTag', [zone_cn+'-init']),
+        (ldap0.MOD_ADD, 'aeZoneAdmins', [zone_admins_dn]),
+        (ldap0.MOD_ADD, 'aeZoneAuditors', [zone_auditors_dn]),
     ]
 )
 logger.info('Updated %r', zone_dn)

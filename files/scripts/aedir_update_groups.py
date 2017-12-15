@@ -10,6 +10,8 @@ It is designed to run as a CRON job.
 Author: Michael Ströder <michael@stroeder.com>
 """
 
+from __future__ import absolute_import
+
 __version__ = '0.3.1'
 
 #-----------------------------------------------------------------------
@@ -18,12 +20,14 @@ __version__ = '0.3.1'
 
 import os
 
-# set LDAPRC env var *before* importing ldap
+# set LDAPRC env var *before* importing ldap0
 os.environ['LDAPRC'] = '/opt/ae-dir/etc/ldap.conf'
-import ldap
-from ldap.filter import escape_filter_chars
-from ldap.controls.deref import DereferenceControl
-import ldapurl
+
+# from ldap0 package
+import ldap0
+from ldap0.filter import escape_filter_chars
+from ldap0.controls.deref import DereferenceControl
+import ldap0.ldapurl
 import aedir
 import aedir.process
 
@@ -116,31 +120,31 @@ class AEGroupUpdater(aedir.process.AEProcess):
         add_members = new_members - old_members
         if add_members:
             mod_list.append(
-                (ldap.MOD_ADD, MEMBER_ATTR, list(add_members)),
+                (ldap0.MOD_ADD, MEMBER_ATTR, list(add_members)),
             )
 
         remove_members = old_members - new_members
         if remove_members:
             mod_list.append(
-                (ldap.MOD_DELETE, MEMBER_ATTR, list(remove_members)),
+                (ldap0.MOD_DELETE, MEMBER_ATTR, list(remove_members)),
             )
 
         remove_member_attr_values = old_member_attr_values - new_member_attr_values
         if remove_member_attr_values:
             mod_list.append(
-                (ldap.MOD_DELETE, member_map_attr, list(remove_member_attr_values)),
+                (ldap0.MOD_DELETE, member_map_attr, list(remove_member_attr_values)),
             )
 
         add_member_attr_values = new_member_attr_values - old_member_attr_values
         if add_member_attr_values:
             mod_list.append(
-                (ldap.MOD_ADD, member_map_attr, list(add_member_attr_values)),
+                (ldap0.MOD_ADD, member_map_attr, list(add_member_attr_values)),
             )
 
         if mod_list:
             try:
                 self.ldap_conn.modify_s(group_dn, mod_list)
-            except ldap.LDAPError, ldap_error:
+            except ldap0.LDAPError as ldap_error:
                 self.logger.error(
                     u'LDAPError modifying %r: %s mod_list = %r',
                     group_dn,
@@ -179,9 +183,9 @@ class AEGroupUpdater(aedir.process.AEProcess):
         """
         for group_object_class, member_attrs in MEMBER_ATTRS_MAP.items():
             member_map_attr, member_user_attr = member_attrs
-            msg_id = self.ldap_conn.search_ext(
+            msg_id = self.ldap_conn.search(
                 self.ldap_conn.find_search_base(),
-                ldap.SCOPE_SUBTREE,
+                ldap0.SCOPE_SUBTREE,
                 '(&(objectClass={0})(!({1}=*))(aeStatus=0))'.format(
                     group_object_class,
                     MEMBERURL_ATTR,
@@ -204,7 +208,7 @@ class AEGroupUpdater(aedir.process.AEProcess):
                 ],
             )
 
-            for _, ldap_results, _, _ in self.ldap_conn.allresults(msg_id, add_ctrls=1):
+            for _, ldap_results, _, _ in self.ldap_conn.results(msg_id, add_ctrls=1):
 
                 for ldap_group_dn, ldap_group_entry, ldap_resp_controls in ldap_results:
 
@@ -264,7 +268,7 @@ class AEGroupUpdater(aedir.process.AEProcess):
             return None
         ldap_result = self.ldap_conn.search_s(
             self.ldap_conn.find_search_base(),
-            ldap.SCOPE_SUBTREE,
+            ldap0.SCOPE_SUBTREE,
             '(&{0})'.format(''.join(person_filter_parts)),
             attrlist=['1.1'],
         ) or []
@@ -280,7 +284,7 @@ class AEGroupUpdater(aedir.process.AEProcess):
         """
         dynamic_groups = self.ldap_conn.search_s(
             self.ldap_conn.find_search_base(),
-            ldap.SCOPE_SUBTREE,
+            ldap0.SCOPE_SUBTREE,
             '({0}=*)'.format(MEMBERURL_ATTR),
             attrlist=[
                 'aeDept',
@@ -318,7 +322,7 @@ class AEGroupUpdater(aedir.process.AEProcess):
             for member_url in dyn_group_entry[MEMBERURL_ATTR]:
 
                 self.logger.debug('member_url = %r', member_url)
-                member_url_obj = ldapurl.LDAPUrl(member_url)
+                member_url_obj = ldap0.ldapurl.LDAPUrl(member_url)
                 dyn_group_filter = '(&{0}(!(entryDN={1})){2}{3})'.format(
                     member_url_obj.filterstr,
                     dyn_group_dn,
@@ -342,9 +346,9 @@ class AEGroupUpdater(aedir.process.AEProcess):
                     server_ctrls = None
 
                 try:
-                    msg_id = self.ldap_conn.search_ext(
+                    msg_id = self.ldap_conn.search(
                         member_url_obj.dn,
-                        member_url_obj.scope or ldap.SCOPE_SUBTREE,
+                        member_url_obj.scope or ldap0.SCOPE_SUBTREE,
                         dyn_group_filter,
                         attrlist=[
                             'cn',
@@ -353,7 +357,7 @@ class AEGroupUpdater(aedir.process.AEProcess):
                         ]+(member_url_obj.attrs or [])+USER_ATTRS,
                         serverctrls=server_ctrls,
                     )
-                    for _, ldap_results, _, _ in self.ldap_conn.allresults(msg_id, add_ctrls=1):
+                    for _, ldap_results, _, _ in self.ldap_conn.results(msg_id, add_ctrls=1):
                         for groupmember_dn, groupmember_entry, ldap_resp_controls in ldap_results:
                             if person_dn_set is not None and \
                                groupmember_entry['aePerson'][0].lower() not in person_dn_set:
@@ -383,7 +387,7 @@ class AEGroupUpdater(aedir.process.AEProcess):
                                             deref_entry,
                                         )
 
-                except ldap.LDAPError, ldap_error:
+                except ldap0.LDAPError as ldap_error:
                     self.logger.error(
                         u'LDAPError searching members for %r with %r and %r: %s',
                         dyn_group_dn,
