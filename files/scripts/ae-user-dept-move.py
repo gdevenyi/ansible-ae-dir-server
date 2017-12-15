@@ -4,6 +4,8 @@
 Prepare moving aeUser entries beneath aeZone with appropriate aeDept set
 """
 
+from __future__ import absolute_import
+
 __version__ = '0.1.0'
 
 import sys
@@ -12,9 +14,11 @@ import csv
 
 # set LDAPRC env var *before* importing ldap
 os.environ['LDAPRC'] = '/opt/ae-dir/etc/ldap.conf'
-import ldap
+
+# from ldap0 package
+import ldap0
 import aedir
-from ldap.controls.deref import DereferenceControl
+from ldap0.controls.deref import DereferenceControl
 
 PYLDAP_TRACE_LEVEL = 0
 
@@ -31,7 +35,7 @@ DEREF_CONTROL = DereferenceControl(
 # main()
 #---------------------------------------------------------------------------
 
-ldap._trace_level = PYLDAP_TRACE_LEVEL
+ldap0._trace_level = PYLDAP_TRACE_LEVEL
 
 ldap_conn = aedir.AEDirObject(
     None,
@@ -55,15 +59,15 @@ aeuser_filter = (
   ')'
 ).format(aedir_search_base=aedir_search_base)
 
-msg_id = ldap_conn.search_ext(
+msg_id = ldap_conn.search(
     'cn={},'.format(sys.argv[1])+aedir_search_base,
-    ldap.SCOPE_SUBTREE,
+    ldap0.SCOPE_SUBTREE,
     aeuser_filter,
     attrlist=['uid'],
     serverctrls = [DEREF_CONTROL],
 )
 
-for res_type, res_data, res_msgid, res_controls in ldap_conn.allresults(
+for res_type, res_data, res_msgid, res_controls in ldap_conn.results(
     msg_id,
     add_ctrls=1
 ):
@@ -80,11 +84,11 @@ for res_type, res_data, res_msgid, res_controls in ldap_conn.allresults(
         try:
             new_zone_dn = ldap_conn.find_unique_entry(
                 aedir_search_base,
-                ldap.SCOPE_ONELEVEL,
+                ldap0.SCOPE_ONELEVEL,
                 '(&(objectClass=aeZone)(aeStatus=0)(aeDept={}))'.format(ae_dept),
                 attrlist=['1.1'],
             )[0]
-        except (ldap.LDAPError, KeyError), err:
+        except (ldap0.LDAPError, KeyError) as err:
             #  => ignore
             sys.stderr.write('searching new zone failed: %s\n' % (err))
         else:
