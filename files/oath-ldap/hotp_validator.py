@@ -1,4 +1,4 @@
-#!/usr/bin/python -ROO
+#!/usr/bin/python2 -ROO
 # -*- coding: utf-8 -*-
 """
 slapd-sock listener demon which performs password checking and

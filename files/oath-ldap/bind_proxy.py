@@ -1,4 +1,4 @@
-#!/usr/bin/python -OO
+#!/usr/bin/python2 -OO
 # -*- coding: utf-8 -*-
 """
 slapd-sock listener demon which sends intercepted BIND requests
