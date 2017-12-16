@@ -26,20 +26,27 @@ import email.utils
 import web
 
 # from python-ldap
-import ldap
-import ldap.dn
-import ldap.filter
-import ldap.sasl
-from ldap import LDAPError
-from ldap.ldapobject import ReconnectLDAPObject
-from ldap.controls.sessiontrack import SessionTrackingControl, SESSION_TRACKING_FORMAT_OID_USERNAME
-import ldapurl
+import ldap0
+from ldap0 import LDAPError
+from ldap0.ldapobject import ReconnectLDAPObject
+from ldap0.controls.sessiontrack import SessionTrackingControl, SESSION_TRACKING_FORMAT_OID_USERNAME
+from ldap0.ldapurl import LDAPUrl
+from ldap0.filter import escape_filter_chars
 
 # from mailutil
 import mailutil
 
 # Import constants from configuration module
-from oathenroll_cnf import *
+from oathenroll_cnf import \
+    APP_PATH_PREFIX, ATTR_OWNER_DN, \
+    EMAIL_SUBJECT, EMAIL_TEMPLATE, \
+    FILTERSTR_ADMIN_LOGIN, FILTERSTR_OWNER_READ, FILTERSTR_TOKEN_SEARCH, \
+    LDAPI_AUTHZ_ID, LDAP_URL, \
+    PWD_ADMIN_LEN, PWD_LENGTH, PWD_TMP_CHARS, \
+    PYLDAP_TRACELEVEL, \
+    SMTP_DEBUGLEVEL, SMTP_FROM, SMTP_LOCALHOSTNAME, SMTP_TLSARGS, SMTP_URL, \
+    LAYOUT, TEMPLATES_DIRNAME,  \
+    WEB_CONFIG_DEBUG, WEB_ERROR
 
 #---------------------------------------------------------------------------
 # constants
@@ -56,7 +63,7 @@ URL2CLASS_MAPPING = (
 # basic functions and classes
 #---------------------------------------------------------------------------
 
-class ExtLDAPUrl(ldapurl.LDAPUrl):
+class ExtLDAPUrl(LDAPUrl):
     """
     Special class for handling additional LDAP URL extensions
     """
@@ -195,7 +202,7 @@ class BaseApp(Default):
             trace_file=sys.stderr,
         )
         # Send SASL bind request with mechanism EXTERNAL
-        self.ldap_conn.sasl_external_bind_s(authz_id=authz_id)
+        self.ldap_conn.sasl_non_interactive_bind_s('EXTERNAL', authz_id=authz_id)
         return # end of ldap_connect()
 
     def check_login(self, username, password):
@@ -293,7 +300,7 @@ class BaseApp(Default):
         # Make connection to LDAP server
         try:
             self.ldap_connect(LDAP_URL, authz_id=LDAPI_AUTHZ_ID)
-        except ldap.SERVER_DOWN:
+        except ldap0.SERVER_DOWN:
             return self.GET(message=u'LDAP server not reachable!')
         except LDAPError:
             return self.GET(message=u'Internal LDAP error!')
@@ -405,9 +412,9 @@ class ResetToken(BaseApp):
         """
         ldap_result = self.user_ldap_conn.search_s(
             self.ldap_url.dn,
-            ldap.SCOPE_SUBTREE,
+            ldap0.SCOPE_SUBTREE,
             filterstr='(&(objectClass=account)(oathToken={dn}))'.format(
-                dn=ldap.filter.escape_filter_chars(dn),
+                dn=escape_filter_chars(dn),
             ),
             attrlist=['uid', 'description']
         )
@@ -442,7 +449,7 @@ class ResetToken(BaseApp):
                 for at, av in ldap_result.items()
             ])
         else:
-            return ldap.NO_SUCH_OBJECT('No result')
+            raise ldap0.NO_SUCH_OBJECT('No result with %s' % repr(FILTERSTR_OWNER_READ))
         return result # end of read_owner()
 
     def update_token(self, token_dn, token_entry, token_password):
@@ -464,9 +471,9 @@ class ResetToken(BaseApp):
         # Set an invalid shared secret because we cannot determine
         # whether shared secret is set
         token_mods = [
-            (ldap.MOD_REPLACE, 'oathFailureCount', ['0']),
+            (ldap0.MOD_REPLACE, 'oathFailureCount', ['0']),
             (
-                ldap.MOD_REPLACE,
+                ldap0.MOD_REPLACE,
                 'oathSecretTime',
                 [time.strftime('%Y%m%d%H%M%SZ', time.gmtime(time.time()))],
             ),
@@ -474,22 +481,22 @@ class ResetToken(BaseApp):
         for del_attr in ('oathHOTPCounter', 'oathLastLogin', 'oathLastFailure'):
             if del_attr in token_entry:
                 token_mods.append(
-                    (ldap.MOD_DELETE, del_attr, None)
+                    (ldap0.MOD_DELETE, del_attr, None)
                 )
         # Reset the token entry
-        self.user_ldap_conn.modify_ext_s(
+        self.user_ldap_conn.modify_s(
             token_dn,
             token_mods,
             serverctrls=[session_tracking_ctrl],
         )
         # Try to remove shared secret
         try:
-            self.user_ldap_conn.modify_ext_s(
+            self.user_ldap_conn.modify_s(
                 token_dn,
-                [(ldap.MOD_DELETE, 'oathSecret', None)],
+                [(ldap0.MOD_DELETE, 'oathSecret', None)],
                 serverctrls=[session_tracking_ctrl],
             )
-        except ldap.NO_SUCH_ATTRIBUTE:
+        except ldap0.NO_SUCH_ATTRIBUTE:
             # We can happily ignore this case
             pass
         # Set the new userPassword with Modify Password ext.op.
@@ -538,7 +545,7 @@ class ResetToken(BaseApp):
             enroll_pw2 = random_string(PWD_ADMIN_LEN, PWD_TMP_CHARS)
             enroll_pw = enroll_pw1 + enroll_pw2
             self.update_token(token_dn, token_entry, enroll_pw)
-        except ldap.NO_UNIQUE_ENTRY as ldap_err:
+        except ldap0.NO_UNIQUE_ENTRY as ldap_err:
             logging.error('LDAPError: %s', repr(ldap_err), exc_info=True)
             res = self.GET(message=u'Serial no. not found!')
         except LDAPError as ldap_err:
@@ -614,7 +621,10 @@ class InitToken(BaseApp):
             return RENDER.init_form(u'Invalid Unicode input')
         else:
             if not get_input.serial:
-                message = u'Enter a serial number of token to be (re-)initialized and enrollment passwords.'
+                message = (
+                    u'Enter a serial number of token to be (re-)initialized'
+                    u' and enrollment passwords.'
+                )
             return RENDER.init_form(
                 message,
                 PWD_LENGTH-PWD_ADMIN_LEN,
@@ -635,12 +645,12 @@ class InitToken(BaseApp):
             )
             token_ldap_conn.simple_bind_s(token_binddn, token_password)
             token_dn = token_ldap_conn.whoami_s()[3:]
-            token_ldap_conn.modify_ext_s(
+            token_ldap_conn.modify_s(
                 token_dn,
                 [
-                    (ldap.MOD_ADD, 'oathHOTPCounter', ['0']),
-                    (ldap.MOD_ADD, 'oathSecret', [oath_secret]),
-                    #(ldap.MOD_DELETE, 'userPassword', None),
+                    (ldap0.MOD_ADD, 'oathHOTPCounter', ['0']),
+                    (ldap0.MOD_ADD, 'oathSecret', [oath_secret]),
+                    #(ldap0.MOD_DELETE, 'userPassword', None),
                 ],
                 serverctrls=[
                     SessionTrackingControl(
