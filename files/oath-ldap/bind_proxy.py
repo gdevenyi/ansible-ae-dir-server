@@ -6,17 +6,48 @@ to a remote LDAP server in case the request 'dn' and 'peername'
 information matches
 """
 
+#-----------------------------------------------------------------------
+# Imports
+#-----------------------------------------------------------------------
+
 from __future__ import absolute_import
 
+# from Python's standard lib
 import os
 import logging
+import sys
+import datetime
+import re
+import socket
+import collections
 
-__version__ = '0.4.0'
-__author__ = u'Michael Ströder <michael@stroeder.com>'
+import netaddr
+
+# from ldap0 package
+import ldap0
+from ldap0 import LDAPError
+from ldap0.ldapurl import LDAPUrl
+from ldap0.ldapobject import LDAPObject
+from ldap0.controls.sessiontrack import \
+    SessionTrackingControl, SESSION_TRACKING_FORMAT_OID_USERNAME
+
+# local modules
+from slapdsock.ldaphelper import RESULT_CODE
+from slapdsock.ldaphelper import ldap_datetime_str
+from slapdsock.ldaphelper import is_expired
+from slapdsock.loghelper import combined_logger
+from slapdsock.handler import SlapdSockHandler, SlapdSockHandlerError
+from slapdsock.message import RESULTResponse, InvalidCredentialsResponse
+
+# run multi-threaded
+from slapdsock.service import SlapdSockThreadingServer as SlapdSockServer
 
 #-----------------------------------------------------------------------
 # Configuration constants
 #-----------------------------------------------------------------------
+
+__version__ = '0.4.0'
+__author__ = u'Michael Ströder <michael@stroeder.com>'
 
 # If
 # 1. 'peername' matches any item in
@@ -62,7 +93,7 @@ LDAP_CACHE_TTL = 5.0
 LDAP_LONG_CACHE_TTL = 100 * LDAP_CACHE_TTL
 
 # Timeout in seconds when connecting to local and remote LDAP servers
-# used for ldap.OPT_NETWORK_TIMEOUT and ldap.OPT_TIMEOUT
+# used for ldap0.OPT_NETWORK_TIMEOUT and ldap0.OPT_TIMEOUT
 LDAP_TIMEOUT = 3.0
 
 # Template filter string for reading the bind-DN's entry to determine
@@ -103,32 +134,6 @@ DEBUG_VARS = [
 if __debug__:
     DEBUG_VARS.extend([
     ])
-
-#-----------------------------------------------------------------------
-# Imports
-#-----------------------------------------------------------------------
-
-# from Python's standard lib
-import sys, datetime, re, socket, collections
-
-import netaddr
-
-# python-ldap
-import ldap
-from ldap import LDAPError
-from ldap.controls.sessiontrack import \
-   SessionTrackingControl, SESSION_TRACKING_FORMAT_OID_USERNAME
-
-# local modules
-from slapdsock.ldaphelper import RESULT_CODE
-from slapdsock.ldaphelper import ldap_datetime_str
-from slapdsock.ldaphelper import MyLDAPUrl, is_expired
-from slapdsock.loghelper import combined_logger
-from slapdsock.handler import SlapdSockHandler, SlapdSockHandlerError
-from slapdsock.message import RESULTResponse, InvalidCredentialsResponse
-
-# run multi-threaded
-from slapdsock.service import SlapdSockThreadingServer as SlapdSockServer
 
 #-----------------------------------------------------------------------
 # Classes and functions
@@ -275,7 +280,7 @@ class BindProxyHandler(SlapdSockHandler):
                     local_ldap_conn = self.server.get_ldapi_conn()
                     ldap_result = local_ldap_conn.search_s(
                         request_dn_utf8,
-                        ldap.SCOPE_BASE,
+                        ldap0.SCOPE_BASE,
                         '(&{0}({1}=*))'.format(
                             user_filterstr,
                             LDAP_USERNAME_ATTR,
@@ -287,10 +292,10 @@ class BindProxyHandler(SlapdSockHandler):
                             'pwdPolicySubentry',
                         ],
                     )
-                except ldap.SERVER_DOWN, ldap_error:
+                except ldap0.SERVER_DOWN as ldap_error:
                     self.server.disable_ldapi_conn()
                     raise ldap_error
-            except LDAPError, ldap_error:
+            except LDAPError as err:
                 raise SlapdSockHandlerError(
                     ldap_error,
                     log_level=logging.WARN,
@@ -328,9 +333,9 @@ class BindProxyHandler(SlapdSockHandler):
                         'pwdMaxAge',
                         'pwdMaxFailure',
                     ],
-                    cache_time=LDAP_LONG_CACHE_TTL,
+                    cache_ttl=LDAP_LONG_CACHE_TTL,
                 )
-            except ldap.SERVER_DOWN:
+            except ldap0.SERVER_DOWN:
                 self.server.disable_ldapi_conn()
             except (LDAPError, KeyError):
                 pass
@@ -359,7 +364,7 @@ class BindProxyHandler(SlapdSockHandler):
 
         try:
             try:
-                remote_ldap_conn = ldap.initialize(
+                remote_ldap_conn = LDAPObject(
                     ' '.join(remote_ldap_uris),
                     trace_level=0,
                     trace_file=self.server._logger_fileobj,
@@ -371,7 +376,7 @@ class BindProxyHandler(SlapdSockHandler):
                         self._gen_session_tracking_ctrl(request, request_dn_utf8)
                     ]
                 )
-            except ldap.LDAPError, ldap_error:
+            except LDAPError as ldap_error:
                 try:
                     result_code = RESULT_CODE[type(ldap_error)]
                 except KeyError:
@@ -467,7 +472,7 @@ def run_this():
         my_logger.error('No remote LDAP URIs => abort')
         sys.exit(1)
 
-    local_ldap_uri_obj = MyLDAPUrl(local_ldap_uri)
+    local_ldap_uri_obj = LDAPUrl(local_ldap_uri)
 
     try:
         slapd_sock_listener = SimpleBindProxyServer(

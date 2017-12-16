@@ -38,14 +38,15 @@ except ImportError:
     JWE = JWK = None
 
 # python-ldap
-import ldap
-from ldap import LDAPError
-from ldap.controls.simple import RelaxRulesControl
-from ldap.controls.libldap import AssertionControl
+import ldap0
+from ldap0 import LDAPError
+from ldap0.ldapurl import LDAPUrl
+from ldap0.controls.simple import RelaxRulesControl
+from ldap0.controls.libldap import AssertionControl
 
 # local modules
 from slapdsock.ldaphelper import ldap_datetime
-from slapdsock.ldaphelper import MyLDAPUrl, is_expired
+from slapdsock.ldaphelper import is_expired
 from slapdsock.loghelper import combined_logger
 from slapdsock.handler import SlapdSockHandler, SlapdSockHandlerError
 from slapdsock.message import \
@@ -113,7 +114,7 @@ LDAP_CACHE_TTL = 3.0
 OATH_PARAMS_CACHE_TTL = 30 * LDAP_CACHE_TTL
 
 # Timeout in seconds when connecting to local and remote LDAP servers
-# used for ldap.OPT_NETWORK_TIMEOUT and ldap.OPT_TIMEOUT
+# used for ldap0.OPT_NETWORK_TIMEOUT and ldap0.OPT_TIMEOUT
 LDAP_TIMEOUT = 3.0
 
 # Globbing pattern for searching JSON web key files (private keys)
@@ -258,7 +259,7 @@ class HOTPValidationServer(SlapdSockServer):
             try:
                 privkey_json = open(private_key_filename, 'rb').read()
                 private_key = JWK(**json.loads(privkey_json))
-            except (IOError, ValueError), err:
+            except (IOError, ValueError) as err:
                 self.logger.error(
                     'Error reading/decoding JWK file %r: %s',
                     private_key_filename,
@@ -338,33 +339,33 @@ class HOTPValidationHandler(SlapdSockHandler):
             # Success case
             mods = [
                 # Reset failure counter
-                (ldap.MOD_REPLACE, 'oathFailureCount', ['0']),
+                (ldap0.MOD_REPLACE, 'oathFailureCount', ['0']),
                 # Store last login
-                (ldap.MOD_REPLACE, 'oathLastLogin', [str(self.now_str)]),
+                (ldap0.MOD_REPLACE, 'oathLastLogin', [str(self.now_str)]),
             ]
             # let slapd assert old value <= new value
         else:
             # Update failure counter and timestamp
             mods = [
-                (ldap.MOD_INCREMENT, 'oathFailureCount', ['1']),
-                (ldap.MOD_REPLACE, 'oathLastFailure', [str(self.now_str)]),
+                (ldap0.MOD_INCREMENT, 'oathFailureCount', ['1']),
+                (ldap0.MOD_REPLACE, 'oathLastFailure', [str(self.now_str)]),
             ]
         if oath_hotp_next_counter is not None:
             # Update HOTP counter value!
             mods.append(
-                (ldap.MOD_REPLACE, 'oathHOTPCounter', [str(oath_hotp_next_counter)]),
+                (ldap0.MOD_REPLACE, 'oathHOTPCounter', [str(oath_hotp_next_counter)]),
             )
             mod_ctrls = [
                 AssertionControl(True, '(oathHOTPCounter<=%d)' % oath_hotp_next_counter),
             ]
         # Update the token entry
         try:
-            self.ldap_conn.modify_ext_s(
+            self.ldap_conn.modify_s(
                 token_dn,
                 mods,
                 serverctrls=mod_ctrls,
             )
-        except LDAPError, err:
+        except LDAPError as err:
             # Return unwillingToPerform to let clients fail hard
             # so they hopefully not present login form again
             self._log(
@@ -395,17 +396,17 @@ class HOTPValidationHandler(SlapdSockHandler):
         """
         if not success:
             # record failed login
-            mods = [(ldap.MOD_ADD, 'pwdFailureTime', [str(self.now_str)])]
+            mods = [(ldap0.MOD_ADD, 'pwdFailureTime', [str(self.now_str)])]
         elif 'pwdFailureTime' in user_entry:
-            mods = [(ldap.MOD_DELETE, 'pwdFailureTime', None)]
+            mods = [(ldap0.MOD_DELETE, 'pwdFailureTime', None)]
         # Update the login attribute in user's entry
         try:
-            self.ldap_conn.modify_ext_s(
+            self.ldap_conn.modify_s(
                 user_dn.encode('utf-8'),
                 mods,
                 serverctrls=[RelaxRulesControl(True)],
             )
-        except LDAPError, err:
+        except LDAPError as err:
             self._log(
                 logging.ERROR,
                 'LDAPError updating user entry %r with %r: %s',
@@ -466,7 +467,7 @@ class HOTPValidationHandler(SlapdSockHandler):
                     ]
                 )
             )
-        except ldap.NO_SUCH_OBJECT, err:
+        except ldap0.NO_SUCH_OBJECT as err:
             self._log(
                 logging.INFO,
                 'Entry %r not found: %s => CONTINUE',
@@ -474,7 +475,7 @@ class HOTPValidationHandler(SlapdSockHandler):
                 err,
             )
             response = CONTINUE_RESPONSE
-        except LDAPError, err:
+        except LDAPError as err:
             self._log(
                 logging.WARN,
                 'Error reading %r: %s => %s',
@@ -514,9 +515,9 @@ class HOTPValidationHandler(SlapdSockHandler):
                 oath_token_dn,
                 self.token_filter.encode('utf-8'),
                 attrlist=self.token_attr_list,
-                nocache=1, # caching disabled! (because of counter or similar)
+                cache_ttl=0, # caching disabled! (because of counter or similar)
             )
-        except LDAPError, err:
+        except LDAPError as err:
             self._log(
                 logging.ERROR,
                 'Error reading token %r: %s',
@@ -552,9 +553,9 @@ class HOTPValidationHandler(SlapdSockHandler):
                         'oathOTPLength',
                         'oathSecretMaxAge',
                     ],
-                    cache_time=self.oath_params_cache_ttl,
+                    cache_ttl=self.oath_params_cache_ttl,
                 )
-            except LDAPError, err:
+            except LDAPError as err:
                 self._log(
                     logging.ERROR,
                     'Error reading OATH params from %r: %s => use defaults',
@@ -587,7 +588,7 @@ class HOTPValidationHandler(SlapdSockHandler):
             return oath_secret
         try:
             json_s = json.loads(oath_secret)
-        except ValueError, err:
+        except ValueError as err:
             self._log(
                 logging.DEBUG,
                 'error decoding JWE data: %s => return raw oathSecret value',
@@ -681,7 +682,7 @@ class HOTPValidationHandler(SlapdSockHandler):
         try:
             oath_hotp_current_counter = int(otp_token_entry['oathHOTPCounter'][0])
             oath_secret = otp_token_entry['oathSecret'][0]
-        except KeyError, err:
+        except KeyError as err:
             self._log(
                 logging.ERROR,
                 'Missing OATH attributes in %r: %s => %s',
@@ -909,7 +910,7 @@ class HOTPValidationHandler(SlapdSockHandler):
         try:
             oath_hotp_current_counter = int(otp_token_entry['oathHOTPCounter'][0])
             oath_secret = otp_token_entry['oathSecret'][0]
-        except KeyError, err:
+        except KeyError as err:
             self._log(
                 logging.ERROR,
                 'Missing OATH attributes in %r: %s => %s',
@@ -1105,7 +1106,7 @@ def run_this():
         my_logger.error('Not enough arguments => abort')
         sys.exit(1)
 
-    local_ldap_uri_obj = MyLDAPUrl(local_ldap_uri)
+    local_ldap_uri_obj = LDAPUrl(local_ldap_uri)
 
     try:
         slapd_sock_listener = HOTPValidationServer(
