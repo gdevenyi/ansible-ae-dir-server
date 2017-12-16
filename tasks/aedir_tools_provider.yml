@@ -62,7 +62,7 @@
     user: root
     cron_file: aedir_tools
 
-- name: Run aedir_update_groups.py as CRON job
+- name: "Run aedir_update_groups.py as CRON job"
   cron:
     name: "aedir_update_groups"
     state: present
@@ -71,7 +71,7 @@
     minute: "*/3"
     job: "{{ aedir_python }} {{ aedir_sbin }}/aedir_update_groups.py"
 
-- name: Run aedir_update_status.py as CRON job
+- name: "Run aedir_update_status.py as CRON job"
   cron:
     name: "aedir_update_status"
     state: present
@@ -80,7 +80,7 @@
     minute: "*/13"
     job: "{{ aedir_python }} {{ aedir_sbin }}/aedir_update_status.py"
 
-- name: Run aeperson2aeuser.py as CRON job
+- name: "Run aeperson2aeuser.py as CRON job"
   cron:
     name: "aeperson2aeuser"
     state: present
@@ -89,7 +89,7 @@
     minute: "*/2"
     job: "{{ aedir_python }} {{ aedir_sbin }}/aeperson2aeuser.py {{ aedir_rundir }}/aeperson2aeuser.state"
 
-- name: Reset aeperson2aeuser.py as CRON job
+- name: "Reset aeperson2aeuser.py as CRON job"
   cron:
     name: "aeperson2aeuser_reset"
     state: present
@@ -98,3 +98,11 @@
     hour: "*/12"
     job: "rm {{ aedir_rundir }}/aeperson2aeuser.state > /dev/null 2>&1 || exit 0"
 
+- name: "Remove obsolete CRON jobs from /etc/cron.d/aedir_tools"
+  cron:
+    name: "{{ item }}"
+    state: absent
+    cron_file: aedir_tools
+  with_items:
+    - aedirpwd_cron
+    - aedirpwd_expiry_check

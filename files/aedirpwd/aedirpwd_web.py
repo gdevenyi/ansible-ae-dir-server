@@ -42,8 +42,8 @@ import mailutil
 import aedir
 
 # Import constants from configuration module
-sys.path.append(sys.argv[2])
-from aedirpwd_cnf import PWD_LDAP_URL, WEB_CONFIG_DEBUG, WEB_ERROR, \
+from aedirpwd_cnf import \
+    PWD_LDAP_URL, WEB_CONFIG_DEBUG, WEB_ERROR, \
     APP_PATH_PREFIX, LAYOUT, TEMPLATES_DIRNAME, \
     EMAIL_SUBJECT_ADMIN, EMAIL_SUBJECT_PERSONAL, EMAIL_TEMPLATE_ADMIN, \
     EMAIL_TEMPLATE_PERSONAL, TIME_DISPLAY_FORMAT, \
@@ -998,11 +998,10 @@ def run():
         app.internalerror = False
     # Start the internal web server
     APP_LOGGER.info(
-        'Script %r starts %r instance listening on %r reading config from %r',
+        'Script %r starts %r instance listening on %r',
         sys.argv[0],
         app.__class__.__name__,
         sys.argv[1],
-        sys.argv[2],
     )
     app.run()
 

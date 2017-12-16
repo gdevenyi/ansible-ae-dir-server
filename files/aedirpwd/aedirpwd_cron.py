@@ -34,8 +34,6 @@ import aedir.process
 # Configuration constants
 #-----------------------------------------------------------------------
 
-# Import constants from configuration module
-sys.path.append(sys.argv[1])
 from aedirpwd_cnf import *
 
 ldap0._trace_level = int(os.environ.get('PYLDAP_TRACELEVEL', '0'))

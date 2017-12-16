@@ -64,7 +64,6 @@ FILTERSTR_USER = ur'(&(objectClass=aeUser)(aeStatus=0)(displayName=*)(mail=*))'
 NOTIFY_OLDEST_TIMESPAN = 1.75 * 86400.0
 
 # Import constants from configuration module
-sys.path.append(sys.argv[1])
 from aedirpwd_cnf import *
 
 # E-Mail subject for notification message

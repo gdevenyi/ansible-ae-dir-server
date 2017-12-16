@@ -72,21 +72,30 @@
     - "restart aedirpwd"
   when: aedir_service_manager=="systemd"
 
+- name: "set env var PYTHONPATH={{ aedir_etc }}/aedirpwd in /etc/cron.d/aedirpwd"
+  cron:
+    env: yes
+    name: "PYTHONPATH"
+    value: "{{ aedir_etc }}/aedirpwd"
+    state: present
+    user: ae-dir-pwd
+    cron_file: aedirpwd
+
 - name: Run aedirpwd_cron as CRON job
   cron:
     name: "aedirpwd_cron"
     state: present
     user: ae-dir-pwd
-    cron_file: aedir_tools
+    cron_file: aedirpwd
     minute: "*/2"
-    job: "{{ aedir_python }} {{ aedir_sbin }}/aedirpwd_cron.py {{ aedir_etc }}/aedirpwd"
+    job: "{{ aedir_python }} {{ aedir_sbin }}/aedirpwd_cron.py"
 
 - name: "Run aedirpwd_expiry_check as CRON job"
   cron:
     name: "aedirpwd_expiry_check"
     state: present
     user: ae-dir-pwd
-    cron_file: aedir_tools
+    cron_file: aedirpwd
     hour: "0"
     minute: "0"
-    job: "{{ aedir_python }} {{ aedir_sbin }}/aedirpwd_expiry_check.py {{ aedir_etc }}/aedirpwd"
+    job: "{{ aedir_python }} {{ aedir_sbin }}/aedirpwd_expiry_check.py"

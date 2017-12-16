@@ -18,7 +18,8 @@ Type=simple
 {% if aedir_malloc_ld_preload %}
 Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
 {% endif %}
-ExecStart={{ aedir_python }} {{ aedir_sbin }}/aedirpwd_web.py 127.0.0.1:8080 {{ aedir_etc }}/aedirpwd
+Environment=PYTHONPATH={{ aedir_etc }}/aedirpwd
+ExecStart={{ aedir_python }} {{ aedir_sbin }}/aedirpwd_web.py 127.0.0.1:8080
 User={{ aedirpwd_web_user }}
 Group={{ aedirpwd_web_group }}
 
