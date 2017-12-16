@@ -16,7 +16,8 @@ Type=simple
 {% if aedir_malloc_ld_preload %}
 Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
 {% endif %}
-ExecStart={{ aedir_python }} {{ aedir_sbin }}/oathenroll.py 127.0.0.1:8081 {{ aedir_etc }}/oathenroll
+Environment=PYTHONPATH={{ aedir_etc }}/oathenroll
+ExecStart={{ aedir_python }} {{ aedir_sbin }}/oathenroll.py 127.0.0.1:8081
 User={{ oath_ldap_oathenroll_web_user }}
 Group={{ oath_ldap_oathenroll_web_group }}
 

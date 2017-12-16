@@ -39,7 +39,6 @@ import ldapurl
 import mailutil
 
 # Import constants from configuration module
-sys.path.append(sys.argv[2])
 from oathenroll_cnf import *
 
 #---------------------------------------------------------------------------
