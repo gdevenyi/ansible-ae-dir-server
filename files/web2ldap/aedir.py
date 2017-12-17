@@ -8,7 +8,7 @@ web2ldap plugin classes for
 from __future__ import absolute_import
 
 # Python's standard lib
-import re,time,calendar,socket
+import re,time,socket
 
 # from python-ldap
 import ldap,ldap.filter
@@ -27,13 +27,12 @@ from ldap.controls.deref import DereferenceControl
 import w2lapp.searchform,w2lapp.schema.plugins.inetorgperson,w2lapp.schema.plugins.sudoers,w2lapp.schema.plugins.ppolicy
 
 from w2lapp.schema.syntaxes import \
-  DirectoryString,DistinguishedName,SelectList,GeneralizedTime, \
-  DynamicValueSelectList,IA5String,DNSDomain,NumericString, \
+  DirectoryString,DistinguishedName,SelectList, \
+  DynamicValueSelectList,IA5String,DNSDomain, \
   DynamicDNSelectList,RFC822Address,Integer,ComposedAttribute, \
-  NotBefore,NotAfter,OID,syntax_registry
+  NotBefore,NotAfter,syntax_registry
 
 from w2lapp.schema.plugins.nis import UidNumber,GidNumber,MemberUID,Shell
-from w2lapp.schema.plugins.ppolicy import PwdExpireWarning,PwdMaxAge
 from w2lapp.schema.plugins.inetorgperson import DisplayNameInetOrgPerson
 from w2lapp.schema.plugins.groups import GroupEntryDN
 from w2lapp.schema.plugins.oath import OathHOTPToken
@@ -2264,7 +2263,6 @@ for name in dir():
   syntax_registry.registerSyntaxClass(eval(name))
 
 
-import ldapsession,ldaputil.base
 from ldapsession import LDAPSession as LDAPSessionOrig
 
 class AEDirLDAPSession(LDAPSessionOrig):
