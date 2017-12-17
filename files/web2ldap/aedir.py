@@ -516,7 +516,7 @@ class AEGroupMember(DynamicDNSelectList,AEObjectUtil):
     try:
       ldap_result = self._ls.l.search_ext_s(
         self._ls.uc_encode(self._determineSearchDN(self._dn,self.lu_obj.dn))[0],
-        self.lu_obj.scope or ldap.SCOPE_SUTREE,
+        self.lu_obj.scope or ldap.SCOPE_SUBTREE,
         filterstr=self._determineFilter(),
         attrlist=self.lu_obj.attrs+['description'],
         serverctrls=srv_ctrls,
