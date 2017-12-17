@@ -119,7 +119,7 @@ class AEObjectUtil:
     try:
       zone_cn = dict([
         (at,av)
-        for at,av,flags in dn_list[-1]
+        for at,av,_ in dn_list[-1]
       ])['cn'].decode(self._ls.charset)
     except (KeyError,IndexError):
       result = None
@@ -973,19 +973,6 @@ class AEEntryDNAEZone(DistinguishedName):
   def _additional_links(self):
     attr_value_u = self.attrValue.decode(self._ls.charset)
     r = DistinguishedName._additional_links(self)
-    zone_cn = self._entry['cn'][0].decode('utf-8')
-    if zone_cn=='ae':
-      group_name_ext = ''
-    else:
-      group_name_ext = '-zone'
-    zone_admins_group_dn = u'cn={group_name},{entry_dn}'.format(
-      group_name=zone_cn+group_name_ext+u'-admins',
-      entry_dn=self._dn,
-    )
-    zone_auditors_group_dn = u'cn={group_name},{entry_dn}'.format(
-      group_name=zone_cn+group_name_ext+u'-auditors',
-      entry_dn=self._dn,
-    )
     audit_context = self._ls.getAuditContext(self._ls.currentSearchRoot)
     if audit_context:
       r.append(self._form.applAnchor(
@@ -2147,7 +2134,7 @@ class AERFC822MailMember(DynamicValueSelectList):
     )
     mail_addresses = [
       entry['mail'][0]
-      for dn, entry in ldap_result
+      for _, entry in ldap_result
     ]
     return sorted(mail_addresses)
 
