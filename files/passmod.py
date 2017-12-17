@@ -1,4 +1,4 @@
-#!/usr/bin/python -OO
+#!/usr/bin/python2 -OO
 # -*- coding: utf-8 -*-
 """
 slapd-sock listener demon queried by OpenLDAP's slapd-sock
@@ -25,10 +25,13 @@ from collections import OrderedDict
 # passlib
 import passlib.context
 
-# python-ldap
-import ldap
-from ldap.dn import str2dn
-from ldap.functions import strf_secs as ldap_strf_secs
+# from ldap0 package
+import ldap0
+from ldap0.dn import str2dn
+from ldap0.functions import strf_secs as ldap_strf_secs
+from ldap0.ldapurl import LDAPUrl
+from ldap0.logger import LoggerFileObj
+from ldap0.lock import LDAPLock
 
 # from pyasn1
 from pyasn1.type.univ import OctetString, Sequence
@@ -38,8 +41,8 @@ from pyasn1.codec.ber import decoder as pyasn1_decoder
 from pyasn1.error import PyAsn1Error
 
 # local modules
-from slapdsock.ldaphelper import MyLDAPUrl, MyLDAPObject, LocalLDAPConn
-from slapdsock.loghelper import combined_logger, LoggerFileobj
+from slapdsock.ldaphelper import MyLDAPObject, LocalLDAPConn
+from slapdsock.loghelper import combined_logger
 from slapdsock.handler import SlapdSockHandler
 from slapdsock.service import SlapdSockThreadingServer
 
@@ -71,7 +74,7 @@ ALLOWED_GIDS = [0]
 # String with octal representation of socket permissions
 SOCKET_PERMISSIONS = '0666'
 
-# Trace level for python-ldap logs
+# Trace level for ldap0 logging
 PYLDAP_TRACELEVEL = int(os.environ.get('PYLDAP_TRACELEVEL', 0))
 
 # Number of times connecting to local LDAPI is retried before sending a
@@ -91,7 +94,7 @@ LDAP_CACHE_TTL = 5.0
 LDAP_LONG_CACHE_TTL = 20 * LDAP_CACHE_TTL
 
 # Timeout in seconds when connecting to local and remote LDAP servers
-# used for ldap.OPT_NETWORK_TIMEOUT and ldap.OPT_TIMEOUT
+# used for ldap0.OPT_NETWORK_TIMEOUT and ldap0.OPT_TIMEOUT
 LDAP_TIMEOUT = 3.0
 
 # attribute containing username
@@ -189,7 +192,7 @@ class PWSyncWorker(threading.Thread, LocalLDAPConn):
         threading.Thread.__init__(self, name=self.__class__.__module__+self.__class__.__name__)
         LocalLDAPConn.__init__(self, self.logger)
         self._target_conn = None
-        self._target_conn_lock = ldap.LDAPLock(
+        self._target_conn_lock = LDAPLock(
             desc='target_conn() in %s' % (repr(self.__class__))
         )
         # end of PWSyncWorker.__init__()
@@ -201,7 +204,7 @@ class PWSyncWorker(threading.Thread, LocalLDAPConn):
         if isinstance(self._target_conn, MyLDAPObject):
             self.logger.debug(
                 'Existing LDAP connection to %s (%s)',
-                repr(self._target_conn._uri),
+                repr(self._target_conn.uri),
                 repr(self._target_conn),
             )
             return self._target_conn
@@ -211,14 +214,14 @@ class PWSyncWorker(threading.Thread, LocalLDAPConn):
                 self._target_conn = MyLDAPObject(
                     self._target_ldap_url.initializeUrl(),
                     trace_level=PYLDAP_TRACELEVEL,
-                    trace_file=LoggerFileobj(self.logger, logging.DEBUG),
+                    trace_file=LoggerFileObj(self.logger, logging.DEBUG),
+                    cache_ttl=LDAP_CACHE_TTL,
                     retry_max=LDAP_MAXRETRYCOUNT,
                     retry_delay=LDAP_RETRYDELAY,
                     who=self._target_ldap_url.who or '',
                     cred=self._target_ldap_url.cred or '',
-                    cache_time=LDAP_CACHE_TTL,
                 )
-            except ldap.LDAPError, ldap_error:
+            except ldap0.LDAPError as ldap_error:
                 self._target_conn = None
                 self.logger.error(
                     'LDAPError during connecting to %s: %s',
@@ -242,10 +245,10 @@ class PWSyncWorker(threading.Thread, LocalLDAPConn):
         self.logger.debug('Check password of %r', user_dn)
         ldapi_conn = self.get_ldapi_conn()
         try:
-            user_entry = ldap.cidict.cidict(
+            user_entry = ldap0.cidict.cidict(
                 ldapi_conn.read_s(user_dn, attrlist=['userPassword']) or {}
             )
-        except ldap.LDAPError, ldap_error:
+        except ldap0.LDAPError as ldap_error:
             self.logger.warn('LDAPError checking password of %r: %s', user_dn, ldap_error)
             return False
         try:
@@ -277,9 +280,9 @@ class PWSyncWorker(threading.Thread, LocalLDAPConn):
         self.logger.debug('Extracted %s=%r from source_dn=%r', self.source_id_attr, uid, source_dn)
         target_conn = self.target_conn()
         target_filter = self.target_filter_format.format(self.target_id_attr, uid)
-        ldap_result = target_conn.search_ext_s(
+        ldap_result = target_conn.search_s(
             self._target_ldap_url.dn,
-            self._target_ldap_url.scope or ldap.SCOPE_SUBTREE,
+            self._target_ldap_url.scope or ldap0.SCOPE_SUBTREE,
             target_filter,
             attrlist=['1.1'],
             sizelimit=8,
@@ -313,7 +316,7 @@ class PWSyncWorker(threading.Thread, LocalLDAPConn):
         """
         target_conn = self.target_conn()
         modlist = [(
-            ldap.MOD_REPLACE,
+            ldap0.MOD_REPLACE,
             self.target_password_attr,
             [self.encode_target_password(new_passwd)],
         )]
@@ -435,7 +438,7 @@ class PassModHandler(SlapdSockHandler):
             )
             old_passwd = str(decoded_value.getComponentByName('oldPasswd')) or None
             new_passwd = str(decoded_value.getComponentByName('newPasswd')) or None
-        except Exception, err:
+        except Exception as err:
             self._log(
                 logging.ERROR,
                 'Unhandled exception processing PASSMOD request: %r',
@@ -545,8 +548,8 @@ def run_this():
         my_logger.error('Not enough arguments => abort')
         sys.exit(1)
 
-    local_ldap_uri_obj = MyLDAPUrl(local_ldap_uri)
-    target_ldap_url_obj = MyLDAPUrl(target_ldap_url)
+    local_ldap_uri_obj = LDAPUrl(local_ldap_uri)
+    target_ldap_url_obj = LDAPUrl(target_ldap_url)
     # read target password from file
     with open(target_password_filename, 'rb') as target_password_file:
         target_ldap_url_obj.cred = target_password_file.read()
