@@ -32,6 +32,7 @@ from ldap0.functions import strf_secs as ldap_strf_secs
 from ldap0.ldapurl import LDAPUrl
 from ldap0.logger import LoggerFileObj
 from ldap0.lock import LDAPLock
+from ldap0.pw import unicode_pwd
 
 # from pyasn1
 from pyasn1.type.univ import OctetString, Sequence
@@ -130,18 +131,6 @@ if __debug__:
 #-----------------------------------------------------------------------
 # Classes and functions
 #-----------------------------------------------------------------------
-
-def unicode_pwd(password):
-    """
-    returns password or random generated password as properly encoded
-    'unicodePwd' value for MS AD
-
-    see also:
-    https://msdn.microsoft.com/en-us/library/cc223248.aspx
-    https://support.microsoft.com/en-us/help/269190/how-to-change-a-windows-active-directory-and-lds-user-password-through-ldap
-    """
-    return u'"{}"'.format(password).encode('utf-16-le')
-
 
 class DictQueue(Queue.Queue):
     """
