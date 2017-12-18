@@ -34,6 +34,7 @@ from ldap0.controls.ppolicy import PasswordPolicyControl
 from ldap0.controls.sessiontrack import SessionTrackingControl
 from ldap0.controls.sessiontrack import SESSION_TRACKING_FORMAT_OID_USERNAME
 from ldap0.controls.deref import DereferenceControl
+from ldap0.pw import random_string
 
 # mail utility module
 import mailutil
@@ -808,7 +809,7 @@ class RequestPasswordReset(BaseApp):
         current_time = time.time()
         temp_pwd_len = int(user_entry.get('msPwdResetPwLen', [str(PWD_LENGTH)])[0])
         pwd_admin_len = int(user_entry.get('msPwdResetAdminPwLen', [str(PWD_ADMIN_LEN)])[0])
-        temp_pwd_clear = aedir.random_string(PWD_TMP_CHARS, temp_pwd_len)
+        temp_pwd_clear = random_string(PWD_TMP_CHARS, temp_pwd_len)
         temp_pwd_hash = pwd_hash(
             temp_pwd_clear,
             user_entry.get(

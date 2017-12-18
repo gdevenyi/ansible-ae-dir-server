@@ -15,7 +15,9 @@ import getpass
 
 # set LDAPRC env var *before* importing ldap
 os.environ['LDAPRC'] = '/opt/ae-dir/etc/ldap.conf'
-import ldap
+import ldap0
+from ldap0.pw import random_string
+
 import aedir
 
 PYLDAP_TRACE_LEVEL = int(os.environ.get('PYLDAP_TRACE_LEVEL', '0'))
@@ -29,7 +31,7 @@ logger = aedir.init_logger(log_name=sys.argv[0])
 logger.info('Starting %s %s', sys.argv[0], __version__)
 logger.debug('Imported aedir %s', aedir.__version__)
 
-ldap._trace_level = PYLDAP_TRACE_LEVEL
+ldap0._trace_level = PYLDAP_TRACE_LEVEL
 
 try:
     arg_value = sys.argv[1]
@@ -51,11 +53,11 @@ logger.debug(
 try:
     dn, entry = ldap_conn.find_unique_entry(
         aedir_search_base,
-        scope=ldap.SCOPE_SUBTREE,
+        scope=ldap0.SCOPE_SUBTREE,
         filterstr=ldap_filter,
         attrlist=['pwdPolicySubentry'],
     )
-except ldap.ldapobject.NO_UNIQUE_ENTRY, ldap_err:
+except ldap0.ldapobject.NO_UNIQUE_ENTRY as ldap_err:
     logger.error(str(ldap_err))
     sys.exit(2)
 else:
@@ -99,7 +101,7 @@ else:
 
 try:
     ldap_conn.passwd_s(dn, None, new_password2)
-except ldap.LDAPError, ldap_err:
+except ldap0.LDAPError as ldap_err:
     logger.error('LDAPError setting password: %s', ldap_err)
     sys.exit(1)
 else:

@@ -32,6 +32,7 @@ from ldap0.ldapobject import ReconnectLDAPObject
 from ldap0.controls.sessiontrack import SessionTrackingControl, SESSION_TRACKING_FORMAT_OID_USERNAME
 from ldap0.ldapurl import LDAPUrl
 from ldap0.filter import escape_filter_chars
+from ldap0.pw import random_string
 
 # from mailutil
 import mailutil
@@ -73,25 +74,6 @@ class ExtLDAPUrl(LDAPUrl):
         'start_tls': 'startTLS',
         'trace_level': 'trace',
     }
-
-
-def random_string(length, alphabet):
-    """
-    Create a random random string of given length.
-
-    :length:
-        Requested length of random string.
-    :alphabet:
-        If non-zero this string is assumed to contain all valid chars for
-        the generated string. If zero-length or None the result is an
-        arbitrary octet string.
-    """
-    sys_rand = random.SystemRandom()
-    random_upper_bound = len(alphabet) - 1
-    return ''.join([
-        alphabet[sys_rand.randint(0, random_upper_bound)]
-        for _ in range(length)
-    ])
 
 
 #---------------------------------------------------------------------------
