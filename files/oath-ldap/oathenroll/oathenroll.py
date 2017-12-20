@@ -523,8 +523,8 @@ class ResetToken(BaseApp):
                     accounts=accounts,
                     confirm=confirm_hash,
                 )
-            enroll_pw1 = random_string(PWD_LENGTH-PWD_ADMIN_LEN, PWD_TMP_CHARS)
-            enroll_pw2 = random_string(PWD_ADMIN_LEN, PWD_TMP_CHARS)
+            enroll_pw1 = random_string(alphabet=PWD_TMP_CHARS, length=PWD_LENGTH-PWD_ADMIN_LEN)
+            enroll_pw2 = random_string(alphabet=PWD_TMP_CHARS, length=PWD_ADMIN_LEN)
             enroll_pw = enroll_pw1 + enroll_pw2
             self.update_token(token_dn, token_entry, enroll_pw)
         except ldap0.NO_UNIQUE_ENTRY as ldap_err:
