@@ -399,6 +399,10 @@ class HOTPValidationHandler(SlapdSockHandler):
             mods = [(ldap0.MOD_ADD, 'pwdFailureTime', [str(self.now_str)])]
         elif 'pwdFailureTime' in user_entry:
             mods = [(ldap0.MOD_DELETE, 'pwdFailureTime', None)]
+        else:
+            # nothing to be done
+            self._log(logging.DEBUG, 'No update of user entry %r', user_dn)
+            return
         # Update the login attribute in user's entry
         try:
             self.ldap_conn.modify_s(
@@ -409,18 +413,13 @@ class HOTPValidationHandler(SlapdSockHandler):
         except LDAPError as err:
             self._log(
                 logging.ERROR,
-                'LDAPError updating user entry %r with %r: %s',
+                'Error updating user entry %r with %r: %s',
                 user_dn,
                 mods,
                 err,
             )
         else:
-            self._log(
-                logging.DEBUG,
-                'Updated user entry %r with %r',
-                user_dn,
-                mods,
-            )
+            self._log(logging.DEBUG, 'Updated user entry %r with %r', user_dn, mods)
         return # end of _update_pwdfailuretime()
 
     def _check_userpassword(self, user_dn, user_entry, user_password_clear):
