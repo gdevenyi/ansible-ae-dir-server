@@ -306,13 +306,21 @@ access to
     by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" read
     by * none break
 
+# An uninitialized OATH token device can add new values
+# (authenticated with enrollment userPassword value)
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(&(objectClass=oathToken)(aeStatus=0)(!(oathSecret=*)))"
+  attrs=oathSecret,oathTokenPIN
+    by self =w
+    by * none break
+
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(&(objectClass=oathToken)(aeStatus=0))"
   attrs=oathSecret
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =sw
     by set="user & this/-1/aeZoneAdmins/member" =z
-    by self =w
     by * auth
 
 # no access to oathSecret of inactive entries
@@ -1430,7 +1438,7 @@ constraint_attribute rfc822MailMember,member
 # the Yubikey serial number must be the same in various attributes
 # Example:
 # cn: yubikey-1543514
-# displayName: yubikey neo #1543514
+# displayName: yubikey #1543514
 # oathTokenIdentifier: ubhe01543514
 # oathTokenSerialNumber: 1543514
 # serialNumber: yubikey-1543514
@@ -1441,7 +1449,7 @@ constraint_attribute serialNumber,cn,aeHwSerialNumber
   set "this/serialNumber & this/cn & ([yubikey-] + this/aeHwSerialNumber)"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=oathHOTPToken)"
 constraint_attribute displayName,aeHwSerialNumber
-  set "this/displayName & ([yubikey neo #] + this/aeHwSerialNumber)"
+  set "this/displayName & ([yubikey #] + this/aeHwSerialNumber)"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=oathHOTPToken)"
 constraint_attribute oathTokenSerialNumber,aeHwSerialNumber
   set "this/oathTokenSerialNumber & this/aeHwSerialNumber"
