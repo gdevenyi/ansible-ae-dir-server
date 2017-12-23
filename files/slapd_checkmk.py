@@ -36,7 +36,6 @@ import datetime
 import pprint
 import logging
 import threading
-from cStringIO import StringIO
 
 # optional imports from cryptography (aka PyCA) module
 CRYPTOGRAPHY_AVAIL = False
@@ -63,14 +62,14 @@ os.environ['LDAPNOINIT'] = '0'
 import ldap0
 from ldap0.ldapobject import LDAPObject
 from ldap0.openldap import SyncReplDesc
-from ldapurl import LDAPUrl
-from ldif import ParseLDIF
+from ldap0.ldapurl import LDAPUrl
+from ldap0.ldif import LDIFParser
 
 #-----------------------------------------------------------------------
 # Configuration constants
 #-----------------------------------------------------------------------
 
-__version__ = '2.0.0'
+__version__ = '2.0.1'
 
 STATE_FILENAME = 'slapd_checkmk.state'
 
@@ -978,11 +977,11 @@ class SlapdCheck(LocalCheck):
 
         def _parse_sock_response(sock_response):
             # strip ENTRY\n from response and parse the rest as LDIF
-            _, sock_monitor_entry = ParseLDIF(
-                StringIO(sock_response[6:]),
-                ignore_attrs=['sockLogLevel'],
-                maxentries=1
-            )[0]
+            _, sock_monitor_entry = LDIFParser.fromstring(
+                sock_response[6:],
+                ignored_attr_types=['sockLogLevel'],
+                max_entries=1
+            ).list_entry_records()[0]
             sock_perf_data = []
             # only add numeric monitor data to performance metrics
             for metric_key in sorted(sock_monitor_entry.keys()):
