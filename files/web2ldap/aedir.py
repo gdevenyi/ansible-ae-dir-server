@@ -873,7 +873,7 @@ class AEEntryDNAEPerson(DistinguishedName):
   ref_attrs = (
     ('manager',u'Manages',None,u'Search all entries managed by this person'),
     ('aePerson',u'Users',None,'aeUser',u'Search all personal AE-DIR user accounts (aeUser entries) of this person.'),
-    ('aePerson',u'Devices',None,'aeDevice',u'Search all devices (aeDevice entries) assigned to this person.'),
+    ('aeOwner',u'Devices',None,'aeDevice',u'Search all devices (aeDevice entries) assigned to this person.'),
   )
 
 syntax_registry.registerAttrType(
