@@ -14,14 +14,6 @@ attributetype ( ae-dir-session-at:1
   SINGLE-VALUE
   SUP uniqueIdentifier )
 
-# DN of session owner entry (also enforced to be unique)
-attributetype ( ae-dir-session-at:2
-  NAME 'aeSessionOwner'
-  X-ORIGIN 'AE-DIR'
-  DESC 'AE-DIR: unique session owner'
-  SINGLE-VALUE
-  SUP owner )
-
 # Session bindings
 attributetype ( ae-dir-session-at:3
   NAME 'aeSessionSecret'
@@ -66,6 +58,6 @@ objectclass ( ae-dir-session-oc:1
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: session object'
   STRUCTURAL
-  MUST ( aeSessionId $ aeSessionSecret $ aeSessionOwner $ aeSessionCounter $
+  MUST ( aeSessionId $ aeSessionSecret $ aeOwner $ aeSessionCounter $
          aeNotBefore $ aeNotAfter )
   MAY ( aeSessionBindings $ aeSessionAccessTime ) )

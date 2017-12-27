@@ -548,6 +548,14 @@ attributetype ( ae-dir-at:34
   DESC 'AE-DIR: (Physical) device(s) for e.g. bridge interfaces'
   SUP aeObjectReference )
 
+# DN of owner entry
+attributetype ( ae-dir-at:2
+  NAME 'aeOwner'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: owner'
+  SINGLE-VALUE
+  SUP owner )
+
 # Generic base object class for a device mounted into a single case
 # not directly used
 objectclass ( ae-dir-oc:6
@@ -557,7 +565,7 @@ objectclass ( ae-dir-oc:6
   STRUCTURAL
   SUP ( device $ aeObject )
   MUST ( aeStatus )
-  MAY ( displayName $ aeStockId $ aeHwSerialNumber $ aePerson ) )
+  MAY ( displayName $ aeStockId $ aeHwSerialNumber $ aeOwner ) )
 
 # Object class for servers
 objectclass ( ae-dir-oc:6.1
@@ -637,10 +645,10 @@ objectclass ( ae-dir-oc:25
   DESC 'AE-DIR: Authentication token device (e.g. yubikey)'
   STRUCTURAL
   SUP aeDevice
-  MUST ( aeHwSerialNumber $ serialNumber $ aePerson $ displayName )
+  MUST ( aeHwSerialNumber $ serialNumber $ displayName )
   MAY ( userPassword ) )
 
 ditcontentrule ( ae-dir-oc:25
   NAME 'aeAuthcToken-dcr'
   AUX ( oathHOTPToken $ oathTOTPToken $ ldapPublicKey $ pkiUser )
-  NOT ( l $ o $ ou $ owner $ seeAlso ) )
+  NOT ( l $ o $ ou $ seeAlso ) )

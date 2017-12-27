@@ -1205,13 +1205,27 @@ syntax_registry.registerAttrType(
 )
 
 
+class AEOwner(DynamicDNSelectList):
+  oid = 'AEOwner-oid'
+  desc = 'AE-DIR: DN of owner entry'
+  ldap_url = 'ldap:///_?displayName?sub?(&(objectClass=aePerson)(aeStatus=0))'
+  ref_attrs = (
+    ('aeOwner',u'Devices',None,'aeDevice',u'Search all devices (aeDevice entries) assigned to same owner.'),
+  )
+
+syntax_registry.registerAttrType(
+  AEOwner.oid,[
+    AE_OID_PREFIX+'.4.2', # aeOwner
+  ]
+)
+
+
 class AEPerson(DynamicDNSelectList,AEObjectUtil):
   oid = 'AEPerson-oid'
   desc = 'AE-DIR: DN of person entry'
   ldap_url = 'ldap:///_?displayName?sub?(objectClass=aePerson)'
   ref_attrs = (
     ('aePerson',u'Users',None,'aeUser',u'Search all personal AE-DIR user accounts (aeUser entries) of this person.'),
-    ('aePerson',u'Devices',None,'aeDevice',u'Search all devices (aeDevice entries) assigned to this person.'),
   )
   ae_status_map = {
     -1:(0,),
@@ -2232,7 +2246,7 @@ class AEOathHOTPToken(OathHOTPToken):
   input_fallback = False
 
   def _determineFilter(self):
-    return '(&{0}(aePerson={1}))'.format(
+    return '(&{0}(aeOwner={1}))'.format(
       OathHOTPToken._determineFilter(self),
       self._entry['aePerson'][0],
     )

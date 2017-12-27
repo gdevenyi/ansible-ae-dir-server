@@ -35,7 +35,7 @@ index entryCSN eq
 index entryUUID eq
 
 index aeSessionId eq
-index aeSessionOwner eq
+index aeOwner eq
 index aeSessionAccessTime eq
 index aeNotBefore eq
 index aeNotAfter eq
@@ -74,17 +74,17 @@ access
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" =ascx
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =ascx
     by dn.exact="cn=root,{{ aedir_suffix }}" =ascx
-    by dnattr=aeSessionOwner =scx
+    by dnattr=aeOwner =scx
     by * none
 
 # add-only (but readable) attributes which cannot be altered later on
 access
   to dn.onelevel="{{ aedir_session_suffix }}"
-  attrs=aeSessionId,aeSessionOwner,aeSessionBindings,aeNotBefore,aeNotAfter,aeSessionAccessTime
+  attrs=aeSessionId,aeOwner,aeSessionBindings,aeNotBefore,aeNotAfter,aeSessionAccessTime
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" =arscxd
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =arscxd
     by dn.exact="cn=root,{{ aedir_suffix }}" =arscxd
-    by dnattr=aeSessionOwner read
+    by dnattr=aeOwner read
     by * none
 
 # access to session counter
@@ -95,14 +95,14 @@ access
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" write
     by dn.exact="cn=root,{{ aedir_suffix }}" write
     by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
-    by dnattr=aeSessionOwner read
+    by dnattr=aeOwner read
     by * none
 
 # rest of session objects
 access
   to dn.onelevel="{{ aedir_session_suffix }}"
   filter="(&(objectClass=aeSession)(aeSessionCounter>=0))"
-    by dnattr=aeSessionOwner write
+    by dnattr=aeOwner write
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" read
     by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
@@ -125,13 +125,13 @@ overlay noopsrch
 overlay deref
 
 overlay unique
-unique_uri "ldap:///{{ aedir_session_suffix }}?aeSessionOwner?sub?(objectClass=*)"
+unique_uri "ldap:///{{ aedir_session_suffix }}?aeOwner?sub?(objectClass=*)"
 
 overlay constraint
 
 # session owners must reference active users or services/hosts
 constraint_attribute
-  aeSessionOwner
+  aeOwner
   uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(|(objectClass=aeUser)(objectClass=aeHost)(objectClass=aeService))(aeStatus=0))"
 
 # session usage time must be within validity period
