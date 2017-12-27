@@ -240,7 +240,7 @@ access to
 access to
   dn.subtree="{{ aedir_suffix }}"
   attrs=userPassword
-  filter="(&(objectClass=oathToken)(aeStatus=0)(pwdPolicySubentry=cn=ppolicy-otptokens,cn=ae,{{ aedir_suffix }})(!(|(oathSecret=*)(oathHOTPCounter=*)(oathLastLogin=*)(oathLastFailure=*))))"
+  filter="(&(objectClass=oathToken)(aeStatus=0)(pwdPolicySubentry=cn=ppolicy-otptokens,cn=ae,{{ aedir_suffix }})(!(|(oathSecret=*)(oathHOTPCounter=*))))"
     by dn.base="uid=ae-dir-otpenroll,cn=ae,{{ aedir_suffix }}" =w
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =s
     by self =z
@@ -294,6 +294,10 @@ access to
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =szm
     by * none
 
+#---------------------------------------------------------------------------
+# access to OATH-LDAP entries and their specific attributes
+#---------------------------------------------------------------------------
+
 # oathSecret may be
 # 1. read by OTP validator if token has initialized counter
 # 2. searched and written but not read(!) by AE-DIR admins
@@ -311,8 +315,8 @@ access to
 # (authenticated with enrollment userPassword value)
 access to
   dn.subtree="{{ aedir_suffix }}"
-  filter="(&(objectClass=oathToken)(aeStatus=0)(!(oathSecret=*)))"
-  attrs=oathSecret,oathTokenPIN
+  filter="(&(objectClass=oathToken)(aeStatus=0)(!(|(oathSecret=*)(oathHOTPCounter=*))))"
+  attrs=oathSecret,oathHOTPCounter,oathTokenPIN
     by self =w
     by * none break
 
@@ -329,6 +333,23 @@ access to
   dn.subtree="{{ aedir_suffix }}"
   attrs=oathSecret
     by * none
+
+# read access for device to other attributes during enrollment
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(&(objectClass=oathToken)(aeStatus=0)(!(|(oathSecret=*)(oathHOTPCounter=*))))"
+  attrs=entry,objectClass,serialNumber,oathHOTPParams,oathTokenIdentifier
+    by self read
+    by * none break
+
+# read access for devices to some attributes in the associated policy entries
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(&(objectClass=oathParams)(aeStatus=0))"
+  attrs=entry,objectClass,cn,oathHMACAlgorithm,oathOTPLength
+    by set="user/oathHOTPParams & this" read
+    by set="user/oathTOTPParams & this" read
+    by * none break
 
 # Limit proxy authorization by granting access to 'authzTo'
 # Ensure that no other entity has =x privilege!
