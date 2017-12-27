@@ -450,10 +450,11 @@ class ResetToken(BaseApp):
             SESSION_TRACKING_FORMAT_OID_USERNAME,
             self.user_uid.encode('utf-8'),
         )
-        # Set an invalid shared secret because we cannot determine
-        # whether shared secret is set
         token_mods = [
+            # reset failure count in any case
             (ldap0.MOD_REPLACE, 'oathFailureCount', ['0']),
+            # We don't fully trust enrollment client
+            # => set shared secret time to current time here
             (
                 ldap0.MOD_REPLACE,
                 'oathSecretTime',
@@ -471,7 +472,8 @@ class ResetToken(BaseApp):
             token_mods,
             serverctrls=[session_tracking_ctrl],
         )
-        # Try to remove shared secret
+        # Try to remove shared secret separately because with
+        # strict access control we don't know whether it's set or not
         try:
             self.user_ldap_conn.modify_s(
                 token_dn,
