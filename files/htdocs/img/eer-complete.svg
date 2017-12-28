@@ -349,7 +349,7 @@
 <title>aeAuthcToken&#45;&gt;aePerson</title>
 <path fill="none" stroke="#000000" d="M423.0586,-275.6254C435.7437,-269.4397 448.9212,-262.7174 461,-256 476.332,-247.4734 492.5527,-237.5301 507.2902,-228.1156"/>
 <polygon fill="#000000" stroke="#000000" points="509.2665,-231.0059 515.7781,-222.6483 505.4759,-225.121 509.2665,-231.0059"/>
-<text text-anchor="middle" x="512" y="-244.8" font-family="Times,serif" font-size="14.00" fill="#000000">aePerson</text>
+<text text-anchor="middle" x="512" y="-244.8" font-family="Times,serif" font-size="14.00" fill="#000000">aeOwner</text>
 </g>
 <!-- aeAuthcToken&#45;&gt;pwdPolicy -->
 <g id="edge39" class="edge">
