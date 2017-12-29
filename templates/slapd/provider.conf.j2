@@ -346,7 +346,7 @@ access to
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(&(objectClass=oathParams)(aeStatus=0))"
-  attrs=entry,objectClass,cn,oathHMACAlgorithm,oathOTPLength
+  attrs=entry,objectClass,cn,oathHMACAlgorithm,oathOTPLength,oathEncKey
     by set="user/oathHOTPParams & this" read
     by set="user/oathTOTPParams & this" read
     by * none break
