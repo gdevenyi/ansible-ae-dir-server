@@ -495,21 +495,29 @@ access to
 # Delegated administration of active zones
 #------------------------------------------------------------------
 
-# Delegated administration for zone subtrees
+# Zone admins can add child entries
 access to
   filter="(&(objectClass=aeZone)(aeStatus=0))"
   attrs=children
     by set="user & this/aeZoneAdmins/member" write
     by set="user & this/aeZoneAuditors/member" read
     by set="user/-1 & this" search
-    by * none break
+    by * none
+# some zone attributes readable for bound entitities in that zone
+access to
+  filter="(&(objectClass=aeZone)(aeStatus=0))"
+  attrs=entry,cn,description,objectClass
+    by set="user & this/aeZoneAdmins/member" read
+    by set="user & this/aeZoneAuditors/member" read
+    by set="user/-1 & this" read
+    by users search
+    by * none
+# rest of zone attributes only readable for zone admins/auditors
 access to
   filter="(&(objectClass=aeZone)(aeStatus=0))"
     by set="user & this/aeZoneAdmins/member" read
     by set="user & this/aeZoneAuditors/member" read
-    by set="user/-1 & this" read
-    by users search break
-    by * none break
+    by * none
 
 # aeSudoRule entries
 access to
