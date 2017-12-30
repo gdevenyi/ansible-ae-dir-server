@@ -298,6 +298,12 @@ access to
 # access to OATH-LDAP entries and their specific attributes
 #---------------------------------------------------------------------------
 
+# FIX ME! No access to oathTokenPIN for now (needs better access concept later)
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  attrs=oathTokenPIN
+    by * none
+
 # oathSecret may be
 # 1. read by OTP validator if token has initialized counter
 # 2. searched and written but not read(!) by AE-DIR admins
