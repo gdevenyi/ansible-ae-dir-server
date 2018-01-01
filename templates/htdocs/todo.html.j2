@@ -17,6 +17,9 @@
 </ul>
 
 <h1 id="open">Open</h1>
+<p>
+  In no particular order...
+</p>
 
 <h2 id="sso">WebSSO</h2>
 <p>Possible IdP implementations for SAML 2.0, OAuth 2.0, Open ID connect:</p>
@@ -180,7 +183,7 @@
   </li>
 </ul>
 
-<h2 id="nac">Network Access Control</h2>
+<h2 id="nac">Network Access Control (NAC)</h2>
 <ul>
   <li>
     <a href="https://en.wikipedia.org/wiki/IEEE_802.1X">IEEE 802.1X</a>
@@ -193,14 +196,23 @@
   </li>
 </ul>
 
-<h2 id="freeradius">FreeRADIUS</h2>
-<a href="https://freeradius.org/">FreeRADIUS</a> integration:
+<h2 id="radius">RADIUS</h2>
+<p>
+  Support for RADIUS with dynamic RADIUS client configuration
+  (see also <a href="#nac">NAC</a>).
+</p>
 <ul>
   <li>
-    dynamic RADIUS client configuration (with shared secrets)
+    <a href="https://freeradius.org/">FreeRADIUS</a>:
+    has many features, basic LDAP authc out-of-the-box
   </li>
   <li>
-    <a href="https://tools.ietf.org/html/draft-ietf-opsawg-tacacs">TACACS+</a>
+    <a href="http://www.bsdradius.org/">BSDRadius</a>:
+    needs own module
+  </li>
+  <li>
+    thin implementation based on
+    <a href="https://github.com/wichert/pyrad">pyrad</a>
   </li>
 </ul>
 
