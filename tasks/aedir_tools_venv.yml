@@ -13,19 +13,20 @@
 
 - name: "Additional PIP packages in virtualenv {{ aedir_prefix }} on {{ lsb_id }}"
   pip:
-    name:
-      - ldap0
-      - aedir
-      - netaddr
-      - cryptography
-      - jwcrypto
-      - pyasn1
-      - pyasn1_modules
+    name: "{{ item }}"
     state: present
     virtualenv: "{{ aedir_prefix }}"
     virtualenv_site_packages: no
     virtualenv_python: python2.7
     extra_args: "{{ aedir_pip_extra_args }}"
+  with_items:
+    - ldap0
+    - aedir
+    - netaddr
+    - cryptography
+    - jwcrypto
+    - pyasn1
+    - pyasn1_modules
   notify:
     - restart aedirpwd
     - restart hotp_validator
