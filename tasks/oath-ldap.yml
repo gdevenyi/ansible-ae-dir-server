@@ -77,3 +77,21 @@
     - reload systemd
     - "restart {{ oath_bind_listener }}"
   when: aedir_service_manager=="systemd"
+
+- name: "Install OATH-LDAP tool package on {{ lsb_id }}"
+  zypper:
+    name: "python-oathldap-tool"
+    state: latest
+    disable_recommends: yes
+    type: package
+  when: openldap_role == 'provider' and lsb_id == 'SUSE'
+
+- name: "PIP-install OATH-LDAP tool on {{ lsb_id }}"
+  pip:
+    name: "oathldap-tool"
+    state: present
+    virtualenv: "{{ aedir_prefix }}"
+    virtualenv_site_packages: no
+    virtualenv_python: python2.7
+    extra_args: "{{ aedir_pip_extra_args }}"
+  when: openldap_role == 'provider' and lsb_id != 'SUSE'
