@@ -68,7 +68,7 @@ from slapdsock.service import SlapdSockServer
 
 # Regex pattern for HOTP user DNs
 # If bind-DN does not match this pattern, request will be continued by slapd
-USER_DN_PATTERN = u'^uid=[a-z]+,cn=[a-z]+,(cn|ou|o|dc)=.*ae-dir.*$'
+USER_DN_PATTERN = u'^uid=[a-z]+,cn=[a-z0-9]+,(cn|ou|o|dc)=.*ae-dir.*$'
 
 # LDAP filter string for reading HOTP user entry
 USER_FILTER = u'(&(objectClass=oathHOTPUser)(oathHOTPToken=*))'

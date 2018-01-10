@@ -62,7 +62,7 @@ LDAP_PROXY_PEER_NETS = (
 )
 # Regex pattern for HOTP user DNs
 # If bind-DN does not match this pattern, request will be continued by slapd
-LDAP_PROXY_BINDDN_PATTERN = u'^uid=[a-z]+,cn=[a-z]+,(cn|ou|o|dc)=.*ae-dir.*$'
+LDAP_PROXY_BINDDN_PATTERN = u'^uid=[a-z]+,cn=[a-z0-9]+,(cn|ou|o|dc)=.*ae-dir.*$'
 
 # UIDs and peer GIDS of peers which are granted access
 # (list of int/strings)
