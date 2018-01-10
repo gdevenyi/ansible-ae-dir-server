@@ -2114,7 +2114,6 @@ syntax_registry.registerAttrType(
 class AEUserSshPublicKey(SshPublicKey):
   oid = 'AEUserSshPublicKey-oid'
   desc = 'AE-DIR: aeUser:sshPublicKey'
-  reObj = re.compile('(^|.* )(ssh-rsa|ssh-dss|ecdsa-sha2-nistp256|ssh-ed25519) .+$')
 
 syntax_registry.registerAttrType(
   AEUserSshPublicKey.oid,[
