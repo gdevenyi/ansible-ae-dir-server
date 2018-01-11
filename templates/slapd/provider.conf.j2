@@ -901,7 +901,7 @@ access to
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=posixAccount)"
-  attrs=sshPublicKey,userCertificate,loginShell,aeRemoteHost
+  attrs=sshPublicKey,userCertificate,loginShell,aeRemoteHost,aeSSHPermissions
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeLoginGroups/member & this" read
     by set="user/-1/aeProxyFor/aeLoginGroups/member & this" read
@@ -1542,9 +1542,11 @@ constraint_attribute aeSrvGroup
   uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeSrvGroup)(aeStatus=0))"
 
 # SSH certificate options, see CLI arg -O in man-page ssh-keygen(1)
-# only "permit-*" values are allowed
+# only permit values are allowed assuming that
+# 1. SSH certs are issued with '-O clear' and
+# 2. authorized keys files are generated with 'restrict'
 constraint_attribute aeSSHPermissions
-  regex "^permit-(pty|x11-forwarding|agent-forwarding|port-forwarding|user-rc)$"
+  regex "^(pty|x11-forwarding|agent-forwarding|port-forwarding|user-rc)$"
 
 # Where to log LDAP write operations (for auditing)
 overlay accesslog

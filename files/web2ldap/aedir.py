@@ -2259,15 +2259,19 @@ syntax_registry.registerAttrType(
 )
 
 
+# see sshd(AUTHORIZED_KEYS FILE FORMAT
+# and the -O option in ssh-keygen(1)
 class AESSHPermissions(SelectList):
   oid = 'AESSHPermissions-oid'
   desc = 'AE-DIR: Status of object'
   attr_value_dict = {
-    u'permit-pty':u'permit-pty',
-    u'permit-x11-forwarding':u'permit-x11-forwarding',
-    u'permit-agent-forwarding':u'permit-agent-forwarding',
-    u'permit-port-forwarding':u'permit-port-forwarding',
-    u'permit-user-rc':u'permit-user-rc',
+    u'pty':u'PTY allocation',
+    u'x11-forwarding':u'X11 forwarding',
+    u'agent-forwarding':u'Key agent forwarding',
+    u'port-forwarding':u'Port forwarding',
+    u'user-rc':u'Execute ~/.ssh/rc',
+    # magic value for enforcing no permissions at all
+    u'__none__':u'No permissions',
   }
 
 syntax_registry.registerAttrType(
