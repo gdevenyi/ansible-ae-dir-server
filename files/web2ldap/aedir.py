@@ -2097,6 +2097,7 @@ class AEEntryDNAEPolicy(DistinguishedName):
   ref_attrs = (
     ('pwdPolicySubentry',u'Users',None,'aeUser',u'Search all personal user accounts restricted by this password policy.'),
     ('pwdPolicySubentry',u'Services',None,'aeService',u'Search all service accounts restricted by this password policy.'),
+    ('pwdPolicySubentry',u'Tokens',None,'aeAuthcToken',u'Search all authentication tokens restricted by this password policy.'),
     ('oathHOTPParams',u'HOTP Tokens',None,'oathHOTPToken',u'Search all HOTP tokens affected by this HOTP parameters.'),
     ('oathTOTPParams',u'TOTP Tokens',None,'oathTOTPToken',u'Search all TOTP tokens affected by this TOTP parameters.'),
   )
