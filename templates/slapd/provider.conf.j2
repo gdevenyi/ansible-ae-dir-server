@@ -515,8 +515,17 @@ access to
   attrs=entry,cn,description,objectClass
     by set="user & this/aeZoneAdmins/member" read
     by set="user & this/aeZoneAuditors/member" read
+    by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1 & this" read
     by users search
+    by * none
+# rest of zone attributes only readable for zone admins/auditors
+access to
+  filter="(&(objectClass=aeZone)(aeStatus=0))"
+  attrs=aeZoneAdmins
+    by set="user & this/aeZoneAdmins/member" read
+    by set="user & this/aeZoneAuditors/member" read
+    by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" read
     by * none
 # rest of zone attributes only readable for zone admins/auditors
 access to
@@ -738,9 +747,15 @@ access to
 access to
   dn.regex="^uid=({{ aedir_aeuser_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
   filter="(objectClass=aeUser)"
-  attrs=msPwdResetPasswordHash,msPwdResetAdminPw
+  attrs=msPwdResetPasswordHash
     by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" =w
-    by group/aeGroup/member.expand="cn=${d2}-zone-admins,cn=${d2},{{ aedir_suffix }}" read
+    by * none
+access to
+  dn.regex="^uid=({{ aedir_aeuser_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(objectClass=aeUser)"
+  attrs=msPwdResetAdminPw
+    by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" =w
+    by set="user & this/-1/aeZoneAdmins/member" read
     by * none
 
 # Access to rest of msPwdReset* attributes
@@ -749,8 +764,8 @@ access to
   filter="(objectClass=aeUser)"
   attrs=@msPwdResetObject
     by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" write
-    by group/aeGroup/member.expand="cn=${d2}-zone-admins,cn=${d2},{{ aedir_suffix }}" read
-    by group/aeGroup/member.expand="cn=${d2}-zone-auditors,cn=${d2},{{ aedir_suffix }}" read
+    by set="user & this/-1/aeZoneAdmins/member" read
+    by set="user & this/-1/aeZoneAuditors/member" read
     by self read
     by * none
 
@@ -758,13 +773,6 @@ access to
 access to
   filter="(objectClass=aeUser)"
   attrs=entry,uid,aeStatus,objectClass,mail,pwdPolicySubentry,pwdChangedTime,aeTag,cn,displayName,description,entryCSN,creatorsName,createTimestamp,modifiersName,modifyTimestamp,memberOf,aeRemoteHost
-    by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" read
-    by * none break
-
-# Allow read access to zone admin group references in active zones
-access to
-  filter="(&(objectClass=aeZone)(aeStatus=0))"
-  attrs=entry,objectClass,cn,aeZoneAdmins
     by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" read
     by * none break
 
