@@ -107,6 +107,17 @@ attributetype ( ae-dir-at:10
   SUP associatedDomain
   SINGLE-VALUE )
 
+# SSH certificate options
+# see CLI arg -O in man-page ssh-keygen(1)
+# only "permit-*" values are allowed
+attributetype ( ae-dir-at:47
+  NAME 'aeSSHPermissions'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: permissions set in SSH certificate'
+  EQUALITY caseIgnoreMatch
+  SUBSTR caseIgnoreSubstringsMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{40} )
+
 # Tagging
 #-----------------------------------------------------------------------
 
@@ -384,7 +395,7 @@ objectclass ( ae-dir-oc:2
   STRUCTURAL
   SUP ( inetOrgPerson $ account $ aeObject )
   MUST ( uid $ aePerson $ givenName $ displayName )
-  MAY ( aeRemoteHost ) )
+  MAY ( aeRemoteHost $ aeSSHPermissions ) )
 
 ditcontentrule ( ae-dir-oc:2
   NAME 'aeUser-dcr'
@@ -627,7 +638,7 @@ objectclass ( ae-dir-oc:4
   STRUCTURAL
   SUP ( account $ aeObject )
   MUST ( uid $ description )
-  MAY ( aeRemoteHost $ aeHost $ aeSrvGroup $ userPassword ) )
+  MAY ( aeRemoteHost $ aeSSHPermissions $ aeHost $ aeSrvGroup $ userPassword ) )
 
 ditcontentrule ( ae-dir-oc:4
   NAME 'aeService-dcr'

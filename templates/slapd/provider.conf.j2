@@ -1541,6 +1541,11 @@ constraint_attribute aeOwner
 constraint_attribute aeSrvGroup
   uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeSrvGroup)(aeStatus=0))"
 
+# SSH certificate options, see CLI arg -O in man-page ssh-keygen(1)
+# only "permit-*" values are allowed
+constraint_attribute aeSSHPermissions
+  regex "^permit-(pty|x11-forwarding|agent-forwarding|port-forwarding|user-rc)$"
+
 # Where to log LDAP write operations (for auditing)
 overlay accesslog
 logdb "{{ aedir_accesslog_suffix }}"

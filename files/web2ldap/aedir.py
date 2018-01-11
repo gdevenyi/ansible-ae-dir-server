@@ -2259,6 +2259,24 @@ syntax_registry.registerAttrType(
 )
 
 
+class AESSHPermissions(SelectList):
+  oid = 'AESSHPermissions-oid'
+  desc = 'AE-DIR: Status of object'
+  attr_value_dict = {
+    u'permit-pty':u'permit-pty',
+    u'permit-x11-forwarding':u'permit-x11-forwarding',
+    u'permit-agent-forwarding':u'permit-agent-forwarding',
+    u'permit-port-forwarding':u'permit-port-forwarding',
+    u'permit-user-rc':u'permit-user-rc',
+  }
+
+syntax_registry.registerAttrType(
+  AESSHPermissions.oid,[
+    AE_OID_PREFIX+'.4.47', # aeSSHPermissions
+  ]
+)
+
+
 # Register all syntax classes in this module
 for name in dir():
   syntax_registry.registerSyntaxClass(eval(name))
