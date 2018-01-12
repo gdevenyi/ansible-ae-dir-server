@@ -2266,7 +2266,7 @@ class AESSHPermissions(SelectList):
   desc = 'AE-DIR: Status of object'
   attr_value_dict = {
     u'pty':u'PTY allocation',
-    u'x11-forwarding':u'X11 forwarding',
+    u'X11-forwarding':u'X11 forwarding',
     u'agent-forwarding':u'Key agent forwarding',
     u'port-forwarding':u'Port forwarding',
     u'user-rc':u'Execute ~/.ssh/rc',
