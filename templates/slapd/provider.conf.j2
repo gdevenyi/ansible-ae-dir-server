@@ -1546,7 +1546,7 @@ constraint_attribute aeSrvGroup
 # 1. SSH certs are issued with '-O clear' and
 # 2. authorized keys files are generated with 'restrict'
 constraint_attribute aeSSHPermissions
-  regex "^(pty|x11-forwarding|agent-forwarding|port-forwarding|user-rc)$"
+  regex "^({{ aedir_sshkey_perms|join('|') }})$"
 
 # Where to log LDAP write operations (for auditing)
 overlay accesslog

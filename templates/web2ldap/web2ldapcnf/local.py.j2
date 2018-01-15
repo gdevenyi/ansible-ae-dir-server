@@ -87,6 +87,11 @@ w2lapp.schema.plugins.aedir.AELoginShell.attr_value_dict = {
   u'{{ login_shell }}':u'{{ login_shell }}',
 {% endfor %}
 }
+w2lapp.schema.plugins.aedir.AESSHPermissions.attr_value_dict = {
+{% for ssh_perm in aedir_sshkey_perms %}
+  u'{{ ssh_perm }}':u'{{ ssh_perm }}',
+{% endfor %}
+}
 
 # Parameters for generating/checking user names
 # aeUser entries

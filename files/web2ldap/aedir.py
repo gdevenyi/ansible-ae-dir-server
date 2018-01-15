@@ -2270,8 +2270,6 @@ class AESSHPermissions(SelectList):
     u'agent-forwarding':u'Key agent forwarding',
     u'port-forwarding':u'Port forwarding',
     u'user-rc':u'Execute ~/.ssh/rc',
-    # magic value for enforcing no permissions at all
-    u'__none__':u'No permissions',
   }
 
 syntax_registry.registerAttrType(
