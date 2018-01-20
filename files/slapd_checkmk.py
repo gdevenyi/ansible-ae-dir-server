@@ -69,7 +69,7 @@ from ldap0.ldif import LDIFParser
 # Configuration constants
 #-----------------------------------------------------------------------
 
-__version__ = '2.0.1'
+__version__ = '2.0.2'
 
 STATE_FILENAME = 'slapd_checkmk.state'
 
@@ -197,6 +197,14 @@ class LocalCheck(object):
             self._next_state = {}
         self.script_name = os.path.basename(sys.argv[0])
         return  # __init__()
+
+    def _get_rate(self, key, current_val, time_span):
+        last_val = int(self._state.data.get(key, '0'))
+        if current_val < last_val:
+            val1, val2 = last_val, last_val+current_val
+        else:
+            val1, val2 = last_val, current_val
+        return (val2 - val1) / time_span # end of _get_rate()
 
     def checks(self):
         """
@@ -1218,10 +1226,10 @@ class SlapdCheck(LocalCheck):
             'cn=PDU,cn=Statistics', 'monitorCounter')
         stats_referrals = self._monitor_cache.get_value(
             'cn=Referrals,cn=Statistics', 'monitorCounter')
-        stats_bytes_rate = (stats_bytes - int(self._state.data.get('stats_bytes', '0'))) / last_time_span
-        stats_entries_rate = (stats_entries - int(self._state.data.get('stats_entries', '0'))) / last_time_span
-        stats_pdu_rate = (stats_pdu - int(self._state.data.get('stats_pdu', '0'))) / last_time_span
-        stats_referrals_rate = (stats_referrals - int(self._state.data.get('stats_referrals', '0'))) / last_time_span
+        stats_bytes_rate = self._get_rate('stats_bytes', stats_bytes, last_time_span)
+        stats_entries_rate = self._get_rate('stats_entries', stats_entries, last_time_span)
+        stats_pdu_rate = self._get_rate('stats_pdu', stats_pdu, last_time_span)
+        stats_referrals_rate = self._get_rate('stats_referrals', stats_pdu, last_time_span)
         self._next_state['stats_bytes'] = stats_bytes
         self._next_state['stats_entries'] = stats_entries
         self._next_state['stats_pdu'] = stats_pdu
@@ -1250,24 +1258,18 @@ class SlapdCheck(LocalCheck):
         if monitor_ops_counters:
             ops_all_initiated = 0
             ops_all_completed = 0
-            old_ops_all_initiated = 0
-            old_ops_all_completed = 0
             ops_all_waiting = 0
             for ops_name, ops_initiated, ops_completed in monitor_ops_counters:
                 item_name = 'SlapdOps_%s' % (ops_name)
                 self.add_item(item_name)
-                old_ops_initiated = int(self._state.data.get(ops_name+'_ops_initiated', '0'))
-                old_ops_all_initiated += old_ops_initiated
-                old_ops_completed = int(self._state.data.get(ops_name+'_ops_completed', '0'))
-                old_ops_all_completed += old_ops_completed
                 self._next_state[ops_name+'_ops_initiated'] = ops_initiated
                 self._next_state[ops_name+'_ops_completed'] = ops_completed
                 ops_waiting = ops_initiated - ops_completed
                 ops_all_waiting += ops_waiting
                 ops_all_completed += ops_completed
                 ops_all_initiated += ops_initiated
-                ops_initiated_rate = max(0, ops_initiated - old_ops_initiated) / last_time_span
-                ops_completed_rate = max(0, ops_completed - old_ops_completed) / last_time_span
+                ops_initiated_rate = self._get_rate(ops_name+'_ops_initiated', ops_initiated, last_time_span)
+                ops_completed_rate = self._get_rate(ops_name+'_ops_completed', ops_completed, last_time_span)
                 self.result(
                     CHECK_RESULT_OK,
                     item_name,
@@ -1284,8 +1286,10 @@ class SlapdCheck(LocalCheck):
                         ops_waiting,
                     ),
                 )
-            ops_all_initiated_rate = max(0, ops_all_initiated-old_ops_all_initiated) / last_time_span
-            ops_all_completed_rate = max(0, ops_all_completed-old_ops_all_completed) / last_time_span
+            ops_all_initiated_rate = self._get_rate('ops_all_initiated', ops_all_initiated, last_time_span)
+            ops_all_completed_rate = self._get_rate('ops_all_completed', ops_all_completed, last_time_span)
+            self._next_state['ops_all_initiated'] = ops_all_initiated
+            self._next_state['ops_all_completed'] = ops_all_completed
             if OPS_WAITING_CRIT != None and ops_all_waiting > OPS_WAITING_CRIT:
                 state = CHECK_RESULT_ERROR
             elif OPS_WAITING_WARN != None and ops_all_waiting > OPS_WAITING_WARN:
