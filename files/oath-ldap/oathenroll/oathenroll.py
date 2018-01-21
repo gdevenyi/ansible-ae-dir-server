@@ -395,7 +395,7 @@ class ResetToken(BaseApp):
         ldap_result = self.user_ldap_conn.search_s(
             self.ldap_url.dn,
             ldap0.SCOPE_SUBTREE,
-            filterstr='(&(objectClass=account)(oathToken={dn}))'.format(
+            filterstr='(&(objectClass=oathUser)(oathToken={dn}))'.format(
                 dn=escape_filter_chars(dn),
             ),
             attrlist=['uid', 'description']
@@ -451,8 +451,6 @@ class ResetToken(BaseApp):
             self.user_uid.encode('utf-8'),
         )
         token_mods = [
-            # reset failure count in any case
-            (ldap0.MOD_REPLACE, 'oathFailureCount', ['0']),
             # We don't fully trust enrollment client
             # => set shared secret time to current time here
             (
@@ -461,7 +459,12 @@ class ResetToken(BaseApp):
                 [time.strftime('%Y%m%d%H%M%SZ', time.gmtime(time.time()))],
             ),
         ]
-        for del_attr in ('oathHOTPCounter', 'oathLastLogin', 'oathLastFailure'):
+        for del_attr in (
+                'oathHOTPCounter',
+                'oathLastLogin',
+                'oathFailureCount',
+                'oathLastFailure',
+            ):
             if del_attr in token_entry:
                 token_mods.append(
                     (ldap0.MOD_DELETE, del_attr, None)

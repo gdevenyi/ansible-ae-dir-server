@@ -233,14 +233,14 @@ access to
 {% endif %}
 
 # Password of active token entries may be
-# 1. searched but not read or written(!) by AE-DIR admins
-# 2. written but not read(!) by enrollment service
+# 1. searched but not read or written by AE-DIR admins
+# 2. written but not read by enrollment service
 # 3. removed by self
 # 4. used for LDAP simple bind
 access to
   dn.subtree="{{ aedir_suffix }}"
   attrs=userPassword
-  filter="(&(objectClass=oathToken)(aeStatus=0)(pwdPolicySubentry=cn=ppolicy-otptokens,cn=ae,{{ aedir_suffix }})(!(|(oathSecret=*)(oathHOTPCounter=*))))"
+  filter="(&(objectClass=oathToken)(aeStatus=0)(pwdPolicySubentry=cn=ppolicy-otptokens,cn=ae,{{ aedir_suffix }})(!(oathHOTPCounter=*)))"
     by dn.base="uid=ae-dir-otpenroll,cn=ae,{{ aedir_suffix }}" =w
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =s
     by self =z
@@ -294,16 +294,12 @@ access to
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =szm
     by * none
 
-#---------------------------------------------------------------------------
-# access to OATH-LDAP entries and their specific attributes
-#---------------------------------------------------------------------------
+#------------------------------------------------------------------
+# access to OATH-LDAP attribute 'oathSecret'
+# Note: more OATH-LDAP related ACLs below
+#------------------------------------------------------------------
 
-# oathSecret may be
-# 1. read by OTP validator if token has initialized counter
-# 2. searched and written but not read(!) by AE-DIR admins
-# 3. deleted but not read(!) by enrollment service
-# 4. written but not read(!) self (with temporary password)
-
+# OTP validator can read oathSecret if token is initialized
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(&(objectClass=oathToken)(aeStatus=0)(oathHOTPCounter>=0))"
@@ -311,51 +307,30 @@ access to
     by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" read
     by * none break
 
-# An uninitialized OATH token device can add new values
-# (authenticated with enrollment userPassword value)
-access to
-  dn.subtree="{{ aedir_suffix }}"
-  filter="(&(objectClass=oathToken)(aeStatus=0)(!(|(oathSecret=*)(oathHOTPCounter=*))))"
-  attrs=oathSecret,oathHOTPCounter,oathTokenPIN
-    by self =w
-    by * none break
-
-# FIX ME! No access to oathTokenPIN for now (needs better access concept later)
-access to
-  dn.subtree="{{ aedir_suffix }}"
-  attrs=oathTokenPIN
-    by * none
-
+# 1. AE admin can search and write but not read 'oathSecret'
+# 2. Zone admin can delete but not read 'oathSecret'
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(&(objectClass=oathToken)(aeStatus=0))"
   attrs=oathSecret
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =sw
     by set="user & this/-1/aeZoneAdmins/member" =z
+    by * none break
+
+# An uninitialized OATH token device can itself write (not read) some attributes
+# (authenticated with enrollment userPassword value)
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(&(objectClass=oathToken)(aeStatus=0)(!(oathHOTPCounter=*)))"
+  attrs=oathSecret
+    by self =a
     by * auth
 
-# no access to oathSecret of inactive entries
+# last-catch: no access to oathSecret from here
 access to
   dn.subtree="{{ aedir_suffix }}"
   attrs=oathSecret
     by * none
-
-# read access for device to other attributes during enrollment
-access to
-  dn.subtree="{{ aedir_suffix }}"
-  filter="(&(objectClass=oathToken)(aeStatus=0)(!(|(oathSecret=*)(oathHOTPCounter=*))))"
-  attrs=entry,objectClass,serialNumber,oathHOTPParams,oathTokenIdentifier
-    by self read
-    by * none break
-
-# read access for devices to some attributes in the associated policy entries
-access to
-  dn.subtree="{{ aedir_suffix }}"
-  filter="(&(objectClass=oathParams)(aeStatus=0))"
-  attrs=entry,objectClass,cn,oathHMACAlgorithm,oathOTPLength,oathEncKey
-    by set="user/oathHOTPParams & this" read
-    by set="user/oathTOTPParams & this" read
-    by * none break
 
 # Limit proxy authorization by granting access to 'authzTo'
 # Ensure that no other entity has =x privilege!
@@ -415,28 +390,11 @@ access to
   attrs=entry,children,objectClass,entryUUID,hasSubordinates,entryDN,modifyTimestamp,cn,description,@namedObject,@posixGroup,@sudoRole,@DUAConfigProfile,@pkiCA
     by users read
 
-# for OATH-LDAP
+#------------------------------------------------------------------
+# OATH-LDAP access control
 #------------------------------------------------------------------
 
-# Access to read all OATH parameter entries for
-# 1. OTP validator
-# 2. active aeUser entries
-access to
-  dn.subtree="{{ aedir_suffix }}"
-  filter="(objectClass=oathParams)"
-    by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" read
-    by set="user/objectClass & [aeUser]" read
-    by * none
-
-# write access to special status attributes for OTP validator
-access to
-  dn.subtree="{{ aedir_suffix }}"
-  filter="(objectClass=oathUser)"
-  attrs=pwdFailureTime
-    by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" manage
-    by * none break
-
-# read access to password policy DN for OTP validator
+# grant read access to password policy DN in oathUser entries to OTP validator
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=oathUser)"
@@ -444,58 +402,110 @@ access to
     by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" read
     by * none break
 
+# manage access to attribute 'pwdFailureTime' for OTP validator
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(objectClass=oathUser)"
+  attrs=pwdFailureTime
+    by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" manage
+    by * none break
+
+# An active but uninitialized OATH token device can
+# itself set but not read new oathTokenPIN value
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(&(objectClass=oathToken)(aeStatus=0)(!(oathHOTPCounter=*)))"
+  attrs=oathTokenPIN
+    by self =w
+    by * none break
+
+# FIX ME! (concept for recovering token PIN needed)
+# No other access to oathTokenPIN from here
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  attrs=oathTokenPIN
+    by * none
+
+# An active but uninitialized OATH token device can itself
+# read someother attributes during enrollment
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(&(objectClass=oathToken)(aeStatus=0)(!(oathHOTPCounter=*)))"
+  attrs=entry,objectClass,serialNumber,oathHOTPParams,oathTokenIdentifier
+    by self read
+    by * none break
+
+# read access for devices to some attributes in the associated policy entries
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(&(objectClass=oathHOTPParams)(aeStatus=0))"
+  attrs=entry,objectClass,cn,oathHMACAlgorithm,oathOTPLength,oathEncKey
+    by set="user/oathHOTPParams & this" read
+    by * none break
+
+# read access for devices to some attributes in the associated policy entries
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(&(objectClass=oathTOTPParams)(aeStatus=0))"
+  attrs=entry,objectClass,cn,oathHMACAlgorithm,oathOTPLength,oathEncKey
+    by set="user/oathTOTPParams & this" read
+    by * none break
+
+# Access to read all OATH parameter entries for
+# 1. OTP validator
+# 2. user entries referencing a token controlled by this
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(objectClass=oathParams)"
+    by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" read
+    by set="user/objectClass & [aeUser]" read
+    by set="user/oathHOTPToken/oathHOTPParams & this" read
+    by set="user/oathTOTPToken/oathTOTPParams & this" read
+    by * none
+
 # write access to special status attributes for OTP validator
 access to
   dn.onelevel="cn=otp,{{ aedir_suffix }}"
   filter="(objectClass=oathToken)"
   attrs=oathLastLogin,oathFailureCount,oathLastFailure
     by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" write
-    by group/aeGroup/member="cn=otp-zone-admins,cn=otp,{{ aedir_suffix }}" write
+    by set="user & this/-1/aeZoneAdmins/member" =rz
     by * none break
 
-# oathHOTPCounter in token entries may be
+# oathHOTPCounter in token entries
 #---------------------------------------------------------------------------
-# 1. read and (only active) deleted by OTP registration/enrollment admins
-# 1. read and (only active) reset to 0 with enrollment password (self)
-# 2. read and (only active) written by validation service
-# 3. read by OTP registration/enrollment admins
-# 4. read by associated users
 
-# allow OTP registration/enrollment admins to add new value 0
+# An active but uninitialized OATH token device can
+# itself reset the oathHOTPCounter value to zero
 access to
-  dn.onelevel="cn=otp,{{ aedir_suffix }}"
-  filter="(&(objectClass=oathToken)(aeStatus=0))"
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(&(objectClass=oathToken)(aeStatus=0)(!(oathHOTPCounter=*)))"
   attrs=oathHOTPCounter
   val/integerMatch="0"
-    by self =ra
+    by self =a
     by * none break
 
+# 'oathHOTPCounter' in token entries can be
+# 1. read and written by validation service
+# 2. read and deleted by zone admins
+# 3. read by associated users
 access to
-  dn.onelevel="cn=otp,{{ aedir_suffix }}"
+  dn.subtree="{{ aedir_suffix }}"
   filter="(&(objectClass=oathToken)(aeStatus=0))"
   attrs=oathHOTPCounter
     by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" write
-    by group/aeGroup/member="cn=otp-zone-admins,cn=otp,{{ aedir_suffix }}" =rz
+    by dn.base="uid=ae-dir-otpenroll,cn=ae,{{ aedir_suffix }}" read
+    by set="user & this/-1/aeZoneAdmins/member" =rz
+    by set="user & this/-1/aeZoneAuditors/member" read
     by set="user/oathHOTPToken & this" read
-    by self =rz
     by * none
 
-# Token entries can be
-#---------------------------------------------------------------------------
-# 1. written by OTP registration/enrollment admins
-# 2. read by OTP validator
-# 3. read by referencing personal user account
-# 4. read by all zone admins
-#    (FIX ME: limit to zone admins of referencing users)
+# Token entries must be read by OTP validator
 access to
-  dn.onelevel="cn=otp,{{ aedir_suffix }}"
+  dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=oathToken)"
     by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" read
-    by set="user & this/aeZoneAdmins/member" read
-    by set="user & this/aeZoneAuditors/member" read
-    by set="user/oathHOTPToken & this" read
-    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}" read
-    by * none
+    by * none break
 
 #------------------------------------------------------------------
 # Delegated administration of active zones
@@ -658,6 +668,17 @@ access to
   filter="(objectClass=aeTag)"
     by set="user & this/-1/aeZoneAdmins/member" write
     by set="user & this/-1/aeZoneAuditors/member" read
+    by * none break
+
+# aeAuthcToken entries
+access to
+  dn.regex="^serialNumber=({{ aedir_aeauthctoken_serial_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(objectClass=aeAuthcToken)"
+    by set="user & this/-1/aeZoneAdmins/member" write
+    by set="user & this/-1/aeZoneAuditors/member" read
+    by set="user/oathHOTPToken & this" read
+    by set="user/oathTOTPToken & this" read
+    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}" read
     by * none break
 
 # aeContact entries
@@ -1479,31 +1500,28 @@ constraint_attribute rfc822MailMember,member
   set "this/rfc822MailMember & this/member/mail"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeMailGroup)"
 
-# the Yubikey serial number must be the same in various attributes
-# Example:
-# cn: yubikey-1543514
-# displayName: yubikey #1543514
-# oathTokenIdentifier: ubhe01543514
-# oathTokenSerialNumber: 1543514
-# serialNumber: yubikey-1543514
-# aeHwSerialNumber: 1543514
+# regex constraint for 'serialNumber in aeAuthcToken entries
+constraint_attribute serialNumber
+  regex "^{{ aedir_aeauthctoken_serial_regex }}$"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeAuthcToken)"
+
+# constraints for aeAuthcToken/oathHOTPToken entries for Yubikey
+# aeHwSerialNumber limited to max. eight digits
 constraint_attribute aeHwSerialNumber
   regex "^[0-9]{0,8}$"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(&(objectClass=aeAuthcToken)(objectClass=oathHOTPToken)(cn=yubikey-*))"
 constraint_attribute serialNumber,cn,aeHwSerialNumber
-  set "this/serialNumber & this/cn & ([yubikey-] + this/aeHwSerialNumber)"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=oathHOTPToken)"
+  set "this/serialNumber & ([yubikey-] + this/aeHwSerialNumber)"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(&(objectClass=aeAuthcToken)(objectClass=oathHOTPToken)(cn=yubikey-*))"
 constraint_attribute displayName,aeHwSerialNumber
   set "this/displayName & ([yubikey #] + this/aeHwSerialNumber)"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=oathHOTPToken)"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(&(objectClass=aeAuthcToken)(objectClass=oathHOTPToken)(cn=yubikey-*))"
 constraint_attribute oathTokenSerialNumber,aeHwSerialNumber
   set "this/oathTokenSerialNumber & this/aeHwSerialNumber"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=oathHOTPToken)"
 constraint_attribute oathTokenIdentifier
   regex "^ubhe[0-9]{8}$"
-# FIX ME! Not sure how to match "ubhe"*<oathTokenIdentifier>
-#constraint_attribute oathTokenIdentifier,aeHwSerialNumber
-#  set " & ([uhbe] + this/aeHwSerialNumber) & this/oathTokenIdentifier"
-#  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=oathHOTPToken)"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(&(objectClass=aeAuthcToken)(objectClass=oathHOTPToken)(cn=yubikey-*))"
 
 # standard constraints for OATH-LDAP
 constraint_attribute oathHOTPToken

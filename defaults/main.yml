@@ -98,6 +98,8 @@ aedir_aegroup_cn_regex: "{{ aedir_aezone_cn_regex }}-[a-z0-9-]+"
 aedir_aetag_cn_regex: "{{ aedir_aegroup_cn_regex }}"
 aedir_aesudorule_cn_regex: "{{ aedir_aegroup_cn_regex }}"
 aedir_aesrvgroup_cn_regex: "{{ aedir_aegroup_cn_regex }}"
+# attribute 'serialNumber'
+aedir_aeauthctoken_serial_regex: "[a-z0-9_-]+"
 # attribute 'uid'
 aedir_aeuser_uid_regex: "[a-z]{{ '{' }}{{ aedir_username_minlen }},{{ aedir_username_maxlen }}{{ '}' }}"
 aedir_aeservice_uid_regex: "[a-zA-Z0-9_.-]+"

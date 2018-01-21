@@ -74,7 +74,7 @@ USER_DN_PATTERN = u'^uid=[a-z]+,cn=[a-z0-9]+,(cn|ou|o|dc)=.*ae-dir.*$'
 USER_FILTER = u'(&(objectClass=oathHOTPUser)(oathHOTPToken=*))'
 
 # LDAP filter string for reading fully initialized HOTP token entry
-OATH_TOKEN_FILTER = u'(&(objectClass=oathHOTPToken)(oathHOTPCounter=*)(oathSecret=*))'
+OATH_TOKEN_FILTER = u'(&(objectClass=oathHOTPToken)(oathHOTPCounter>=0)(oathSecret=*))'
 # Attribute for saving the last login timestamp
 LOGIN_TIMESTAMP_ATTR = 'authTimestamp'
 
