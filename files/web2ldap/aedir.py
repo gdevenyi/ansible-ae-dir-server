@@ -2246,10 +2246,12 @@ class AEOathHOTPToken(OathHOTPToken):
   input_fallback = False
 
   def _determineFilter(self):
-    return '(&{0}(aeOwner={1}))'.format(
-      OathHOTPToken._determineFilter(self),
-      self._entry['aePerson'][0],
-    )
+    if 'aePerson' in self._entry:
+      return '(&{0}(aeOwner={1}))'.format(
+        OathHOTPToken._determineFilter(self),
+        self._entry['aePerson'][0],
+      )
+    return OathHOTPToken._determineFilter(self)
 
 syntax_registry.registerAttrType(
   AEOathHOTPToken.oid,[
