@@ -7,6 +7,10 @@ objectClass: aeObject
 objectClass: aeUser
 objectClass: posixAccount
 objectClass: ldapPublicKey
+{% if oath_ldap_enabled==True %}
+objectClass: oathUser
+objectClass: oathHOTPUser
+{% endif %}
 aeStatus: 0
 loginShell: /bin/bash
 pwdPolicySubentry: cn=ppolicy-users,cn=ae,{{ aedir_suffix }}
