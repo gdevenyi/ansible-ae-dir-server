@@ -17,6 +17,31 @@ ltb_openldap_repo:
   CentOS: "https://ltb-project.org/rpm/$releasever/$basearch"
   Debian: "deb https://ltb-project.org/debian/{{ ansible_distribution_release }} {{ ansible_distribution_release }} main"
 
+# which repos on https://download.opensuse.org to use for openSUSE or SLES versions
+aedir_suse_repos:
+  "SUSE Linux Enterprise Server 12 SP3":
+    - name: "home_stroeder_AE-DIR"
+      repo: "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR/SLE_12_SP3/"
+    - name: "network_ldap"
+      repo: "http://download.opensuse.org/repositories/network:/ldap/SLE_12_SP3/"
+    - name: "Apache_Modules"
+      repo: "http://download.opensuse.org/repositories/Apache:/Modules/SLE_12_SP3/"
+    - name: "devel_languages_python"
+      repo: "http://download.opensuse.org/repositories/devel:/languages:/python/SLE_12_SP3/"
+  "openSUSE Leap 15.0":
+    - name: "home_stroeder_AE-DIR"
+      repo: "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR/openSUSE_Leap_15.0/"
+  "openSUSE Leap 42.3":
+    - name: "home_stroeder_AE-DIR"
+      repo: "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR/openSUSE_Leap_42.3/"
+    - name: "network_ldap"
+      repo: "http://download.opensuse.org/repositories/network:/ldap/openSUSE_Leap_42.3/"
+    - name: "devel_languages_python"
+      repo: "http://download.opensuse.org/repositories/devel:/languages:/python/openSUSE_Leap_42.3/"
+  "openSUSE Tumbleweed":
+    - name: "home_stroeder_AE-DIR"
+      repo: "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR/openSUSE_Tumbleweed/"
+
 # OS-specific maps
 os_openldap_paths:
   CentOS:

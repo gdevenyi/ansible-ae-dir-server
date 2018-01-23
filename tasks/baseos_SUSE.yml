@@ -15,6 +15,7 @@
     - ca-certificates
     - python
     - python-xml
+    - zypper
 
 - name: "Install alternative malloc package {{ aedir_malloc_package }}"
   zypper:
@@ -23,3 +24,19 @@
     disable_recommends: yes
     type: package
   when: aedir_malloc_package!=""
+
+- name: "additonal zypper repos on "
+  zypper_repository:
+    state: present
+    #enabled: yes
+    overwrite_multiple: yes
+    auto_import_keys: yes
+    autorefresh: yes
+    name: "{{ item.name }}"
+    repo: "{{ item.repo }}"
+  with_items: "{{ aedir_suse_repos[ansible_lsb.description] }}"
+
+- name: "Refresh all repos on {{ ansible_lsb.description }}"
+  zypper_repository:
+    repo: '*'
+    runrefresh: yes
