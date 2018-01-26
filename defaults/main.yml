@@ -544,7 +544,12 @@ aedir_news: []
 # set to True to enable (default is False=disabled)
 oath_ldap_enabled: False
 
-# regex pattern for limiting the entries for which bind requests are sent to external OATH-LDAP listener
+# regex pattern for limiting the entries for which bind requests
+# are sent to external OATH-LDAP listener
+# Note:
+# This needs OpenLDAP built with ITS#8051 in otherwise slapd won't start!
+# If in doubt leave empty.
+#oath_ldap_dn_regex: "^uid=({{ aedir_aeuser_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
 oath_ldap_dn_regex: ""
 
 # map slapd role to bind listener parameters
