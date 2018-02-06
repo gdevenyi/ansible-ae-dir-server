@@ -9,6 +9,9 @@ objectClass: posixAccount
 objectClass: ldapPublicKey
 objectClass: inetLocalMailRecipient
 aeStatus: 0
+{% if 'aeUser' in ae_expiry_status_defaults %}
+aeExpiryStatus: {{ ae_expiry_status_defaults.aeUser }}
+{% endif %}
 aeExpiryStatus: 1
 description: primary desktop/mailbox account
 loginShell: /bin/bash

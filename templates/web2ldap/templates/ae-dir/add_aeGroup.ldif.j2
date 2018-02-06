@@ -5,5 +5,8 @@ objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
 aeStatus: 0
+{% if 'aeGroup' in ae_expiry_status_defaults %}
+aeExpiryStatus: {{ ae_expiry_status_defaults.aeGroup }}
+{% endif %}
 aeNotBefore: now
 

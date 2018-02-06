@@ -345,6 +345,15 @@ aedir_htdocs_layout: "layout.html.j2"
 aedir_malloc_package: ""
 aedir_malloc_ld_preload: ""
 
+# Default values for attribute 'aeExpiryStatus' in LDIF templates
+# key is the structural object class
+# Example:
+# ae_expiry_status_defaults:
+#     aeUser: 1
+#     aeGroup: 1
+#     aeService: 1
+ae_expiry_status_defaults: {}
+
 #---------------------------------------------------------------------------
 # OpenLDAP parameters
 #---------------------------------------------------------------------------

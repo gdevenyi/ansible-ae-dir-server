@@ -4,5 +4,8 @@ objectClass: aeObject
 objectClass: aeContact
 objectClass: mailboxRelatedObject
 aeStatus: 0
+{% if 'aeContact' in ae_expiry_status_defaults %}
+aeExpiryStatus: {{ ae_expiry_status_defaults.aeContact }}
+{% endif %}
 aeNotBefore: now
 
