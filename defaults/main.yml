@@ -238,6 +238,14 @@ aedir_ldapi_services:
     description: The system user for running Apache server process (httpd)
     roles:
       - provider
+  # system user for running web2ldap instance under control of uwsgi
+  ae-dir-web2ldap:
+    cn: web2ldap demon user
+    uid_number: "{{ aedir_min_gid-10 }}"
+    gid_number: "{{ aedir_min_gid-10 }}"
+    description: The system user for running web2ldap service process
+    roles:
+      - provider
 
 # POSIX UID and GID which is mapped to rootdn
 aedir_rootdn_uid_number: 0
