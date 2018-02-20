@@ -658,8 +658,9 @@ class InitToken(BaseApp):
             )
         return res # end of InitToken.do_the_work()
 
+application = web.application(URL2CLASS_MAPPING, globals(), autoreload=bool(WEB_ERROR)).wsgifunc()
 
-def start():
+def run():
     """
     Start the web application service
     """
@@ -675,4 +676,4 @@ def start():
 
 
 if __name__ == '__main__':
-    start()
+    run()

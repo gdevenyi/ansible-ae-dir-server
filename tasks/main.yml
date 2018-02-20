@@ -55,12 +55,6 @@
   tags:
     - htdocs
 
-- name: "Install web2ldap on {{ openldap_role }}"
-  include_tasks: "web2ldap.yml"
-  when: openldap_role=="provider"
-  tags:
-    - web2ldap
-
 - name: "Configure apache2"
   include_tasks: "configure_apache2.yml"
   when: openldap_role == 'provider'
@@ -73,8 +67,8 @@
   tags:
     - aedirpwd
 
-- name: "Customize web2ldap for AE-DIR on {{ openldap_role }}"
-  include_tasks: configure_web2ldap.yml
+- name: "Install and configure web2ldap on {{ openldap_role }}"
+  include_tasks: "web2ldap.yml"
   when: openldap_role=="provider"
   tags:
     - web2ldap

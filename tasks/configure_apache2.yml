@@ -27,16 +27,6 @@
   notify:
     - "restart web server"
 
-- name: "Create FastCGI socket directory {{ apache_rundir }}"
-  file:
-    path: "{{ apache_rundir }}/fcgid-sock"
-    state: directory
-    owner: "{{ apache_user }}"
-    group: "{{ apache_group }}"
-    mode: 0750
-  notify:
-    - "restart web server"
-
 - name: "Install apache2 CA cert bundle {{ apache_cacert_filename }} to {{ apache_cacert_pathname }}"
   copy:
     src: "{{ apache_cacert_filename }}"

@@ -15,6 +15,7 @@
     - python
     - libxml2-python
     - polkit
+    - epel-release
 
 - name: "Install alternative malloc package {{ aedir_malloc_package }}"
   yum:

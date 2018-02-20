@@ -7,13 +7,13 @@
     disable_recommends: yes
     type: package
   with_items:
-    - python-aedir
-    - python-ldap0
-    - python-ldap=2.5.2
     - python-pyasn1>=0.3.7
     - python-pyasn1-modules>=0.1.5
+    - python-ldap0
+    - python-aedir
     - python-netaddr
     - python-jwcrypto
+    - python-virtualenv
   notify:
     - restart aedirpwd
     - restart hotp_validator
@@ -43,8 +43,21 @@
     - python-web.py
     - python-passlib
     - python-pyweblib
+    - python-M2Crypto
   when: openldap_role == 'provider'
   notify:
     - restart aedirpwd
     - restart oathenroll
     - restart hotp_validator
+
+- name: "Prepare virtualenv {{ aedir_prefix }} needed for PIP installation of web2ldap"
+  pip:
+    name:
+      - pip
+      - setuptools
+    state: latest
+    virtualenv: "{{ aedir_prefix }}"
+    virtualenv_site_packages: yes
+    virtualenv_python: python2.7
+    extra_args: "{{ aedir_pip_extra_args }}"
+  when: openldap_role == 'provider'

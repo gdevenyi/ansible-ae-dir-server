@@ -10,10 +10,10 @@
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
   notify:
-  - "restart web server"
+    - "restart web server"
   with_items:
-  - apache2
-  - libapache2-mod-fcgid
+    - apache2
+    - libapache2-mod-proxy-uwsgi
 
 - name: "Install packages needed for running Apache 2.4 on {{ lsb_id }}"
   apt:
@@ -24,14 +24,21 @@
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
   notify:
-  - "restart web server"
+    - "restart web server"
   when: ansible_distribution_release == "jessie"
 
-# Debian package seems to be buggy and does not create this
-- name: "Create mod_fcgid directory"
-  file:
-    path: /var/lib/apache2/fcgid
-    state: directory
-    owner: root
-    group: root
-    mode: u=rwx,g=rx,o=rx
+- name: "Install UWSGI packages on {{ lsb_id }}"
+  apt:
+    name: "{{ item }}"
+    state: installed
+    update_cache: yes
+    cache_valid_time: 3600
+    install_recommends: no
+    dpkg_options: 'force-confold,force-confdef'
+  notify:
+    - "restart aedirpwd"
+    - "restart oathenroll"
+    - "restart web2ldap"
+  with_items:
+    - uwsgi
+    - uwsgi-plugin-python

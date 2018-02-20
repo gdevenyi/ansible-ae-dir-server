@@ -8,14 +8,6 @@ Some local configuration tweaks for Æ-DIR
 # imports from Python's standard lib
 import sys, os, re
 
-# for 'validate:' in ansible
-if __name__ == '__main__':
-  sys.path.insert(0,'{{ web2ldap_etc }}')
-  sys.path.insert(0,'{{ web2ldap_pylib }}')
-
-# python-ldap
-import ldap
-
 # internal configuration import
 import web2ldapcnf.misc
 
@@ -57,37 +49,37 @@ web2ldapcnf.monitor.access_allowed = [
 # Tweak some class attributes of AE-DIR plugin classes
 #-----------------------------------------------------------------------
 
-import w2lapp.schema.plugins.aedir
+import web2ldap.app.plugins.aedir
 
-w2lapp.schema.plugins.aedir.AETicketId.reObj = re.compile('^{{ aeticketid_regex }}$')
-w2lapp.schema.plugins.aedir.AETicketId.html_tmpl = '<a href="https://issues.example.com/browse/{av}">{av}</a>'
+web2ldap.app.plugins.aedir.AETicketId.reObj = re.compile('^{{ aeticketid_regex }}$')
+web2ldap.app.plugins.aedir.AETicketId.html_tmpl = '<a href="https://issues.example.com/browse/{av}">{av}</a>'
 
 # Check hostname in DNS and reverse DNS
-w2lapp.schema.plugins.aedir.AEHostname.host_lookup=2
+web2ldap.app.plugins.aedir.AEHostname.host_lookup=2
 
-import w2lapp.schema.plugins.posixautogen
-w2lapp.schema.plugins.posixautogen.AutogenUIDNumber.minNewValue = {{ aedir_min_uid }}L
-w2lapp.schema.plugins.posixautogen.AutogenUIDNumber.maxNewValue = {{ aedir_max_uid }}L
-w2lapp.schema.plugins.posixautogen.AutogenGIDNumber.minNewValue = {{ aedir_min_gid }}L
-w2lapp.schema.plugins.posixautogen.AutogenGIDNumber.maxNewValue = {{ aedir_max_gid }}L
+import web2ldap.app.plugins.posixautogen
+web2ldap.app.plugins.posixautogen.AutogenUIDNumber.minNewValue = {{ aedir_min_uid }}L
+web2ldap.app.plugins.posixautogen.AutogenUIDNumber.maxNewValue = {{ aedir_max_uid }}L
+web2ldap.app.plugins.posixautogen.AutogenGIDNumber.minNewValue = {{ aedir_min_gid }}L
+web2ldap.app.plugins.posixautogen.AutogenGIDNumber.maxNewValue = {{ aedir_max_gid }}L
 
 # regex patterns for enforcing naming conventions (substring match necessary!)
-w2lapp.schema.plugins.aedir.AECommonNameAEZone.reObj = re.compile('^{{ aedir_aezone_cn_regex }}$')
-w2lapp.schema.plugins.aedir.AECommonNameAELocation.reObj = re.compile('^{{ aedir_aelocation_cn_regex }}$')
-w2lapp.schema.plugins.aedir.AECommonNameAEGroup.reObj = re.compile('^{{ aedir_aesrvgroup_cn_regex }}$')
-w2lapp.schema.plugins.aedir.AECommonNameAESrvGroup.reObj = re.compile('^{{ aedir_aegroup_cn_regex }}$')
-w2lapp.schema.plugins.aedir.AECommonNameAESudoRule.reObj = re.compile('^{{ aedir_aesudorule_cn_regex }}$')
-w2lapp.schema.plugins.aedir.AEDepartmentNumber.reObj = re.compile('^{{ aedir_aedept_deptnumber_regex }}$')
-w2lapp.schema.plugins.aedir.AEServiceSshPublicKey.reObj = re.compile('^{{ aedir_aeservice_sshpubkey_regex }}$')
-w2lapp.schema.plugins.aedir.AEUserSshPublicKey.reObj = re.compile('^{{ aedir_aeuser_sshpubkey_regex }}$')
-w2lapp.schema.plugins.aedir.AEHomeDirectory.homeDirectoryPrefixes = ('{{ aedir_homedirectory_prefixes|join("','") }}',)
-w2lapp.schema.plugins.aedir.AEHomeDirectory.homeDirectoryHidden = '{{ aedir_homedirectory_hidden }}'
-w2lapp.schema.plugins.aedir.AELoginShell.attr_value_dict = {
+web2ldap.app.plugins.aedir.AECommonNameAEZone.reObj = re.compile('^{{ aedir_aezone_cn_regex }}$')
+web2ldap.app.plugins.aedir.AECommonNameAELocation.reObj = re.compile('^{{ aedir_aelocation_cn_regex }}$')
+web2ldap.app.plugins.aedir.AECommonNameAEGroup.reObj = re.compile('^{{ aedir_aesrvgroup_cn_regex }}$')
+web2ldap.app.plugins.aedir.AECommonNameAESrvGroup.reObj = re.compile('^{{ aedir_aegroup_cn_regex }}$')
+web2ldap.app.plugins.aedir.AECommonNameAESudoRule.reObj = re.compile('^{{ aedir_aesudorule_cn_regex }}$')
+web2ldap.app.plugins.aedir.AEDepartmentNumber.reObj = re.compile('^{{ aedir_aedept_deptnumber_regex }}$')
+web2ldap.app.plugins.aedir.AEServiceSshPublicKey.reObj = re.compile('^{{ aedir_aeservice_sshpubkey_regex }}$')
+web2ldap.app.plugins.aedir.AEUserSshPublicKey.reObj = re.compile('^{{ aedir_aeuser_sshpubkey_regex }}$')
+web2ldap.app.plugins.aedir.AEHomeDirectory.homeDirectoryPrefixes = ('{{ aedir_homedirectory_prefixes|join("','") }}',)
+web2ldap.app.plugins.aedir.AEHomeDirectory.homeDirectoryHidden = '{{ aedir_homedirectory_hidden }}'
+web2ldap.app.plugins.aedir.AELoginShell.attr_value_dict = {
 {% for login_shell in aedir_login_shells %}
   u'{{ login_shell }}':u'{{ login_shell }}',
 {% endfor %}
 }
-w2lapp.schema.plugins.aedir.AESSHPermissions.attr_value_dict = {
+web2ldap.app.plugins.aedir.AESSHPermissions.attr_value_dict = {
 {% for ssh_perm in aedir_sshkey_perms %}
   u'{{ ssh_perm }}':u'{{ ssh_perm }}',
 {% endfor %}
@@ -95,14 +87,14 @@ w2lapp.schema.plugins.aedir.AESSHPermissions.attr_value_dict = {
 
 # Parameters for generating/checking user names
 # aeUser entries
-w2lapp.schema.plugins.aedir.AEUserUid.genLen = {{ aedir_username_length }}L
-w2lapp.schema.plugins.aedir.AEUserUid.minLen = {{ aedir_username_minlen }}L
-w2lapp.schema.plugins.aedir.AEUserUid.maxLen = {{ aedir_username_maxlen }}L
-w2lapp.schema.plugins.aedir.AEUserUid.reObj = re.compile('^{{ aedir_aeuser_uid_regex }}$')
-w2lapp.schema.plugins.aedir.AEUserUid.maxGenTrials = {{ aedir_username_gen_trials }}L
+web2ldap.app.plugins.aedir.AEUserUid.genLen = {{ aedir_username_length }}L
+web2ldap.app.plugins.aedir.AEUserUid.minLen = {{ aedir_username_minlen }}L
+web2ldap.app.plugins.aedir.AEUserUid.maxLen = {{ aedir_username_maxlen }}L
+web2ldap.app.plugins.aedir.AEUserUid.reObj = re.compile('^{{ aedir_aeuser_uid_regex }}$')
+web2ldap.app.plugins.aedir.AEUserUid.maxGenTrials = {{ aedir_username_gen_trials }}L
 # aeService entries
-w2lapp.schema.plugins.aedir.AEUserUid.reObj = re.compile('^{{ aedir_aeservice_uid_regex }}$')
+web2ldap.app.plugins.aedir.AEUserUid.reObj = re.compile('^{{ aedir_aeservice_uid_regex }}$')
 
 # for using only uid for login
 import ldapsession
-ldapsession.LDAPSession = w2lapp.schema.plugins.aedir.AEDirLDAPSession
+ldapsession.LDAPSession = web2ldap.app.plugins.aedir.AEDirLDAPSession

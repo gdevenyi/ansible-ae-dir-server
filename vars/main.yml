@@ -31,6 +31,8 @@ aedir_suse_repos:
   "openSUSE Leap 15.0":
     - name: "home_stroeder_AE-DIR"
       repo: "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR/openSUSE_Leap_15.0/"
+    - name: "devel_languages_python"
+      repo: "http://download.opensuse.org/repositories/devel:/languages:/python/openSUSE_Leap_15.0/"
   "openSUSE Leap 42.3":
     - name: "home_stroeder_AE-DIR"
       repo: "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR/openSUSE_Leap_42.3/"
@@ -41,6 +43,8 @@ aedir_suse_repos:
   "openSUSE Tumbleweed":
     - name: "home_stroeder_AE-DIR"
       repo: "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR/openSUSE_Tumbleweed/"
+    - name: "devel_languages_python"
+      repo: "http://download.opensuse.org/repositories/devel:/languages:/python/openSUSE_Tumbleweed/"
 
 # OS-specific maps
 os_openldap_paths:
@@ -96,7 +100,6 @@ apache2_config:
       - socache_shmcb
       - env
       - unixd
-      - fcgid
       - dir
       - alias
       - ssl
@@ -111,7 +114,7 @@ apache2_config:
       - mpm_worker
       - systemd
       - proxy
-      - proxy_http
+      - proxy_uwsgi
   Debian:
     service_name: "apache2"
     user: "www-data"
@@ -126,7 +129,6 @@ apache2_config:
       - mpm_prefork
       - socache_shmcb
       - env
-      - fcgid
       - dir
       - alias
       - ssl
@@ -137,7 +139,7 @@ apache2_config:
       - deflate
       - filter
       - proxy
-      - proxy_http
+      - proxy_uwsgi
   SUSE:
     service_name: "apache2"
     user: "wwwrun"
@@ -151,7 +153,6 @@ apache2_config:
     modules:
       - socache_shmcb
       - env
-      - fcgid
       - dir
       - alias
       - ssl
@@ -163,4 +164,10 @@ apache2_config:
       - filter
       - logio
       - proxy
-      - proxy_http
+      - proxy_uwsgi
+
+# which uwsgi executable to use
+uwsgi_exec:
+  CentOS: "/usr/sbin/uwsgi"
+  Debian: "/usr/bin/uwsgi"
+  SUSE: "/usr/sbin/uwsgi"

@@ -81,6 +81,7 @@ aedir_sbin: "{{ aedir_prefix }}/sbin"
 aedir_etc: "{{ aedir_prefix }}/etc"
 aedir_etc_openldap: "{{ aedir_etc }}/openldap"
 aedir_rundir: "{{ aedir_prefix }}/run"
+aedir_python_sitepackages: "{{ aedir_prefix }}/lib/python2.7/site-packages"
 
 # where to install systemd files
 aedir_systemd_dir: "/etc/systemd/system"
@@ -670,9 +671,6 @@ web_server: "{{ apache2_config[lsb_id].service_name }}"
 # FQDN of service interface
 web_service_fqdn: "{{ inventory_hostname }}"
 
-# where to find the spawn-fcgi executable
-spawn_fcgi_exec: "/usr/bin/spawn-fcgi"
-
 # e-mail address of web server admin(s)
 web_server_admin_email: "web2ldap-admin@example.com"
 
@@ -697,24 +695,18 @@ web2ldap_download_url: "https://www.web2ldap.de/download/{{ web2ldap_filename }}
 web2ldap_src: "web2ldap/{{ web2ldap_filename }}"
 
 # Various path names
-web2ldap_prefix: "/opt/web2ldap-{{ web2ldap_version }}"
+web2ldap_prefix: "{{ aedir_prefix }}"
 
 # Config directories
 web2ldap_etc: "{{ web2ldap_prefix }}/etc/web2ldap"
-web2ldap_cnfdir: "{{ web2ldap_etc }}/web2ldapcnf"
+web2ldap_cnfdir: "{{ aedir_python_sitepackages }}/web2ldapcnf"
 web2ldap_templates: "{{ web2ldap_etc }}/templates"
 
-# Full pathname of stand-alone start script
-web2ldap_sbin_script: "{{ web2ldap_prefix }}/sbin/web2ldap.py"
-
-# Full pathname of FastCGI start script
-web2ldap_fcgi_script: "{{ web2ldap_prefix }}/fcgi/web2ldap.py"
+# Full pathname of WSGI start script
+web2ldap_wsgi_script: "{{ aedir_python_sitepackages }}/web2ldap/wsgi.py"
 
 # web2ldap modules directory
-web2ldap_pylib: "{{ web2ldap_prefix }}/pylib"
-
-# static HTML docs
-web2ldap_htdocs: "{{ web2ldap_prefix }}/htdocs"
+web2ldap_pylib: "{{ aedir_python_sitepackages }}/web2ldap"
 
 web2ldap_monitor_access_allowed:
   - 127.0.0.0/255.0.0.0
@@ -725,23 +717,14 @@ web2ldap_monitor_access_allowed:
 #  - ::0
 
 # user/group to run as
-web2ldap_user: "web2ldap"
-web2ldap_uid: "1760"
-web2ldap_group: "web2ldap"
-web2ldap_gid: "1760"
-
-# Pathnames of PID files
-web2ldap_pidfile_standalone: "{{ web2ldap_prefix }}/var/run/web2ldap-standalone.pid"
-web2ldap_pidfile_fcgi: "{{ web2ldap_prefix }}/var/run/web2ldap-fcgi.pid"
+web2ldap_user: "ae-dir-web2ldap"
+web2ldap_group: "ae-dir-web2ldap"
 
 # where to install systemd files
 web2ldap_systemd_dir: "/etc/systemd/system"
 
 # use libldap from this directory
 web2ldap_libldap_dir: /usr/local/openldap/lib64
-
-# which web2ldap service to use
-web2ldap_service: web2ldap-fcgi
 
 #---------------------------------------------------------------------------
 # apache2 parameters

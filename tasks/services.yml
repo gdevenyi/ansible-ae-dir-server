@@ -29,6 +29,13 @@
     enabled: yes
   when: openldap_role=="provider" and lsb_id == "CentOS"
 
+- name: "Ensure web2ldap is running"
+  service:
+    name: "web2ldap"
+    state: started
+    enabled: yes
+  when: openldap_role=="provider"
+
 - name: "Ensure aedirpwd is running"
   service:
     name: "aedirpwd"

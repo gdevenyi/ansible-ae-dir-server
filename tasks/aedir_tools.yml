@@ -10,9 +10,11 @@
     mode: u=rwx,g=rx,o=rx
   with_items:
     - "{{ aedir_etc }}"
+    - "{{ aedir_etc }}/uwsgi"
     - "{{ aedir_bin }}"
     - "{{ aedir_sbin }}"
     - "{{ aedir_rundir }}"
+    - "{{ aedir_rundir }}/uwsgi"
 
 - name: "Create client config file {{ aedir_etc }}/ldap.conf from template"
   template:

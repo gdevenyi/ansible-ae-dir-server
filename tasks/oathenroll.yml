@@ -41,10 +41,34 @@
 - name: "Install OATH enrollment web application"
   copy:
     src: "oath-ldap/oathenroll/oathenroll.py"
-    dest: "{{ aedir_sbin }}/oathenroll.py"
+    dest: "{{ aedir_python_sitepackages }}/oathenroll.py"
     owner: root
     group: "{{ oath_ldap_oathenroll_web_group }}"
     mode: 0750
+  notify:
+    - "restart oathenroll"
+
+- name: "Create UWSGI socket directory for oathenroll"
+  file:
+    path: "{{ aedir_rundir }}/uwsgi/oathenroll"
+    state: directory
+    owner: ae-dir-otpenroll
+    group: ae-dir-httpd
+    mode: u=rwx,g=rx,o=
+  notify:
+    - "restart oathenroll"
+
+- name: "Create uwsgi.ini for oathenroll"
+  import_tasks: uwsgi.yml
+  vars:
+    name: oathenroll
+    user: ae-dir-pwd
+    module: "oathenroll:application"
+    processes: 10
+    threads: 0
+    stats_port: 9093
+    buffer_size: 4096
+    harakiri: 10
   notify:
     - "restart oathenroll"
 

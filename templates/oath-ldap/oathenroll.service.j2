@@ -17,7 +17,7 @@ Type=simple
 Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
 {% endif %}
 Environment=PYTHONPATH={{ aedir_etc }}/oathenroll
-ExecStart={{ aedir_python }} {{ aedir_sbin }}/oathenroll.py 127.0.0.1:8081
+ExecStart={{ uwsgi_exec[lsb_id] }} --ini {{ aedir_etc }}/uwsgi/oathenroll.ini
 User={{ oath_ldap_oathenroll_web_user }}
 Group={{ oath_ldap_oathenroll_web_group }}
 

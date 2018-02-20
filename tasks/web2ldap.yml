@@ -1,31 +1,134 @@
 ---
-# tasks file for roles/web2ldap
+# Install and configure web2ldap
 
-- name: "Unpack {{ web2ldap_filename }} to {{ web2ldap_prefix }}"
-  unarchive:
-    src: "{{ web2ldap_src }}"
-    dest: "/opt"
-    copy: yes
-    creates: "{{ web2ldap_prefix }}"
-    mode: a+r
-    owner: root
-    group: root
-  notify:
-    - "restart web server"
-
-- name: "Install fcgi.py"
-  copy:
-    src: "web2ldap/fcgi.py"
-    dest: "{{ web2ldap_pylib }}/fcgi.py"
+- name: "PIP package web2ldap in virtualenv {{ aedir_prefix }}"
+  pip:
+    name: web2ldap
+    state: present
+    virtualenv: "{{ aedir_prefix }}"
+    virtualenv_site_packages: no
+    extra_args: "{{ aedir_pip_extra_args }}"
   notify:
     - restart web2ldap
 
-- name: "Compile {{ web2ldap_prefix }}"
-  shell: "{{ aedir_python }} -O -m compileall {{ web2ldap_prefix }}"
-  args:
-    creates: "{{ web2ldap_pylib }}/w2lapp/__init__.pyo"
+- name: Create web2ldapcnf/local.py for AE-DIR
+  template:
+    src: "{{ item }}"
+    dest: "{{ web2ldap_cnfdir }}/local.py"
+    owner: root
+    group: root
+    mode: 0644
+  with_first_found:
+    - files:
+       - "web2ldap/web2ldapcnf/local.py.j2"
+      paths: "{{ aedir_templates_dirs }}"
+  notify:
+    - restart web2ldap
 
-- name: Remove .htaccess file
+- name: Create web2ldapcnf/hosts.py for AE-DIR
+  template:
+    src: "{{ item }}"
+    dest: "{{ web2ldap_cnfdir }}/hosts.py"
+    owner: root
+    group: root
+    mode: 0644
+  with_first_found:
+    - files:
+       - "web2ldap/web2ldapcnf/hosts.py.j2"
+      paths: "{{ aedir_templates_dirs }}"
+  notify:
+    - restart web2ldap
+
+- name: "Create connect AE-DIR landing page for web2ldap"
+  template:
+    src: "{{ item }}"
+    dest: "{{ web2ldap_templates }}/connect.html"
+    owner: root
+    group: root
+    mode: 0644
+  with_first_found:
+    - files:
+       - "web2ldap/templates/connect.html.j2"
+      paths: "{{ aedir_templates_dirs }}"
+
+- name: "Create search provider file pointing to {{ aedir_main_provider_hostname }}"
+  template:
+    src: "web2ldap/opensearch-ae-dir.xml.j2"
+    dest: "{{ aedir_prefix }}/htdocs/opensearch-ae-dir.xml"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: "web2ldap HTML and LDIF templates for AE-DIR (copy)"
+  copy:
+    src: "{{ item }}"
+    dest: "{{ web2ldap_templates }}/ae-dir/{{ item | basename }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_fileglob:
+    "web2ldap/templates/ae-dir/*.*"
+
+- name: "web2ldap HTML and LDIF templates for AE-DIR (template)"
+  template:
+    src: "{{ item }}"
+    dest: "{{ web2ldap_templates }}/ae-dir/{{ item | basename | regex_replace('\\.j2','') }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_fileglob:
+    "../templates/web2ldap/templates/ae-dir/*.*.j2"
+
+- name: install AE-DIR plugin module for web2ldap
+  copy:
+    src: "web2ldap/aedir.py"
+    dest: "{{ web2ldap_pylib }}/app/plugins/aedir.py"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart web2ldap
+
+- name: "Create supplemental schema file for AE-DIR (ae-suppl-schema.ldif)"
+  copy:
+    src: "web2ldap/ae-suppl-schema.ldif"
+    dest: "{{ web2ldap_etc }}/ae-suppl-schema.ldif"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: "Create UWSGI socket directory for web2ldap"
   file:
-    dest: "{{ web2ldap_htdocs }}/.htaccess"
-    state: absent
+    path: "{{ aedir_rundir }}/uwsgi/web2ldap"
+    state: directory
+    owner: ae-dir-web2ldap
+    group: ae-dir-httpd
+    mode: u=rwx,g=rx,o=
+  notify:
+    - "restart web2ldap"
+
+- name: "Create uwsgi.ini for web2ldap"
+  import_tasks: uwsgi.yml
+  vars:
+    name: web2ldap
+    user: ae-dir-web2ldap
+    module: "web2ldap.wsgi:application"
+    processes: 1
+    threads: 10
+    stats_port: 9091
+    buffer_size: 8192
+    harakiri: 20
+  notify:
+    - "restart web2ldap"
+
+- name: "Install systemd unit file for web2ldap"
+  template:
+    src: "web2ldap/web2ldap.service.j2"
+    dest: "{{ aedir_systemd_dir }}/web2ldap.service"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - reload systemd
+    - "restart web2ldap"
+  when: ansible_service_mgr=="systemd"

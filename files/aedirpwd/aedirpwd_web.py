@@ -982,6 +982,7 @@ class FinishPasswordReset(ChangePassword):
             res = RENDER.resetpw_action(self.form.d.username, user_dn)
         return res
 
+application = web.application(URL2CLASS_MAPPING, globals(), autoreload=bool(WEB_ERROR)).wsgifunc()
 
 def run():
     """

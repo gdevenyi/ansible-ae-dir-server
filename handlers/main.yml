@@ -30,9 +30,9 @@
   when: openldap_role == 'provider'
 
 - name: "restart web2ldap"
-  command: "echo"
-  notify:
-    - "restart web server"
+  service:
+    name: "web2ldap"
+    state: restarted
   when: openldap_role == 'provider'
 
 - name: restart passmod

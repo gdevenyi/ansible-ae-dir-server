@@ -61,18 +61,6 @@ Listen 0.0.0.0:80
 # for SSL vhost
 Listen 0.0.0.0:443
 
-# Global mod_fcgid options
-FcgidIdleTimeout 7200
-FcgidBusyTimeout 600
-FcgidErrorScanInterval 60
-FcgidZombieScanInterval 10
-FcgidProcessLifeTime 86400
-FcgidConnectTimeout 60
-FcgidIOTimeout 600
-FcgidIPCDir {{ apache_rundir }}/fcgid-sock
-
-FcgidCmdOptions {{ aedir_sbin }}/start-web2ldap MaxProcesses 1
-
 # SSL Session Resumption
 SSLSessionCache        {{ apache2_config[lsb_id].ssl_session_cache }}
 SSLSessionCacheTimeout  7200
@@ -120,6 +108,10 @@ ProxyPreserveHost On
   # do not use .htaccess files
   AccessFileName .htaccess-this-does-not-exist
 
+  #---------------------------------------------------------------------
+  # htdocs/
+  #---------------------------------------------------------------------
+
   DocumentRoot "{{ web_document_root }}"
   <Directory {{ web_document_root }}>
     # do not use .htaccess files
@@ -138,19 +130,9 @@ ProxyPreserveHost On
   # web2ldap
   #---------------------------------------------------------------------
 
-  ScriptAlias /web2ldap {{ aedir_sbin }}/start-web2ldap
-
-  Alias /web2ldap-doc {{ web2ldap_prefix }}/htdocs
-
-  # Enforce using libldap from package openldap-ltb which is linked against OpenSSL
-  FcgidInitialEnv LD_LIBRARY_PATH /usr/local/openldap/lib
-
-  # Needs Python 2.6.7+ or 2.7.3+
-  FcgidInitialEnv PYTHONHASHSEED random
+  ProxyPass /web2ldap unix:{{ aedir_rundir }}/uwsgi/web2ldap/web2ldap.sock|uwsgi://web2ldap/
 
   <Location /web2ldap>
-    SetHandler fcgid-script
-    Options ExecCGI
     # Tell mod_ssl to set the SSL standard env vars
     SSLOptions +StdEnvVars
     <Limit GET POST>
@@ -160,18 +142,9 @@ ProxyPreserveHost On
     </Limit>
   </Location>
 
-  <Directory {{ web2ldap_htdocs }}>
-    DirectoryIndex web2ldap.html
-    <Limit GET>
-{% for require in apache_web2ldap_requires %}
-      Require {{ require }}
-{% endfor %}
-    </Limit>
-  </Directory>
-
-{% for location in ['css','js','img'] %}
-  Alias /{{ location }}/web2ldap {{ web2ldap_htdocs }}/{{ location }}/web2ldap
-  <Location /{{ location }}/web2ldap>
+  # CSS files for web2ldap
+  Alias /css/web2ldap {{ web2ldap_etc }}/css
+  <Location /css/web2ldap>
     <Limit GET>
 {% for require in apache_web2ldap_requires %}
       Require {{ require }}
@@ -179,18 +152,14 @@ ProxyPreserveHost On
     </Limit>
   </Location>
 
-{% endfor %}
-
   #----------------------------------------------------------------------
   # Æ-DIR password self-service web application (reverse proxy)
   #----------------------------------------------------------------------
 
   RedirectPermanent /pwd /pwd/
-  ProxyPass        /pwd/ http://127.0.0.1:8080/ retry=2 timeout=60
+  ProxyPass /pwd/ unix:{{ aedir_rundir }}/uwsgi/aedirpwd/aedirpwd.sock|uwsgi://aedirpwd/
 
   <Location /pwd>
-    # Fix IE problem (http error 408/409)
-    SetEnv proxy-nokeepalive 1
 {% for require in apache_web2ldap_requires %}
       Require {{ require }}
 {% endfor %}
@@ -202,11 +171,9 @@ ProxyPreserveHost On
   #----------------------------------------------------------------------
 
   RedirectPermanent /oath /oath/
-  ProxyPass        /oath/ http://127.0.0.1:8081/ retry=2 timeout=60
+  ProxyPass /oath/ unix:{{ aedir_rundir }}/uwsgi/oathenroll/oathenroll.sock|uwsgi://oath/
 
   <Location /oath>
-    # Fix IE problem (http error 408/409)
-    SetEnv proxy-nokeepalive 1
 {% for require in apache_web2ldap_requires %}
       Require {{ require }}
 {% endfor %}

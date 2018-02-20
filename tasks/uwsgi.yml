@@ -1,0 +1,12 @@
+# install an uwsgi.ini file
+---
+
+- name: "Create uwsgi.ini for {{ name }}"
+  template:
+    src: "uwsgi.ini.j2"
+    dest: "{{ aedir_etc }}/uwsgi/{{ name }}.ini"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - "restart {{ name }}"

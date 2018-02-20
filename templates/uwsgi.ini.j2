@@ -1,0 +1,24 @@
+#---------------------------------------------------------------------------
+# uwsgi config for {{ name }} service
+# {{ ansible_managed }}
+#---------------------------------------------------------------------------
+[uwsgi]
+socket = {{ aedir_rundir }}/uwsgi/{{ name }}/{{ name }}.sock
+chmod-socket = 666
+#chown-socket = {{ user }}:ae-dir-httpd
+chdir = {{ aedir_rundir }}/uwsgi/{{ name }}
+module = {{ module }}
+stats = 127.0.0.1:{{ stats_port }}
+manage-script-name = true
+#master = true
+{% if processes >= 1 %}
+processes = {{ processes }}
+{% endif %}
+{% if threads >= 1 %}
+threads = {{ threads }}
+{% endif %}
+buffer-size = {{ buffer_size }}
+harakiri = {{ harakiri }}
+plugin = python
+virtualenv = {{ aedir_prefix }}
+log-format = %(addr) - %(user) [%(ltime)] "%(method) %(uri) %(proto)" %(status) %(size) "%(referer)" "%(uagent)"

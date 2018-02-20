@@ -1,13 +1,13 @@
 #-----------------------------------------------------------------------
-# initiate:   systemctl enable aedirpwd.service
-# start:      systemctl start aedirpwd.service
-# get status: systemctl status aedirpwd.service
+# initiate:   systemctl enable web2ldap.service
+# start:      systemctl start web2ldap.service
+# get status: systemctl status web2ldap.service
 #
 # {{ ansible_managed }}
 #-----------------------------------------------------------------------
 
 [Unit]
-Description=aedirpwd - AE-DIR password self-service web application
+Description=web2ldap
 Requires=network.target local-fs.target remote-fs.target
 After=local-fs.target remote-fs.target network.target
 #Wants=ldap.service
@@ -18,10 +18,9 @@ Type=simple
 {% if aedir_malloc_ld_preload %}
 Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
 {% endif %}
-Environment=PYTHONPATH={{ aedir_etc }}/aedirpwd
-ExecStart={{ uwsgi_exec[lsb_id] }} --ini {{ aedir_etc }}/uwsgi/aedirpwd.ini
-User={{ aedirpwd_web_user }}
-Group={{ aedirpwd_web_group }}
+ExecStart={{ uwsgi_exec[lsb_id] }} --ini {{ aedir_etc }}/uwsgi/web2ldap.ini
+User={{ web2ldap_user }}
+Group={{ web2ldap_group }}
 
 [Install]
 WantedBy=multi-user.target

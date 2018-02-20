@@ -8,9 +8,20 @@
     disable_recommends: yes
     type: package
   notify:
-  - "restart web server"
+    - "restart web server"
   with_items:
-  - apache2
-  - apache2-prefork
-  - apache2-mod_fcgid
+    - apache2
+    - apache2-prefork
+    - apache2-mod_proxy_uwsgi
 
+- name: "Install UWSGI packages {{ lsb_id }}"
+  zypper:
+    name: "{{ item }}"
+    state: present
+    disable_recommends: yes
+    type: package
+  notify:
+    - "restart web server"
+  with_items:
+    - uwsgi
+    - uwsgi-python

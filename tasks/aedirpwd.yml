@@ -39,13 +39,11 @@
 
 - name: "Install password service web application"
   copy:
-    src: "aedirpwd/{{ item }}"
-    dest: "{{ aedir_sbin }}/{{ item }}"
+    src: "aedirpwd/aedirpwd_web.py"
+    dest: "{{ aedir_python_sitepackages }}/aedirpwd_web.py"
     owner: root
-    group: "{{ aedirpwd_web_group }}"
-    mode: 0750
-  with_items:
-    - aedirpwd_web.py
+    group: root
+    mode: 0644
   notify:
     - "restart aedirpwd"
 
@@ -59,6 +57,30 @@
   with_items:
     - aedirpwd_cron.py
     - aedirpwd_expiry_check.py
+
+- name: "Create UWSGI socket directory for aedirpwd"
+  file:
+    path: "{{ aedir_rundir }}/uwsgi/aedirpwd"
+    state: directory
+    owner: ae-dir-pwd
+    group: ae-dir-httpd
+    mode: u=rwx,g=rx,o=
+  notify:
+    - "restart aedirpwd"
+
+- name: "Create uwsgi.ini for aedirpwd"
+  import_tasks: uwsgi.yml
+  vars:
+    name: aedirpwd
+    user: ae-dir-pwd
+    module: "aedirpwd_web:application"
+    processes: 10
+    threads: 0
+    stats_port: 9092
+    buffer_size: 4096
+    harakiri: 10
+  notify:
+    - "restart aedirpwd"
 
 - name: Install systemd unit file from template
   template:
