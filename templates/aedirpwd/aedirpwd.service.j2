@@ -22,6 +22,11 @@ Environment=PYTHONPATH={{ aedir_etc }}/aedirpwd
 ExecStart={{ uwsgi_exec[lsb_id] }} --ini {{ aedir_etc }}/uwsgi/aedirpwd.ini
 User={{ aedirpwd_web_user }}
 Group={{ aedirpwd_web_group }}
+Restart=always
+KillSignal=SIGQUIT
+Type=notify
+StandardError=syslog
+NotifyAccess=all
 
 [Install]
 WantedBy=multi-user.target

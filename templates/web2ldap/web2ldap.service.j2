@@ -21,6 +21,11 @@ Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
 ExecStart={{ uwsgi_exec[lsb_id] }} --ini {{ aedir_etc }}/uwsgi/web2ldap.ini
 User={{ web2ldap_user }}
 Group={{ web2ldap_group }}
+Restart=always
+KillSignal=SIGQUIT
+Type=notify
+StandardError=syslog
+NotifyAccess=all
 
 [Install]
 WantedBy=multi-user.target

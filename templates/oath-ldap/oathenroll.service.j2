@@ -20,6 +20,11 @@ Environment=PYTHONPATH={{ aedir_etc }}/oathenroll
 ExecStart={{ uwsgi_exec[lsb_id] }} --ini {{ aedir_etc }}/uwsgi/oathenroll.ini
 User={{ oath_ldap_oathenroll_web_user }}
 Group={{ oath_ldap_oathenroll_web_group }}
+Restart=always
+KillSignal=SIGQUIT
+Type=notify
+StandardError=syslog
+NotifyAccess=all
 
 [Install]
 WantedBy=multi-user.target
