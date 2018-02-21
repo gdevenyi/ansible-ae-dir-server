@@ -727,7 +727,7 @@ class SyncreplProviderTask(threading.Thread):
                 continue
             else:
                 if not self.remote_csn_dict[db_suffix]:
-                    self.result(
+                    self.check_instance.result(
                         CHECK_RESULT_ERROR,
                         item_name,
                         check_output='no attribute contextCSN for %r on %r' % (
