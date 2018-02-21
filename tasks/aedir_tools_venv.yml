@@ -20,7 +20,6 @@
     virtualenv_python: python2.7
     extra_args: "{{ aedir_pip_extra_args }}"
   with_items:
-    - netaddr
     - cryptography
     - jwcrypto
     - pyasn1

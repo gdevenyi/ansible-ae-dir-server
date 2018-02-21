@@ -20,7 +20,7 @@ import re
 import socket
 import collections
 
-import netaddr
+import ipaddress
 
 # from ldap0 package
 import ldap0
@@ -33,7 +33,6 @@ from ldap0.controls.sessiontrack import \
 # local modules
 from slapdsock.ldaphelper import RESULT_CODE
 from slapdsock.ldaphelper import ldap_datetime_str
-from slapdsock.ldaphelper import is_expired
 from slapdsock.loghelper import combined_logger
 from slapdsock.handler import SlapdSockHandler, SlapdSockHandlerError
 from slapdsock.message import RESULTResponse, InvalidCredentialsResponse
@@ -58,7 +57,7 @@ LDAP_PROXY_PEER_ADDRS = (
     '127.0.0.1',
 )
 LDAP_PROXY_PEER_NETS = (
-    '0.0.0.0/0',
+    u'0.0.0.0/0',
 )
 # Regex pattern for HOTP user DNs
 # If bind-DN does not match this pattern, request will be continued by slapd
@@ -190,7 +189,7 @@ class BindProxyHandler(SlapdSockHandler):
     }
     ldap_proxy_peer_addrs = set(LDAP_PROXY_PEER_ADDRS)
     ldap_proxy_peer_nets = [
-        netaddr.IPNetwork(p)
+        ipaddress.ip_network(p)
         for p in LDAP_PROXY_PEER_NETS
     ]
     ldap_proxy_filter_tmpl = LDAP_PROXY_FILTER_TMPL
@@ -201,20 +200,17 @@ class BindProxyHandler(SlapdSockHandler):
             return True
         if not peer_type == 'ip':
             return False
-        peer_ip_address = netaddr.IPAddress(peer_addr)
+        peer_ip_address = ipaddress.ip_address(peer_addr.decode('ascii'))
         for peer_net in self.ldap_proxy_peer_nets:
-            if not isinstance(peer_net, netaddr.IPNetwork):
-                continue
             if peer_ip_address in peer_net:
                 return True
         return False # end of _check_peername()
 
-    def _shuffle_remote_ldap_uris(self, dn):
+    def _shuffle_remote_ldap_uris(self, user_dn):
         # Generate list of upstream LDAP URIs shifted based on bind-DN hash
-        remote_ldap_uris = collections.deque(self.server.remote_ldap_uris)
-        remote_ldap_uris.rotate(hash(dn) % len(remote_ldap_uris))
-        self._log(logging.DEBUG, 'remote_ldap_uris=%s', repr(remote_ldap_uris))
-        return remote_ldap_uris # end of _shuffle_remote_ldap_uris()
+        ldap_uris = collections.deque(self.server.remote_ldap_uris)
+        ldap_uris.rotate(hash(user_dn) % len(self.server.remote_ldap_uris))
+        return ldap_uris # end of _shuffle_remote_ldap_uris()
 
     def _gen_session_tracking_ctrl(self, request, request_dn_utf8):
         # Prepare Session Track control for bind request to upstream
@@ -244,20 +240,20 @@ class BindProxyHandler(SlapdSockHandler):
         if not self._check_peername(request.peername):
             self._log(
                 logging.DEBUG,
-                'Peer %s not in %s and %s => let slapd continue',
-                repr(request.peername),
-                repr(self.ldap_proxy_peer_addrs),
-                repr(self.ldap_proxy_peer_nets),
+                'Peer %r not in %r and %r => let slapd continue',
+                request.peername,
+                self.ldap_proxy_peer_addrs,
+                self.ldap_proxy_peer_nets,
             )
             return 'CONTINUE\n'
 
         if not self._check_regex(request):
             self._log(
                 logging.DEBUG,
-                'Bind-DN %s (from %s) does not match %s => let slapd continue',
-                repr(request.dn),
-                repr(request.peername),
-                repr(LDAP_PROXY_BINDDN_PATTERN),
+                'Bind-DN %r (from %r) does not match %r => let slapd continue',
+                request.dn,
+                request.peername,
+                LDAP_PROXY_BINDDN_PATTERN,
             )
             return 'CONTINUE\n'
 
@@ -284,17 +280,12 @@ class BindProxyHandler(SlapdSockHandler):
                             user_filterstr,
                             LDAP_USERNAME_ATTR,
                         ),
-                        attrlist=[
-                            LDAP_USERNAME_ATTR,
-                            'pwdChangedTime',
-                            'pwdFailureTime',
-                            'pwdPolicySubentry',
-                        ],
+                        attrlist=['1.1'],
                     )
                 except ldap0.SERVER_DOWN as ldap_error:
                     self.server.disable_ldapi_conn()
                     raise ldap_error
-            except LDAPError as err:
+            except LDAPError as ldap_error:
                 raise SlapdSockHandlerError(
                     ldap_error,
                     log_level=logging.WARN,
@@ -305,61 +296,17 @@ class BindProxyHandler(SlapdSockHandler):
             # Check whether we want handle this
             if not ldap_result:
                 raise SlapdSockHandlerError(
-                    Exception('No result reading %s with filter %s' % (
-                        repr(request.dn), repr(user_filterstr),
+                    Exception('No result reading %r with filter %r' % (
+                        request.dn, user_filterstr,
                     )),
                     log_level=logging.WARN,
                     response='CONTINUE\n',
                     log_vars=self.server._log_vars,
                 )
 
-            user_entry = ldap_result[0][1]
-            self._log(logging.DEBUG, 'user_entry = %s', repr(user_entry))
-
-            # Attributes from user entry
-            pwd_changed_time = user_entry.get('pwdChangedTime', [None])[0]
-            pwd_failure_times = user_entry.get('pwdFailureTime', [])
-
-            # Try to read password policy subentry
-            try:
-                pwd_policy_subentry_dn = user_entry['pwdPolicySubentry'][0]
-                pwd_policy_subentry = local_ldap_conn.read_s(
-                    pwd_policy_subentry_dn,
-                    '(objectClass=pwdPolicy)',
-                    attrlist=[
-                        'pwdAttribute',
-                        'pwdFailureCountInterval',
-                        'pwdMaxAge',
-                        'pwdMaxFailure',
-                    ],
-                    cache_ttl=LDAP_LONG_CACHE_TTL,
-                )
-            except ldap0.SERVER_DOWN:
-                self.server.disable_ldapi_conn()
-            except (LDAPError, KeyError):
-                pass
-            else:
-                pwd_max_age = pwd_policy_subentry.get('pwdMaxAge', ['-1'])[0]
-                # Check whether OATH secret exceeds max age (is expired)
-                pwd_expired = is_expired(
-                    pwd_changed_time,
-                    pwd_max_age,
-                    now_dt
-                )
-                if pwd_expired:
-                    raise SlapdSockHandlerError(
-                        Exception('Password of %s is expired' % (
-                            repr(request.dn),
-                        )),
-                        log_level=logging.INFO,
-                        response='CONTINUE\n',
-                        log_vars=self.server._log_vars,
-                    )
-
         # Generate list of upstream LDAP URIs shifted based on bind-DN hash
-        remote_ldap_uris = collections.deque(self.server.remote_ldap_uris)
-        remote_ldap_uris.rotate(hash(request_dn_utf8) % len(remote_ldap_uris))
-        self._log(logging.DEBUG, 'remote_ldap_uris=%s', repr(remote_ldap_uris))
+        remote_ldap_uris = self._shuffle_remote_ldap_uris(request_dn_utf8)
+        self._log(logging.DEBUG, 'remote_ldap_uris = %r', remote_ldap_uris)
 
         try:
             try:
@@ -382,12 +329,13 @@ class BindProxyHandler(SlapdSockHandler):
                     result_code = RESULT_CODE['other']
                 try:
                     info = ldap_error.args[0]['info']
-                except (AttributeError, KeyError):
+                except (AttributeError, KeyError, TypeError):
                     info = None
                 self._log(
                     logging.ERROR,
-                    'LDAPError from upstream: %s => return %s',
-                    str(ldap_error),
+                    'LDAPError from upstream: %s => return %s %r',
+                    ldap_error,
+                    ldap_error,
                     result_code,
                 )
             else:
@@ -396,9 +344,9 @@ class BindProxyHandler(SlapdSockHandler):
                 info = None
                 self._log(
                     logging.INFO,
-                    'Validation ok for %s (from %s) => RESULT: %s',
-                    repr(request.dn),
-                    repr(request.peername),
+                    'Validation ok for %r (from %r) => RESULT: %s',
+                    request.dn,
+                    request.peername,
                     result_code,
                 )
         finally:
@@ -455,7 +403,11 @@ def run_this():
 
     if __debug__:
         my_logger.error(
-            '!!! Running in debug mode (log level %d)! Secret data will be logged! Don\'t do that!!!',
+            (
+                '!!! Running in debug mode (log level %d)! '
+                'Secret data will be logged! '
+                'Don\'t do that!!!'
+            ),
             my_logger.level
         )
 
@@ -474,7 +426,7 @@ def run_this():
     local_ldap_uri_obj = LDAPUrl(local_ldap_uri)
 
     try:
-        slapd_sock_listener = SimpleBindProxyServer(
+        listener = SimpleBindProxyServer(
             socket_path,
             BindProxyHandler,
             my_logger,
@@ -483,15 +435,15 @@ def run_this():
             ALLOWED_UIDS, ALLOWED_GIDS,
             log_vars=DEBUG_VARS,
         )
-        slapd_sock_listener.ldapi_uri = local_ldap_uri_obj.initializeUrl()
-        slapd_sock_listener.ldap_trace_level = int(local_ldap_uri_obj.trace_level or '0') or PYLDAP_TRACELEVEL
-        slapd_sock_listener.remote_ldap_uris = remote_ldap_uris
+        listener.ldapi_uri = local_ldap_uri_obj.initializeUrl()
+        listener.ldap_trace_level = int(local_ldap_uri_obj.trace_level or '0') or PYLDAP_TRACELEVEL
+        listener.remote_ldap_uris = remote_ldap_uris
         try:
-            slapd_sock_listener.serve_forever()
+            listener.serve_forever()
         except KeyboardInterrupt:
             my_logger.warn('Received interrupt signal => shutdown')
     finally:
-        my_logger.debug('Remove socket path %s', repr(socket_path))
+        my_logger.debug('Remove socket path %r', socket_path)
         try:
             os.remove(socket_path)
         except OSError:
