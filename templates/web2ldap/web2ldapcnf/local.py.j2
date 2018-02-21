@@ -31,7 +31,6 @@ web2ldapcnf.misc.session_remove = 900
 
 import web2ldapcnf.hosts
 import web2ldapcnf.monitor
-import w2lapp.schema.syntaxes
 
 # this import is needed for the following code lines being executed after this import
 import web2ldapcnf.plugins
@@ -41,7 +40,7 @@ import web2ldapcnf.plugins
 # Which IP addresses are allowed to access monitor page
 web2ldapcnf.monitor.access_allowed = [
 {% for allowed in web2ldap_monitor_access_allowed %}
-  '{{ allowed }}',
+  u'{{ allowed }}',
 {% endfor %}
 ]
 
@@ -96,5 +95,5 @@ web2ldap.app.plugins.aedir.AEUserUid.maxGenTrials = {{ aedir_username_gen_trials
 web2ldap.app.plugins.aedir.AEUserUid.reObj = re.compile('^{{ aedir_aeservice_uid_regex }}$')
 
 # for using only uid for login
-import ldapsession
-ldapsession.LDAPSession = web2ldap.app.plugins.aedir.AEDirLDAPSession
+import web2ldap.ldapsession
+web2ldap.ldapsession.LDAPSession = web2ldap.app.plugins.aedir.AEDirLDAPSession
