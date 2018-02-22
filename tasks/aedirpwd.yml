@@ -74,6 +74,7 @@
     name: aedirpwd
     user: ae-dir-pwd
     module: "aedirpwd_web:application"
+    master: "true"
     processes: 10
     threads: 0
     stats_port: 9092

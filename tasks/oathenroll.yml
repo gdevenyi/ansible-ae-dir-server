@@ -64,6 +64,7 @@
     name: oathenroll
     user: ae-dir-pwd
     module: "oathenroll:application"
+    master: "true"
     processes: 10
     threads: 0
     stats_port: 9093

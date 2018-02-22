@@ -10,7 +10,7 @@ chdir = {{ aedir_rundir }}/uwsgi/{{ name }}
 module = {{ module }}
 stats = 127.0.0.1:{{ stats_port }}
 manage-script-name = true
-#master = true
+master = {{ master }}
 {% if processes >= 1 %}
 processes = {{ processes }}
 {% endif %}
