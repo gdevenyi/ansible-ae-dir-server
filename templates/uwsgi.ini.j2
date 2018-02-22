@@ -16,6 +16,7 @@ processes = {{ processes }}
 {% endif %}
 {% if threads >= 1 %}
 threads = {{ threads }}
+enable-threads = true
 {% endif %}
 buffer-size = {{ buffer_size }}
 harakiri = {{ harakiri }}
