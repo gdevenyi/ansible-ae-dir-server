@@ -4,7 +4,7 @@
 - name: "Install packages needed for running Apache 2.4 on {{ lsb_id }}"
   apt:
     name: "{{ item }}"
-    state: installed
+    state: present
     update_cache: yes
     cache_valid_time: 3600
     install_recommends: no
@@ -18,7 +18,7 @@
 - name: "Install packages needed for running Apache 2.4 on {{ lsb_id }}"
   apt:
     name: apache2-mpm-prefork
-    state: installed
+    state: present
     update_cache: yes
     cache_valid_time: 3600
     install_recommends: no
@@ -30,7 +30,7 @@
 - name: "Install UWSGI packages on {{ lsb_id }}"
   apt:
     name: "{{ item }}"
-    state: installed
+    state: present
     update_cache: yes
     cache_valid_time: 3600
     install_recommends: no

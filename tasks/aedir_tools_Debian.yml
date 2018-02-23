@@ -3,7 +3,7 @@
 - name: "Install C compiler packages on {{ lsb_id }}"
   apt:
     name: "{{ item }}"
-    state: installed
+    state: present
     update_cache: yes
     cache_valid_time: 3600
     install_recommends: no
@@ -22,7 +22,7 @@
 - name: "Install base packages on {{ lsb_id }}"
   apt:
     name: "{{ item }}"
-    state: installed
+    state: present
     update_cache: no
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'

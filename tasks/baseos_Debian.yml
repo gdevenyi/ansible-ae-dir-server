@@ -4,7 +4,7 @@
 - name: "Install base OS packages"
   apt:
     name: "{{ item }}"
-    state: installed
+    state: present
     update_cache: yes
     cache_valid_time: 3600
     install_recommends: no
@@ -21,7 +21,7 @@
 - name: "Install alternative malloc package {{ aedir_malloc_package }}"
   apt:
     name: "{{ aedir_malloc_package }}"
-    state: installed
+    state: present
     update_cache: yes
     cache_valid_time: 3600
     install_recommends: no
