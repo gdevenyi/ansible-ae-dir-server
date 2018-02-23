@@ -130,9 +130,9 @@ ProxyPreserveHost On
   # web2ldap
   #---------------------------------------------------------------------
 
-  ProxyPass /web2ldap unix:{{ aedir_rundir }}/uwsgi/web2ldap/web2ldap.sock|uwsgi://web2ldap/
 
   <Location /web2ldap>
+    ProxyPass unix:{{ aedir_rundir }}/uwsgi/web2ldap/web2ldap.sock|uwsgi://web2ldap/
     # Tell mod_ssl to set the SSL standard env vars
     SSLOptions +StdEnvVars
     <Limit GET POST>
@@ -157,12 +157,13 @@ ProxyPreserveHost On
   #----------------------------------------------------------------------
 
   RedirectPermanent /pwd /pwd/
-  ProxyPass /pwd/ unix:{{ aedir_rundir }}/uwsgi/aedirpwd/aedirpwd.sock|uwsgi://aedirpwd/
-
   <Location /pwd>
+    ProxyPass unix:{{ aedir_rundir }}/uwsgi/aedirpwd/aedirpwd.sock|uwsgi://aedirpwd/
+    <Limit GET POST>
 {% for require in apache_web2ldap_requires %}
       Require {{ require }}
 {% endfor %}
+    </Limit>
   </Location>
 
 {% if oath_ldap_enabled==True %}
@@ -171,12 +172,13 @@ ProxyPreserveHost On
   #----------------------------------------------------------------------
 
   RedirectPermanent /oath /oath/
-  ProxyPass /oath/ unix:{{ aedir_rundir }}/uwsgi/oathenroll/oathenroll.sock|uwsgi://oath/
-
   <Location /oath>
+    ProxyPass unix:{{ aedir_rundir }}/uwsgi/oathenroll/oathenroll.sock|uwsgi://oath/
+    <Limit GET POST>
 {% for require in apache_web2ldap_requires %}
       Require {{ require }}
 {% endfor %}
+    </Limit>
   </Location>
 {% endif %}
 
