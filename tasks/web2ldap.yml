@@ -14,7 +14,7 @@
 - name: Create web2ldapcnf/local.py for AE-DIR
   template:
     src: "{{ item }}"
-    dest: "{{ web2ldap_cnfdir }}/local.py"
+    dest: "{{ aedir_python_sitepackages }}/web2ldapcnf/local.py"
     owner: root
     group: root
     mode: 0644
@@ -28,7 +28,7 @@
 - name: Create web2ldapcnf/hosts.py for AE-DIR
   template:
     src: "{{ item }}"
-    dest: "{{ web2ldap_cnfdir }}/hosts.py"
+    dest: "{{ aedir_python_sitepackages }}/web2ldapcnf/hosts.py"
     owner: root
     group: root
     mode: 0644
@@ -42,7 +42,7 @@
 - name: "Create connect AE-DIR landing page for web2ldap"
   template:
     src: "{{ item }}"
-    dest: "{{ web2ldap_templates }}/connect.html"
+    dest: "{{ aedir_prefix }}/etc/web2ldap/templates/connect.html"
     owner: root
     group: root
     mode: 0644
@@ -62,7 +62,7 @@
 - name: "web2ldap HTML and LDIF templates for AE-DIR (copy)"
   copy:
     src: "{{ item }}"
-    dest: "{{ web2ldap_templates }}/ae-dir/{{ item | basename }}"
+    dest: "{{ aedir_prefix }}/etc/web2ldap/templates/ae-dir/{{ item | basename }}"
     owner: root
     group: root
     mode: 0644
@@ -72,7 +72,7 @@
 - name: "web2ldap HTML and LDIF templates for AE-DIR (template)"
   template:
     src: "{{ item }}"
-    dest: "{{ web2ldap_templates }}/ae-dir/{{ item | basename | regex_replace('\\.j2','') }}"
+    dest: "{{ aedir_prefix }}/etc/web2ldap/templates/ae-dir/{{ item | basename | regex_replace('\\.j2','') }}"
     owner: root
     group: root
     mode: 0644
@@ -82,7 +82,7 @@
 - name: install AE-DIR plugin module for web2ldap
   copy:
     src: "web2ldap/aedir.py"
-    dest: "{{ web2ldap_pylib }}/app/plugins/aedir.py"
+    dest: "{{ aedir_python_sitepackages }}/web2ldap/app/plugins/aedir.py"
     owner: root
     group: root
     mode: 0644
@@ -92,7 +92,7 @@
 - name: "Create supplemental schema file for AE-DIR (ae-suppl-schema.ldif)"
   copy:
     src: "web2ldap/ae-suppl-schema.ldif"
-    dest: "{{ web2ldap_etc }}/ae-suppl-schema.ldif"
+    dest: "{{ aedir_prefix }}/etc/web2ldap/ae-suppl-schema.ldif"
     owner: root
     group: root
     mode: 0644

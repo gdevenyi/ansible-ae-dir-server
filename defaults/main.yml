@@ -681,33 +681,6 @@ web_document_root: "{{ aedir_prefix }}/htdocs"
 # web2ldap parameters
 #---------------------------------------------------------------------------
 
-# the release to be installed
-web2ldap_version: "1.2.100"
-
-# source filename
-web2ldap_filename: "web2ldap-{{ web2ldap_version }}.tar.gz"
-
-# where to download the web2ldap source archive
-# override this for machines without Internet access
-web2ldap_download_url: "https://www.web2ldap.de/download/{{ web2ldap_filename }}"
-
-# src parameter used when retrieving web2ldap source tar.gz
-web2ldap_src: "web2ldap/{{ web2ldap_filename }}"
-
-# Various path names
-web2ldap_prefix: "{{ aedir_prefix }}"
-
-# Config directories
-web2ldap_etc: "{{ web2ldap_prefix }}/etc/web2ldap"
-web2ldap_cnfdir: "{{ aedir_python_sitepackages }}/web2ldapcnf"
-web2ldap_templates: "{{ web2ldap_etc }}/templates"
-
-# Full pathname of WSGI start script
-web2ldap_wsgi_script: "{{ aedir_python_sitepackages }}/web2ldap/wsgi.py"
-
-# web2ldap modules directory
-web2ldap_pylib: "{{ aedir_python_sitepackages }}/web2ldap"
-
 web2ldap_monitor_access_allowed:
   - 127.0.0.0/255.0.0.0
   - ::1
@@ -719,12 +692,6 @@ web2ldap_monitor_access_allowed:
 # user/group to run as
 web2ldap_user: "ae-dir-web2ldap"
 web2ldap_group: "ae-dir-web2ldap"
-
-# where to install systemd files
-web2ldap_systemd_dir: "/etc/systemd/system"
-
-# use libldap from this directory
-web2ldap_libldap_dir: /usr/local/openldap/lib64
 
 #---------------------------------------------------------------------------
 # apache2 parameters
