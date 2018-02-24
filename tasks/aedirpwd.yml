@@ -72,6 +72,7 @@
   import_tasks: uwsgi.yml
   vars:
     name: aedirpwd
+    socket_port: "{{ '8081' if aedir_uwsgi_usetcp else '' }}"
     user: ae-dir-pwd
     module: "aedirpwd_web:application"
     master: "true"

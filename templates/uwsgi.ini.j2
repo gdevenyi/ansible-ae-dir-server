@@ -3,7 +3,11 @@
 # {{ ansible_managed }}
 #---------------------------------------------------------------------------
 [uwsgi]
+{% if socket_port %}
+socket = 127.0.0.1:{{ socket_port }}
+{% else %}
 socket = {{ aedir_rundir }}/uwsgi/{{ name }}/{{ name }}.sock
+{% endif %}
 chmod-socket = 666
 #chown-socket = {{ user }}:ae-dir-httpd
 chdir = {{ aedir_rundir }}/uwsgi/{{ name }}

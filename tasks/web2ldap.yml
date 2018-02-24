@@ -111,6 +111,7 @@
   import_tasks: uwsgi.yml
   vars:
     name: web2ldap
+    socket_port: "{{ '8080' if aedir_uwsgi_usetcp else '' }}"
     user: ae-dir-web2ldap
     module: "web2ldap.wsgi:application"
     master: "false"

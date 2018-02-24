@@ -62,6 +62,7 @@
   import_tasks: uwsgi.yml
   vars:
     name: oathenroll
+    socket_port: "{{ '8082' if aedir_uwsgi_usetcp else '' }}"
     user: ae-dir-pwd
     module: "oathenroll:application"
     master: "true"

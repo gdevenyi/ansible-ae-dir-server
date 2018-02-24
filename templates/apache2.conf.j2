@@ -132,7 +132,11 @@ ProxyPreserveHost On
 
 
   <Location /web2ldap>
+{% if aedir_uwsgi_usetcp %}
+    ProxyPass uwsgi://127.0.0.1:8080/
+{% else %}
     ProxyPass unix:{{ aedir_rundir }}/uwsgi/web2ldap/web2ldap.sock|uwsgi://web2ldap/
+{% endif %}
     # Tell mod_ssl to set the SSL standard env vars
     SSLOptions +StdEnvVars
     <Limit GET POST>
@@ -158,7 +162,11 @@ ProxyPreserveHost On
 
   RedirectPermanent /pwd /pwd/
   <Location /pwd>
+{% if aedir_uwsgi_usetcp %}
+    ProxyPass uwsgi://127.0.0.1:8081/
+{% else %}
     ProxyPass unix:{{ aedir_rundir }}/uwsgi/aedirpwd/aedirpwd.sock|uwsgi://aedirpwd/
+{% endif %}
     <Limit GET POST>
 {% for require in apache_web2ldap_requires %}
       Require {{ require }}
@@ -173,7 +181,11 @@ ProxyPreserveHost On
 
   RedirectPermanent /oath /oath/
   <Location /oath>
+{% if aedir_uwsgi_usetcp %}
+    ProxyPass uwsgi://127.0.0.1:8082/
+{% else %}
     ProxyPass unix:{{ aedir_rundir }}/uwsgi/oathenroll/oathenroll.sock|uwsgi://oath/
+{% endif %}
     <Limit GET POST>
 {% for require in apache_web2ldap_requires %}
       Require {{ require }}

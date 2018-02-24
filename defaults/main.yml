@@ -363,6 +363,10 @@ aedir_malloc_ld_preload: ""
 #     aeService: 1
 ae_expiry_status_defaults: {}
 
+# Enforce uwsgi to bind to TCP sockets instead of Unix domain sockets
+# mainly needed for Debian Jessie
+aedir_uwsgi_usetcp: "{{ lsb_id == 'Debian' and ansible_distribution_release == 'jessie' }}"
+
 #---------------------------------------------------------------------------
 # OpenLDAP parameters
 #---------------------------------------------------------------------------
