@@ -59,7 +59,12 @@
     - "restart oathenroll"
 
 - name: "Create uwsgi.ini for oathenroll"
-  import_tasks: uwsgi.yml
+  template:
+    src: "uwsgi.ini.j2"
+    dest: "{{ aedir_etc }}/uwsgi/{{ name }}.ini"
+    owner: root
+    group: root
+    mode: 0644
   vars:
     name: oathenroll
     socket_port: "{{ '8082' if aedir_uwsgi_usetcp else '' }}"

@@ -69,7 +69,12 @@
     - "restart aedirpwd"
 
 - name: "Create uwsgi.ini for aedirpwd"
-  import_tasks: uwsgi.yml
+  template:
+    src: "uwsgi.ini.j2"
+    dest: "{{ aedir_etc }}/uwsgi/{{ name }}.ini"
+    owner: root
+    group: root
+    mode: 0644
   vars:
     name: aedirpwd
     socket_port: "{{ '8081' if aedir_uwsgi_usetcp else '' }}"
