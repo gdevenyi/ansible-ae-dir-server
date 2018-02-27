@@ -36,7 +36,7 @@ try:
 except ImportError:
     JWE = JWK = None
 
-# python-ldap
+# from ldap0 package
 import ldap0
 from ldap0 import LDAPError
 from ldap0.ldapurl import LDAPUrl
@@ -93,7 +93,7 @@ ALLOWED_GIDS = [0, 'ae-dir-slapd']
 # String with octal representation of socket permissions
 SOCKET_PERMISSIONS = '0666'
 
-# Trace level for python-ldap logs
+# Trace level for ldap0 logs
 PYLDAP_TRACELEVEL = 0
 
 # Number of times connecting to local LDAPI is retried before sending a

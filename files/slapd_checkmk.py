@@ -55,10 +55,10 @@ else:
     CRYPTOGRAPHY_AVAIL = True
 
 # Switch off processing .ldaprc or ldap.conf
-# before importing python-ldap (libldap)
+# before importing ldap0 with loads libldap.so
 os.environ['LDAPNOINIT'] = '0'
 
-# from python-ldap
+# from ldap0 package
 import ldap0
 from ldap0.ldapobject import LDAPObject
 from ldap0.openldap import SyncReplDesc

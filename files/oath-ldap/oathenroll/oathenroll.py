@@ -25,7 +25,7 @@ import email.utils
 # web.py
 import web
 
-# from python-ldap
+# from ldap0 package
 import ldap0
 from ldap0 import LDAPError
 from ldap0.ldapobject import ReconnectLDAPObject

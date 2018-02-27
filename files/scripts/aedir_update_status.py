@@ -29,7 +29,7 @@ import aedir.process
 # Configuration constants
 #-----------------------------------------------------------------------
 
-# python-ldap trace level
+# ldap0 trace level
 PYLDAP_TRACELEVEL = int(os.environ.get('PYLDAP_TRACELEVEL', '0'))
 
 #-----------------------------------------------------------------------

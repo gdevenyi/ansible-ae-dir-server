@@ -20,7 +20,7 @@ import smtplib
 import email.utils
 from socket import getfqdn
 
-# from python-ldap
+# from ldap0 package
 import ldap0
 import ldap0.functions
 

@@ -71,7 +71,7 @@ ALLOWED_GIDS = [0]
 # String with octal representation of socket permissions
 SOCKET_PERMISSIONS = '0666'
 
-# Trace level for python-ldap logs
+# Trace level for ldap0 logs
 PYLDAP_TRACELEVEL = 0
 
 # Number of times connecting to local LDAPI is retried before sending a
