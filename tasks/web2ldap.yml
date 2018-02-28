@@ -7,7 +7,7 @@
     state: present
     virtualenv: "{{ aedir_prefix }}"
     virtualenv_site_packages: no
-    extra_args: "{{ aedir_pip_extra_args }}"
+    extra_args: "{{ aedir_pip_extra_args }} --find-links https://www.web2ldap.de/download.html"
   notify:
     - restart web2ldap
 
