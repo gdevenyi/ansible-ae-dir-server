@@ -329,19 +329,18 @@ class BindProxyHandler(SlapdSockHandler):
                     except ldap0.SERVER_DOWN as ldap_error:
                         self._log(
                             logging.WARN,
-                            'Connecting to %r failed: %s',
+                            'Connecting to %r failed: %s => try next',
                             remote_ldap_uri,
                             ldap_error,
                         )
                         if not remote_ldap_uris:
-                            self._log(
-                                logging.ERROR,
-                                'Could not connect to any provider in %s',
-                                remote_ldap_uris,
-                            )
                             raise
                     else:
                         break
+            except ldap0.SERVER_DOWN as ldap_error:
+                self._log(logging.ERROR, 'Could not connect to any provider')
+                result_code = RESULT_CODE['unavailable']
+                info = 'OATH providers unavailable'
             except LDAPError as ldap_error:
                 try:
                     result_code = RESULT_CODE[type(ldap_error)]
