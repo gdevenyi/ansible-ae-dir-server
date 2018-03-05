@@ -310,18 +310,38 @@ class BindProxyHandler(SlapdSockHandler):
 
         try:
             try:
-                remote_ldap_conn = LDAPObject(
-                    ' '.join(remote_ldap_uris),
-                    trace_level=0,
-                    trace_file=self.server._logger_fileobj,
-                )
-                remote_ldap_conn.simple_bind_s(
-                    request_dn_utf8,
-                    request.cred,
-                    serverctrls=[
-                        self._gen_session_tracking_ctrl(request, request_dn_utf8)
-                    ]
-                )
+                while remote_ldap_uris:
+                    remote_ldap_uri = remote_ldap_uris.popleft()
+                    self._log(logging.DEBUG, 'Sending request to %r', remote_ldap_uri)
+                    try:
+                        remote_ldap_conn = LDAPObject(
+                            remote_ldap_uri,
+                            trace_level=0,
+                            trace_file=self.server._logger_fileobj,
+                        )
+                        remote_ldap_conn.simple_bind_s(
+                            request_dn_utf8,
+                            request.cred,
+                            serverctrls=[
+                                self._gen_session_tracking_ctrl(request, request_dn_utf8)
+                            ]
+                        )
+                    except ldap0.SERVER_DOWN as ldap_error:
+                        self._log(
+                            logging.WARN,
+                            'Connecting to %r failed: %s',
+                            remote_ldap_uri,
+                            ldap_error,
+                        )
+                        if not remote_ldap_uris:
+                            self._log(
+                                logging.ERROR,
+                                'Could not connect to any provider in %s',
+                                remote_ldap_uris,
+                            )
+                            raise
+                    else:
+                        break
             except LDAPError as ldap_error:
                 try:
                     result_code = RESULT_CODE[type(ldap_error)]
@@ -344,9 +364,10 @@ class BindProxyHandler(SlapdSockHandler):
                 info = None
                 self._log(
                     logging.INFO,
-                    'Validation ok for %r (from %r) => RESULT: %s',
+                    'Validation ok for %r (from %r) using provider %r => RESULT: %s',
                     request.dn,
                     request.peername,
+                    remote_ldap_conn.uri,
                     result_code,
                 )
         finally:
