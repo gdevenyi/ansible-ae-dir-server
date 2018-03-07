@@ -43,11 +43,13 @@
     - python-passlib
     - python-pyweblib
     - python-M2Crypto
+    - python-xlwt
   when: openldap_role == 'provider'
   notify:
     - restart aedirpwd
     - restart oathenroll
     - restart hotp_validator
+    - restart web2ldap
 
 - name: "Prepare virtualenv {{ aedir_prefix }} needed for PIP installation of web2ldap"
   pip:

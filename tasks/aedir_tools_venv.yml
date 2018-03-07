@@ -50,7 +50,7 @@
       - mailutil
       - paramiko
       - passlib
-      - pyExcelerator
+      - xlwt
       - pyweblib
       - web.py
     state: present
