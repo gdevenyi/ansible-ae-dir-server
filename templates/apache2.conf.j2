@@ -161,11 +161,11 @@ ProxyPreserveHost On
   #----------------------------------------------------------------------
 
   RedirectPermanent /pwd /pwd/
-  <Location /pwd>
+  <Location /pwd/>
 {% if aedir_uwsgi_usetcp %}
     ProxyPass uwsgi://127.0.0.1:8081/
 {% else %}
-    ProxyPass unix:{{ aedir_rundir }}/uwsgi/aedirpwd/aedirpwd.sock|uwsgi://aedirpwd/
+    ProxyPass unix:{{ aedir_rundir }}/uwsgi/aedirpwd/aedirpwd.sock|uwsgi://aedirpwd/pwd/
 {% endif %}
     <Limit GET POST>
 {% for require in apache_web2ldap_requires %}
@@ -180,11 +180,11 @@ ProxyPreserveHost On
   #----------------------------------------------------------------------
 
   RedirectPermanent /oath /oath/
-  <Location /oath>
+  <Location /oath/>
 {% if aedir_uwsgi_usetcp %}
     ProxyPass uwsgi://127.0.0.1:8082/
 {% else %}
-    ProxyPass unix:{{ aedir_rundir }}/uwsgi/oathenroll/oathenroll.sock|uwsgi://oath/
+    ProxyPass unix:{{ aedir_rundir }}/uwsgi/oathenroll/oathenroll.sock|uwsgi://oath_enroll/oath/
 {% endif %}
     <Limit GET POST>
 {% for require in apache_web2ldap_requires %}
