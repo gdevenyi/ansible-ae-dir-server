@@ -34,7 +34,7 @@
     group: root
     mode: 0644
 
-- name: "install CA cert for SMTP/STARTTLS"
+- name: "install CA cert for SMTP/STARTTLS to {{ smtp_cacert_pathname }}"
   copy:
     src: "{{ smtp_cacert_filename }}"
     dest: "{{ smtp_cacert_pathname }}"
