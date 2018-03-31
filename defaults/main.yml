@@ -396,7 +396,7 @@ openldap_slapd_conf: "{{ aedir_etc_openldap }}/slapd.conf"
 # where to find slapd executable
 openldap_slapd_exec: "{{ os_openldap_paths[lsb_id].openldap_slapd_exec }}"
 # URIs specifying on which interface slapd shall listen
-openldap_listen_urls: "{{ openldap_ldapi_uri }} ldap://*:389 ldaps://*:636"
+openldap_listen_urls: "{{ openldap_ldapi_uri|replace('%','%%') }} ldap://*:389 ldaps://*:636"
 # system user/group to run slapd with
 openldap_slapd_user: "ae-dir-slapd"
 openldap_slapd_group: "ae-dir-slapd"
