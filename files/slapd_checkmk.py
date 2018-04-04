@@ -715,7 +715,7 @@ class SyncreplProviderTask(threading.Thread):
                 self.remote_csn_dict[db_suffix] = \
                     ldap_conn.get_context_csn(db_suffix)
             except CATCH_ALL_EXC as exc:
-                self.result(
+                self.check_instance.result(
                     CHECK_RESULT_ERROR,
                     item_name,
                     check_output='Exception while retrieving remote contextCSN for %r from %r: %s' % (
