@@ -96,7 +96,7 @@ if new_password1:
         sys.exit(1)
 else:
     # empty password input => generate random password
-    new_password2 = aedir.random_string(length=max(aedir.PWD_LENGTH, pwd_min_length))
+    new_password2 = random_string(length=max(aedir.PWD_LENGTH, pwd_min_length))
     sys.stdout.write('Generated password: %s\n' % (new_password2))
 
 try:
