@@ -726,7 +726,7 @@
 <p>
   The following diagram shows the attribute type hierarchy:
 </p>
-{% set img_anchor="object_classes_graph" -%}
+{% set img_anchor="attribute_types_graph" -%}
 {% set img_file="attribute_types_graph.svg" -%}
 {% set img_title="Graph of AE-DIR's attribute type" -%}
 {% include "includes/img.html.j2" %}
@@ -1271,9 +1271,10 @@
 <h3 id="schema-oc-aeLocation">aeLocation</h3>
 <p>
   The object class <var>aeLocation</var> is used for entries representing
-  geographic locations (offices, data centers) and can be referenced from
+  geographic locations (offices, data centers) which are referenced from
   <a href="schema-oc-aePerson">aePerson</a> or
-  <a href="schema-oc-aeHost">aeHost</a> entries.
+  <a href="schema-oc-aeHost">aeHost</a> entries to indicate the
+  current location of these objects.
 </p>
 <dl id="schema-oc-aeLocation-attributes">
   <dt>
@@ -1305,8 +1306,11 @@
   <dd>
     Name of the tag.
   </dd>
-  <dt>meta attributes</dt>
-  <dd>see <a href="#schema-oc-aeObject-attributes">aeObject</a></dd>
+  <dt>aeStatus</dt>
+  <dd>
+    Status of tag
+    (see <a href="#schema-at-aeStatus"><var>aeStatus</var> values and their meaning</a>)
+  </dd>
 </dl>
 
 <h3 id="schema-oc-aeZone">aeZone</h3>
@@ -1330,11 +1334,19 @@
   </dd>
   <dt>aeDept</dt>
   <dd>
-    Associated department referenced by DN of
+    Associated departments referenced by DN of
     <a href="#schema-oc-aeDept">aeDept</a> entry.
     If set, this constraints the set of persons, for which
     <a href="#schema-oc-aeUser">aeUser</a> entries can be added within this
     zone to matching department members.
+  </dd>
+  <dt>aeLocation</dt>
+  <dd>
+    Associated locations referenced by DN of
+    <a href="#schema-oc-aeLocation">aeLocation</a> entry.
+    If set, this constraints the set of persons, for which
+    <a href="#schema-oc-aeUser">aeUser</a> entries can be added within this
+    zone to same location(s).
   </dd>
   <dt>meta attributes</dt>
   <dd>see <a href="#schema-oc-aeObject-attributes">aeObject</a></dd>
@@ -1474,8 +1486,69 @@
   </dd>
   <dt>aeDept</dt>
   <dd>
-    Associated department referenced by DN of
+    Associated departments referenced by DN of
     <a href="#schema-oc-aeDept">aeDept</a> entry.
+    If set, this constraints the set of persons whose
+    <a href="#schema-oc-aeUser">aeUser</a> entries can be added to the
+    group.
+  </dd>
+  <dt>aeLocation</dt>
+  <dd>
+    Associated locations referenced by DN of
+    <a href="#schema-oc-aeLocation">aeLocation</a> entry.
+    If set, this constraints the set of persons whose
+    <a href="#schema-oc-aeUser">aeUser</a> entries can be added to the
+    group.
+  </dd>
+  <dt>meta attributes</dt>
+  <dd>see <a href="#schema-oc-aeObject-attributes">aeObject</a></dd>
+</dl>
+
+<h3 id="schema-oc-aeMailGroup">aeMailGroup</h3>
+<p>
+  Mail groups are created using object class <var>aeMailGroup</var>. This
+  hybrid group object class is derived from two structural group object
+  classes:
+</p>
+<dl>
+  <dt>groupOfEntries</dt>
+  <dd>
+    replacement for <var>groupOfNames</var> which permits empty groups
+    (see <a href="https://tools.ietf.org/html/draft-findlay-ldap-groupofentries">draft-findlay-ldap-groupofentries</a>)
+  </dd>
+  <dt>nisMailAlias</dt>
+  <dd>
+    for adding list of members' mail addresses
+  </dd>
+</dl>
+<p>
+  The following attributes are used in <var>aeMailGroup</var> entries:
+</p>
+<dl id="schema-oc-aeMailGroup-attributes">
+  <dt>cn</dt>
+  <dd>
+    unique group name
+  </dd>
+  <dt>member</dt>
+  <dd>
+    Distinguished names of all member entries
+  </dd>
+  <dt>rfc822MailMember</dt>
+  <dd>
+    <var>mail</var> values of all member entries
+  </dd>
+  <dt>aeDept</dt>
+  <dd>
+    Associated departments referenced by DN of
+    <a href="#schema-oc-aeDept">aeDept</a> entry.
+    If set, this constraints the set of persons whose
+    <a href="#schema-oc-aeUser">aeUser</a> entries can be added to the
+    group.
+  </dd>
+  <dt>aeLocation</dt>
+  <dd>
+    Associated locations referenced by DN of
+    <a href="#schema-oc-aeLocation">aeLocation</a> entry.
     If set, this constraints the set of persons whose
     <a href="#schema-oc-aeUser">aeUser</a> entries can be added to the
     group.
