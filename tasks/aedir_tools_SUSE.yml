@@ -42,7 +42,7 @@
     - python-web.py
     - python-passlib
     - python-pyweblib
-    - python-M2Crypto
+    - python-asn1crypto
     - python-xlwt
   when: openldap_role == 'provider'
   notify:
