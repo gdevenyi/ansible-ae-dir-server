@@ -58,11 +58,15 @@
 
 - name: "Install {{ oath_bind_listener }}.py"
   copy:
-    src: "oath-ldap/{{ oath_bind_listener }}.py"
+    src: "{{ item }}"
     dest: "{{ aedir_sbin }}/{{ oath_bind_listener }}.py"
     owner: root
     group: "{{ oath_listener_user }}"
     mode: 0750
+  with_first_found:
+    - files:
+       - "oath-ldap/{{ oath_bind_listener }}.py"
+      paths: "{{ aedir_files_dirs }}"
   notify:
     - "restart {{ oath_bind_listener }}"
 
