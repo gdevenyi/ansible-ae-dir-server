@@ -1386,13 +1386,13 @@ constraint_attribute aeProxyFor,entryDN
   set "this/aeProxyFor/-1 & this/-1"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeSrvGroup)"
 
-# restrict aeSrvGroup in aeHost entry to reference solely active aeSrvGroup in same zone
+# restrict aeSrvGroup in aeHost and aeService entries to reference solely active aeSrvGroup in same zone
 constraint_attribute aeSrvGroup
-  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeSrvGroup)(aeStatus=0))"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeSrvGroup)"
+  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeSrvGroup)(aeStatus=0)(!(aeProxyFor=*)))"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(|(objectClass=aeHost)(objectClass=aeService))"
 constraint_attribute aeSrvGroup
   set "this/aeSrvGroup/-1 & this/-2"
-  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeHost)"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(|(objectClass=aeHost)(objectClass=aeService))"
 
 # restrict aeNwDevice in aeNwDevice entry to reference
 # an active aeNwDevice in same aeHost but not itself
@@ -1402,7 +1402,7 @@ constraint_attribute aeNwDevice
   set "this/aeNwDevice/-1 & this/-1"
 
 # restrict aeHost in aeService entry to reference solely active aeHost entry
-constraint_attribute aeSrvGroup
+constraint_attribute aeHost
   uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeHost)(aeStatus=0))"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeService)"
 
@@ -1554,10 +1554,6 @@ constraint_attribute aeOwner
 # FIX ME! This does not work as expected yet!
 #constraint_attribute pwdPolicySubentry
 #  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=pwdPolicy)(aeStatus=0))"
-
-# restrict references from aeHost/aeService to active aeSrvGroup entries
-constraint_attribute aeSrvGroup
-  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeSrvGroup)(aeStatus=0))"
 
 # SSH certificate options, see CLI arg -O in man-page ssh-keygen(1)
 # only permit values are allowed assuming that
