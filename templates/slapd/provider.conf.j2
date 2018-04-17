@@ -641,7 +641,7 @@ access to
     by * none break
 
 # aeService entries can also be subordinate entries of aeSrvGroup
-# entries if the need read access to aeUser and aeGroup entries
+# entries if they need read access to aeUser and aeGroup entries
 # aeService entries add-only attributes
 access to
   dn.regex="^uid=({{ aedir_aeservice_uid_regex }}),cn=({{ aedir_aesrvgroup_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
