@@ -74,8 +74,8 @@
     processes: 10
     threads: 0
     stats_port: 9093
-    buffer_size: 4096
-    harakiri: 10
+    buffer_size: "{{ aedir_uwsgi_params.oathenroll.buffer_size }}"
+    harakiri: "{{ aedir_uwsgi_params.oathenroll.harakiri }}"
   notify:
     - "restart oathenroll"
 

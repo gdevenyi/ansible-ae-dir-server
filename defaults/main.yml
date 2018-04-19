@@ -367,6 +367,18 @@ ae_expiry_status_defaults: {}
 # mainly needed for Debian Jessie
 aedir_uwsgi_usetcp: "{{ lsb_id == 'Debian' and ansible_distribution_release == 'jessie' }}"
 
+# some uwsgi parameters per service
+aedir_uwsgi_params:
+  web2ldap:
+    buffer_size: 16384
+    harakiri: 20
+  oathenroll:
+    buffer_size: 8192
+    harakiri: 10
+  aedirpwd:
+    buffer_size: 8192
+    harakiri: 10
+
 #---------------------------------------------------------------------------
 # OpenLDAP parameters
 #---------------------------------------------------------------------------

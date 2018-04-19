@@ -123,8 +123,8 @@
     processes: 1
     threads: 10
     stats_port: 9091
-    buffer_size: 8192
-    harakiri: 20
+    buffer_size: "{{ aedir_uwsgi_params.web2ldap.buffer_size }}"
+    harakiri: "{{ aedir_uwsgi_params.web2ldap.harakiri }}"
   notify:
     - "restart web2ldap"
 

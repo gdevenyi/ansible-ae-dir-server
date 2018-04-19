@@ -84,8 +84,8 @@
     processes: 10
     threads: 0
     stats_port: 9092
-    buffer_size: 4096
-    harakiri: 10
+    buffer_size: "{{ aedir_uwsgi_params.aedirpwd.buffer_size }}"
+    harakiri: "{{ aedir_uwsgi_params.aedirpwd.harakiri }}"
   notify:
     - "restart aedirpwd"
 
