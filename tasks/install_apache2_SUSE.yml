@@ -12,7 +12,6 @@
   with_items:
     - apache2
     - apache2-prefork
-    - apache2-mod_proxy_uwsgi
 
 - name: "Install UWSGI packages {{ lsb_id }}"
   zypper:
