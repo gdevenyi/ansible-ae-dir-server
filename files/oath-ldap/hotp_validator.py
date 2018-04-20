@@ -6,7 +6,7 @@ HOTP validation on intercepted BIND requests
 
 from __future__ import absolute_import
 
-__version__ = '0.10.0'
+__version__ = '0.10.1'
 __author__ = u'Michael Ströder <michael@stroeder.com>'
 
 #-----------------------------------------------------------------------
@@ -329,7 +329,14 @@ class HOTPValidationHandler(SlapdSockHandler):
             (not_after is None or ldap_datetime(not_after) >= self.now_dt)
         # end of _check_validity_period()
 
-    def _update_token_entry(self, request, token_dn, success, oath_hotp_next_counter):
+    def _update_token_entry(
+            self,
+            request,
+            token_dn,
+            success,
+            oath_hotp_next_counter,
+            otp_token_entry,
+        ):
         """
         update OATH token entry
         """
@@ -346,7 +353,14 @@ class HOTPValidationHandler(SlapdSockHandler):
         else:
             # Update failure counter and timestamp
             mods = [
-                (ldap0.MOD_INCREMENT, 'oathFailureCount', ['1']),
+                (
+                    {
+                        False: ldap0.MOD_ADD,
+                        True: ldap0.MOD_INCREMENT,
+                    }['oathFailureCount' in otp_token_entry],
+                    'oathFailureCount',
+                    ['1']
+                ),
                 (ldap0.MOD_REPLACE, 'oathLastFailure', [str(self.now_str)]),
             ]
         if oath_hotp_next_counter is not None:
@@ -759,6 +773,7 @@ class HOTPValidationHandler(SlapdSockHandler):
             oath_token_dn,
             otp_compare and oath_token_identifier == oath_token_identifier_req,
             oath_hotp_next_counter,
+            otp_token_entry,
         )
 
         # now do all the additional policy checks
@@ -978,6 +993,7 @@ class HOTPValidationHandler(SlapdSockHandler):
             oath_token_dn,
             otp_compare and oath_token_identifier == oath_token_identifier_req,
             oath_hotp_next_counter,
+            otp_token_entry,
         )
 
         # now do all the additional policy checks
