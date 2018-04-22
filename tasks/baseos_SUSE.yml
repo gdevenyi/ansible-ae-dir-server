@@ -25,10 +25,10 @@
     type: package
   when: aedir_malloc_package!=""
 
-- name: "additonal zypper repos on "
+- name: "Add zypper repos for {{ ansible_lsb.description }}"
   zypper_repository:
     state: present
-    #enabled: yes
+    enabled: yes
     overwrite_multiple: yes
     auto_import_keys: yes
     autorefresh: yes
