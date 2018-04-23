@@ -23,9 +23,22 @@
     state: present
     system: yes
     createhome: no
+    non_unique: no
+    home: "{{ item.value.get('home_directory', aedir_rundir+'/'+item.key) }}"
   with_dict:
     "{{ aedir_ldapi_services }}"
   when: openldap_role in item.value.roles
+
+- name: "Create home directories for some system accounts on {{ openldap_role }}"
+  file:
+    path: "{{ item.value.home_directory }}"
+    state: directory
+    owner: "{{ item.value.uid_number }}"
+    group: "{{ item.value.gid_number }}"
+    mode: u=rwx,g=,o=
+  with_dict:
+    "{{ aedir_ldapi_services }}"
+  when: openldap_role in item.value.roles and 'home_directory' in item.value
 
 # Remove system accounts/groups
 #---------------------------------------------------------------------------
