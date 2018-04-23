@@ -1,21 +1,6 @@
 ---
 # Install some AE-DIR script tools and documentation files
 
-- name: "Create directory structure {{ aedir_prefix }}"
-  file:
-    path: "{{ item }}"
-    state: directory
-    owner: root
-    group: root
-    mode: u=rwx,g=rx,o=rx
-  with_items:
-    - "{{ aedir_etc }}"
-    - "{{ aedir_etc }}/uwsgi"
-    - "{{ aedir_bin }}"
-    - "{{ aedir_sbin }}"
-    - "{{ aedir_rundir }}"
-    - "{{ aedir_rundir }}/uwsgi"
-
 - name: "Create client config file {{ aedir_etc }}/ldap.conf from template"
   template:
     src: "ldap.conf.j2"
