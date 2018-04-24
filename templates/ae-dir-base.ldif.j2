@@ -759,7 +759,7 @@ cn: {{ s.cn }}
 description: {{ s.cn }}
 uidNumber: {{ s.uid_number }}
 gidNumber: {{ s.gid_number }}
-homeDirectory: /home/{{ uid }}
+homeDirectory: {{ s.get('home_directory', '/home/'+uid) }}
 loginShell: /bin/true
 objectClass: account
 objectClass: aeObject
