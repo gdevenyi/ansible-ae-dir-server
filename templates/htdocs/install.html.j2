@@ -198,6 +198,10 @@
     Check the systems' health by invoking as <em>root</em> the monitoring
     script on all &AElig;-DIR servers. By default it is installed to:
     <pre>/opt/ae-dir/sbin/slapd_checkmk.sh</pre>
+  <li>
+    For PAM/NSS client self-integration invoke ansible play in sub-directory <code>ansible/</code>
+    (here using command <code>su</code>):
+    <pre>/opt/ansible/bin/ansible-playbook ae-dir-clients.yml -i myenv/hosts --become -K --become-method=su -l ae-dir-servers</pre>
   </li>
 </ol>
 
