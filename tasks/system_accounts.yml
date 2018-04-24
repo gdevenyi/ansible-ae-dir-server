@@ -24,7 +24,7 @@
     system: yes
     createhome: no
     non_unique: no
-    home: "{{ item.value.get('home_directory', aedir_rundir+'/'+item.key) }}"
+    home: "{{ item.value.get('home_directory', '/home/'+item.key) }}"
   with_dict:
     "{{ aedir_ldapi_services }}"
   when: openldap_role in item.value.roles
