@@ -69,7 +69,7 @@ from ldap0.ldif import LDIFParser
 # Configuration constants
 #-----------------------------------------------------------------------
 
-__version__ = '2.0.2'
+__version__ = '2.1.0'
 
 STATE_FILENAME = 'slapd_checkmk.state'
 
@@ -163,19 +163,14 @@ def slapd_pid_fromfile(config_attrs):
 # Classes
 #-----------------------------------------------------------------------
 
-class LocalCheck(object):
+class MonitoringCheck(object):
     """
-    Simple class for writing check_mk output
+    base class for a monitoting check
     """
-    checkmk_status = {
-        CHECK_RESULT_OK: 'OK',
-        CHECK_RESULT_WARNING: 'WARNING',
-        CHECK_RESULT_ERROR: 'ERROR',
-        CHECK_RESULT_UNKNOWN: 'UNKNOWN',
-    }
-    item_name_special_chars = set(',!:$%=/\\')
+
     item_names = None
     output_encoding = 'ascii'
+    item_name_special_chars = set()
 
     def __init__(self, output_file, state_filename=None):
         """
@@ -261,6 +256,9 @@ class LocalCheck(object):
                 s_list.append(char)
         return ''.join(s_list)  # _subst_item_name_chars()
 
+    def serialize_perf_data(self, performance_data):
+        return str(performance_data)
+
     def result(self, status, item_name, performance_data=None, check_output=None):
         """
         Registers check_mk result to be output later
@@ -269,8 +267,8 @@ class LocalCheck(object):
         item_name
            the check_mk item name
         """
-        # Provoke KeyError or ValueError if status is not known integer
-        status_str = self.checkmk_status[status]
+        assert performance_data is None or isinstance(performance_data, dict), \
+            TypeError('Expected performance_data to be None or dict, but was %r' % performance_data)
         # Provoke KeyError if item_name is not known
         try:
             self._item_dict[item_name]
@@ -280,19 +278,19 @@ class LocalCheck(object):
                 self._item_dict.keys(),
             ))
         self._item_dict[item_name] = (
-            str(status),
-            self.subst_item_name_chars(item_name),
-            performance_data or u'-',
-            status_str,
-            u'-',
+            status,
+            item_name,
+            performance_data or {},
             check_output or u'',
         )
         return  # result()
 
     def output(self):
         """
-        Outputs all check results registered before with method result()
+        Outputs all results registered before with method result()
         """
+        # add default unknown result for all known check items
+        # which up to now did not receive a particular result
         for i in sorted(self._item_dict.keys()):
             if not self._item_dict[i]:
                 self.result(
@@ -300,9 +298,44 @@ class LocalCheck(object):
                     i,
                     check_output='No defined check result yet!',
                 )
+
+
+class CheckMkLocalCheck(MonitoringCheck):
+    """
+    Simple class for writing check_mk output
+    """
+    checkmk_status = {
+        CHECK_RESULT_OK: 'OK',
+        CHECK_RESULT_WARNING: 'WARNING',
+        CHECK_RESULT_ERROR: 'ERROR',
+        CHECK_RESULT_UNKNOWN: 'UNKNOWN',
+    }
+    output_format = '{status_code} {name} {perf_data} {status_text} - {msg}\n'
+    item_name_special_chars = set(',!:$%=/\\')
+
+    def serialize_perf_data(self, pdat):
+        if not pdat:
+            return '-'
+        return '|'.join([
+            '%s=%s' % (pkey, pval)
+            for pkey, pval in pdat.items()
+        ])
+
+    def output(self):
+        """
+        Outputs all check_mk results registered before with method result()
+        """
+        MonitoringCheck.output(self)
+        for i in sorted(self._item_dict.keys()):
+            status, check_name, perf_data, check_msg = self._item_dict[i]
             sys.stdout.write(
-                u'%s\n' % u' '.join(self._item_dict[i]).encode(
-                    self.output_encoding)
+                self.output_format.format(
+                    status_code=status,
+                    perf_data=self.serialize_perf_data(perf_data),
+                    name=self.subst_item_name_chars(check_name),
+                    status_text=self.checkmk_status[status],
+                    msg=check_msg,
+                )
             )
         return  # output()
 
@@ -753,7 +786,7 @@ class SyncreplProviderTask(threading.Thread):
         return # end of SyncreplProviderTask.run()
 
 
-class SlapdCheck(LocalCheck):
+class SlapdCheck(CheckMkLocalCheck):
     """
     Check class for OpenLDAP's slapd
     """
@@ -775,7 +808,7 @@ class SlapdCheck(LocalCheck):
     )
 
     def __init__(self, output_file, state_filename=None):
-        LocalCheck.__init__(self, output_file, state_filename)
+        CheckMkLocalCheck.__init__(self, output_file, state_filename)
         # make pylint happy
         self._ldapi_conn = None
         self._config_attrs = {}
@@ -990,20 +1023,13 @@ class SlapdCheck(LocalCheck):
                 ignored_attr_types=['sockLogLevel'],
                 max_entries=1
             ).list_entry_records()[0]
-            sock_perf_data = []
+            sock_perf_data = {}
             # only add numeric monitor data to performance metrics
-            for metric_key in sorted(sock_monitor_entry.keys()):
+            for metric_key in sock_monitor_entry.keys():
                 try:
-                    float(sock_monitor_entry[metric_key][0])
+                    sock_perf_data[metric_key] = float(sock_monitor_entry[metric_key][0])
                 except ValueError:
                     continue
-                else:
-                    sock_perf_data.append(
-                        u'%s=%s' % (
-                            metric_key,
-                            sock_monitor_entry[metric_key][0],
-                        )
-                    )
             return sock_perf_data # end of _parse_sock_response()
 
         try:
@@ -1050,7 +1076,7 @@ class SlapdCheck(LocalCheck):
                     self.result(
                         check_result,
                         item_name,
-                        performance_data=u'|'.join(sock_perf_data),
+                        performance_data=sock_perf_data,
                         check_output=', '.join(check_msgs),
                     )
         return # end of _check_slapd_sock()
@@ -1172,7 +1198,7 @@ class SlapdCheck(LocalCheck):
         self.result(
             state,
             'SlapdConns',
-            performance_data='count=%d' % (current_connections),
+            performance_data={'count': current_connections},
             check_output='%d open connections' % (current_connections),
         )
         return # end of _check_conns()
@@ -1197,8 +1223,10 @@ class SlapdCheck(LocalCheck):
         self.result(
             state,
             'SlapdThreads',
-            performance_data='threads_active=%d|threads_pending=%d' % (
-                threads_active, threads_pending),
+            performance_data={
+                'threads_active=%d': threads_active,
+                'threads_pending=%d': threads_pending,
+            },
             check_output='Thread counts active:%d pending: %d' % (
                 threads_active, threads_pending)
         )
@@ -1237,12 +1265,12 @@ class SlapdCheck(LocalCheck):
         self.result(
             CHECK_RESULT_OK,
             'SlapdStats',
-            performance_data='bytes=%d|entries=%d|pdu=%d|referrals=%d' % (
-                stats_bytes_rate,
-                stats_entries_rate,
-                stats_pdu_rate,
-                stats_referrals_rate,
-            ),
+            performance_data={
+                'bytes': stats_bytes_rate,
+                'entries': stats_entries_rate,
+                'pdu': stats_pdu_rate,
+                'referrals': stats_referrals_rate,
+            },
             check_output='Stats: %d bytes (%0.1f bytes/sec) / %d entries (%0.1f entries/sec) / %d PDUs (%0.1f PDUs/sec) / %d referrals (%0.1f referrals/sec)' % (
                 stats_bytes,
                 stats_bytes_rate,
@@ -1273,11 +1301,11 @@ class SlapdCheck(LocalCheck):
                 self.result(
                     CHECK_RESULT_OK,
                     item_name,
-                    performance_data='ops_completed_rate=%0.2f|ops_initiated_rate=%0.2f|ops_waiting=%d' % (
-                        ops_completed_rate,
-                        ops_initiated_rate,
-                        ops_waiting,
-                    ),
+                    performance_data={
+                        'ops_completed_rate': ops_completed_rate,
+                        'ops_initiated_rate': ops_initiated_rate,
+                        'ops_waiting': ops_waiting,
+                    },
                     check_output='completed %d of %d operations (%0.2f/s completed, %0.2f/s initiated, %d waiting)' % (
                         ops_completed,
                         ops_initiated,
@@ -1298,9 +1326,11 @@ class SlapdCheck(LocalCheck):
                 state = CHECK_RESULT_OK
             self.result(
                 state, 'SlapdOps',
-                performance_data='ops_completed_rate=%0.2f|ops_initiated_rate=%0.2f|ops_waiting=%d' % (
-                    ops_all_completed_rate, ops_all_initiated_rate, ops_all_waiting,
-                ),
+                performance_data={
+                    'ops_completed_rate': ops_all_completed_rate,
+                    'ops_initiated_rate': ops_all_initiated_rate,
+                    'ops_waiting': ops_all_waiting,
+                },
                 check_output='%d operation types / completed %d of %d operations (%0.2f/s completed, %0.2f/s initiated, %d waiting)' % (
                     len(monitor_ops_counters),
                     ops_all_completed,
@@ -1425,9 +1455,9 @@ class SlapdCheck(LocalCheck):
                             self.result(
                                 CHECK_RESULT_ERROR,
                                 item_name,
-                                performance_data='count=%d' % (
-                                    num_all_search_results
-                                ),
+                                performance_data={
+                                    'count': num_all_search_results,
+                                },
                                 check_output='%r has %d referrals! (response time %0.1f s)' % (
                                     db_suffix,
                                     num_all_search_continuations,
@@ -1438,9 +1468,9 @@ class SlapdCheck(LocalCheck):
                             self.result(
                                 CHECK_RESULT_WARNING,
                                 item_name,
-                                performance_data='count=%d' % (
-                                    num_all_search_results
-                                ),
+                                performance_data={
+                                    'count': num_all_search_results,
+                                },
                                 check_output='%r only has %d entries (response time %0.1f s)' % (
                                     db_suffix,
                                     num_all_search_results,
@@ -1451,9 +1481,9 @@ class SlapdCheck(LocalCheck):
                             self.result(
                                 CHECK_RESULT_OK,
                                 item_name,
-                                performance_data='count=%d' % (
-                                    num_all_search_results
-                                ),
+                                performance_data={
+                                    'count': num_all_search_results,
+                                },
                                 check_output='%r has %d entries (response time %0.1f s)' % (
                                     db_suffix,
                                     num_all_search_results,
@@ -1501,10 +1531,10 @@ class SlapdCheck(LocalCheck):
         self.result(
             check_result,
             'SlapdProviders',
-            performance_data='count=%d|percent=%0.1f|' % (
-                len(remote_csn_dict),
-                slapd_provider_percentage,
-            ),
+            performance_data={
+                'count': len(remote_csn_dict),
+                'percent': slapd_provider_percentage,
+            },
             check_output='Connected to %d of %d (%0.1f%%) providers: %s' % (
                 len(remote_csn_dict),
                 len(syncrepl_topology),
@@ -1732,9 +1762,9 @@ class SlapdCheck(LocalCheck):
             self.result(
                 state,
                 item_name,
-                performance_data='max_csn_timedelta=%0.1f' % (
-                    max_csn_timedelta
-                ),
+                performance_data={
+                    'max_csn_timedelta': max_csn_timedelta
+                },
                 check_output='%r max. contextCSN delta: %0.1f / %s' % (
                     db_suffix,
                     max_csn_timedelta,
