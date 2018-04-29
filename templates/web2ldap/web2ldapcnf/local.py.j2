@@ -9,40 +9,50 @@ Some local configuration tweaks for Æ-DIR
 import sys, os, re
 
 # internal configuration import
-import web2ldapcnf.misc
+import web2ldapcnf
 
 #-----------------------------------------------------------------------
 # session limit/expiration parameters
 
 # explicitly set Cookie domain to prevent DNS rebinding attacks
-#web2ldapcnf.misc.cookie_domain = '{{ web_service_fqdn }}'
+#web2ldapcnf.cookie_domain = '{{ web_service_fqdn }}'
 
 # Maximum number of concurrent web sessions stored
-web2ldapcnf.misc.session_limit = 80
+web2ldapcnf.session_limit = 80
 
 # Maximum number of concurrent web sessions per remote IP
-web2ldapcnf.misc.session_per_ip_limit = 20
+web2ldapcnf.session_per_ip_limit = 20
 
 # Amount of time in seconds after which inactive sessions will be expired
 # and the session data is removed silently without the possibility to relogin.
-web2ldapcnf.misc.session_remove = 900
+web2ldapcnf.session_remove = 900
 
 #-----------------------------------------------------------------------
 
 import web2ldapcnf.hosts
-import web2ldapcnf.monitor
 
 # this import is needed for the following code lines being executed after this import
 import web2ldapcnf.plugins
 
 #-----------------------------------------------------------------------
 
-# Which IP addresses are allowed to access monitor page
-web2ldapcnf.monitor.access_allowed = [
+# Dictionary specifying accepted address/net mask strings of
+# accepted client addresses for certain URL commands.
+# Use [u'0.0.0.0/0.0.0.0','::0'] to allow access to every client but think twice!
+# IPv6 network addresses without brackets!
+web2ldapcnf.access_allowed = {
+  u'_':[
+    u'0.0.0.0/0.0.0.0',
+    u'::0',
+  ],
+  u'monitor':[
 {% for allowed in web2ldap_monitor_access_allowed %}
-  u'{{ allowed }}',
+    u'{{ allowed }}',
 {% endfor %}
-]
+  ],
+  # disable web2ldap's DNS SRV lookups completely
+  u'locate':[],
+}
 
 #-----------------------------------------------------------------------
 # Tweak some class attributes of AE-DIR plugin classes

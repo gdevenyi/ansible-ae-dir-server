@@ -7,7 +7,13 @@ web2ldapcnf/hosts.py - Host-related options
 """
 
 # Leave this alone
-import os,ldap0,web2ldapcnf
+import os
+
+import ldap0
+
+import certifi
+
+import web2ldapcnf
 
 class Web2LDAPConfig:
   """
@@ -206,7 +212,7 @@ ae_dir_config = Web2LDAPConfig(
     'aeUser':r'<span title="%(displayName)s: %(description)s">%(uid)s: %(description)s</span>',
   },
   session_track_control=1,
-  supplement_schema=os.path.join(web2ldapcnf.etc_dir,'web2ldap','ae-suppl-schema.ldif'),
+  supplement_schema=os.path.join(web2ldapcnf.etc_dir,'ae-suppl-schema.ldif'),
   modify_constant_attrs=[
     # Mostly OpenLDAP
     'entryCSN','entryDN','entryUUID',
@@ -527,7 +533,7 @@ ae_dir_config = Web2LDAPConfig(
     'aePerson':os.path.join(web2ldapcnf.templates_dir,'ae-dir','inputform_aePerson.html'),
     'aeContact':os.path.join(web2ldapcnf.templates_dir,'ae-dir','inputform_aeContact.html'),
     'aePosixIdRanges':os.path.join(web2ldapcnf.templates_dir,'ae-dir','inputform_aePosixIdRanges.html'),
-    'mailboxRelatedObject':os.path.join(web2ldapcnf.templates_dir,'read_mailboxRelatedObject.html'),
+    'mailboxRelatedObject':os.path.join(web2ldapcnf.templates_dir,'inputform_mailboxRelatedObject.html'),
     'namedObject':os.path.join(web2ldapcnf.templates_dir,'inputform_namedObject.html'),
     'namedPolicy':os.path.join(web2ldapcnf.templates_dir,'inputform_namedPolicy.html'),
     'inetLocalMailRecipient':os.path.join(web2ldapcnf.templates_dir,'inputform_inetLocalMailRecipient.html'),
@@ -540,10 +546,10 @@ ae_dir_config = Web2LDAPConfig(
     'oathTOTPParams':os.path.join(web2ldapcnf.templates_dir,'oath','inputform_oathTOTPParams.html'),
   },
   inputform_supentrytemplate={
-    'aeRoot':r'%(description)s',
-    'aeZone':r'Zone <strong>%(cn)s</strong>: %(description)s',
-    'aeSrvGroup':r'Server/service group <strong>%(cn)s</strong>: %(description)s',
-    'aeHost':r'Host/server <strong>%(host)s</strong>: %(description)s',
+    'aeRoot':r'<em>%(entryDN)s</em><br>%(description)s (aeRoot)',
+    'aeZone':r'<em>%(entryDN)s</em><br>Zone <strong>%(cn)s</strong>: <br>%(description)s',
+    'aeSrvGroup':r'<em>%(entryDN)s</em><br>Server/service group <strong>%(cn)s</strong>: <br>%(description)s',
+    'aeHost':r'<em>%(entryDN)s</em><br>Host/server <strong>%(host)s</strong>: <br>%(description)s',
   },
   addform_entry_templates={
     u'Æ-DIR tag':os.path.join(web2ldapcnf.templates_dir,'ae-dir','add_aeTag.ldif'),
@@ -632,25 +638,20 @@ ldap_def = {
     starttls=0,
 
     # Dictionary for specifying arbitrary TLS-related LDAP options.
-    # Which options are really available on your system depends on your ldap0 and OpenLDAP build.
+    # Which options are really available on your system depends on your ldap0 and OpenLDAP builds.
     # (see section TLS OPTIONS on OpenLDAP's man page ldap_set_option(3)
     tls_options={
       # you should really set this!
       ldap0.OPT_X_TLS_REQUIRE_CERT:ldap0.OPT_X_TLS_DEMAND,
       # Directory containing all the trusted root CA certs (symbolic hash links required!)
-#      LDAP_OPT_X_TLS_CACERTDIR = os.path.sep.join([web2ldapcnf.etc_dir,'web2ldap', 'ssl', 'crt']),
+#      LDAP_OPT_X_TLS_CACERTDIR = os.path.sep.join(web2ldapcnf.etc_dir,'ssl','crt'),
       # File containing all the trusted root CA certs
       ldap0.OPT_X_TLS_CACERTFILE:'{{ openldap_cacert_pathname }}',
 #      ldap0.OPT_X_TLS_CIPHER_SUITE:'ECDHE-RSA-AES256-SHA:DHE-RSA-AES256-SHA',
       ldap0.OPT_X_TLS_PROTOCOL_MIN:3,
 #      ldap0.OPT_X_TLS_CRLCHECK:ldap0.OPT_X_TLS_CRL_PEER,
-#      ldap0.OPT_X_TLS_CRLFILE:os.path.join(web2ldapcnf.etc_dir,'web2ldap','ssl','crt','peers.crl'),
+#      ldap0.OPT_X_TLS_CRLFILE:os.path.join(web2ldapcnf.etc_dir,'ssl','crt','peers.crl'),
     },
-    # regular expression of subject DNs in client certs
-    ssl_valid_dn=r'/.*',
-    # regular expression of subject DNs in issuer certs
-    ssl_valid_idn=r'/.*',
-    sec_reqlevel=0,
 
     # Send session track control
     session_track_control=1,
@@ -806,6 +807,7 @@ ldap_def = {
       'posixAccount':os.path.join(web2ldapcnf.templates_dir,'read_posixAccount.html'),
       'posixGroup':os.path.join(web2ldapcnf.templates_dir,'read_posixGroup.html'),
       'eduPerson':os.path.join(web2ldapcnf.templates_dir,'read_eduPerson.html'),
+      'mailboxRelatedObject':os.path.join(web2ldapcnf.templates_dir,'read_mailboxRelatedObject.html'),
       'namedObject':os.path.join(web2ldapcnf.templates_dir,'read_namedObject.html'),
       'namedPolicy':os.path.join(web2ldapcnf.templates_dir,'read_namedPolicy.html'),
       'pwdPolicy':os.path.join(web2ldapcnf.templates_dir,'read_pwdPolicy.html'),
@@ -830,24 +832,19 @@ ldap_def = {
     # Maximum count of attribute values displayed when displaying a single entry
     # without attribute values being expanded
     read_tablemaxcount={
+      'allowedAttributes':2,
+      'allowedAttributesEffective':2,
+      'allowedChildClasses':2,
+      'allowedChildClassesEffective':2,
       'member':40,
-      'memberUID':40,
-      'roleOccupant':40,
       'memberOf':30,
-      'allowedAttributes':2,
-      'allowedAttributesEffective':2,
-      'allowedChildClasses':2,
-      'allowedChildClassesEffective':2,
-      'allowedChildClassesEffective':2,
-      'allowedAttributes':2,
-      'allowedAttributesEffective':2,
-      'allowedChildClasses':2,
-      'allowedChildClassesEffective':2,
-      'allowedChildClassesEffective':2,
+      'memberUID':40,
+      'pwdHistory':2,
+      'roleOccupant':40,
       'tokenGroups':4,
       'tokenGroupsGlobalAndUniversal':4,
       'tokenGroupsNoGCAcceptable':4,
-      'pwdHistory':2,
+      'uniqueMember':40,
     },
 
     # HTML template file used for displaying input forms for entries
@@ -864,6 +861,7 @@ ldap_def = {
       'msOrganization':os.path.join(web2ldapcnf.templates_dir,'inputform_msOrganization.html'),
       'groupOfNames':os.path.join(web2ldapcnf.templates_dir,'inputform_groupOfNames.html'),
       'eduPerson':os.path.join(web2ldapcnf.templates_dir,'inputform_eduPerson.html'),
+      'mailboxRelatedObject':os.path.join(web2ldapcnf.templates_dir,'inputform_mailboxRelatedObject.html'),
       'namedObject':os.path.join(web2ldapcnf.templates_dir,'inputform_namedObject.html'),
       'namedPolicy':os.path.join(web2ldapcnf.templates_dir,'inputform_namedPolicy.html'),
       'pwdPolicy':os.path.join(web2ldapcnf.templates_dir,'inputform_pwdPolicy.html'),
@@ -935,7 +933,7 @@ ldap_def = {
     },
 
     # LDIF file used as locally stored pseudo LDAPv3 schema
-    schema_uri='file:'+os.path.join(web2ldapcnf.etc_dir,'web2ldap','localschema.ldif'),
+    schema_uri='file:'+os.path.join(web2ldapcnf.etc_dir,'localschema.ldif'),
 
     # Whether to apply strict subschema consistency check (e.g. uniqueness)
     schema_strictcheck=True,
