@@ -546,6 +546,8 @@ openldap_syncrepl_providers: "{{ aedir_hosts['provider'] }}"
 aedir_pwsync_targeturl: ""
 
 # regex pattern for limiting the entries for which password changes are exported
+# Example: Restrict syncing passwords to aeUser and aeService entries within zones "base" and "test"
+# aedir_pwsync_dn_regex: "^uid=({{ aedir_aeuser_uid_regex }}|{{ aedir_aeservice_uid_regex }}),cn=(base|test),{{ aedir_suffix }}$"
 aedir_pwsync_dn_regex: ""
 
 # password of authenticating to sync target (should be ansible vault or similar)
