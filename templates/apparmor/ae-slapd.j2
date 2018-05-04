@@ -17,7 +17,7 @@
   # access to config
   {{ openldap_slapd_conf }} r,
   {{ openldap_slapd_conf|dirname }}/rootDSE.ldif r,
-  {{ openldap_schema_prefix }}//*.schema r,
+  {{ openldap_schema_prefix }}/*.schema r,
   {{ aedir_schema_prefix }}/*.schema r,
 
   # allow r/w access to PID and args files
@@ -27,8 +27,7 @@
   {{ openldap_ldapi_socket }} rw,
 
   # allow r/w access to database files
-  {{ openldap_data }}/um/* rwk,
-  {{ openldap_data }}/accesslog/* rwk,
+  {{ openldap_data }}/{um,accesslog}/* rwk,
 {% if openldap_role=="provider" %}
   {{ openldap_data }}/session/* rwk,
 {% endif %}
