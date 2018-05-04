@@ -17,9 +17,12 @@ Type=simple
 Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
 {% endif %}
 PIDFile={{ openldap_rundir }}/slapd.pid
-ExecStart={{ openldap_slapd_exec }} -n ae-slapd -l {{ openldap_syslog_facility }} -s {{ openldap_syslog_level }} -f {{ openldap_slapd_conf }} -h '{{ openldap_listen_urls }}' -u {{ openldap_slapd_user }} -g {{ openldap_slapd_group }} -o slp=off
+ExecStart={{ openldap_slapd_exec }} -n ae-slapd -l {{ openldap_syslog_facility }} -s {{ openldap_syslog_level }} -f {{ openldap_slapd_conf }} -h '{{ openldap_listen_urls }}' -o slp=off -u {{ openldap_slapd_user }} -g {{ openldap_slapd_group }}
 User=root
 Group=root
+{% if apparmor_enabled %}
+AppArmorProfile={{ openldap_slapd_exec }}
+{% endif %}
 
 [Install]
 WantedBy=multi-user.target

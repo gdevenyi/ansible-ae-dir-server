@@ -767,3 +767,13 @@ apache_key_filename: "{{ openldap_key_filename }}"
 apache_cacert_pathname: "{{ openldap_cacert_pathname }}"
 apache_cert_pathname: "{{ openldap_cert_pathname }}"
 apache_key_pathname: "{{ openldap_key_pathname }}"
+
+#---------------------------------------------------------------------------
+# AppArmor parameters
+#---------------------------------------------------------------------------
+
+# set to True to enable mandatory access control with AppArmor
+apparmor_enabled: False
+
+# where custom AppArmor profiles are stored
+apparmor_profiles_dir: "/etc/apparmor.d"

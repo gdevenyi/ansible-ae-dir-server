@@ -1,0 +1,56 @@
+# AppArmor profile for ae-slapd
+# {{ ansible_managed }}
+
+#include <tunables/global>
+
+{{ openldap_slapd_exec }} {
+
+  #include <abstractions/base>
+  #include <abstractions/nameservice>
+
+  capability setuid,
+  capability setgid,
+
+  # access to dynamically loadable modules
+  {{ os_openldap_paths[lsb_id].openldap_modules }}/* rm,
+
+  # access to config
+  {{ openldap_slapd_conf }} r,
+  {{ openldap_slapd_conf|dirname }}/rootDSE.ldif r,
+  {{ openldap_schema_prefix }}//*.schema r,
+  {{ aedir_schema_prefix }}/*.schema r,
+
+  # allow r/w access to PID and args files
+  {{ openldap_rundir }}/slapd.pid rw,
+  {{ openldap_rundir }}/slapd.args rw,
+  # allow r/w access to Unix domain socket used for LDAPI
+  {{ openldap_ldapi_socket }} rw,
+
+  # allow r/w access to database files
+  {{ openldap_data }}/um/* rwk,
+  {{ openldap_data }}/accesslog/* rwk,
+{% if openldap_role=="provider" %}
+  {{ openldap_data }}/session/* rwk,
+{% endif %}
+
+  # access to TLS-related files
+  {{ openldap_cacert_pathname }} r,
+{% if openldap_cert_pathname %}
+  {{ openldap_cert_pathname }} r,
+{% endif %}
+{% if openldap_key_pathname %}
+  {{ openldap_key_pathname }} r,
+{% endif %}
+  {{ openldap_dhparam_pathname }} r,
+
+{% if oath_ldap_enabled==True %}
+  # allow r/w access to external bind listener (for OATH-LDAP)
+  {{ oath_ldap_socket_path }} rw,
+{% endif %}
+
+{% if openldap_role=="provider" and aedir_pwsync_targeturl %}
+  # allow r/w access to external pwsync listener
+  {{ aedir_pwsync_socket_path }} rw,
+{% endif %}
+
+}

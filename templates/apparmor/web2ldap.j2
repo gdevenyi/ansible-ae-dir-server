@@ -1,0 +1,19 @@
+# AppArmor profile for web2ldap installed in virtual env {{ aedir_prefix }}
+# {{ ansible_managed }}
+
+#include <tunables/global>
+
+profile web2ldap {
+
+  #include <abstractions/base>
+  #include <abstractions/nameservice>
+  #include <abstractions/python>
+
+  {{ aedir_python.split(' ', 1)[0] }} ix,
+  {{ aedir_python_sitepackages }}/** r,
+  {{ aedir_prefix }}/etc/web2ldap/** r,
+
+  # allow r/w access to Unix domain socket of local slapd
+  {{ openldap_ldapi_socket }} rw,
+
+}

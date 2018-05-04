@@ -4,6 +4,14 @@
 - name: reload systemd
   command: systemctl daemon-reload
 
+- name: reload apparmor
+  command: systemctl reload apparmor
+  when: apparmor_enabled == True
+
+- name: restart apparmor
+  command: systemctl restart apparmor
+  when: apparmor_enabled == True
+
 - name: restart slapd
   service: name=ae-slapd state=restarted
 

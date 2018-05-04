@@ -139,3 +139,15 @@
     - reload systemd
     - "restart web2ldap"
   when: ansible_service_mgr=="systemd"
+
+#- name: "Create AppArmor profile for web2ldap"
+#  template:
+#    src: "apparmor/web2ldap.j2"
+#    dest: "{{ apparmor_profiles_dir }}/web2ldap"
+#    owner: root
+#    group: root
+#    mode: 0644
+#  notify:
+#    - "reload apparmor"
+#    - "restart web2ldap"
+#  when: apparmor_enabled == True

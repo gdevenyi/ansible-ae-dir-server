@@ -1,0 +1,22 @@
+---
+# install and activate AppArmor on openSUSE and SLE
+
+- name: "Install AppArmor packages on {{ lsb_id }}"
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
+    install_recommends: no
+    dpkg_options: 'force-confold,force-confdef'
+  with_items:
+    - apparmor
+    - apparmor-profiles
+  notify:
+    - restart aedirpwd
+    - restart hotp_validator
+    - restart oathenroll
+    - restart bind_proxy
+    - restart web2ldap
+    - restart slapd
+    - "restart web server"

@@ -63,3 +63,10 @@
     state: started
     enabled: yes
   when: openldap_role=="provider" and aedir_pwsync_targeturl
+
+- name: "ensure AppArmor service is running"
+  service:
+    name: "apparmor"
+    state: started
+    enabled: yes
+  when: apparmor_enabled == True

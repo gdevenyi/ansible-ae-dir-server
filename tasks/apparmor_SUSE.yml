@@ -1,0 +1,22 @@
+---
+# install and activate AppArmor on openSUSE and SLE
+
+- name: "Install AppArmor packages on {{ lsb_id }}"
+  zypper:
+    name: "{{ item }}"
+    state: present
+    disable_recommends: yes
+    type: package
+  with_items:
+    - apparmor-abstractions
+    - apparmor-profiles
+  notify:
+    - restart apparmor
+    - reload apparmor
+    - restart aedirpwd
+    - restart hotp_validator
+    - restart oathenroll
+    - restart bind_proxy
+    - restart web2ldap
+    - restart slapd
+    - "restart web server"

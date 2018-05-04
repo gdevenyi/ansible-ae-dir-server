@@ -14,6 +14,12 @@
 - name: "OS base configuration"
   include_tasks: "baseos_{{ lsb_id }}.yml"
 
+- name: "Install AppArmor packages"
+  include_tasks: "apparmor_{{ lsb_id }}.yml"
+  when: apparmor_enabled == True
+  tags:
+    - apparmor
+
 - name: "Install OpenLDAP packages"
   include_tasks: "install_openldap_{{ lsb_id }}.yml"
 
