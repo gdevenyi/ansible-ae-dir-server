@@ -82,3 +82,15 @@
     - reload systemd
     - "restart web server"
   when: ansible_service_mgr=="systemd"
+
+- name: "Create AppArmor profile for {{ apache2_config[lsb_id].httpd_exec }}"
+  template:
+    src: "apparmor/ae-apache.j2"
+    dest: "{{ apparmor_profiles_dir }}/{{ apache2_config[lsb_id].httpd_exec[1:]|replace('/', '.') }}"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - "reload apparmor"
+    - "restart web server"
+  when: apparmor_enabled == True

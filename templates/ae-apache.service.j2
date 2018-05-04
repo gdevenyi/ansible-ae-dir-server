@@ -19,11 +19,14 @@ Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
 {% endif %}
 Environment=APACHE_PID_FILE={{ apache_pid_file }}
 PIDFile={{ apache_pid_file }}
-ExecStart={{ apache2_config[lsb_id].apache_ctl }} -DSYSTEMD -DFOREGROUND -f {{ apache_conf }} -k start       
-ExecReload={{ apache2_config[lsb_id].apache_ctl }} -DSYSTEMD -DFOREGROUND -f {{ apache_conf }} -k graceful
-ExecStop={{ apache2_config[lsb_id].apache_ctl }} -DSYSTEMD -DFOREGROUND -f {{ apache_conf }} -k graceful-stop
+ExecStart={{ apache2_config[lsb_id].httpd_exec }} -DSYSTEMD -DFOREGROUND -f {{ apache_conf }} -k start       
+ExecReload={{ apache2_config[lsb_id].httpd_exec }} -DSYSTEMD -DFOREGROUND -f {{ apache_conf }} -k graceful
+ExecStop={{ apache2_config[lsb_id].httpd_exec }} -DSYSTEMD -DFOREGROUND -f {{ apache_conf }} -k graceful-stop
 KillMode=mixed
 NotifyAccess=all
+{% if apparmor_enabled %}
+AppArmorProfile={{ apache2_config[lsb_id].httpd_exec }}
+{% endif %}
 
 [Install]
 WantedBy=multi-user.target

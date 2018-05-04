@@ -1,0 +1,47 @@
+# AppArmor profile for ae-apache
+# {{ ansible_managed }}
+
+#include <tunables/global>
+
+{{ apache2_config[lsb_id].httpd_exec }} {
+
+  #include <abstractions/base>
+  #include <abstractions/nameservice>
+
+  capability setuid,
+  capability setgid,
+
+  # access to dynamically loadable modules
+  {{ apache2_config[lsb_id].mod_dir }}/mod_*.so rm,
+
+  # access to config files
+  {{ apache_conf }} r,
+  /etc/mime.types r,
+
+{% if apache_pid_file!="" %}
+  # the PID file
+  {{ apache_pid_file }} rw,
+{% endif %}
+
+  # allow r/w access to SSL session cache
+  {{ apache2_config[lsb_id].run_dir }}/ssl_scache rw,
+
+  # allow r/w access to access log file
+  {{ apache_access_log }} rw,
+
+  # access to TLS-related files
+  {{ apache_cacert_pathname }} r,
+  {{ apache_cert_pathname }} r,
+  {{ apache_key_pathname }} r,
+
+  # access to static htdocs/ files
+  {{ web_document_root }}/** r,
+
+{% if not aedir_uwsgi_usetcp %}
+  # access to UWSGI's Unix domain sockets
+  {{ aedir_rundir }}/uwsgi/web2ldap/web2ldap.sock r,
+  {{ aedir_rundir }}/uwsgi/aedirpwd/aedirpwd.sock r,
+  {{ aedir_rundir }}/uwsgi/oathenroll/oathenroll.sock r,
+{% endif %}
+
+}
