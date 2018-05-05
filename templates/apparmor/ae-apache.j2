@@ -37,6 +37,9 @@
   # access to static htdocs/ files
   {{ web_document_root }}/** r,
 
+  # access to web2ldap's static CSS files
+  {{ aedir_prefix }}/etc/web2ldap/css/*.css r,
+
 {% if not aedir_uwsgi_usetcp %}
   # access to UWSGI's Unix domain sockets
   {{ aedir_rundir }}/uwsgi/web2ldap/web2ldap.sock r,
