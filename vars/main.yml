@@ -55,7 +55,7 @@ os_openldap_paths:
     openldap_data: /usr/local/openldap/var/openldap-data
     openldap_rundir: /usr/local/openldap/var/run
     openldap_slapd_exec: /usr/local/openldap/libexec/slapd
-    openldap_modules: /usr/local/openldap/
+    openldap_modules: /usr/local/openldap/libexec/openldap
   SUSE:
     # openSUSE packages
     openldap_prefix: /usr

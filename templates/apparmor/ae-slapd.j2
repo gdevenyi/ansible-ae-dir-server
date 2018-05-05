@@ -52,4 +52,10 @@
   {{ aedir_pwsync_socket_path }} rw,
 {% endif %}
 
+{% if lsb_id=="Debian" %}
+  # specifics for LTB packages on Debian
+  /usr/local/berkeleydb/lib/libdb* rm,
+  /usr/local/openldap/lib64/* rm,
+{% endif %}
+
 }
