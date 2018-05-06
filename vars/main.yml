@@ -6,12 +6,6 @@ lsb_id_map:
   openSUSE: "SUSE"
   RedHatEnterpriseServer: "CentOS"
 
-# which Python interpreter to use
-aedir_platform_python:
-  CentOS: "{{ aedir_bin }}/python2"
-  Debian: "{{ aedir_bin }}/python2"
-  SUSE: "/usr/bin/python2"
-
 # which repo to use for LTB OpenLDAP builds (Debian and RHEL/CentOS)
 ltb_openldap_repo:
   CentOS: "https://ltb-project.org/rpm/$releasever/$basearch"
