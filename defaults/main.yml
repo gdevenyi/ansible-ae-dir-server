@@ -87,7 +87,7 @@ aedir_python_sitepackages: "{{ aedir_prefix }}/lib/python2.7/site-packages"
 aedir_systemd_dir: "/etc/systemd/system"
 
 # which Python interpreter to use
-aedir_python: "{{ aedir_bin }}/python2.7 -ROO"
+aedir_python: "{{ aedir_bin }}/python2.7 -ROOB"
 
 # regex patterns for enforcing naming conventions (substring match!)
 # Important notes:
