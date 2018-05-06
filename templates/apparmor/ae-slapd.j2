@@ -52,10 +52,16 @@
   {{ aedir_pwsync_socket_path }} rw,
 {% endif %}
 
+  # access to OpenLDAP's client libs
+  {{ os_openldap_paths[lsb_id].openldap_libdir }}/lib{lber,ldap}* rm,
+  # access to OpenLDAP's client config
+  {{ os_openldap_paths[lsb_id].openldap_conf_prefix }}/ldap.conf rm,
+
 {% if lsb_id=="Debian" %}
   # specifics for LTB packages on Debian
+  /etc/hosts.{allow,deny} r,
+  /etc/gss/mech.d/ r,
   /usr/local/berkeleydb/lib/libdb* rm,
-  /usr/local/openldap/lib64/* rm,
 {% endif %}
 
 }

@@ -47,7 +47,8 @@ os_openldap_paths:
     openldap_data: /usr/local/openldap/var/openldap-data
     openldap_rundir: /usr/local/openldap/var/run
     openldap_slapd_exec: /usr/local/openldap/libexec/slapd
-    openldap_modules: /usr/local/openldap/
+    openldap_libdir: /usr/local/openldap/lib64
+    openldap_modules: /usr/local/openldap/libexec/openldap
   Debian:
     # LTB-based installation
     openldap_prefix: /usr/local/openldap
@@ -55,6 +56,7 @@ os_openldap_paths:
     openldap_data: /usr/local/openldap/var/openldap-data
     openldap_rundir: /usr/local/openldap/var/run
     openldap_slapd_exec: /usr/local/openldap/libexec/slapd
+    openldap_libdir: /usr/local/openldap/lib64
     openldap_modules: /usr/local/openldap/libexec/openldap
   SUSE:
     # openSUSE packages
@@ -63,6 +65,7 @@ os_openldap_paths:
     openldap_data: /var/lib/ldap
     openldap_rundir: /var/run/slapd
     openldap_slapd_exec: /usr/lib64/slapd
+    openldap_libdir: /usr/lib64
     openldap_modules: /usr/lib64/openldap
 
 cron_config:
