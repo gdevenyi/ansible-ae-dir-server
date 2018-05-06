@@ -13,6 +13,8 @@
     - apparmor
     - apparmor-profiles
   notify:
+    - restart apparmor
+    - reload apparmor
     - restart aedirpwd
     - restart hotp_validator
     - restart oathenroll
