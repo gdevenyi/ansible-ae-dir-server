@@ -3,10 +3,12 @@
 
 #include <tunables/global>
 
-{{ openldap_slapd_exec }} {
+profile ae-slapd {
 
   #include <abstractions/base>
   #include <abstractions/nameservice>
+
+  #include <ae-dir/abstractions/ldapclient>
 
   capability setuid,
   capability setgid,
@@ -23,8 +25,6 @@
   # allow r/w access to PID and args files
   {{ openldap_rundir }}/slapd.pid rw,
   {{ openldap_rundir }}/slapd.args rw,
-  # allow r/w access to Unix domain socket used for LDAPI
-  {{ openldap_ldapi_socket }} rw,
 
   # allow r/w access to database files
   {{ openldap_data }}/{um,accesslog}/* rwk,
@@ -58,9 +58,7 @@
   {{ os_openldap_paths[lsb_id].openldap_conf_prefix }}/ldap.conf rm,
 
 {% if lsb_id=="Debian" %}
-  # specifics for LTB packages on Debian
   /etc/hosts.{allow,deny} r,
-  /etc/gss/mech.d/ r,
   /usr/local/berkeleydb/lib/libdb* rm,
 {% endif %}
 

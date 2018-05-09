@@ -86,11 +86,11 @@
 - name: "Create AppArmor profile for {{ apache2_config[lsb_id].httpd_exec }}"
   template:
     src: "apparmor/ae-apache.j2"
-    dest: "{{ apparmor_profiles_dir }}/{{ apache2_config[lsb_id].httpd_exec[1:]|replace('/', '.') }}"
+    dest: "{{ apparmor_profiles_dir }}/ae-apache"
     owner: root
     group: root
     mode: 0644
   notify:
-    - "reload apparmor"
+    - "restart apparmor"
     - "restart web server"
   when: apparmor_enabled == True

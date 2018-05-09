@@ -25,7 +25,7 @@ ExecStop={{ apache2_config[lsb_id].httpd_exec }} -DSYSTEMD -DFOREGROUND -f {{ ap
 KillMode=mixed
 NotifyAccess=all
 {% if apparmor_enabled %}
-AppArmorProfile={{ apache2_config[lsb_id].httpd_exec }}
+AppArmorProfile=ae-apache
 {% endif %}
 
 [Install]

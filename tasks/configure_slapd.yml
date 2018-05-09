@@ -173,11 +173,11 @@
 - name: "Create AppArmor profile for slapd {{ openldap_slapd_exec }}"
   template:
     src: "apparmor/ae-slapd.j2"
-    dest: "{{ apparmor_profiles_dir }}/{{ openldap_slapd_exec[1:]|replace('/', '.') }}"
+    dest: "{{ apparmor_profiles_dir }}/ae-slapd"
     owner: root
     group: root
     mode: 0644
   notify:
-    - "reload apparmor"
+    - "restart apparmor"
     - "restart slapd"
   when: apparmor_enabled == True

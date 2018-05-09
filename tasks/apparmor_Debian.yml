@@ -10,11 +10,11 @@
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
   with_items:
+    - libapparmor1
+    - libapparmor-perl
     - apparmor
-    - apparmor-profiles
   notify:
     - restart apparmor
-    - reload apparmor
     - restart aedirpwd
     - restart hotp_validator
     - restart oathenroll

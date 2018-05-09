@@ -8,11 +8,10 @@
     disable_recommends: yes
     type: package
   with_items:
+    - apparmor-parser
     - apparmor-abstractions
-    - apparmor-profiles
   notify:
     - restart apparmor
-    - reload apparmor
     - restart aedirpwd
     - restart hotp_validator
     - restart oathenroll

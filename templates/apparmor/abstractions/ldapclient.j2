@@ -1,0 +1,10 @@
+# AppArmor abstraction for all local AE-DIR LDAPI clients
+# {{ ansible_managed }}
+
+  # allow r/w access to Unix domain socket of local slapd
+  {{ openldap_ldapi_socket }} rw,
+
+{% if lsb_id=="Debian" %}
+  # specifics for Debian
+  /etc/gss/mech.d/ r,
+{% endif %}

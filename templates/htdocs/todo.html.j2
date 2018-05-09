@@ -13,6 +13,7 @@
 
 <ol>
   <li><a href="#mfa">Multi-factor authc</a></li>
+  <li><a href="#apparmor">AppArmor</a></li>
 </ol>
 
 <h2 id="mfa">Multi-factor authc</h2>
@@ -25,6 +26,14 @@
   </li>
 </ul>
 
+<h2 id="apparmor">AppArmor</h2>
+<p>
+  If you set ansible variable <var>apparmor_enabled: True</var> then
+  <a href="http://wiki.apparmor.net">AppArmor</a> profiles and abstractions 
+  are installed to confine all components to enforce mode.<br>
+  Only supported on <em>Debian Stretch</em> and <em>openSUSE/SLE</em>.
+</p>
+
 <h1 id="open">Open</h1>
 
 <ol>
@@ -33,7 +42,6 @@
   <li><a href="#ansible">ansible</a></li>
   <li><a href="#logging">Logging</a></li>
   <li><a href="#monitoring">Monitoring</a></li>
-  <li><a href="#apparmor">AppArmor</a></li>
   <li><a href="#pxe">PXE/DHCP/TFTP integration</a></li>
   <li><a href="#nac">Network Access Control (NAC)</a></li>
   <li><a href="#radius">RADIUS</a></li>
@@ -183,12 +191,6 @@
     monitor whether PAM/NSS client still has valid configuration
   </li>
 </ul>
-
-<h2 id="apparmor">AppArmor</h2>
-<p>
-  Automatically install correct profiles to run
-  <a href="http://wiki.apparmor.net">AppArmor</a> in mandatory mode.
-</p>
 
 <h2 id="pxe">PXE/DHCP/TFTP integration</h2>
 <ul>

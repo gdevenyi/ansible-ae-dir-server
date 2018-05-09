@@ -19,7 +19,7 @@ Type=simple
 Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
 {% endif %}
 Environment=PYTHONPATH={{ aedir_etc }}/aedirpwd
-ExecStart={{ uwsgi_exec[lsb_id] }} --ini {{ aedir_etc }}/uwsgi/aedirpwd.ini
+ExecStart={{ uwsgi_paths[lsb_id].exec }} --ini {{ aedir_etc }}/uwsgi/aedirpwd.ini
 User={{ aedirpwd_web_user }}
 Group={{ aedirpwd_web_group }}
 Restart=always

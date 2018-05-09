@@ -1,0 +1,19 @@
+# AppArmor profile for web2ldap installed in virtual env {{ aedir_prefix }}
+# {{ ansible_managed }}
+
+#include <tunables/global>
+
+profile {{ name }} {
+
+  #include <ae-dir/abstractions/uwsgi-python>
+
+  # access to {{ name }} application config
+  {{ aedir_etc }}/{{ name }}/** r,
+
+  # access to uwsgi config
+  {{ aedir_etc }}/uwsgi/{{ name }}.ini r,
+
+  # allow r/w access to own Unix domain socket
+  {{ aedir_rundir }}/uwsgi/{{ name }}/{{ name }}.sock rw,
+
+}

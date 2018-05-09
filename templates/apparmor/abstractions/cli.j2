@@ -1,0 +1,9 @@
+# AppArmor abstraction for CLI tools
+# {{ ansible_managed }}
+
+  #include <abstractions/base>
+  #include <abstractions/nameservice>
+
+  #include <ae-dir/abstractions/ldapclient>
+
+  {{ aedir_etc }}/ldap.conf r,

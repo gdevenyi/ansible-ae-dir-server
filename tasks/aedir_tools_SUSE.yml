@@ -45,6 +45,7 @@
     - python-asn1crypto
     - python-xlwt
     - python-dnspython
+    - python-certifi
   when: openldap_role == 'provider'
   notify:
     - restart aedirpwd
@@ -52,7 +53,7 @@
     - restart hotp_validator
     - restart web2ldap
 
-- name: "Prepare virtualenv {{ aedir_prefix }} needed for PIP installation of web2ldap"
+- name: "Prepare Python 2.x virtualenv {{ aedir_prefix }}"
   pip:
     name:
       - pip
@@ -62,4 +63,3 @@
     virtualenv_site_packages: yes
     virtualenv_python: python2.7
     extra_args: "{{ aedir_pip_extra_args }}"
-  when: openldap_role == 'provider'

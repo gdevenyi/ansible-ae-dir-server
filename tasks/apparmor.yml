@@ -1,0 +1,39 @@
+---
+
+- name: "Install AppArmor packages"
+  include_tasks: "apparmor_{{ lsb_id }}.yml"
+  when: apparmor_enabled == True
+  tags:
+    - apparmor
+
+- name: "Create AppArmor directories"
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - "{{ apparmor_profiles_dir }}/ae-dir"
+    - "{{ apparmor_profiles_dir }}/ae-dir/abstractions"
+  notify:
+    - restart apparmor
+
+- name: "Create AppArmor abstractions files in {{ apparmor_profiles_dir }}/ae-dir/abstractions/"
+  template:
+    src: "apparmor/abstractions/{{ item }}.j2"
+    dest: "{{ apparmor_profiles_dir }}/ae-dir/abstractions/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - ldapclient
+    - python
+    - cli
+    - uwsgi-python
+  notify:
+    - restart apparmor
+    - restart aedirpwd
+    - restart oathenroll
+    - "restart {{ oath_bind_listener }}"
+    - restart web2ldap

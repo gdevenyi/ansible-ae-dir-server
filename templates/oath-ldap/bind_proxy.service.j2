@@ -15,9 +15,13 @@ After=network.target
 Type=simple
 {% if aedir_malloc_ld_preload %}
 Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
-Environment=LDAPTLS_CACERT={{ openldap_cacert_pathname }}
 {% endif %}
-ExecStart={{ aedir_python }} {{ aedir_sbin }}/{{ oath_bind_listener }}.py "{{ oath_ldap_socket_path }}" "{{ openldap_ldapi_uri|replace('%','%%') }}????x-saslmech=EXTERNAL" {% for host in openldap_syncrepl_providers %} ldaps://{{ hostvars[host].get('openldap_service_fqdn',host) }}{% endfor%}
+Environment=LDAPTLS_CACERT={{ openldap_cacert_pathname }}
+ExecStart={{ aedir_python }} {{ aedir_sbin }}/{{ oath_bind_listener }}.py "{{ oath_ldap_socket_path }}" "{{ openldap_ldapi_uri|replace('%','%%') }}????x-saslmech=EXTERNAL" {% for host in openldap_syncrepl_providers %} ldaps://{{ hostvars[host].get('openldap_service_fqdn',host) }}{% endfor %}
+
+{% if apparmor_enabled %}
+AppArmorProfile={{ oath_bind_listener }}
+{% endif %}
 
 User={{ oath_listener_user }}
 Group={{ oath_listener_user }}

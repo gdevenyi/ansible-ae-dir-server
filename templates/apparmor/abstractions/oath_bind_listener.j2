@@ -1,0 +1,9 @@
+# AppArmor abstraction for external OATH-LDAP bind listener
+# {{ ansible_managed }}
+
+  #include <ae-dir/abstractions/python>
+
+  {{ aedir_sbin }}/{{ oath_bind_listener }}.py r,
+
+  # allow r/w access to own Unix domain socket
+  {{ oath_ldap_socket_path }} rw,

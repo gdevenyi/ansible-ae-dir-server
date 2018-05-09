@@ -1,0 +1,9 @@
+# AppArmor abstraction for all Python web apps started via uwsgi
+# {{ ansible_managed }}
+
+  #include <ae-dir/abstractions/python>
+
+  # for loading the Python 2.7 plugin
+  {{ uwsgi_paths[lsb_id].python_plugin }} rm,
+
+  /proc/sys/net/core/somaxconn r,

@@ -83,7 +83,7 @@ apache2_config:
     user: "apache"
     group: "apache"
     pid_file: ""
-    httpd_exec: ""
+    httpd_exec: "/usr/sbin/httpd"
     conf_pathname: "/etc/httpd/conf/httpd.conf"
     mod_dir: "/usr/lib64/httpd/modules"
     log_dir: "/var/log/httpd"
@@ -160,7 +160,13 @@ apache2_config:
       - proxy_uwsgi
 
 # which uwsgi executable to use
-uwsgi_exec:
-  CentOS: "/usr/sbin/uwsgi"
-  Debian: "/usr/bin/uwsgi"
-  SUSE: "/usr/sbin/uwsgi"
+uwsgi_paths:
+  CentOS:
+    exec: "/usr/sbin/uwsgi"
+    python_plugin: "/usr/lib64/uwsgi/python_plugin.so"
+  Debian:
+    exec: "/usr/bin/uwsgi-core"
+    python_plugin: "/usr/lib/uwsgi/plugins/python27_plugin.so"
+  SUSE:
+    exec: "/usr/sbin/uwsgi"
+    python_plugin: "/usr/lib64/uwsgi/python_plugin.so"

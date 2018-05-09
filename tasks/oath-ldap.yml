@@ -99,3 +99,30 @@
     virtualenv_python: python2.7
     extra_args: "{{ aedir_pip_extra_args }}"
   when: openldap_role == 'provider' and lsb_id != 'SUSE'
+
+- name: "Create AppArmor abstractions"
+  template:
+    src: "apparmor/abstractions/{{ item }}.j2"
+    dest: "{{ apparmor_profiles_dir }}/ae-dir/abstractions/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - "oath_bind_listener"
+  when: apparmor_enabled == True
+  notify:
+    - "restart apparmor"
+    - "restart {{ oath_bind_listener }}"
+
+- name: "Create AppArmor profile for {{ oath_bind_listener }}"
+  template:
+    src: "apparmor/{{ oath_bind_listener }}.j2"
+    dest: "{{ apparmor_profiles_dir }}/{{ oath_bind_listener }}"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - "restart apparmor"
+    - "restart web server"
+    - "restart {{ oath_bind_listener }}"
+  when: apparmor_enabled == True

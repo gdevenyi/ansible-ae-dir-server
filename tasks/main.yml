@@ -15,7 +15,7 @@
   include_tasks: "baseos_{{ lsb_id }}.yml"
 
 - name: "Install AppArmor packages"
-  include_tasks: "apparmor_{{ lsb_id }}.yml"
+  include_tasks: "apparmor.yml"
   when: apparmor_enabled == True
   tags:
     - apparmor
