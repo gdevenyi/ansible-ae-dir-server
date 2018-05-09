@@ -3,7 +3,11 @@
 
   #include <ae-dir/abstractions/python>
 
+  # the demon script
   {{ aedir_sbin }}/{{ oath_bind_listener }}.py r,
+
+  # access to TLS-related files
+  {{ openldap_cacert_pathname }} r,
 
   # allow r/w access to own Unix domain socket
   {{ oath_ldap_socket_path }} rw,
