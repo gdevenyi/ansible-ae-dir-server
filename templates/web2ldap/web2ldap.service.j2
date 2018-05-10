@@ -16,6 +16,8 @@ Type=simple
 {% if aedir_malloc_ld_preload %}
 Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
 {% endif %}
+Environment=PYTHONOPTIMIZE=2
+Environment=PYTHONDONTWRITEBYTECODE=1
 ExecStart={{ uwsgi_paths[lsb_id].exec }} --ini {{ aedir_etc }}/uwsgi/web2ldap.ini
 User={{ web2ldap_user }}
 Group={{ web2ldap_group }}
