@@ -9,4 +9,4 @@
   # for loading the Python 2.7 plugin
   {{ uwsgi_paths[lsb_id].python_plugin }} rm,
 
-  /proc/sys/net/core/somaxconn r,
+  @{PROC}/sys/net/core/somaxconn r,
