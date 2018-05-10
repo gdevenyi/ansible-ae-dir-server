@@ -10,6 +10,7 @@
   # Python and its modules
   {{ aedir_python.split(' ', 1)[0] }} ix,
   {{ aedir_python_sitepackages }}/ r,
+  {{ aedir_python_sitepackages }}/** r,
   {{ aedir_prefix }}/lib/python2.7/orig-prefix.txt r,
   {{ aedir_prefix }}/lib/python2.7/**.py{,c,o} r,
   {{ aedir_prefix }}/lib/python2.7/**.so* rm,

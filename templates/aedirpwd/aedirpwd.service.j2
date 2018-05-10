@@ -27,6 +27,9 @@ KillSignal=SIGQUIT
 Type=notify
 StandardError=syslog
 NotifyAccess=all
+{% if apparmor_enabled %}
+AppArmorProfile=aedirpwd
+{% endif %}
 
 [Install]
 WantedBy=multi-user.target

@@ -90,3 +90,17 @@
     - reload systemd
     - "restart oathenroll"
   when: aedir_service_manager=="systemd"
+
+- name: "Create AppArmor profile for oathenroll"
+  template:
+    src: "apparmor/uwsgi-python.j2"
+    dest: "{{ apparmor_profiles_dir }}/oathenroll"
+    owner: root
+    group: root
+    mode: 0644
+  vars:
+    name: oathenroll
+  notify:
+    - "restart apparmor"
+    - "restart oathenroll"
+  when: apparmor_enabled == True

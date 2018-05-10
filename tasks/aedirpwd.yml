@@ -101,6 +101,20 @@
     - "restart aedirpwd"
   when: aedir_service_manager=="systemd"
 
+- name: "Create AppArmor profile for aedirpwd"
+  template:
+    src: "apparmor/uwsgi-python.j2"
+    dest: "{{ apparmor_profiles_dir }}/aedirpwd"
+    owner: root
+    group: root
+    mode: 0644
+  vars:
+    name: aedirpwd
+  notify:
+    - "restart apparmor"
+    - "restart aedirpwd"
+  when: apparmor_enabled == True
+
 - name: "set env var PYTHONPATH={{ aedir_etc }}/aedirpwd in /etc/cron.d/aedirpwd"
   cron:
     env: yes

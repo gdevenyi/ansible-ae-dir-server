@@ -3,6 +3,9 @@
 
   #include <ae-dir/abstractions/python>
 
+  # we need MIME types
+  /etc/mime.types r,
+
   # for loading the Python 2.7 plugin
   {{ uwsgi_paths[lsb_id].python_plugin }} rm,
 

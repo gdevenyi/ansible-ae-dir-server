@@ -10,6 +10,8 @@ profile ae-apache {
 
   capability setuid,
   capability setgid,
+  capability kill,
+  capability net_bind_service,
 
   # access to dynamically loadable modules
   {{ apache2_config[lsb_id].mod_dir }}/mod_*.so rm,
