@@ -73,8 +73,11 @@ Header always set X-XSS-Protection "1; mode=block"
 Header always set X-Content-Type-Options "nosniff"
 Header always set X-Frame-Options "deny"
 Header always set Frame-Options "DENY"
-Header always set Content-Security-Policy "default-src 'none'; img-src 'self' data:; style-src 'self'; connect-src 'none'; font-src 'self'; frame-src 'none'; child-src 'none'; script-src 'none';"
-Header always set Referrer-Policy "same-origin"
+# FIX ME!
+# These headers should only be set if a called web app does not set them
+# but mod_headers' "setifempty" does not work as documented.
+#Header always setifempty Content-Security-Policy "foo 'bar';"
+#Header always setifempty Referrer-Policy "same-origin"
 
 ProxyRequests Off
 ProxyPreserveHost On
