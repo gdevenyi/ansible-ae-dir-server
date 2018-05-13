@@ -67,17 +67,14 @@ SSLSessionCacheTimeout  7200
 SSLRandomSeed          startup file:/dev/urandom  512
 SSLRandomSeed          connect builtin
 
-# Default headers sent for any virtual host:
+# Default headers always sent
 Header always set Strict-Transport-Security "max-age=15768000 ; includeSubDomains"
 Header always set X-XSS-Protection "1; mode=block"
 Header always set X-Content-Type-Options "nosniff"
 Header always set X-Frame-Options "deny"
 Header always set Frame-Options "DENY"
-# FIX ME!
-# These headers should only be set if a called web app does not set them
-# but mod_headers' "setifempty" does not work as documented.
-#Header always setifempty Content-Security-Policy "foo 'bar';"
-#Header always setifempty Referrer-Policy "same-origin"
+Header always set Content-Security-Policy "child-src 'none'; connect-src 'none'; default-src 'none'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; frame-src 'none'; img-src 'self' data:; script-src 'none'; style-src 'self';"
+Header always set Referrer-Policy "same-origin"
 
 ProxyRequests Off
 ProxyPreserveHost On
