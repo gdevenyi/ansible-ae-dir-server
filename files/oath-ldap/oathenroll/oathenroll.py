@@ -144,9 +144,17 @@ class Default(object):
         """
         Add more HTTP headers to response
         """
-        csp_value = ';'.join((
-            "default-src 'self'",
-            "script-src 'none'",
+        csp_value = ' '.join((
+            "child-src 'none';",
+            "connect-src 'none';",
+            "default-src 'none';",
+            "font-src 'self';",
+            "form-action 'self';",
+            "frame-ancestors 'none';",
+            "frame-src 'none';",
+            "img-src 'self' data:;",
+            "script-src 'none';",
+            "style-src 'self';",
         ))
         for header, value in (
                 ('Cache-Control', 'no-store,no-cache,max-age=0,must-revalidate'),
@@ -158,7 +166,8 @@ class Default(object):
                 ('Content-Security-Policy', csp_value),
                 ('X-Webkit-CSP', csp_value),
                 ('X-Content-Security-Policy', csp_value),
-        ):
+                ('Referrer-Policy', 'same-origin'),
+            ):
             web.header(header, value)
         return # end of Default._add_headers()
 

@@ -252,17 +252,6 @@ class Default(object):
     """
     ldap_url = aedir.AEDirUrl(PWD_LDAP_URL)
     logger = APP_LOGGER
-    http_headers = (
-        ('Cache-Control', 'no-store,no-cache,max-age=0,must-revalidate'),
-        ('X-XSS-Protection', '1; mode=block'),
-        ('X-DNS-Prefetch-Control', 'off'),
-        ('X-Content-Type-Options', 'nosniff'),
-        ('X-Frame-Options', 'deny'),
-        ('Server', 'unknown'),
-        ('Content-Security-Policy', "default-src 'self';script-src 'none'"),
-        ('X-Webkit-CSP', "default-src 'self';script-src 'none'"),
-        ('X-Content-Security-Policy', "default-src 'self';script-src 'none'"),
-    )
 
     def __init__(self):
         self.remote_ip = web.ctx.env.get(
@@ -276,10 +265,39 @@ class Default(object):
             self.remote_ip,
             web.ctx.ip,
         )
-        # Set additional headers in response
-        for header, value in self.http_headers:
-            web.header(header, value)
+        self._add_headers()
         return # end of __init__()
+
+    def _add_headers(self):
+        """
+        Add more HTTP headers to response
+        """
+        csp_value = ' '.join((
+            "child-src 'none';",
+            "connect-src 'none';",
+            "default-src 'none';",
+            "font-src 'self';",
+            "form-action 'self';",
+            "frame-ancestors 'none';",
+            "frame-src 'none';",
+            "img-src 'self' data:;",
+            "script-src 'none';",
+            "style-src 'self';",
+        ))
+        for header, value in (
+                ('Cache-Control', 'no-store,no-cache,max-age=0,must-revalidate'),
+                ('X-XSS-Protection', '1; mode=block'),
+                ('X-DNS-Prefetch-Control', 'off'),
+                ('X-Content-Type-Options', 'nosniff'),
+                ('X-Frame-Options', 'deny'),
+                ('Server', 'unknown'),
+                ('Content-Security-Policy', csp_value),
+                ('X-Webkit-CSP', csp_value),
+                ('X-Content-Security-Policy', csp_value),
+                ('Referrer-Policy', 'same-origin'),
+            ):
+            web.header(header, value)
+        return # end of Default._add_headers()
 
     def GET(self):
         """
