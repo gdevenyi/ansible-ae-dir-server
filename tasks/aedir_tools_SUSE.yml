@@ -11,6 +11,7 @@
     - python-pyasn1-modules>=0.1.5
     - python-ldap0
     - python-aedir
+    - python-cryptography
     - python-jwcrypto
     - python-virtualenv
   notify:
@@ -44,6 +45,7 @@
     - python-pyweblib
     - python-asn1crypto
     - python-xlwt
+    - python-pycryptodome
     - python-dnspython
     - python-certifi
   when: openldap_role == 'provider'
