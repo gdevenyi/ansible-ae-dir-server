@@ -353,7 +353,8 @@ class BindProxyHandler(SlapdSockHandler):
                     info = None
                 self._log(
                     logging.ERROR,
-                    'LDAPError from upstream: %s => return %s %r',
+                    'LDAPError from %s: %s => return %s %r',
+                    remote_ldap_uri,
                     ldap_error,
                     ldap_error,
                     result_code,
