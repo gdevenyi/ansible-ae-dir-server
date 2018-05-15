@@ -48,6 +48,7 @@
     - python-pycryptodome
     - python-dnspython
     - python-certifi
+    - python-Pillow
   when: openldap_role == 'provider'
   notify:
     - restart aedirpwd
