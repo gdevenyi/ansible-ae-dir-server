@@ -6,6 +6,10 @@
   # we need MIME types
   /etc/mime.types r,
 
+  # write temporary files
+  /tmp/ rw,
+  owner /tmp/** rwkl,
+
   # for loading the Python 2.7 plugin
   {{ uwsgi_paths[lsb_id].python_plugin }} rm,
 
