@@ -29,14 +29,12 @@ KillSignal=SIGQUIT
 Type=notify
 StandardError=syslog
 NotifyAccess=all
+{% if aedir_systemd_hardening %}
 # various hardening options
-PrivateTmp=yes
-ProtectSystem=full
-ProtectHome=yes
-ProtectKernelModules=yes
-ProtectKernelTunables=yes
-ProtectControlGroups=yes
-NoNewPrivileges=yes
+{% for systemd_option in aedir_systemd_hardening %}
+{{ systemd_option }}
+{% endfor %}
+{% endif %}
 {% if apparmor_enabled %}
 AppArmorProfile=aedirpwd
 {% endif %}

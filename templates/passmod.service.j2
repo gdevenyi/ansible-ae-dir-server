@@ -20,14 +20,12 @@ Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
 ExecStart={{ aedir_python }} {{ aedir_sbin }}/passmod.py "{{ aedir_pwsync_socket_path }}" "{{ openldap_ldapi_uri|replace('%','%%') }}????x-saslmech=EXTERNAL" "{{ aedir_pwsync_targeturl }}" "{{ aedir_pwsync_targetpwfile }}"
 User={{ aedir_pwsync_listener_user }}
 Group={{ aedir_pwsync_listener_user }}
+{% if aedir_systemd_hardening %}
 # various hardening options
-PrivateTmp=yes
-ProtectSystem=full
-ProtectHome=yes
-ProtectKernelModules=yes
-ProtectKernelTunables=yes
-ProtectControlGroups=yes
-NoNewPrivileges=yes
+{% for systemd_option in aedir_systemd_hardening %}
+{{ systemd_option }}
+{% endfor %}
+{% endif %}
 
 [Install]
 WantedBy=multi-user.target

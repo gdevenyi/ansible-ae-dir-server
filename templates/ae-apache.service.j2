@@ -24,14 +24,12 @@ ExecReload={{ apache2_config[lsb_id].httpd_exec }} -DSYSTEMD -DFOREGROUND -f {{ 
 ExecStop={{ apache2_config[lsb_id].httpd_exec }} -DSYSTEMD -DFOREGROUND -f {{ apache_conf }} -k graceful-stop
 KillMode=mixed
 NotifyAccess=all
+{% if aedir_systemd_hardening %}
 # various hardening options
-PrivateTmp=yes
-ProtectSystem=full
-ProtectHome=yes
-ProtectKernelModules=yes
-ProtectKernelTunables=yes
-ProtectControlGroups=yes
-NoNewPrivileges=yes
+{% for systemd_option in aedir_systemd_hardening %}
+{{ systemd_option }}
+{% endfor %}
+{% endif %}
 {% if apparmor_enabled %}
 AppArmorProfile=ae-apache
 {% endif %}

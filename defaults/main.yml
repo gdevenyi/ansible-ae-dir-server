@@ -86,6 +86,18 @@ aedir_python_sitepackages: "{{ aedir_prefix }}/lib/python2.7/site-packages"
 # where to install systemd files
 aedir_systemd_dir: "/etc/systemd/system"
 
+# various systemd.exec options for hardening the service units
+aedir_systemd_hardening:
+  - "PrivateTmp=yes"
+  - "ProtectSystem=full"
+  - "ProtectHome=yes"
+  - "ProtectKernelModules=yes"
+  - "ProtectKernelTunables=yes"
+  - "ProtectControlGroups=yes"
+  - "NoNewPrivileges=yes"
+  - "MountFlags=private"
+  - "SystemCallArchitectures=native"
+
 # which Python interpreter to use
 aedir_python: "{{ aedir_bin }}/python2.7 -ROOB"
 
