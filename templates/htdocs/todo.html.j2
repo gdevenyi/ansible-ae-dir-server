@@ -26,12 +26,22 @@
   </li>
 </ul>
 
-<h2 id="apparmor">AppArmor</h2>
+<h2 id="hardening">Hardening</h2>
+
+<h3 id="apparmor">AppArmor</h3>
 <p>
   If you set ansible variable <var>apparmor_enabled: True</var> then
   <a href="http://wiki.apparmor.net">AppArmor</a> profiles and abstractions 
   are installed to confine all components to enforce mode.<br>
   Only supported on <em>Debian Stretch</em> and <em>openSUSE/SLE</em>.
+</p>
+
+<h3 id="systemd">systemd</h3>
+<p>
+  Using various
+  <a href="https://www.freedesktop.org/software/systemd/man/index.html">
+  systemd security configuration options</a>
+  for starting services via systemd units.
 </p>
 
 <h1 id="open">Open</h1>
