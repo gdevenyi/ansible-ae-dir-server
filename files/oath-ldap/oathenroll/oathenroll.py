@@ -8,7 +8,7 @@ Author: Michael Ströder <michael@stroeder.com>
 
 from __future__ import absolute_import
 
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 
 # from Python's standard lib
 import sys
@@ -554,7 +554,7 @@ class ResetToken(BaseApp):
             # try to send 2nd enrollment password part to token owner
             try:
                 self._send_pw(self.form.d.serial, owner_entry, enroll_pw1)
-            except (socket.error, smtplib.SMTPException):
+            except (socket.error, socket.gaierror, smtplib.SMTPException) as mail_error:
                 res = self.GET(message=u'Error sending e-mail via SMTP!')
             else:
                 res = RENDER.reset_action(

@@ -8,7 +8,7 @@ Author: Michael Ströder <michael@stroeder.com>
 
 from __future__ import absolute_import
 
-__version__ = '0.5.0'
+__version__ = '0.5.1'
 
 # from Python's standard lib
 import re
@@ -873,7 +873,7 @@ class RequestPasswordReset(BaseApp):
                     user_entry,
                     temp_pwd_clear,
                 )
-            except (socket.error, smtplib.SMTPException), mail_error:
+            except (socket.error, socket.gaierror, smtplib.SMTPException) as mail_error:
                 self.logger.error(
                     'Error sending reset e-mail to user %r: %s',
                     self.form.d.username,
