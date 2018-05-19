@@ -97,6 +97,12 @@ aedir_systemd_hardening:
   - "NoNewPrivileges=yes"
   - "MountFlags=private"
   - "SystemCallArchitectures=native"
+  - "RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX"
+  - "PrivateDevices=yes"
+#  - "InaccessiblePaths=/run/systemd"
+#  - "SystemCallFilter=~ ptrace madvise @clock @cpu-emulation @debug @keyring @module @mount @privileged @raw-io @reboot @swap"
+#  - "CapabilityBoundingSet=CAP_NET_BIND_SERVICE"
+#  - "AmbientCapabilities=CAP_NET_BIND_SERVICE"
 
 # which Python interpreter to use
 aedir_python: "{{ aedir_bin }}/python2.7 -ROOB"
