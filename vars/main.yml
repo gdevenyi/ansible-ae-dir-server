@@ -104,7 +104,6 @@ apache2_config:
       - logio
       - log_config
       - mpm_worker
-      - systemd
       - proxy
       - proxy_uwsgi
   Debian:
