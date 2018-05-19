@@ -13,17 +13,21 @@ After=network.target
 
 [Service]
 Type=simple
-PrivateTmp=true
 {% if aedir_malloc_ld_preload %}
 Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
 {% endif %}
 Environment=APACHE_PID_FILE={{ apache_pid_file }}
 PIDFile={{ apache_pid_file }}
+User=root
+Group=root
 ExecStart={{ apache2_config[lsb_id].httpd_exec }} -DSYSTEMD -DFOREGROUND -f {{ apache_conf }} -k start       
 ExecReload={{ apache2_config[lsb_id].httpd_exec }} -DSYSTEMD -DFOREGROUND -f {{ apache_conf }} -k graceful
 ExecStop={{ apache2_config[lsb_id].httpd_exec }} -DSYSTEMD -DFOREGROUND -f {{ apache_conf }} -k graceful-stop
 KillMode=mixed
 NotifyAccess=all
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE CAP_SETUID CAP_SETGID CAP_KILL
+AmbientCapabilities=CAP_NET_BIND_SERVICE CAP_SETUID CAP_SETGID CAP_KILL
+MemoryDenyWriteExecute=yes
 {% if aedir_systemd_hardening %}
 # various hardening options
 {% for systemd_option in aedir_systemd_hardening %}
