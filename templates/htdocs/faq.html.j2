@@ -322,6 +322,23 @@
 
 <ol>
 
+  <li id="roles">
+    <p class="faq_q">
+      Does every application integrated with &AElig;-DIR stick to its fixed role model?
+    </p>
+    <p class="faq_a">
+      No.<br>
+      If you are using shared infrastructure components it is very
+      useful to simply use the <a href="docs.html#roles">&AElig;-DIR
+      roles</a> (e.g. <a href="docs.html#role-setup-admin">Setup Admin</a>)
+      for access control in your infrastructure.<br>
+      But if that model does not fit security requirements of a specific
+      application you can simply maintain groups in &AElig;-DIR and map
+      those to specific roles within your application just like with any
+      other LDAP server.
+    </p>
+  </li>
+
   <li id="tls">
     <p class="faq_q">
       Can I setup a &AElig;-DIR test instance without having to issue TLS certs?
