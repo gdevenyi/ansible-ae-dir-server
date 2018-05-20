@@ -723,7 +723,9 @@ web2ldap_monitor_access_allowed:
   - 127.0.0.0/255.0.0.0
   - ::1
   - fe00::0
-#  - 10.0.0.0/255.0.0.0
+  - 10.0.0.0/255.0.0.0
+  - 172.16.0.0/255.240.0.0
+  - 192.168.0.0/255.255.0.0
 #  - 0.0.0.0/0.0.0.0
 #  - ::0
 
@@ -765,11 +767,22 @@ apache_log_format: !unsafe '{ \"time\":\"%{%Y-%m-%dT%H:%M:%S%z}t\", \"ip\":\"%h\
 # Apache ServerAdmin value
 apache_server_admin: "{{ web_server_admin_email }}"
 
-# which IP nets are allowed to access web2ldap
-apache_web2ldap_requires:
+# which IP nets are allowed to access normal htdocs/
+apache_htdocs_requires:
   - "ip 127.0.0.1"
   - "ip ::1"
   - "ip 10.0.0.0/255.0.0.0"
+  - "ip 172.16.0.0/255.240.0.0"
+  - "ip 192.168.0.0/255.255.0.0"
+
+# which IP nets are allowed to access web2ldap
+apache_web2ldap_requires: "{{ apache_htdocs_requires }}"
+
+# which IP nets are allowed to access oathenroll
+apache_oath_requires: "{{ apache_htdocs_requires }}"
+
+# which IP nets are allowed to access password self-service
+apache_pwd_requires: "{{ apache_htdocs_requires }}"
 
 # Apache TLS parameters
 apache_ssl_protocol: "+TLSv1.2"

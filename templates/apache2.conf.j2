@@ -122,6 +122,12 @@ ProxyPreserveHost On
     AddType text/html .html
     AddType text/plain .txt .log .py .schema
     AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript image/svg+xml
+
+    <Limit GET POST>
+{% for require in apache_htdocs_requires %}
+      Require {{ require }}
+{% endfor %}
+    </Limit>
   </Directory>
 
   Header always set Strict-Transport-Security "max-age=15552000; includeSubDomains; preload"
@@ -168,7 +174,7 @@ ProxyPreserveHost On
     ProxyPass unix:{{ aedir_rundir }}/uwsgi/aedirpwd/aedirpwd.sock|uwsgi://aedirpwd/pwd/
 {% endif %}
     <Limit GET POST>
-{% for require in apache_web2ldap_requires %}
+{% for require in apache_pwd_requires %}
       Require {{ require }}
 {% endfor %}
     </Limit>
@@ -187,7 +193,7 @@ ProxyPreserveHost On
     ProxyPass unix:{{ aedir_rundir }}/uwsgi/oathenroll/oathenroll.sock|uwsgi://oath_enroll/oath/
 {% endif %}
     <Limit GET POST>
-{% for require in apache_web2ldap_requires %}
+{% for require in apache_oath_requires %}
       Require {{ require }}
 {% endfor %}
     </Limit>
