@@ -54,7 +54,7 @@ body {
   font-size:0.8em;
 }
 
-p.pagetitle,h1,h2,h3,h4 {
+p.pagetitle,p.pagesubtitle,h1,h2,h3,h4 {
   font-weight:bold;
 }
 
@@ -78,6 +78,12 @@ p.pagetitle {
   font-size:1.5em;
   padding-bottom:0.3em;
   counter-reset: h1counter;
+  margin-left:0;
+}
+
+p.pagesubtitle {
+  font-size:1.2em;
+  padding-bottom:0.1em;
   margin-left:0;
 }
 
