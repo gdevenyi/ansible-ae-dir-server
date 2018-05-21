@@ -4,6 +4,9 @@
 {% block head_pagedescription %}Authorized Entities Directory{% endblock %}
 
 {% block content %}
+<p class="pagesubtitle">The agile IAM for DevOps</p>
+
+{% if aedir_main_provider_hostname %}
 <p>
   <a href="https://{{ aedir_main_provider_hostname }}/web2ldap"
      title="Access to administration UI (web2ldap)">Admin UI (web2ldap)</a> //
@@ -12,6 +15,7 @@
   <a href="https://{{ aedir_main_provider_hostname }}/oath/"
      title="Access to OATH-LDAP Token Enrollment Service">OATH enrollment</a>
 </p>
+{% endif %}
 
 <p>
   <strong>&AElig;-DIR</strong> is an acronym for
