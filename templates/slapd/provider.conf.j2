@@ -683,7 +683,7 @@ access to
 
 # aeContact entries
 access to
-  dn.regex="^cn=[^,]+,cn={{ aedir_aezone_cn_regex }},{{ aedir_suffix }}$"
+  dn.regex="^(cn|mail)=[^,]+,cn={{ aedir_aezone_cn_regex }},{{ aedir_suffix }}$"
   filter="(objectClass=aeContact)"
     by set="user & this/-1/aeZoneAdmins/member" write
     by set="user & this/-1/aeZoneAuditors/member" read
