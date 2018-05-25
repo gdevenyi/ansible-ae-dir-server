@@ -392,10 +392,11 @@ access to
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=aeHost)"
-  attrs=entry,objectClass,structuralObjectClass,aeStatus,cn,host
+  attrs=entry,objectClass,structuralObjectClass,aeStatus,cn,host,aeSrvGroup
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeProxyFor & this/-1" read
     by set="user/aeSrvGroup/aeProxyFor & this/-1" read
+    by self read
     by * none break
 
 # Read access to network device entries filtered by (objectClass=aeNwDevice)
