@@ -43,10 +43,7 @@
   /etc/resolvconf/run/resolv.conf r,
   /{,var/}run/systemd/resolve/stub-resolv.conf r,
 
-#FIXME#  /etc/samba/lmhosts      r,
   /etc/services           r,
-  # db backend
-#FIXME#  /var/lib/misc/*.db      r,
   # The Name Service Cache Daemon can cache lookups, sometimes leading
   # to vast speed increases when working with network-based lookups.
   /{,var/}run/.nscd_socket   rw,
@@ -74,10 +71,3 @@
   network inet6 stream,
   network inet  dgram,
   network inet6 dgram,
-
-  # TODO: adjust when support finer-grained netlink rules
-  # Netlink raw needed for nscd
-#FIXME#  network netlink raw,
-
-  # interface details
-#FIXME#  @{PROC}/@{pid}/net/route r,

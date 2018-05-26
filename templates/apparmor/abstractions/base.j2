@@ -32,7 +32,6 @@
   /usr/share/**/locale/**        r,
   /usr/share/zoneinfo/           r,
   /usr/share/zoneinfo/**         r,
-  /usr/share/X11/locale/**       r,
   /run/systemd/journal/dev-log w,
   # systemd native journal API (see sd_journal_print(4))
   /run/systemd/journal/socket w,
@@ -96,43 +95,11 @@
   # glibc's *printf protections read the maps file
   @{PROC}/@{pid}/{maps,auxv,status} r,
 
-  # libgcrypt reads some flags from /proc
-  @{PROC}/sys/crypto/*           r,
-
-  # some applications will display license information
-  /usr/share/common-licenses/**  r,
-
-  # glibc statvfs
-  @{PROC}/filesystems            r,
-
   # glibc malloc (man 5 proc)
   @{PROC}/sys/vm/overcommit_memory r,
 
-  # Allow determining the highest valid capability of the running kernel
-  @{PROC}/sys/kernel/cap_last_cap r,
-
-  # Allow other processes to read our /proc entries, futexes, perf tracing and
-  # kcmp for now (they will need 'read' in the first place). Administrators can
-  # override with:
-  #   deny ptrace (readby) ...
-  ptrace (readby),
-
-  # Allow other processes to trace us by default (they will need 'trace' in
-  # the first place). Administrators can override with:
-  #   deny ptrace (tracedby) ...
-  ptrace (tracedby),
-
-  # Allow us to ptrace read ourselves
-  ptrace (read) peer=@{profile_name},
-
   # Allow unconfined processes to send us signals by default
   signal (receive) peer=unconfined,
-
-  # Allow us to signal ourselves
-  signal peer=@{profile_name},
-
-  # Checking for PID existence is quite common so add it by default for now
-  signal (receive, send) set=("exists"),
 
   # Allow us to create and use abstract and anonymous sockets
   unix peer=(label=@{profile_name}),
@@ -145,19 +112,3 @@
 
   # Allow us to getattr, getopt, setop and shutdown on unix sockets
   unix (getattr, getopt, setopt, shutdown),
-
-  # Workaround https://launchpad.net/bugs/359338 until upstream handles stacked
-  # filesystems generally. This does not appreciably decrease security with
-  # Ubuntu profiles because the user is expected to have access to files owned
-  # by him/her. Exceptions to this are explicit in the profiles. While this rule
-  # grants access to those exceptions, the intended privacy is maintained due to
-  # the encrypted contents of the files in this directory. Files in this
-  # directory will also use filename encryption by default, so the files are
-  # further protected. Also, with the use of 'owner', this rule properly
-  # prevents access to the files from processes running under a different uid.
-
-  # encrypted ~/.Private and old-style encrypted $HOME
-  owner @{HOME}/.Private/** mrixwlk,
-  # new-style encrypted $HOME
-  owner @{HOMEDIRS}/.ecryptfs/*/.Private/** mrixwlk,
-
