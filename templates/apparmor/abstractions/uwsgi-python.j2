@@ -6,6 +6,9 @@
   # we need MIME types
   /etc/mime.types r,
 
+  # uwsgi needs to look at mounts
+  @{PROC}/filesystems r,
+
   # write temporary files
   /tmp/ rw,
   owner /tmp/** rwkl,
