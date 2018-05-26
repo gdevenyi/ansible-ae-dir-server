@@ -12,6 +12,7 @@ profile ae-slapd {
 
   capability setuid,
   capability setgid,
+  capability net_bind_service,
 
   # access to dynamically loadable modules
   {{ os_openldap_paths[lsb_id].openldap_modules }}/* rm,
