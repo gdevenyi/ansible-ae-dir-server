@@ -16,6 +16,7 @@ Type=simple
 {% if aedir_malloc_ld_preload %}
 Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
 {% endif %}
+Environment=LDAPNOINIT=1
 Environment=PYTHONPATH={{ aedir_etc }}/oathenroll
 Environment=PYTHONOPTIMIZE=2
 Environment=PYTHONDONTWRITEBYTECODE=1

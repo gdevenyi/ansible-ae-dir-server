@@ -16,6 +16,7 @@ Type=simple
 {% if aedir_malloc_ld_preload %}
 Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
 {% endif %}
+Environment=LDAPNOINIT=1
 PIDFile={{ openldap_rundir }}/slapd.pid
 {% if lsb_id == 'Debian' and ansible_distribution_release == 'jessie' %}
 ExecStart={{ openldap_slapd_exec }} -n ae-slapd -l {{ openldap_syslog_facility }} -s {{ openldap_syslog_level }} -f {{ openldap_slapd_conf }} -h '{{ openldap_listen_urls }}' -o slp=off -u {{ openldap_slapd_user }} -g {{ openldap_slapd_group }}
