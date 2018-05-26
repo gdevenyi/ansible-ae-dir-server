@@ -1,16 +1,5 @@
-# vim:syntax=apparmor
-# ------------------------------------------------------------------
-#
-#    Copyright (C) 2002-2009 Novell/SUSE
-#    Copyright (C) 2009-2011 Canonical Ltd.
-#
-#    This program is free software; you can redistribute it and/or
-#    modify it under the terms of version 2 of the GNU General Public
-#    License published by the Free Software Foundation.
-#
-# ------------------------------------------------------------------
-
-
+# Hardened base abstractions for AE-DIR services
+# {{ ansible_managed }}
 
   # (Note that the ldd profile has inlined this file; if you make
   # modifications here, please consider including them in the ldd
@@ -45,9 +34,6 @@
   /usr/lib{,32,64}/gconv/gconv-modules*  mr,
   /usr/lib/@{multiarch}/gconv/*.so           mr,
   /usr/lib/@{multiarch}/gconv/gconv-modules* mr,
-
-  # used by glibc when binding to ephemeral ports
-  /etc/bindresvport.blacklist    r,
 
   # ld.so.cache and ld are used to load shared libraries; they are best
   # available everywhere
