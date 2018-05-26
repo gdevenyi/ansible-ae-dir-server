@@ -84,6 +84,9 @@
   # glibc malloc (man 5 proc)
   @{PROC}/sys/vm/overcommit_memory r,
 
+  # some kernel parameters
+  /sys/kernel/mm/transparent_hugepage/enabled r,
+
   # Allow unconfined processes to send us signals by default
   signal (receive) peer=unconfined,
 
