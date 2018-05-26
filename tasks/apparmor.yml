@@ -27,7 +27,9 @@
     group: root
     mode: 0644
   with_items:
+    - base
     - ldapclient
+    - nameservice
     - python
     - cli
     - uwsgi-python
