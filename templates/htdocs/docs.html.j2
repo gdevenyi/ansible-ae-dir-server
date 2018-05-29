@@ -11,6 +11,9 @@
 
 <ol>
   <li>
+    <a href="#design">Design paradigms</a>
+  </li>
+  <li>
     <a href="#sys-arch">System architecture</a>
     <ol>
       <li><a href="#sys-provider">&AElig;-DIR provider</a></li>
@@ -62,6 +65,22 @@
     </ol>
   </li>
 </ol>
+
+<h1 id="design">Design paradigms</h1>
+<ul>
+  <li>Explicit is better than implicit</li>
+  <li>Secure authorization requires secure authentication</li>
+  <li>No anonymous access at all</li>
+  <li>Individual authentication instead of shared credentials</li>
+  <li>Avoid all-mighty proxy roles</li>
+  <li>Rights assignment / permission granting always based on groups</li>
+  <li>Do not assume hierarchical structure</li>
+  <li>A person is not an user account</li>
+  <li>Role separation with multiple user accounts per person</li>
+  <li>Persistent IDs (never re-used) for reliable audit trails</li>
+  <li>Only encrypted network traffic</li>
+  <li>Well-defined semantics for all object classes and attributes (better no data than bad data)</li>
+</ul>
 
 <h1 id="sys-arch">System architecture</h1>
 

@@ -27,11 +27,22 @@
   Every now and then I will reload the initial database.
 </p>
 
-<h1>Web user interface</h1>
-<p>
-  <a href="https://{{ aedir_main_provider_hostname }}/web2ldap">https://{{ aedir_main_provider_hostname }}/web2ldap</a>
-  shows direct login links
-</p>
+<h1>Web applications</h1>
+<dl>
+  <dt><a href="https://{{ aedir_main_provider_hostname }}/web2ldap">web2ldap</a></dt>
+  <dd>
+    The administrative web user interface.
+    Simply follow the login links on the front page.
+  </dd>
+  <dt><a href="https://{{ aedir_main_provider_hostname }}/pwd">Password self-service</a></dt>
+  <dd>
+    Change own password, request password reset.
+  </dd>
+  <dt><a href="https://{{ aedir_main_provider_hostname }}/oath">OTP enrollment</a></dt>
+  <dd>
+    Enrolling OTP tokens
+  </dd>
+</dl>
 
 <h1>LDAP access</h1>
 <table>

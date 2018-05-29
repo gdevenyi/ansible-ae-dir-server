@@ -4,8 +4,6 @@
 {% block head_pagedescription %}Authorized Entities Directory{% endblock %}
 
 {% block content %}
-<p class="pagesubtitle">The agile IAM for DevOps</p>
-
 {% if aedir_main_provider_hostname %}
 <p>
   <a href="https://{{ aedir_main_provider_hostname }}/web2ldap"
@@ -17,12 +15,28 @@
 </p>
 {% endif %}
 
+<p class="pagesubtitle">The agile IAM for DevOps</p>
+
 <p>
-  <strong>&AElig;-DIR</strong> is an acronym for
-  <em>Authorized Entities Directory</em>
-  (and a small Unicode challenge), an LDAP service based on
-  <a href="https://www.openldap.org">OpenLDAP</a> which
-  implements a Privileged Identity and Access Management (IAM/PIM/PAM)
+  <strong>Authorized Entities Directory (&AElig;-DIR)</strong>
+  is a Privileged Identity and Access Management (IAM/PIM/PAM)
+  based on <a href="https://www.openldap.org">OpenLDAP</a>
+</p>
+
+<p id="objectives">
+  Objectives:
+</p>
+<ul>
+  <li>Strictly follow <strong>need to know</strong> and <strong>least privilege</strong> principles</li>
+  <li>Agile data maintenance by consequent delegation of manageable small areas</li>
+  <li>Provide meaningful audit trails for compliance checks</li>
+  <li>Secure defaults</li>
+</ul>
+
+<p>
+  You can find longer introductions in
+  <a href="https://stroeder.com/publications.html">
+  &AElig;-DIR conference presentations</a>.
 </p>
 
 {% if aedir_news %}
@@ -36,37 +50,4 @@
 </ul>
 {% endif %}
 
-<p id="objectives">
-  Objectives:
-</p>
-<ul>
-  <li>Strictly follow <strong>need to know</strong> and <strong>least privilege</strong> principles</li>
-  <li>Agile data maintenance by consequent delegation of manageable small areas</li>
-  <li>Provide meaningful audit trails</li>
-  <li>Compliance</li>
-</ul>
-
-<p>
-  Design paradigms:
-</p>
-<ul>
-  <li>Explicit is better than implicit</li>
-  <li>Secure authorization requires secure authentication</li>
-  <li>No anonymous access at all</li>
-  <li>Individual authentication instead of shared credentials</li>
-  <li>Avoid all-mighty proxy roles</li>
-  <li>Rights assignment / permission granting always based on groups</li>
-  <li>Do not assume hierarchical structure</li>
-  <li>A person is not an user account</li>
-  <li>Role separation with multiple user accounts per person</li>
-  <li>Persistent IDs (never re-used) for reliable audit trails</li>
-  <li>Only encrypted network traffic</li>
-  <li>Well-defined semantics for all object classes and attributes (better no data than bad data)</li>
-</ul>
-
-<p>
-  For a longer introduction you can check out various
-  <a href="https://stroeder.com/publications.html">
-  &AElig;-DIR conference presentations</a>.
-</p>
 {% endblock content %}
