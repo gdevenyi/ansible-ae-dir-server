@@ -491,15 +491,14 @@ openldap_keygen: 0
 openldap_tls_protocol_min: "3.3"
 
 # value for slapd.conf directive TLSCipherSuite
-openldap_tls_cipher_suite: "ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDH-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES128-GCM-SHA256:ECDH-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:!ADH"
+openldap_tls_cipher_suite: "HIGH:!aNULL:!kDH:!kECDH:!MD5"
 
 # value for parameter tls_protocol_min of slapd.conf directive 'syncrepl'
 # 3.<x> means TLSv1.<x-1>
 openldap_syncrepl_tls_protocol_min: "3.3"
 
 # value for parameter tls_cipher_suite of slapd.conf directive 'syncrepl'
-#openldap_syncrepl_tls_cipher_suite: "ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDH-RSA-AES256-GCM-SHA384:!ADH"
-openldap_syncrepl_tls_cipher_suite: "HIGH:!aNULL:!kDH:!kECDH:!MD5"
+openldap_syncrepl_tls_cipher_suite: "ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDH-RSA-AES256-GCM-SHA384:!ADH"
 
 # The full path names on the target system
 openldap_cacert_pathname: "{{ aedir_etc }}/tls/{{ openldap_cacert_filename|basename }}"
@@ -787,7 +786,7 @@ apache_pwd_requires: "{{ apache_htdocs_requires }}"
 
 # Apache TLS parameters
 apache_ssl_protocol: "+TLSv1.2"
-apache_ssl_cipher_suite: 'ECDHE-RSA-AES256-SHA:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:!RC4-SHA:!MEDIUM:!ADH:!LOW:!EXP:!NULL'
+apache_ssl_cipher_suite: "HIGH:!aNULL:!kDH:!kECDH:!MD5"
 
 # Path name of CA cert bundle file
 apache_cacert_filename: "{{ openldap_cacert_filename }}"
