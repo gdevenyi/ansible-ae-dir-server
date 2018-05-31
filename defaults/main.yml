@@ -498,7 +498,8 @@ openldap_tls_cipher_suite: "ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA38
 openldap_syncrepl_tls_protocol_min: "3.3"
 
 # value for parameter tls_cipher_suite of slapd.conf directive 'syncrepl'
-openldap_syncrepl_tls_cipher_suite: "ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDH-RSA-AES256-GCM-SHA384:!ADH"
+#openldap_syncrepl_tls_cipher_suite: "ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDH-RSA-AES256-GCM-SHA384:!ADH"
+openldap_syncrepl_tls_cipher_suite: "HIGH:!aNULL:!kDH:!kECDH:!MD5"
 
 # The full path names on the target system
 openldap_cacert_pathname: "{{ aedir_etc }}/tls/{{ openldap_cacert_filename|basename }}"
