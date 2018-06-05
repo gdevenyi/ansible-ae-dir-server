@@ -11,8 +11,15 @@ profile {{ name }} {
   # access to {{ name }} application config
   {{ aedir_etc }}/{{ name }}/** r,
 
+{% if name=="web2ldap" %}
+  # access to CA cert for LDAPS
+  {{ openldap_cacert_pathname }} r,
+{% endif %}
+
+{% if name=="aedirpwd" or name=="oathenroll" %}
   # access to CA cert for sending e-mail
   {{ smtp_cacert_pathname }} r,
+{% endif %}
 
   # access to uwsgi config
   {{ aedir_etc }}/uwsgi/{{ name }}.ini r,
