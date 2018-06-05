@@ -1,0 +1,18 @@
+{
+   "name": "ae-dir",
+   "title": "Æ-DIR -- Authorized Entities Directory",
+   "description": "The agile IAM for DevOps",
+   "homepage": "https://www.ae-dir.com/",
+   "license": "APL-2.0",
+   "tags": "iam, ldap, openldap, pam, nss",
+   "releases": [
+      {
+         "version": "1.0.0",
+         "state": "stable",
+         "scope": "major feature",
+         "changes": "Initial public release",
+         "download": "https://www.ae-dir.com/download/ae-dir-1.0.0.tar.gz",
+         "published": "2018-06-24T12:00:00+00:00"
+      },
+   ]
+}
