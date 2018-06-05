@@ -7,6 +7,16 @@
     state: stopped
     enabled: no
 
+- name: "Create ae-apache log directory {{ apache_access_log|dirname }}"
+  file:
+    path: "{{ apache_access_log|dirname }}"
+    state: directory
+    owner: root
+    group: "{{ apache_group }}"
+    mode: 0770
+  notify:
+    - "restart web server"
+
 - name: "Create config for Apache from template"
   template:
     src: 'apache2.conf.j2'
@@ -16,6 +26,14 @@
     mode: 0644
   notify:
     - "restart web server"
+
+- name: "Create ae-apache logrotate config {{ apache_logrotate }}"
+  template:
+    src: "logrotate_ae-apache.j2"
+    dest: "/etc/logrotate.d/ae-apache"
+    owner: root
+    group: root
+    mode: 0644
 
 - name: "Create Apache run directory {{ apache_rundir }}"
   file:

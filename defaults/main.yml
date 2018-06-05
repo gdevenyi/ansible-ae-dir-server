@@ -756,7 +756,7 @@ apache_error_log: "syslog:daemon"
 #apache_error_log: "{{ apache2_config[lsb_id].log_dir }}/error.log"
 
 # Apache accesslog file
-apache_access_log: "{{ apache2_config[lsb_id].log_dir }}/ae-dir-{{ openldap_role }}.log"
+apache_access_log: "/var/log/ae-apache/access.log"
 
 # Apache LogLevel value
 apache_log_level: "info"
