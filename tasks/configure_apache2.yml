@@ -13,7 +13,7 @@
     state: directory
     owner: root
     group: "{{ apache_group }}"
-    mode: 0770
+    mode: 0750
   notify:
     - "restart web server"
 
