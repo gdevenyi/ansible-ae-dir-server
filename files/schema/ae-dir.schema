@@ -176,14 +176,6 @@ attributetype ( ae-dir-at:17.2
   SUP aePosixId
   SINGLE-VALUE )
 
-attributetype ( ae-dir-at:17.3
-  NAME 'aeUidNumberNext'
-  OBSOLETE
-  X-ORIGIN 'AE-DIR'
-  DESC 'AE-DIR: next uidNumber value'
-  SUP aePosixId
-  SINGLE-VALUE )
-
 attributetype ( ae-dir-at:17.4
   NAME 'aeGidNumberMin'
   X-ORIGIN 'AE-DIR'
@@ -195,14 +187,6 @@ attributetype ( ae-dir-at:17.5
   NAME 'aeGidNumberMax'
   X-ORIGIN 'AE-DIR'
   DESC 'AE-DIR: maximum gidNumber value'
-  SUP aePosixId
-  SINGLE-VALUE )
-
-attributetype ( ae-dir-at:17.6
-  NAME 'aeGidNumberNext'
-  OBSOLETE
-  X-ORIGIN 'AE-DIR'
-  DESC 'AE-DIR: next gidNumber value'
   SUP aePosixId
   SINGLE-VALUE )
 
