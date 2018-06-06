@@ -13,6 +13,11 @@ profile ae-apache {
   capability kill,
   capability net_bind_service,
 
+  # Allow unconfined processes to send us signals by default
+  signal (receive) peer=unconfined,
+  # Allow us to signal ourselves
+  signal peer=@{profile_name},
+
   # access to dynamically loadable modules
   {{ apache2_config[lsb_id].mod_dir }}/mod_*.so rm,
 
