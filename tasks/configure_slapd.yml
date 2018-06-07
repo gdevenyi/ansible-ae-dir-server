@@ -127,6 +127,17 @@
     group: "{{ openldap_slapd_group }}"
     mode: 0640
 
+- name: "Create /etc/sasl2/slapd.conf on {{ lsb_id }}"
+  template:
+    src: "slapd/sasl2.conf.j2"
+    dest: "/etc/sasl2/slapd.conf"
+    owner: root
+    group: "{{ openldap_slapd_group }}"
+    mode: 0640
+  notify:
+    - "restart slapd"
+  when: lsb_id != "Debian"
+
 - name: "Create role-specific slapd.conf for {{ openldap_role }}"
   template:
     src: "slapd/{{ openldap_role }}.conf.j2"

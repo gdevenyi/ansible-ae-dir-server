@@ -63,4 +63,9 @@ profile ae-slapd {
   /usr/local/berkeleydb/lib/libdb* rm,
 {% endif %}
 
+{% if lsb_id!="Debian" %}
+  # SASL config for slapd
+  /etc/sasl2/slapd.conf r,
+{% endif %}
+
 }
