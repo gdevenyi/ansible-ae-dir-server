@@ -279,7 +279,11 @@
     (IP address range, VLAN).
   </li>
   <li>
-    Add host-based firewalling to your &AElig;-DIR servers!
+    Add host-based firewall rules to your &AElig;-DIR servers!
+  </li>
+  <li>
+    Adjust the ansible variables <var>apache_*_requires</var> for IP-based
+    access control to web applications.
   </li>
 </ul>
 
@@ -299,6 +303,13 @@
     The hostnames should at least contain one dot. Otherwise Chrome web browser
     won't accept/return cookies.
   </li>
+  <li>
+    It's helpful to encode the &AElig;-DIR slapd role into the host names.
+  </li>
+  <li>
+    Make sure to use a numbering scheme which allows you to add more replicas
+    for each role without having to invent new host naming scheme.
+  </li>
 </ul>
 <p>
   If you have fine-grained access control for delegated sub domains in your
@@ -309,11 +320,7 @@
   issued to your domains.
 </p>
 <p>
-  Example sub-domain:<br>
-  <code>ae-dir.example.com</code>
-</p>
-<p>
-  It's helpful to encode the &AElig;-DIR slapd role into the host names.<br>
+  Example sub-domain: <code>ae-dir.example.com</code>
 </p>
 <p>
   Examples:<br>
