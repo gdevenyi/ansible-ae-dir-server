@@ -71,7 +71,7 @@
     user: ae-dir-pwd
     module: "oathenroll:application"
     master: "true"
-    processes: 10
+    processes: 6
     threads: 0
     stats_port: 9093
     buffer_size: "{{ aedir_uwsgi_params.oathenroll.buffer_size }}"
