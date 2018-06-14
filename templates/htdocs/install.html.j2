@@ -186,7 +186,7 @@
             <pre>ldapmodify -f /opt/ae-dir/etc/ae-dir-base.ldif</pre>
           </li>
           <li>
-            On Debian:
+            On Debian and CentOS:
             <pre>/usr/local/openldap/bin/ldapmodify -f /opt/ae-dir/etc/ae-dir-base.ldif</pre>
           </li>
         </ul>
@@ -201,12 +201,58 @@
     Check the systems' health by invoking as <em>root</em> the monitoring
     script on all &AElig;-DIR servers. By default it is installed to:
     <pre>/opt/ae-dir/sbin/slapd_checkmk.sh</pre>
-  <li>
-    For PAM/NSS client self-integration invoke ansible play in sub-directory <code>ansible/</code>
-    (here using command <code>su</code>):
-    <pre>/opt/ansible/bin/ansible-playbook ae-dir-clients.yml -i myenv/hosts --become -K --become-method=su -l ae-dir-servers</pre>
-  </li>
 </ol>
+
+<h2 id="linux-login">NSS/PAM self-integration</h2>
+<p>
+  For PAM/NSS client self-integration invoke ansible play in sub-directory <code>ansible/</code>
+  (here using command <code>su</code>):
+</p>
+<pre class="cli">
+/opt/ansible/bin/ansible-playbook ae-dir-clients.yml -i myenv/hosts --become -K --become-method=su -l ae-dir-servers
+</pre>
+
+<h2 id="oath-ldap">Two-factor authentication (OATH-LDAP)</h2>
+<p>
+  You can easily use the built-in two-factor authentication based on
+  <a href="https://oath-ldap.stroeder.com/">OATH-LDAP</a>.
+</p>
+<p>
+  This is enabled by setting ansible variable
+  <var>oath_ldap_enabled: True</var> and then play the complete
+  configuration to the &AElig;-DIR servers. Of course you set this flag
+  also before the first run. This installs an additional web app and the
+  so-called bind listeners on providers and consumers.
+</p>
+<p>
+  Afterwards you have to generate at least one master key pair for
+  protecting the token shared secrets (OTP seeds):
+</p>
+<pre class="cli">
+# oathldap-tool genkey --key-path /opt/ae-dir/etc/oath-master-keys/
+Generating RSA-2048 key pair...
+
+wrote /opt/ae-dir/etc/oath-master-keys/oathldap_master_key_201806141818.priv
+wrote /opt/ae-dir/etc/oath-master-keys/oathldap_master_key_201806141818.pub
+</pre>
+<p>
+  Correct the permissions if needed which would also be done by next ansible play:
+</p>
+<pre class="cli">
+# chmod 640 /opt/ae-dir/etc/oath-master-keys/oathldap_master_key_201806141818.*
+</pre>
+<p>
+  Then store the new public key in the OATH parameters entry:
+</p>
+<pre class="cli">
+# ldapmodify &lt;&lt;EOF
+dn: cn=oath-policy-hotp-users,cn=ae,ou=ae-dir
+changetype: modify
+replace: oathEncKey
+oathEncKey:&lt; file:/opt/ae-dir/etc/oath-master-keys/oathldap_master_key_201806141818.pub
+
+EOF
+</pre>
 
 <h1 id="license">Copyright &amp; License</h1>
 <p>
