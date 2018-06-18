@@ -25,7 +25,7 @@
     <ol>
       <li><a href="#sso">WebSSO</a></li>
       <li><a href="#pki">X.509 PKI</a></li>
-      <li><a href="#ansible">ansible</a></li>
+      <li><a href="#devops">DevOps tooling</a></li>
       <li><a href="#logging">Logging</a></li>
       <li><a href="#monitoring">Monitoring</a></li>
       <li><a href="#pxe">PXE/DHCP/TFTP integration</a></li>
@@ -240,7 +240,20 @@
   </li>
 </ul>
 
-<h2 id="ansible">ansible</h2>
+<h2 id="devops">DevOps tooling</h2>
+<ul>
+  <li>
+    Scripts for local <em>slapd-ldap</em> instance used as admin proxy for
+    bulk operations from ansible plays, dynamic ansible inventory based on
+    &AElig;-DIR entries or similar.
+  </li>
+  <li>
+    proper keyring support for tools (inspired by Mirko's
+    <a href="https://gist.github.com/mfriedenhagen/e488235d732b7becda81#file-password_from_keyring-py">password_from_keyring-py</a>)
+  </li>
+</ul>
+
+<h3 id="ansible">ansible</h3>
 <ul>
   <li>
     Automated authentication configuration (set <var>userPassword</var>) for
@@ -248,14 +261,9 @@
     <a href="docs.html#schema-oc-aeService">aeService</a>
   </li>
   <li>
-    <a
-    href="https://docs.ansible.com/ansible/developing_inventory.html">
+    <a href="https://docs.ansible.com/ansible/developing_inventory.html">
     Dynamic inventory</a> module for accessing attributes in
     &AElig;-DIR entries
-  </li>
-  <li>
-    proper keyring support (inspired by Mirko's
-    <a href="https://gist.github.com/mfriedenhagen/e488235d732b7becda81#file-password_from_keyring-py">password_from_keyring-py</a>)
   </li>
 </ul>
 
