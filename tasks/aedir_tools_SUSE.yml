@@ -72,7 +72,6 @@
     type: package
   with_items:
     - python-pyweblib>=1.3.13
-    - python-Pillow
     - python-dnspython
     - python-certifi
   when: openldap_role == 'provider'
