@@ -42,7 +42,7 @@
     - python-mailutil
     - python-web.py
     - python-passlib
-    - python-pyweblib
+    - python-pyweblib>=1.3.13
     - python-asn1crypto
     - python-xlwt
     - python-pycryptodome
