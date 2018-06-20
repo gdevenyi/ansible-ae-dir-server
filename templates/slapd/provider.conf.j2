@@ -1162,7 +1162,7 @@ access to
     by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}" read
     by * none break
 
-# restricted addressbook usage to person users for normal users
+# restricted addressbook usage to person entries for normal users
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=aePerson)"
