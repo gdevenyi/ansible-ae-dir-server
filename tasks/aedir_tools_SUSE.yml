@@ -40,20 +40,43 @@
   with_items:
     - python-paramiko
     - python-mailutil
-    - python-web.py
     - python-passlib
-    - python-pyweblib>=1.3.13
     - python-asn1crypto
     - python-xlwt
     - python-pycryptodome
-    - python-dnspython
-    - python-certifi
-    - python-Pillow
   when: openldap_role == 'provider'
   notify:
     - restart aedirpwd
     - restart oathenroll
     - restart hotp_validator
+    - restart web2ldap
+
+- name: "Install additional packages for simple web apps on {{ openldap_role }} on {{ lsb_id }}"
+  zypper:
+    name: "{{ item }}"
+    state: present
+    disable_recommends: yes
+    type: package
+  with_items:
+    - python-web.py
+  when: openldap_role == 'provider'
+  notify:
+    - restart aedirpwd
+    - restart oathenroll
+
+- name: "Install additional packages for web2ldap on {{ openldap_role }} on {{ lsb_id }}"
+  zypper:
+    name: "{{ item }}"
+    state: present
+    disable_recommends: yes
+    type: package
+  with_items:
+    - python-pyweblib>=1.3.13
+    - python-Pillow
+    - python-dnspython
+    - python-certifi
+  when: openldap_role == 'provider'
+  notify:
     - restart web2ldap
 
 - name: "Prepare Python 2.x virtualenv {{ aedir_prefix }}"
