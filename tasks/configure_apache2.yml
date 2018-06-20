@@ -27,7 +27,7 @@
   notify:
     - "restart web server"
 
-- name: "Create ae-apache logrotate config {{ apache_logrotate }}"
+- name: "Create ae-apache logrotate config"
   template:
     src: "logrotate_ae-apache.j2"
     dest: "/etc/logrotate.d/ae-apache"
