@@ -3,12 +3,13 @@
 
 - name: "Add LTB OpenLDAP repository key"
   apt_key:
-    data: "{{ lookup('file', 'RPM-GPG-KEY-LTB-project') }}"
+    data: "{{ lookup('file', aedir_pkg_repos['ltb_project_org'].key) }}"
     state: present
 
-- name: "Add LTB OpenLDAP Debian repository {{ ltb_openldap_repo_source }}"
+- name: "Add LTB Debian repository"
   apt_repository:
-    repo: "{{ ltb_openldap_repo_source }}"
+    filename: "ltb_project_org"
+    repo: "{{ aedir_pkg_repos['ltb_project_org'].repo }}"
     state: present
     update_cache: yes
 

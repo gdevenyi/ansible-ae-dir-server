@@ -36,6 +36,13 @@ aedir_pip_install_options:
 aedir_pip_extra_args: "{{ aedir_pip_install_options|join(' ') }}"
 
 #---------------------------------------------------------------------------
+# software repo parameters
+#---------------------------------------------------------------------------
+
+# Dictionary defining additional OS package repos
+aedir_pkg_repos: "{{ aedir_package_repos[lsb_id] }}"
+
+#---------------------------------------------------------------------------
 # AE-DIR parameters
 #---------------------------------------------------------------------------
 
@@ -405,9 +412,6 @@ aedir_uwsgi_params:
 
 # replica role, must be either 'provider' or 'consumer'
 openldap_role: "consumer"
-
-# which repo to use for LTB OpenLDAP builds (Debian and RHEL/CentOS)
-ltb_openldap_repo_source: "{{ ltb_openldap_repo[lsb_id] }}"
 
 # default FQDN in LDAP service URL
 openldap_service_fqdn: "{{ inventory_hostname }}"

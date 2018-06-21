@@ -32,9 +32,9 @@
     overwrite_multiple: yes
     auto_import_keys: yes
     autorefresh: yes
-    name: "{{ item.name }}"
-    repo: "{{ item.repo }}"
-  with_items: "{{ aedir_suse_repos[ansible_lsb.description] }}"
+    name: "{{ item.key }}"
+    repo: "{{ item.value.repo }}"
+  with_dict: "{{ aedir_pkg_repos }}"
 
 - name: "Refresh all repos on {{ ansible_lsb.description }}"
   zypper_repository:

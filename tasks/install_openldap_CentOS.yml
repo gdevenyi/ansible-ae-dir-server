@@ -3,8 +3,8 @@
 
 - name: copy GPG key file
   copy:
-    src: RPM-GPG-KEY-LTB-project
-    dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-LTB-project
+    src: "{{ aedir_pkg_repos['ltb_project_org'].key }}"
+    dest: "/etc/pki/rpm-gpg/{{ aedir_pkg_repos['ltb_project_org'].key }}"
     owner: root
     group: root
     mode: 0600
@@ -13,8 +13,8 @@
   yum_repository:
     name: ltp-openldap
     description: LTB OpenLDAP repository
-    baseurl: "{{ ltb_openldap_repo_source }}"
-    gpgkey: "file:///etc/pki/rpm-gpg/RPM-GPG-KEY-LTB-project"
+    baseurl: "{{ aedir_pkg_repos['ltb_project_org'].repo }}"
+    gpgkey: "file:///etc/pki/rpm-gpg/{{ aedir_pkg_repos['ltb_project_org'].key }}"
     gpgcheck: yes
 
 - name: Install OpenLDAP packages and dependencies

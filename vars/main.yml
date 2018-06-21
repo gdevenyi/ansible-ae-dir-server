@@ -9,31 +9,25 @@ lsb_id_map:
   openSUSE: "SUSE"
   RedHatEnterpriseServer: "CentOS"
 
-# which repo to use for LTB OpenLDAP builds (Debian and RHEL/CentOS)
-ltb_openldap_repo:
-  CentOS: "https://ltb-project.org/rpm/$releasever/$basearch"
-  Debian: "deb https://ltb-project.org/debian/{{ ansible_distribution_release }} {{ ansible_distribution_release }} main"
-
 # which repos on https://download.opensuse.org to use for openSUSE or SLES versions
-aedir_suse_repos:
-  "SUSE Linux Enterprise Server 12 SP3":
-    - name: "home_stroeder_AE-DIR"
-      repo: "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR/SLE_12_SP3/"
-    - name: "network_ldap"
-      repo: "http://download.opensuse.org/repositories/network:/ldap/SLE_12_SP3/"
-    - name: "Apache_Modules"
-      repo: "http://download.opensuse.org/repositories/Apache:/Modules/SLE_12_SP3/"
-  "openSUSE Leap 15.0":
-    - name: "home_stroeder_AE-DIR"
-      repo: "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR/openSUSE_Leap_15.0/"
-  "openSUSE Leap 42.3":
-    - name: "home_stroeder_AE-DIR"
-      repo: "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR/openSUSE_Leap_42.3/"
-    - name: "network_ldap"
-      repo: "http://download.opensuse.org/repositories/network:/ldap/openSUSE_Leap_42.3/"
-  "openSUSE Tumbleweed":
-    - name: "home_stroeder_AE-DIR"
-      repo: "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR/openSUSE_Tumbleweed/"
+aedir_suse_repo:
+  "SUSE Linux Enterprise Server 15": "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR/SLE_15/"
+  "openSUSE Leap 15.0": "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR/openSUSE_Leap_15.0/"
+  "openSUSE Tumbleweed": "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR/openSUSE_Tumbleweed/"
+
+aedir_package_repos:
+  CentOS:
+    "ltb_project_org":
+      repo: "https://ltb-project.org/rpm/$releasever/$basearch"
+      key: "RPM-GPG-KEY-LTB-project"
+  Debian:
+    "ltb_project_org":
+      repo: "deb https://ltb-project.org/debian/{{ ansible_distribution_release }} {{ ansible_distribution_release }} main"
+      key: "RPM-GPG-KEY-LTB-project"
+  SUSE:
+    "home_stroeder_AE-DIR":
+      repo: "{{ aedir_suse_repo.get(ansible_lsb.description, '') }}"
+      key: ""
 
 # OS-specific maps
 os_openldap_paths:
