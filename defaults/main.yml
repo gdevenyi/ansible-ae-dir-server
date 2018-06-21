@@ -808,6 +808,7 @@ apache_key_pathname: "{{ openldap_key_pathname }}"
 #---------------------------------------------------------------------------
 
 # set to True to enable mandatory access control with AppArmor
+#apparmor_enabled: "{{ ansible_apparmor.status == 'enabled' }}"
 apparmor_enabled: False
 
 # where custom AppArmor profiles are stored
