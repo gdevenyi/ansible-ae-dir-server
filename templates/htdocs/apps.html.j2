@@ -42,6 +42,9 @@
   <li>
     <a href="#ssh-proxy">SSH proxy</a>
   </li>
+  <li>
+    <a href="#slapd-ldap">LDAP proxy</a>
+  </li>
 </ol>
 
 <h1 id="client-params">Client parameters</h1>
@@ -330,4 +333,45 @@
     </a>
   </li>
 </ul>
+
+<h1 id="slapd-ldap">LDAP proxy</h1>
+<p>
+  If you want to secure administrative access to another LDAP server you
+  can use OpenLDAP's
+  <a href="https://www.openldap.org/software/man.cgi?query=slapd-ldap">slapd-ldap(5)</a>
+  for integrated authentication and authorization.
+</p>
+<p>
+  The following picture shows an example for a separate LDAP server serving
+  DNS and DHCP data (or anything else) which gets maintained via LDAPS.
+</p>
+
+{% set img_anchor="slapd-ldap" -%}
+{% set img_file="slapd-ldap.svg" -%}
+{% set img_title="LDAP proxy integrated with &AElig;-DIR" -%}
+{% include "includes/img.html.j2" %}
+
+<p>Further notes:</p>
+<ul>
+  <li>
+    The admin is authenticated via LDAP simple bind pass-through.
+  </li>
+  <li>
+    With its <a href="docs.html#schema-oc-aeService">service entry</a> the
+    LDAP proxy queries users and groups from &AElig;-DIR and uses that for 
+    authorizing administrative access to the entries stored in the local 
+    database backend.
+  </li>
+  <li>
+    It is recommended to use the TLS server certificate of 
+    the external LDAP server also for authentication to &AElig;-DIR to avoid 
+    the need for maintaining another system credential (e.g. service password).
+  </li>
+</ul>
+
+<p>
+  Example configuration file with SASL/EXTERNAL bind with TLS client cert:
+  <code>client-examples/slapd-ldap/</code>
+</p>
+
 {% endblock content %}
