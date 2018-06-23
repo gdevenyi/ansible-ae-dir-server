@@ -45,6 +45,9 @@
   <li>
     <a href="#slapd-ldap">LDAP proxy</a>
   </li>
+  <li>
+    <a href="#wifi">Wifi access point</a>
+  </li>
 </ol>
 
 <h1 id="client-params">Client parameters</h1>
@@ -358,13 +361,13 @@
   </li>
   <li>
     With its <a href="docs.html#schema-oc-aeService">service entry</a> the
-    LDAP proxy queries users and groups from &AElig;-DIR and uses that for 
-    authorizing administrative access to the entries stored in the local 
+    LDAP proxy queries users and groups from &AElig;-DIR and uses that for
+    authorizing administrative access to the entries stored in the local
     database backend.
   </li>
   <li>
-    It is recommended to use the TLS server certificate of 
-    the external LDAP server also for authentication to &AElig;-DIR to avoid 
+    It is recommended to use the TLS server certificate of
+    the external LDAP server also for authentication to &AElig;-DIR to avoid
     the need for maintaining another system credential (e.g. service password).
   </li>
 </ul>
@@ -385,6 +388,51 @@
   <li>
     <a href="https://www.openldap.org/doc/admin24/backends.html#LDAP">
       LDAP backend in OpenLDAP Software 2.4 Administrator's Guide
+    </a>
+  </li>
+</ul>
+
+<h1 id="wifi">Wifi access point</h1>
+<p>
+  For setting up a very simple wireless access point using WPA2 enterprise
+  authentication you can install <a
+  href="https://w1.fi/hostapd/">hostapd</a> and <a
+  href="https://freeradius.org/">FreeRADIUS</a> on one system and configure
+  the latter as LDAP client as shown in the following picture.
+</p>
+
+{% set img_anchor="wifi-ap" -%}
+{% set img_file="wifi-ap.svg" -%}
+{% set img_title="Wifi access point integrated with &AElig;-DIR" -%}
+{% include "includes/img.html.j2" %}
+
+<p>Further notes:</p>
+<ul>
+  <li>
+  </li>
+  <li>
+    With its <a href="docs.html#schema-oc-aeService">service entry</a> the
+    RADIUS service queries users and groups from &AElig;-DIR and uses that
+    for authorizing access to your Wifi network(s).
+  </li>
+  <li>
+    It is recommended to use the EAP-TLS server certificate of the RADIUS
+    service also for authentication to &AElig;-DIR to avoid the need for
+    maintaining another system credential (e.g. service password).
+  </li>
+</ul>
+
+<p>
+  See also:
+</p>
+<ul>
+  <li>
+    Example configuration files:
+    <code>client-examples/freeradius/</code>
+  </li>
+  <li>
+    <a href="https://freeradius.org/documentation/">
+      FreeRADIUS Documentation
     </a>
   </li>
 </ul>
