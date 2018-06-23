@@ -34,6 +34,7 @@
     autorefresh: yes
     name: "{{ item.key }}"
     repo: "{{ item.value.repo }}"
+    priority: 90
   with_dict: "{{ aedir_pkg_repos }}"
 
 - name: "Refresh all repos on {{ ansible_lsb.description }}"
