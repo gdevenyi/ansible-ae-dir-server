@@ -81,7 +81,7 @@
     user: ae-dir-pwd
     module: "aedirpwd_web:application"
     master: "true"
-    processes: 6
+    processes: "{{ aedir_uwsgi_params.aedirpwd.processes }}"
     threads: 0
     stats_port: 9092
     buffer_size: "{{ aedir_uwsgi_params.aedirpwd.buffer_size }}"

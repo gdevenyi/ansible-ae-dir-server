@@ -399,12 +399,15 @@ aedir_uwsgi_params:
   web2ldap:
     buffer_size: 16384
     harakiri: 20
+    threads: 10
   oathenroll:
     buffer_size: 8192
     harakiri: 10
+    processes: 10
   aedirpwd:
     buffer_size: 8192
     harakiri: 10
+    processes: 10
 
 #---------------------------------------------------------------------------
 # OpenLDAP parameters
