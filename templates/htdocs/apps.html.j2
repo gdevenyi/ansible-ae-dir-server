@@ -409,16 +409,20 @@
 <p>Further notes:</p>
 <ul>
   <li>
-  </li>
-  <li>
     With its <a href="docs.html#schema-oc-aeService">service entry</a> the
     RADIUS service queries users and groups from &AElig;-DIR and uses that
     for authorizing access to your Wifi network(s).
   </li>
   <li>
-    The client must use EAP-TTLS with PAP in inner tunnel because &AElig;-DIR
-    does not give read access to attribute <var>userPassword</var> and
-    the user's password is stored as salted hash.
+    The client must use
+    <a href="https://en.wikipedia.org/wiki/Extensible_Authentication_Protocol#EAP_Tunneled_Transport_Layer_Security_(EAP-TTLS)">
+      EAP-TTLS
+    </a>
+    with PAP in inner tunnel
+    (see also <a href="https://tools.ietf.org/html/rfc5281#section-11.2.5">RFC 5281</a>)
+    because &AElig;-DIR does not give read access to attribute
+    <var>userPassword</var> and the user's password is stored as salted
+    hash.
   </li>
   <li>
     It is recommended to use the EAP-TLS server certificate of the RADIUS
