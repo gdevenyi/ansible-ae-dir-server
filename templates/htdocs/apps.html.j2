@@ -422,7 +422,9 @@
     (see also <a href="https://tools.ietf.org/html/rfc5281#section-11.2.5">RFC 5281</a>)
     because &AElig;-DIR does not give read access to attribute
     <var>userPassword</var> and the user's password is stored as salted
-    hash.
+    hash. It is highly recommended to disable all other mechanisms in
+    FreeRADIUS config to avoid e.g. Windows insisting on using
+    <em>MSCHAP</em> or other challenge-response mechs.
   </li>
   <li>
     It is recommended to use the EAP-TLS server certificate of the RADIUS
