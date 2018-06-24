@@ -416,9 +416,19 @@
     for authorizing access to your Wifi network(s).
   </li>
   <li>
+    The client must use EAP-TTLS with PAP in inner tunnel because &AElig;-DIR
+    does not give read access to attribute <var>userPassword</var> and
+    the user's password is stored as salted hash.
+  </li>
+  <li>
     It is recommended to use the EAP-TLS server certificate of the RADIUS
     service also for authentication to &AElig;-DIR to avoid the need for
     maintaining another system credential (e.g. service password).
+  </li>
+  <li>
+    The RADIUS shared secret for <em>hostapd</em> is a purely local matter.
+    It is not used to secure a remote RADIUS access.
+    So no need to manage it centrally.
   </li>
 </ul>
 
