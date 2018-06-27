@@ -7,12 +7,20 @@
    "tags": "iam, openldap, ldap, pam, nss",
    "releases": [
       {
-         "version": "1.0.0",
+         "version": "0.2.0",
+         "state": "stable",
+         "scope": "minor feature",
+         "changes": "Polished and improved lots of minor stuff, last version for Debian Jessie",
+         "download": "https://ae-dir.com/install.html",
+         "published": "2018-06-27T12:00:00+00:00"
+      },
+      {
+         "version": "0.1.0",
          "state": "stable",
          "scope": "major feature",
-         "changes": "Initial public release",
-         "download": "https://www.ae-dir.com/download/ae-dir-1.0.0.tar.gz",
-         "published": "2018-06-24T12:00:00+00:00"
-      },
+         "changes": "initial submission",
+         "download": "https://ae-dir.com/install.html",
+         "published": "2018-06-02T12:00:00+00:00"
+      }
    ]
 }
