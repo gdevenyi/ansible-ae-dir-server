@@ -22,13 +22,6 @@
     enabled: yes
   when: openldap_role=="provider"
 
-- name: "ensure polkit is running"
-  service:
-    name: "polkit"
-    state: started
-    enabled: yes
-  when: openldap_role=="provider" and lsb_id == "CentOS"
-
 - name: "Ensure web2ldap is running"
   service:
     name: "web2ldap"
