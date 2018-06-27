@@ -12,13 +12,13 @@ galaxy_info:
   - name: opensuse
     versions:
     - Tumbleweed
-    - 42.3
+    - 15.0
   - name: Debian
     versions:
-    - jessie
+    - stretch
   - name: SLES
     versions:
-    - 12SP3
+    - 15
   - name: EL
     versions:
     - 7

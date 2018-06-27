@@ -116,7 +116,6 @@
     mode: 0644
   vars:
     name: web2ldap
-    socket_port: "{{ '8080' if aedir_uwsgi_usetcp else '' }}"
     user: ae-dir-web2ldap
     module: "web2ldap.wsgi:application"
     master: "false"
@@ -136,9 +135,8 @@
     group: root
     mode: 0644
   notify:
-    - reload systemd
     - "restart web2ldap"
-  when: ansible_service_mgr=="systemd"
+  when: aedir_service_manager == "systemd"
 
 - name: "Create AppArmor profile for web2ldap"
   template:

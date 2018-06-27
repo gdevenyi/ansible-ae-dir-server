@@ -23,7 +23,7 @@
     state: latest
     update_cache: yes
   notify:
-    - restart slapd
+    - "restart ae-slapd"
   with_items:
     - openldap-ltb
     - openldap-ltb-contrib-overlays

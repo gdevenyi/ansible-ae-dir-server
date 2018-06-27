@@ -8,7 +8,7 @@
     disable_recommends: yes
     type: package
   notify:
-    - restart slapd
+    - "restart ae-slapd"
   with_items:
     - cyrus-sasl
     - openldap2

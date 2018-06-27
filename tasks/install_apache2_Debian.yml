@@ -10,22 +10,10 @@
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
   notify:
-    - "restart web server"
+    - "restart ae-apache"
   with_items:
     - apache2
     - libapache2-mod-proxy-uwsgi
-
-- name: "Install packages needed for running Apache 2.4 on {{ lsb_id }}"
-  apt:
-    name: apache2-mpm-prefork
-    state: present
-    update_cache: yes
-    cache_valid_time: 3600
-    install_recommends: no
-    dpkg_options: 'force-confold,force-confdef'
-  notify:
-    - "restart web server"
-  when: ansible_distribution_release == "jessie"
 
 - name: "Install UWSGI packages on {{ lsb_id }}"
   apt:

@@ -18,19 +18,11 @@ Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
 {% endif %}
 Environment=LDAPNOINIT=1
 PIDFile={{ openldap_rundir }}/slapd.pid
-{% if lsb_id == 'Debian' and ansible_distribution_release == 'jessie' %}
-ExecStart={{ openldap_slapd_exec }} -n ae-slapd -l {{ openldap_syslog_facility }} -s {{ openldap_syslog_level }} -f {{ openldap_slapd_conf }} -h '{{ openldap_listen_urls }}' -o slp=off -u {{ openldap_slapd_user }} -g {{ openldap_slapd_group }}
-User=root
-Group=root
-CapabilityBoundingSet=CAP_NET_BIND_SERVICE CAP_SETUID CAP_SETGID
-AmbientCapabilities=CAP_NET_BIND_SERVICE CAP_SETUID CAP_SETGID
-{% else %}
 ExecStart={{ openldap_slapd_exec }} -n ae-slapd -l {{ openldap_syslog_facility }} -s {{ openldap_syslog_level }} -f {{ openldap_slapd_conf }} -h '{{ openldap_listen_urls }}' -o slp=off
 User={{ openldap_slapd_user }}
 Group={{ openldap_slapd_group }}
 CapabilityBoundingSet=CAP_NET_BIND_SERVICE
 AmbientCapabilities=CAP_NET_BIND_SERVICE
-{% endif %}
 MemoryDenyWriteExecute=yes
 {% if aedir_systemd_hardening %}
 # various hardening options

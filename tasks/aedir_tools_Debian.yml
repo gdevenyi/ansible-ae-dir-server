@@ -10,7 +10,6 @@
     dpkg_options: 'force-confold,force-confdef'
   with_items:
     - gcc
-    - swig
     - libssl-dev
     - libsasl2-dev
     - libldap-dev

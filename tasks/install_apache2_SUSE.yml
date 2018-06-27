@@ -8,7 +8,7 @@
     disable_recommends: yes
     type: package
   notify:
-    - "restart web server"
+    - "restart ae-apache"
   with_items:
     - apache2
     - apache2-prefork
@@ -20,7 +20,7 @@
     disable_recommends: yes
     type: package
   notify:
-    - "restart web server"
+    - "restart ae-apache"
   with_items:
     - uwsgi
     - uwsgi-python

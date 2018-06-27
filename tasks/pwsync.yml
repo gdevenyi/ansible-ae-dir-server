@@ -85,6 +85,5 @@
     group: root
     mode: 0644
   notify:
-    - reload systemd
     - "restart passmod"
-  when: ansible_service_mgr=="systemd"
+  when: aedir_service_manager == "systemd"

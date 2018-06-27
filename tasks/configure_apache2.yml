@@ -15,7 +15,7 @@
     group: "{{ apache_group }}"
     mode: 0750
   notify:
-    - "restart web server"
+    - "restart ae-apache"
 
 - name: "Create config for Apache from template"
   template:
@@ -25,7 +25,7 @@
     group: root
     mode: 0644
   notify:
-    - "restart web server"
+    - "restart ae-apache"
 
 - name: "Create ae-apache logrotate config"
   template:
@@ -43,7 +43,7 @@
     group: "{{ apache_group }}"
     mode: 0775
   notify:
-    - "restart web server"
+    - "restart ae-apache"
 
 - name: "Install apache2 CA cert bundle {{ apache_cacert_filename }} to {{ apache_cacert_pathname }}"
   copy:
@@ -54,7 +54,7 @@
     mode: 0644
   when: apache_cacert_filename != openldap_cacert_filename and apache_cacert_pathname != openldap_cacert_pathname
   notify:
-    - "restart web server"
+    - "restart ae-apache"
 
 - name: "Install apache2 server cert {{ apache_cert_filename }} to {{ apache_cert_pathname }}"
   copy:
@@ -65,7 +65,7 @@
     mode: 0644
   when: apache_cert_filename != openldap_cert_filename and apache_cert_pathname != openldap_cert_pathname
   notify:
-    - "restart web server"
+    - "restart ae-apache"
 
 - name: "Install apache2 server key {{ apache_key_filename }} to {{ apache_key_pathname }}"
   copy:
@@ -77,7 +77,7 @@
   when: apache_key_filename and (apache_key_filename != openldap_key_filename and apache_key_pathname != openldap_key_pathname)
   no_log: True
   notify:
-    - "restart web server"
+    - "restart ae-apache"
 
 - name: "Set ownership/permissions of apache2 server key {{ apache_key_pathname }}"
   file:
@@ -87,7 +87,7 @@
     mode: 0640
   when: apache_key_pathname != openldap_key_pathname
   notify:
-    - "restart web server"
+    - "restart ae-apache"
 
 - name: "Install systemd unit file for ae-apache"
   template:
@@ -97,9 +97,8 @@
     group: root
     mode: 0644
   notify:
-    - reload systemd
-    - "restart web server"
-  when: ansible_service_mgr=="systemd"
+    - "restart ae-apache"
+  when: aedir_service_manager == "systemd"
 
 - name: "Create AppArmor profile for {{ apache2_config[lsb_id].httpd_exec }}"
   template:
@@ -110,5 +109,5 @@
     mode: 0644
   notify:
     - "restart apparmor"
-    - "restart web server"
+    - "restart ae-apache"
   when: apparmor_enabled == True

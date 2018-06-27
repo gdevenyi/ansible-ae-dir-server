@@ -2,6 +2,11 @@
 
 # enable running services
 
+- name: "Make sure systemd unit files are reloaded"
+  systemd:
+    daemon_reload: yes
+  when: aedir_service_manager == "systemd"
+
 - name: "Enable and start ae-slapd is running"
   service:
     name: ae-slapd

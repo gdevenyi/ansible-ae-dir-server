@@ -7,7 +7,7 @@
     state: present
     update_cache: yes
   notify:
-    - "restart web server"
+    - "restart ae-apache"
   with_items:
     - httpd
     - mod_ssl

@@ -78,9 +78,8 @@
     group: root
     mode: 0644
   notify:
-    - reload systemd
     - "restart {{ oath_bind_listener }}"
-  when: aedir_service_manager=="systemd"
+  when: aedir_service_manager == "systemd"
 
 - name: "Install OATH-LDAP tool package on {{ lsb_id }}"
   zypper:
@@ -123,6 +122,6 @@
     mode: 0644
   notify:
     - "restart apparmor"
-    - "restart web server"
+    - "restart ae-apache"
     - "restart {{ oath_bind_listener }}"
   when: apparmor_enabled == True

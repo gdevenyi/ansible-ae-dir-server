@@ -17,5 +17,5 @@
     - restart oathenroll
     - restart bind_proxy
     - restart web2ldap
-    - restart slapd
-    - "restart web server"
+    - "restart ae-slapd"
+    - "restart ae-apache"

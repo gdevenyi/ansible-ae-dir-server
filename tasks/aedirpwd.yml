@@ -77,7 +77,6 @@
     mode: 0644
   vars:
     name: aedirpwd
-    socket_port: "{{ '8081' if aedir_uwsgi_usetcp else '' }}"
     user: ae-dir-pwd
     module: "aedirpwd_web:application"
     master: "true"
@@ -97,9 +96,8 @@
     group: root
     mode: 0644
   notify:
-    - reload systemd
     - "restart aedirpwd"
-  when: aedir_service_manager=="systemd"
+  when: aedir_service_manager == "systemd"
 
 - name: "Create AppArmor profile for aedirpwd"
   template:

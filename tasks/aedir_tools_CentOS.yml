@@ -7,7 +7,6 @@
     update_cache: yes
   with_items:
     - gcc
-    - swig
     - openssl-devel
     - cyrus-sasl-devel
     - openldap-devel

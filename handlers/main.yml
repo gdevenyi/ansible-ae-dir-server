@@ -1,36 +1,31 @@
 ---
 # handlers file for roles/ae-dir
 
-- name: reload systemd
-  command: systemctl daemon-reload
-
-- name: restart apparmor
-  command: systemctl restart apparmor
+- name: "restart apparmor"
+  service: name=apparmor state=restarted
   when: apparmor_enabled == True
 
-- name: restart slapd
+- name: "restart ae-slapd"
   service: name=ae-slapd state=restarted
 
-- name: restart aedirpwd
+- name: "restart aedirpwd"
   service: name=aedirpwd state=restarted
   when: openldap_role == 'provider'
 
-- name: restart hotp_validator
+- name: "restart hotp_validator"
   service: name=hotp_validator state=restarted
   when: openldap_role == 'provider' and oath_ldap_enabled == True
 
-- name: restart oathenroll
+- name: "restart oathenroll"
   service: name=oathenroll state=restarted
   when: openldap_role == 'provider' and oath_ldap_enabled == True
 
-- name: restart bind_proxy
+- name: "restart bind_proxy"
   service: name=bind_proxy state=restarted
   when: openldap_role == 'consumer' and oath_ldap_enabled == True
 
-- name: "restart web server"
-  service:
-    name: "ae-apache"
-    state: restarted
+- name: "restart ae-apache"
+  service: name=ae-apache state=restarted
   when: openldap_role == 'provider'
 
 - name: "restart web2ldap"
@@ -39,6 +34,6 @@
     state: restarted
   when: openldap_role == 'provider'
 
-- name: restart passmod
+- name: "restart passmod"
   service: name=passmod state=restarted
   when: openldap_role == 'provider' and aedir_pwsync_targeturl
