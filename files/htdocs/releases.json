@@ -4,7 +4,7 @@
    "description": "The agile IAM for DevOps",
    "homepage": "https://www.ae-dir.com/",
    "license": "APL-2.0",
-   "tags": "iam, openldap, ldap, pam, nss",
+   "tags": "iam, identity-management, ldap, openldap, pam, nss, security, authentication-directory",
    "releases": [
       {
          "version": "0.2.0",
