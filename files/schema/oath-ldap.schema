@@ -43,9 +43,9 @@ attributetype ( oath-ldap-at:1
   DESC 'OATH-LDAP: Shared Secret (possibly encrypted with public key in oathEncKey)'
   X-ORIGIN 'OATH-LDAP'
   SINGLE-VALUE
-  EQUALITY caseIgnoreMatch
-  SUBSTR caseIgnoreSubstringsMatch
-  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+  EQUALITY octetStringMatch
+  SUBSTR octetStringSubstringsMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.40 )
 
 attributetype ( oath-ldap-at:2
   NAME 'oathTokenSerialNumber'
@@ -78,6 +78,7 @@ attributetype ( oath-ldap-at:5
   ORDERING integerOrderingMatch
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 )
 
+# OID of HMAC algorithm as assigned in RFC 8018
 attributetype ( oath-ldap-at:6
   NAME 'oathHMACAlgorithm'
   DESC 'OATH-LDAP: HMAC algorithm used for generating OTP values'
@@ -378,6 +379,20 @@ attributetype ( oath-ldap-at:10.6
   SINGLE-VALUE
   SUP oathCounter )
 
+attributetype ( oath-ldap-at:10.8
+  NAME 'oathTOTPTimeStepWindow'
+  DESC 'OATH-LDAP: Size of time step +/- tolerance window used for TOTP validation'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  SUP oathCounter )
+
+attributetype ( oath-ldap-at:10.9
+  NAME 'oathTOTPTimeStepDrift'
+  DESC 'OATH-LDAP: Last observed time step drift seen for TOTP'
+  X-ORIGIN 'OATH-LDAP'
+  SINGLE-VALUE
+  SUP oathCounter )
+
 attributetype ( oath-ldap-at:16.2
   NAME 'oathTOTPValue'
   DESC 'OATH-LDAP: currently valid TOTP value of a token or associated user entry'
@@ -400,7 +415,8 @@ objectclass ( oath-ldap-oc:2.2
   X-ORIGIN 'OATH-LDAP'
   AUXILIARY
   SUP oathParams
-  MUST ( oathTOTPTimeStepPeriod ) )
+  MUST ( oathTOTPTimeStepPeriod )
+  MAY ( oathTOTPTimeStepWindow $ oathTOTPTimeStepDrift ) )
 
 objectclass ( oath-ldap-oc:3.2
   NAME 'oathTOTPToken'
