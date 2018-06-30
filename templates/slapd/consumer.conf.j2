@@ -438,7 +438,7 @@ access to
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=posixAccount)"
-  attrs=entry,objectClass,structuralObjectClass,aeStatus,entryUUID,entryDN,modifyTimestamp,uid,uidNumber,gidNumber,homeDirectory,gecos
+  attrs=entry,objectClass,structuralObjectClass,aeStatus,entryUUID,entryDN,modifyTimestamp,uid,uidNumber,gidNumber,homeDirectory
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeVisibleGroups/member & this" read
     by set="user/-1/aeProxyFor/aeVisibleGroups/member & this" read

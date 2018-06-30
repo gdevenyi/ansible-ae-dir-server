@@ -385,7 +385,7 @@ ditcontentrule ( ae-dir-oc:2
   NAME 'aeUser-dcr'
   AUX ( posixAccount $ inetLocalMailRecipient $ pkiUser $ ldapPublicKey $
         msPwdResetObject $ oathHOTPUser $ oathTOTPUser )
-  NOT ( audio $ businessCategory $ carLicense $
+  NOT ( gecos $ audio $ businessCategory $ carLicense $
         destinationIndicator $ facsimileTelephoneNumber $
         homePhone $ homePostalAddress $ host $ l $ labeledURI $ manager $
         o $ ou $ telephoneNumber $ initials $ internationaliSDNNumber $
@@ -575,7 +575,7 @@ objectclass ( ae-dir-oc:6.1
 ditcontentrule ( ae-dir-oc:6.1
   NAME 'aeHost-dcr'
   AUX ( posixAccount $ ldapPublicKey $ pkiUser $ ipHost )
-  NOT ( o $ ou $ owner $ seeAlso ) )
+  NOT ( gecos $ o $ ou $ owner $ seeAlso ) )
 
 # Object class for network adaptors built into servers, switches, routers etc.
 objectclass ( ae-dir-oc:6.2
@@ -629,7 +629,7 @@ ditcontentrule ( ae-dir-oc:4
   AUX ( posixAccount $ pkiUser $ ldapPublicKey $
         mailboxRelatedObject $ inetLocalMailRecipient $
         oathHOTPUser $ oathTOTPUser )
-  NOT ( host $ l $ o $ ou ) )
+  NOT ( gecos $ host $ l $ o $ ou ) )
 
 # Authentication tokens (yubikey etc.)
 #-----------------------------------------------------------------------
