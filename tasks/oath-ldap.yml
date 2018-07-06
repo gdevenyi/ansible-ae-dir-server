@@ -83,7 +83,7 @@
 
 - name: "Install OATH-LDAP tool package on {{ lsb_id }}"
   zypper:
-    name: "python-oathldap-tool"
+    name: "oathldap-tool"
     state: latest
     disable_recommends: yes
     type: package
