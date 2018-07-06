@@ -21,6 +21,10 @@ import time
 import email.utils
 from email.header import Header as email_Header
 
+# mailutil is optional dependency of module aedir
+# => provoke first fail here before doing anything else
+import mailutil
+
 # the separate python-aedir module
 import aedir.process
 
