@@ -6,7 +6,6 @@
     name: web2ldap
     state: present
     virtualenv: "{{ aedir_prefix }}"
-    virtualenv_site_packages: no
     extra_args: "{{ aedir_pip_extra_args }}"
   notify:
     - restart web2ldap

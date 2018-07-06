@@ -16,7 +16,6 @@
     name: "{{ item }}"
     state: present
     virtualenv: "{{ aedir_prefix }}"
-    virtualenv_site_packages: no
     virtualenv_python: python2.7
     extra_args: "{{ aedir_pip_extra_args }}"
   with_items:
@@ -39,7 +38,6 @@
     name: slapdsock
     state: present
     virtualenv: "{{ aedir_prefix }}"
-    virtualenv_site_packages: no
     extra_args: "{{ aedir_pip_extra_args }}"
   notify:
     - restart hotp_validator
@@ -57,7 +55,6 @@
       - dnspython
     state: present
     virtualenv: "{{ aedir_prefix }}"
-    virtualenv_site_packages: yes
     extra_args: "{{ aedir_pip_extra_args }}"
   when: openldap_role == 'provider'
   notify:
