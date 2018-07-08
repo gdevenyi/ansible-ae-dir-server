@@ -87,8 +87,9 @@
   </li>
 </ul>
 
-<h2 id="ae-dir-demon">PAM/NSS caching demon</h2>
+<h2 id="aehostd">aehostd -- custom PAM/NSS demon</h2>
 <p>Some details still <a href="#ae-dir-demon-open">open</a>.</p>
+<p><a href="https://pypi.org/project/aehostd/">Installable via PyPI</a></p>
 <dl>
   <dt>Improve Performance</dt>
   <dd>
@@ -119,6 +120,12 @@
         Do hosts lookup similar to ideas for <a href="#dns">DNS</a>.
       </dd>
     </dl>
+  </dd>
+  <dt>Automation / Recovery on error (PAM)</dt>
+  <dd>
+    special system user for
+    <a href="docs.html#schema-oc-aeHost">aeHost</a> with host
+    password allowed to set system password in local configuration
   </dd>
   <dt>Implementation details</dt>
   <dd>
@@ -345,12 +352,6 @@
 
 <h2 id="ae-dir-demon-open">PAM/NSS caching demon</h2>
 <dl>
-  <dt>Automation / Recovery on error (PAM)</dt>
-  <dd>
-    special system user for
-    <a href="docs.html#schema-oc-aeHost">aeHost</a> with host
-    password allowed to set system password in local configuration
-  </dd>
   <dt>Location-specific replicas</dt>
   <dd>
     read DC locations in attribute <var>aeLocation</var> of
