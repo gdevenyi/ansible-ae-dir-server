@@ -17,7 +17,7 @@
           <li><a href="#systemd">systemd</a></li>
         </ol>
       </li>
-      <li><a href="#ae-dir-demon">PAM/NSS caching demon</a></li>
+      <li><a href="#aehostd">Custom PAM/NSS caching demon</a></li>
     </ol>
   </li>
   <li>
@@ -31,7 +31,7 @@
       <li><a href="#pxe">PXE/DHCP/TFTP integration</a></li>
       <li><a href="#nac">Network Access Control (NAC)</a></li>
       <li><a href="#radius">RADIUS</a></li>
-      <li><a href="#ae-dir-demon-open">PAM/NSS caching demon</a></li>
+      <li><a href="#aehostd-open">PAM/NSS caching demon</a></li>
       <li><a href="#dns">DNS</a></li>
       <li><a href="#ui">User Interface</a></li>
       <li><a href="#cli">Command-line tool</a></li>
@@ -88,63 +88,8 @@
 </ul>
 
 <h2 id="aehostd">aehostd -- custom PAM/NSS demon</h2>
-<p>Some details still <a href="#ae-dir-demon-open">open</a>.</p>
-<p><a href="https://pypi.org/project/aehostd/">Installable via PyPI</a></p>
-<dl>
-  <dt>Improve Performance</dt>
-  <dd>
-    &AElig;-DIR-specific caching demon knows the data and therefore can search
-    more efficiently without local configuration (see notes about
-    <a href="apps.html#pam-nss-smart">smart clients</a>)
-  </dd>
-  <dt>Maps</dt>
-  <dd>
-    <dl>
-      <dt>group</dt>
-      <dd>
-        <ul>
-          <li>
-            The <em>group</em> map is extended with virtual role groups
-            based on <a href="docs.html#schema-oc-aeSrvGroup-attributes">
-            rights groups attributes</a> with well-known <var>gidNumber</var>.
-          </li>
-          <li>
-            Add virtual groups for the <var>gidNumber</var> set in
-            <a href="docs.html#schema-oc-aeUser-attributes">aeUser</a>
-            entries.
-          </li>
-        </ul>
-      </dd>
-      <dt>hosts</dt>
-      <dd>
-        Do hosts lookup similar to ideas for <a href="#dns">DNS</a>.
-      </dd>
-    </dl>
-  </dd>
-  <dt>Automation / Recovery on error (PAM)</dt>
-  <dd>
-    special system user for
-    <a href="docs.html#schema-oc-aeHost">aeHost</a> with host
-    password allowed to set system password in local configuration
-  </dd>
-  <dt>Implementation details</dt>
-  <dd>
-    <ul>
-      <li>
-        Uses PAM/NSS frontend modules of
-        <a href="https://arthurdejong.org/nss-pam-ldapd/">nss-pam-ldapd</a>
-      </li>
-      <li>
-        Forked from Arthur's
-        <a href="https://arthurdejong.org/nss-pam-ldapd/pynslcd.8">pynslcd(8)</a>
-      </li>
-      <li>
-        Support using X.509 TLS client certs for
-        <a href="apps.html#sasl-external-bind">SASL/EXTERNAL</a> bind
-      </li>
-    </ul>
-  </dd>
-</dl>
+<p><a href="apps.html#pam-nss-aehostd">aehostd</a> now ready for QA tests.</p>
+<p>Some details still <a href="#aehostd-open">open</a>.</p>
 
 
 <h1 id="open">Open</h1>
@@ -350,7 +295,7 @@
   </li>
 </ul>
 
-<h2 id="ae-dir-demon-open">PAM/NSS caching demon</h2>
+<h2 id="aehostd-open">Custom PAM/NSS caching demon</h2>
 <dl>
   <dt>Location-specific replicas</dt>
   <dd>
