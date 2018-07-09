@@ -355,6 +355,7 @@ aedir_fake_search_roots: []
 # base names with extension of web pages installed to DocumentRoot
 aedir_htdocs_templates:
   - ae-dir
+  - aehostd
   - apps
   - bcp
   - cli
