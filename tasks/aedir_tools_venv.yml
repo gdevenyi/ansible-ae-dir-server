@@ -62,3 +62,14 @@
     - restart oathenroll
     - restart hotp_validator
     - restart web2ldap
+
+- name: "PIP install web2ldap and modules in virtualenv {{ aedir_prefix }} on {{ openldap_role }} on {{ lsb_id }}"
+  pip:
+    name:
+      - web2ldap
+    state: present
+    virtualenv: "{{ aedir_prefix }}"
+    extra_args: "{{ aedir_pip_extra_args }}"
+  when: openldap_role == 'provider'
+  notify:
+    - restart web2ldap

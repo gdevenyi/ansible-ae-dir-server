@@ -88,7 +88,7 @@
   notify:
     - "restart aedirpwd"
 
-- name: Install systemd unit file from template
+- name: "Install systemd unit {{ aedir_systemd_dir }}/aedirpwd.service"
   template:
     src: "aedirpwd/aedirpwd.service.j2"
     dest: "{{ aedir_systemd_dir }}/aedirpwd.service"
@@ -108,6 +108,7 @@
     mode: 0644
   vars:
     name: aedirpwd
+    cfgdir: "{{ aedir_etc }}/aedirpwd"
   notify:
     - "restart apparmor"
     - "restart aedirpwd"

@@ -1,16 +1,7 @@
 ---
 # Install and configure web2ldap
 
-- name: "PIP package web2ldap in virtualenv {{ aedir_prefix }}"
-  pip:
-    name: web2ldap
-    state: present
-    virtualenv: "{{ aedir_prefix }}"
-    extra_args: "{{ aedir_pip_extra_args }}"
-  notify:
-    - restart web2ldap
-
-- name: Create web2ldapcnf/local.py for AE-DIR
+- name: "Create {{ aedir_python_sitepackages }}/web2ldapcnf/local.py"
   template:
     src: "{{ item }}"
     dest: "{{ aedir_python_sitepackages }}/web2ldapcnf/local.py"
@@ -24,7 +15,7 @@
   notify:
     - restart web2ldap
 
-- name: Create web2ldapcnf/hosts.py for AE-DIR
+- name: "Create {{ aedir_python_sitepackages }}/web2ldapcnf/hosts.py"
   template:
     src: "{{ item }}"
     dest: "{{ aedir_python_sitepackages }}/web2ldapcnf/hosts.py"
@@ -38,10 +29,10 @@
   notify:
     - restart web2ldap
 
-- name: "Create connect AE-DIR landing page for web2ldap"
+- name: "Create connect AE-DIR landing page template {{ web2ldapcnf_prefix }}/templates/connect.html"
   template:
     src: "{{ item }}"
-    dest: "{{ aedir_prefix }}/etc/web2ldap/templates/connect.html"
+    dest: "{{ web2ldapcnf_prefix }}/templates/connect.html"
     owner: root
     group: root
     mode: 0644
@@ -61,7 +52,7 @@
 - name: "web2ldap HTML and LDIF templates for AE-DIR (copy)"
   copy:
     src: "{{ item }}"
-    dest: "{{ aedir_prefix }}/etc/web2ldap/templates/ae-dir/{{ item | basename }}"
+    dest: "{{ web2ldapcnf_prefix }}/templates/ae-dir/{{ item | basename }}"
     owner: root
     group: root
     mode: 0644
@@ -71,14 +62,14 @@
 - name: "web2ldap HTML and LDIF templates for AE-DIR (template)"
   template:
     src: "{{ item }}"
-    dest: "{{ aedir_prefix }}/etc/web2ldap/templates/ae-dir/{{ item | basename | regex_replace('\\.j2','') }}"
+    dest: "{{ web2ldapcnf_prefix }}/templates/ae-dir/{{ item | basename | regex_replace('\\.j2','') }}"
     owner: root
     group: root
     mode: 0644
   with_fileglob:
     "../templates/web2ldap/templates/ae-dir/*.*.j2"
 
-- name: install AE-DIR plugin module for web2ldap
+- name: "Install AE-DIR plugin module {{ aedir_python_sitepackages }}/web2ldap/app/plugins/aedir.py"
   copy:
     src: "web2ldap/aedir.py"
     dest: "{{ aedir_python_sitepackages }}/web2ldap/app/plugins/aedir.py"
@@ -88,15 +79,15 @@
   notify:
     - restart web2ldap
 
-- name: "Create supplemental schema file for AE-DIR (ae-suppl-schema.ldif)"
+- name: "Create supplemental schema file {{ web2ldapcnf_prefix }}/ae-suppl-schema.ldif"
   copy:
     src: "web2ldap/ae-suppl-schema.ldif"
-    dest: "{{ aedir_prefix }}/etc/web2ldap/ae-suppl-schema.ldif"
+    dest: "{{ web2ldapcnf_prefix }}/ae-suppl-schema.ldif"
     owner: root
     group: root
     mode: 0644
 
-- name: "Create UWSGI socket directory for web2ldap"
+- name: "Create UWSGI socket directory {{ aedir_rundir }}/uwsgi/web2ldap"
   file:
     path: "{{ aedir_rundir }}/uwsgi/web2ldap"
     state: directory
@@ -106,7 +97,7 @@
   notify:
     - "restart web2ldap"
 
-- name: "Create uwsgi.ini for web2ldap"
+- name: "Create {{ aedir_etc }}/uwsgi/{{ name }}.ini"
   template:
     src: "uwsgi.ini.j2"
     dest: "{{ aedir_etc }}/uwsgi/{{ name }}.ini"
@@ -146,6 +137,7 @@
     mode: 0644
   vars:
     name: web2ldap
+    cfgdir: "{{ web2ldapcnf_prefix }}"
   notify:
     - "restart apparmor"
     - "restart web2ldap"

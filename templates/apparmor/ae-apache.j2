@@ -45,7 +45,7 @@ profile ae-apache {
   {{ web_document_root }}/** r,
 
   # access to web2ldap's static CSS files
-  {{ aedir_prefix }}/etc/web2ldap/css/*.css r,
+  {{ web2ldapcnf_prefix }}/css/*.css r,
 
   # access to UWSGI's Unix domain sockets
   {{ aedir_rundir }}/uwsgi/web2ldap/web2ldap.sock r,

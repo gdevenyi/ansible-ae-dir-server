@@ -149,7 +149,7 @@ ProxyPreserveHost On
   </Location>
 
   # CSS files for web2ldap
-  Alias /css/web2ldap {{ aedir_prefix }}/etc/web2ldap/css
+  Alias /css/web2ldap {{ web2ldapcnf_prefix }}/css
   <Location /css/web2ldap>
     <Limit GET>
 {% for require in apache_web2ldap_requires %}

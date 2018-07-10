@@ -44,6 +44,7 @@
     - python-asn1crypto
     - python-xlwt
     - python-pycryptodome
+    - web2ldap
   when: openldap_role == 'provider'
   notify:
     - restart aedirpwd
@@ -77,14 +78,3 @@
   when: openldap_role == 'provider'
   notify:
     - restart web2ldap
-
-- name: "Prepare Python 2.x virtualenv {{ aedir_prefix }}"
-  pip:
-    name:
-      - pip
-      - setuptools
-    state: latest
-    virtualenv: "{{ aedir_prefix }}"
-    virtualenv_site_packages: yes
-    virtualenv_python: python2.7
-    extra_args: "{{ aedir_pip_extra_args }}"

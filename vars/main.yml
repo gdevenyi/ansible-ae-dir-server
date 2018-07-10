@@ -29,6 +29,18 @@ aedir_package_repos:
       repo: "{{ aedir_suse_repo.get(ansible_lsb.description, '') }}"
       key: ""
 
+# OS-specific Python paths
+aedir_python_paths:
+  CentOS:
+    python_exec: "{{ aedir_prefix }}/bin/python2.7"
+    site_packages: "{{ aedir_prefix }}/lib/python2.7/site-packages"
+  Debian:
+    python_exec: "{{ aedir_prefix }}/bin/python2.7"
+    site_packages: "{{ aedir_prefix }}/lib/python2.7/site-packages"
+  SUSE:
+    python_exec: "/usr/bin/python2.7"
+    site_packages: "/usr/lib/python2.7/site-packages"
+
 # OS-specific maps
 os_openldap_paths:
   CentOS:
@@ -150,6 +162,14 @@ apache2_config:
       - logio
       - proxy
       - proxy_uwsgi
+
+web2ldap_paths:
+  CentOS:
+    configdir: "{{ aedir_prefix }}/etc/web2ldap"
+  Debian:
+    configdir: "{{ aedir_prefix }}/etc/web2ldap"
+  SUSE:
+    configdir: "/etc/web2ldap"
 
 # which uwsgi executable to use
 uwsgi_paths:

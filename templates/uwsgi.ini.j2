@@ -20,5 +20,7 @@ enable-threads = true
 buffer-size = {{ buffer_size }}
 harakiri = {{ harakiri }}
 plugin = python
+{% if aedir_python_sitepackages.startswith(aedir_prefix) %}
 virtualenv = {{ aedir_prefix }}
+{% endif  %}
 log-format = %(addr) - %(user) [%(ltime)] "%(method) %(uri) %(proto)" %(status) %(size) "%(referer)" "%(uagent)"

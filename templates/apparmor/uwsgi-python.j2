@@ -9,7 +9,7 @@ profile {{ name }} {
   #include <ae-dir/abstractions/uwsgi-python>
 
   # access to {{ name }} application config
-  {{ aedir_etc }}/{{ name }}/** r,
+  {{ cfgdir }}/** r,
 
 {% if name=="web2ldap" %}
   # access to CA cert for LDAPS

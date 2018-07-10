@@ -88,7 +88,11 @@ aedir_sbin: "{{ aedir_prefix }}/sbin"
 aedir_etc: "{{ aedir_prefix }}/etc"
 aedir_etc_openldap: "{{ aedir_etc }}/openldap"
 aedir_rundir: "{{ aedir_prefix }}/run"
-aedir_python_sitepackages: "{{ aedir_prefix }}/lib/python2.7/site-packages"
+aedir_python_sitepackages: "{{ aedir_python_paths[lsb_id].site_packages }}"
+
+# which Python interpreter to use
+#aedir_python: "{{ aedir_bin }}/python2.7 -ROOB"
+aedir_python: "{{ aedir_python_paths[lsb_id].python_exec }} -ROOB"
 
 # where to install systemd files
 aedir_systemd_dir: "/etc/systemd/system"
@@ -110,9 +114,6 @@ aedir_systemd_hardening:
 #  - "SystemCallFilter=~ ptrace madvise @clock @cpu-emulation @debug @keyring @module @mount @privileged @raw-io @reboot @swap"
 #  - "CapabilityBoundingSet=CAP_NET_BIND_SERVICE"
 #  - "AmbientCapabilities=CAP_NET_BIND_SERVICE"
-
-# which Python interpreter to use
-aedir_python: "{{ aedir_bin }}/python2.7 -ROOB"
 
 # regex patterns for enforcing naming conventions (substring match!)
 # Important notes:
@@ -722,6 +723,9 @@ web_document_root: "{{ aedir_prefix }}/htdocs"
 #---------------------------------------------------------------------------
 # web2ldap parameters
 #---------------------------------------------------------------------------
+
+# directory where the configuration files are located
+web2ldapcnf_prefix: "{{ web2ldap_paths[lsb_id].configdir }}"
 
 web2ldap_monitor_access_allowed:
   - 127.0.0.0/255.0.0.0

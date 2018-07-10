@@ -78,7 +78,7 @@
   notify:
     - "restart oathenroll"
 
-- name: Install systemd unit file from template
+- name: "Install systemd unit {{ aedir_systemd_dir }}/oathenroll.service"
   template:
     src: "oath-ldap/oathenroll.service.j2"
     dest: "{{ aedir_systemd_dir }}/oathenroll.service"
@@ -98,6 +98,7 @@
     mode: 0644
   vars:
     name: oathenroll
+    cfgdir: "{{ aedir_etc }}/oathenroll"
   notify:
     - "restart apparmor"
     - "restart oathenroll"
