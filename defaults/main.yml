@@ -91,7 +91,6 @@ aedir_rundir: "{{ aedir_prefix }}/run"
 aedir_python_sitepackages: "{{ aedir_python_paths[lsb_id].site_packages }}"
 
 # which Python interpreter to use
-#aedir_python: "{{ aedir_bin }}/python2.7 -ROOB"
 aedir_python: "{{ aedir_python_paths[lsb_id].python_exec }} -ROOB"
 
 # where to install systemd files
