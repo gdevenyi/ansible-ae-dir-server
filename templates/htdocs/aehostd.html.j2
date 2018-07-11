@@ -15,13 +15,13 @@
   </li>
 </ol>
 
-<h1 id="aehostd-intro">Introduction</h1>
+<h1 id="intro">Introduction</h1>
 
 <p>
   While you can integrate your Linux systems with any NSS/PAM service demon
   it is highly recommended to use
   <a href="https://pypi.org/project/aehostd/">aehostd</a>,
-  a custom service implemented
+  a custom NSS/PAM service implemented
   in <a href="https://www.python.org">Python 2.x</a>.
 </p>
 
@@ -35,20 +35,21 @@
 {% set img_title="&AElig;-DIR integration of Linux with aehostd" -%}
 {% include "includes/img.html.j2" %}
 
+<h2 id="features">Specific features</h2>
 <p>
   Additionally to what you expect by such a service this custom client
-  optimized for &AElig;-DIR does the following:
+  is has specific functionality for use with &AElig;-DIR:
 </p>
 <ul>
   <li>
-    Bind to &AElig;-DIR either with
+    Binds to &AElig;-DIR either with
     <ul>
       <li><em>simple bind</em> (short-DN form)</li>
       <li><em>SASL/EXTERNAL</em> bind when using TLS client certs</li>
     </ul>
   </li>
   <li>
-    Send <em>LDAP Who Am I?</em> extended operation
+    Sends <em>LDAP Who Am I?</em> extended operation
     (see <a href="https://tools.ietf.org/html/rfc4532">RFC 4352</a>)
     to find the real DN of their own
     <a href="docs.html#schema-oc-aeHost">aeHost</a> entry
@@ -56,14 +57,9 @@
     membership.
   </li>
   <li>
-    When checking password via Simple Bind Request use
-    <em>Session Tracking</em> extended control with the IP address of the
-    client system accessing the service
-    (see <a href="https://tools.ietf.org/html/draft-wahl-ldap-session">draft-wahl-ldap-session</a>)
-  </li>
-  <li>
-    Construct the search filters for searching user, group and sudoers
-    entries based on the attributes found in all relevant
+    Without specific client configuration it uses search filters for
+    searching user, group and sudoers entries based on the attributes found
+    in all relevant
     <a href="docs.html#schema-oc-aeSrvGroup">aeSrvGroup</a>
     entries searched before:
     <ul>
@@ -71,48 +67,98 @@
       <li>aeVisibleGroups</li>
       <li>aeVisibleSudoers</li>
     </ul>
+    This gives much better performance when having many POSIX systems
+    integrated with &AElig;-DIR.
+  </li>
+  <li>
+    When checking user's password it sends
+    <em>Session Tracking</em> extended control along with the simple bind
+    request with the IP address of the client system and the user name
+    (see <a href="https://tools.ietf.org/html/draft-wahl-ldap-session">draft-wahl-ldap-session</a>).
+    This gives more valuable information in &AElig;-DIR slapd logs for auditing.
   </li>
 </ul>
-<dl>
-  <dt>Improve Performance</dt>
-  <dd>
-    &AElig;-DIR-specific caching demon knows the data and therefore can search
-    more efficiently without local configuration (see notes about
-    <a href="apps.html#pam-nss-smart">smart clients</a>)
-  </dd>
-  <dt>Maps</dt>
-  <dd>
-    <dl>
-      <dt>group</dt>
-      <dd>
-        <ul>
-          <li>
-            The <em>group</em> map is extended with virtual role groups
-            based on <a href="docs.html#schema-oc-aeSrvGroup-attributes">
-            rights groups attributes</a> with well-known <var>gidNumber</var>.
-          </li>
-          <li>
-            Add virtual groups for the <var>gidNumber</var> set in
-            <a href="docs.html#schema-oc-aeUser-attributes">aeUser</a>
-            entries.
-          </li>
-        </ul>
-      </dd>
-      <dt>hosts</dt>
-      <dd>
-        Do hosts lookup similar to ideas for <a href="#dns">DNS</a>.
-      </dd>
-    </dl>
-  </dd>
-  <dt>Automation / Recovery on error (PAM)</dt>
-  <dd>
-    special system user for
-    <a href="docs.html#schema-oc-aeHost">aeHost</a> with host
-    password allowed to set system password in local configuration
-  </dd>
+
+<h2 id="maps">NSS maps</h2>
+<p>
+  The following NSS maps are provided:
+  <ul>
+    <li>passwd</li>
+    <li>group</li>
+    <li>hosts</li>
+  </ul>
+</p>
+
+<p>
+  Besides normal <em>group</em> map this demon returns some virtual
+  groups to the calling application:
+  <ul>
+    <li>
+      Virtual groups for the individual <var>gidNumber</var> set in
+      <a href="docs.html#schema-oc-aeUser-attributes">aeUser</a>.
+      entries.
+    </li>
+    <li>
+      Virtual role groups based on
+      <a href="docs.html#schema-oc-aeSrvGroup-attributes">
+      rights groups attributes</a>
+      <table>
+        <tr>
+          <th>Attribute</th>
+          <th>Group name</th>
+          <th>GID</th>
+        </tr>
+        <tr>
+          <td>aeVisibleGroups</td>
+          <td>ae-vgrp-role-all</td>
+          <td>9000</td>
+        </tr>
+        <tr>
+          <td>aeLoginGroups</td>
+          <td>ae-vgrp-role-log</td>
+          <td>9001</td>
+        </tr>
+        <tr>
+          <td>aeLogStoreGroups</td>
+          <td>ae-vgrp-role-login</td>
+          <td>9002</td>
+        </tr>
+        <tr>
+          <td>aeSetupGroups</td>
+          <td>ae-vgrp-role-setup</td>
+          <td>9003</td>
+        </tr>
+      </table>
+    </li>
+  </ul>
+</p>
+
+<p>
+  Example use-cases for virtual role groups:
+</p>
+<ul>
+  <li>
+    Allow all <a href="docs.html#role-setup-admin">setup admins</a> mapped
+    to virtual role POSIX group <var>ae-vgrp-role-setup</var> to use
+    command <code>su</code> with own password
+    (see <a href="https://linux.die.net/man/8/pam_wheel">pam_wheel(8)</a>).
+  </li>
+  <li>
+    Allow all users with log view right mapped to virtual role POSIX group
+    <var>ae-vgrp-role-log</var> to read log files by simply setting normal
+    group ownership and group permissions (no need to sync POSIX ACLs).
+  </li>
+</ul>
+
+<h2 id="aehost-init">Host password initialization</h2>
+<p>
+  When using password authentication with a special system user and the
+  host password this host password is written to <em>aehostd</em>'s
+  configuration file which allows automated initialization and recovery via
+  PAM.
 </dl>
 
-<h1 id="aehostd-install">Installation</h1>
+<h1 id="install">Installation</h1>
 
 <h2 id="pam-nss-modules">NSS/PAM modules</h2>
 <p>
@@ -127,7 +173,6 @@
 </p>
 
 <h1 id="aehostd-config">Configuration</h1>
-
 <p>
   Example ansible role: <code>ansible/roles/ae-dir-hostd/</code>
   (sets ansible variable <em>nsswitch_module</em> to "aedir")
