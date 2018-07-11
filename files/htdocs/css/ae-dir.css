@@ -137,6 +137,14 @@ pre.cli {
   border:1px #404040 dotted;
 }
 
+pre.cfg {
+  padding:0.4em;
+  margin-left:2em;
+  line-height:1.3em;
+  width:95%;
+  border:1px #404040 dotted;
+}
+
 table ul {
   padding:0.1em;
 }

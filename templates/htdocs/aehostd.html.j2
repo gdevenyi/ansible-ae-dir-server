@@ -26,7 +26,14 @@
     </ol>
   </li>
   <li>
-    <a href="#aehostd-config">Configuration</a>
+    <a href="#cfg">Configuration</a>
+    <ol>
+      <li><a href="#cfg-general">General</a></li>
+      <li><a href="#cfg-socket">Socket</a></li>
+      <li><a href="#cfg-ldap">LDAP</a></li>
+      <li><a href="#cfg-maps">NSS maps</a></li>
+      <li><a href="#cfg-pam">PAM</a></li>
+    </ol>
   </li>
 </ol>
 
@@ -97,12 +104,12 @@
 <h2 id="maps">NSS maps</h2>
 <p>
   The following NSS maps are provided:
-  <ul>
-    <li>passwd</li>
-    <li>group</li>
-    <li>hosts</li>
-  </ul>
 </p>
+<ul>
+  <li>passwd</li>
+  <li>group</li>
+  <li>hosts</li>
+</ul>
 
 <p>
   Besides normal <em>group</em> map this demon returns some virtual
@@ -110,8 +117,7 @@
   <ul>
     <li>
       Virtual groups for the individual <var>gidNumber</var> set in
-      <a href="docs.html#schema-oc-aeUser-attributes">aeUser</a>.
-      entries.
+      <a href="docs.html#schema-oc-aeUser-attributes">aeUser</a> entries.
     </li>
     <li>
       Virtual role groups based on
@@ -165,32 +171,169 @@
   </li>
 </ul>
 
-<h2 id="aehost-init">Host password initialization</h2>
+<h2 id="aehost-init">Initialization of host password</h2>
 <p>
-  When using password authentication with a special system user and the
-  host password this host password is written to <em>aehostd</em>'s
-  configuration file which allows automated initialization and recovery via
-  PAM.
-</dl>
+  <em>aehostd</em> has a special feature which is very helpful for
+  automated enrollment of hosts. It does not require administrative access
+  to the machine before correct initialization and also does not require
+  other agents besides <em>aehostd</em> to be installed on the host. Mainly
+  it is based on a PAM authentication with host password.
+</p>
+<p>Process steps:</p>
+<ol>
+  <li>
+    Host gets installed with correctly configured short bind-DN
+    based on the canonical hostname
+    (usually in file <em>/etc/aehostd.conf</em>)
+    but without a host password
+    (usually in file <em>/var/lib/aehostd/aehostd.pw</em>).
+  </li>
+  <li>
+    A responsible
+    <a href="docs.html#role-setup-admin">setup admin</a> adds a new
+    <a href="docs.html#schema-oc-aeHost">aeHost</a> entry for the canonical
+    hostname and sets a new random password for this entry<br>
+    or just sets a new random password for an existing
+    <a href="docs.html#schema-oc-aeHost">aeHost</a> entry.
+  </li>
+  <li>
+    <a href="docs.html#role-setup-admin">Setup admin</a> connects via SSH
+    to the host authenticating as special service account
+    <var>aehost-init</var> with the new host password set before.
+  </li>
+  <li>
+    <em>aehostd</em> receives the PAM authentication request for the system
+    user account <var>aehost-init</var> and checks it with a simple bind
+    request on behalf of the locally configured host bind DN.
+  </li>
+  <li>
+    In case the host password is correct it is written to a separate
+    <em>aehostd</em> password file in case the password stored therein is
+    different.
+  </li>
+  <li>
+    <em>aehostd</em> receives the PAM authorization request for the system
+    user account <var>aehost-init</var> and rejects it.
+  </li>
+</ol>
 
 <h1 id="install">Installation</h1>
 
 <h2 id="pam-nss-modules">NSS/PAM modules</h2>
 <p>
-    The NSS and PAM front-end modules of
-    <a href="#pam-nss-nslcd">nss-pam-ldapd (aka nslcd)</a>
-    are used preferrably compiled with different compile-time parameters
-    to prevent naming and package collisions with other standard OS packages.<br>
-    For example see the compilation options in the .spec file of this package:<br>
-    <a href="https://build.opensuse.org/package/show/home:stroeder:AE-DIR/aehostd-modules">
-      openSUSE build service: Package <em>aehostd-modules</em>
-    </a>
+  The NSS and PAM front-end modules of
+  <a href="#pam-nss-nslcd">nss-pam-ldapd (aka nslcd)</a>
+  are used preferrably compiled with different compile-time parameters
+  to prevent naming and package collisions with other standard OS packages.<br>
+  For example see the compilation options in the .spec file of this package:<br>
+  <a href="https://build.opensuse.org/package/show/home:stroeder:AE-DIR/aehostd-modules">
+    openSUSE build service: Package <em>aehostd-modules</em>
+  </a>
 </p>
 
-<h1 id="aehostd-config">Configuration</h1>
+<h2 id="config">ansible</h2>
 <p>
   Example ansible role: <code>ansible/roles/ae-dir-hostd/</code>
   (sets ansible variable <em>nsswitch_module</em> to "aedir")
 </p>
+
+<h1 id="options">Configuration</h1>
+<p>
+  The following options can be set in the configuration file <em>/etc/aehostd.conf</em>.
+</p>
+
+<h2 id="cfg-general">General</h2>
+<p>
+  The following options specify general process parameters:
+</p>
+<pre class="cfg">
+# where PID file is stored
+pidfile = /var/run/nslcd/aehostd.pid
+# the number of threads to start
+threads = 5
+# the user id nslcd should be run as
+uid = aehostd
+# the group id nslcd should be run as
+gid = aehostd
+# logging level
+loglevel = 20
+</pre>
+
+<h2 id="cfg-socket">Socket</h2>
+<p>
+  The following options specify handling of the Unix domain socket on which
+  <em>aehostd</em> listens for NSS and PAM requests:
+</p>
+<pre class="cfg">
+# full path name of service socket
+socketpath = /var/run/nslcd/socket
+# timeout of service socket
+sockettimeout = 10.0
+# permissions used for service socket
+socketperms = '0666'
+</pre>
+
+<h2 id="cfg-ldap">LDAP</h2>
+<p>
+  Various LDAP connection parameters can be set and tuned:
+</p>
+<pre class="cfg">
+# The location at which the LDAP server(s) should be reachable.
+uri = ldaps://ae-dir-c1.example.com ldaps://ae-dir-c2.example.com ldaps://ae-dir-c3.example.com
+# preferred short bind-DN form (relocatable)
+binddn = host=host1.example.com,ou=ae-dir
+# pathname of file containing password for the above binddn
+bindpwfile = /etc/aehostd.pw
+# CA certificate for checking TLS server cert of LDAP server(s)
+tls_cacertfile = /etc/ssl/certs/cacerts.pem
+# Client certificate and its private key to use with SASL/EXTERNAL bind
+tls_cert = None
+tls_key = None
+# time limit (secs) for all LDAP operations
+timelimit = 3.0
+# how long to use an existing LDAP connection (secs)
+conn_ttl = 1800.0
+# LDAPObject cache TTL (secs)
+cache_ttl = 6.0
+</pre>
+
+<h2 id="cfg-maps">NSS maps</h2>
+<p>
+  Parameters related to NSS maps:
+</p>
+<pre class="cfg">
+# passwd entries to ignore (default: all users in local /etc/passwd)
+nss_ignore_users =
+nss_ignore_uids =
+# group entries to ignore (default: all users in local /etc/passwd)
+nss_ignore_groups =
+nss_ignore_gids =
+# POSIX-ID and name validation
+nss_min_uid = 0
+nss_min_gid = 0
+nss_max_uid = 65500
+nss_max_gid = 65500
+# regex for constraining valid user and group names (default: POSIX standard)
+validnames =
+# virtual groups
+vgroup_name_prefix = ae-vgrp-
+vgroup_rgid_offset = 9000
+# user account used to authenticate as own aeHost object
+# formatted like entry in /etc/passwd
+aehost_vaccount = aehost-init:x:9042:9042:AE-DIR virtual host init account:/tmp:/bin/true
+# Template string for deriving gecos field from user's name
+gecos_tmpl = AE-DIR user {username}
+# Template string for deriving homeDirectory value from user's name
+homedir_tmpl = /home/{username}
+</pre>
+
+<h2 id="cfg-pam">PAM</h2>
+<p>Parameters related to PAM:</p>
+<pre class="cfg">
+# filter template string to be used when processing PAM authorization requests
+pam_authz_search = (&(uid={username})(|(pwdChangedTime=*)(userCertificate=*)(sshPublicKey=*)))
+# Text to output when rejecting change password requests
+pam_passmod_deny_msg = None
+</pre>
 
 {% endblock content %}
