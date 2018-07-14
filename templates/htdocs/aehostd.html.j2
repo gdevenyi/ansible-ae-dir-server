@@ -228,11 +228,40 @@
 
 <h2 id="pam-nss-modules">NSS/PAM modules</h2>
 <p>
-  The NSS and PAM front-end modules of
-  <a href="#pam-nss-nslcd">nss-pam-ldapd (aka nslcd)</a>
-  are used preferrably compiled with different compile-time parameters
-  to prevent naming and package collisions with other standard OS packages.<br>
-  For example see the compilation options in the .spec file of this package:<br>
+  The NSS and PAM front-end modules of Arthur de Jong's <a
+  href="https://arthurdejong.org/nss-pam-ldapd/">nss-pam-ldapd</a> (aka
+  nslcd) are used for querying the <em>aehostd</em> service via its Unix
+  domain socket.
+</p>
+<p>
+  You can compile these modules with different compile-time parameters
+  to prevent naming and package collisions with other standard OS packages.
+  In the following example the modules are compiled with module name
+  <em>aedir</em> and for using Unix domain socket
+  <em>/var/run/aehostd/aehostd.sock</em>:
+</p>
+<pre class="cli">
+./configure \
+  --with-module-name=aedir \
+  --disable-nslcd --disable-pynslcd --disable-kerberos \
+  --libdir=/lib64 \
+  --with-pam-seclib-dir=/%{_lib}/security \
+  --disable-utils \
+  --with-nss-maps=passwd,group,hosts \
+  --with-ldap-lib=openldap \
+  --with-nslcd-socket=/var/run/aehostd/aehostd.sock
+make
+make install
+</pre>
+<p>
+  In <em>/etc/nsswitch.conf</em> you add the following lines:
+</p>
+<pre class="cli">
+passwd: files aedir
+group:  files aedir
+</pre>
+<p>
+  For openSUSE and SLES there are ready-to-use packages available at
   <a href="https://build.opensuse.org/package/show/home:stroeder:AE-DIR/aehostd-modules">
     openSUSE build service: Package <em>aehostd-modules</em>
   </a>
