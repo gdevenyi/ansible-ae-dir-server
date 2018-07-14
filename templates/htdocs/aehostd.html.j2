@@ -189,7 +189,7 @@
 <ol>
   <li>
     Host gets installed with correctly configured short bind-DN
-    based on the canonical hostname
+    based on the canonical hostname (FQDN)
     (usually in file <em>/etc/aehostd.conf</em>)
     but without a host password
     (usually in file <em>/var/lib/aehostd/aehostd.pw</em>).
@@ -198,7 +198,7 @@
     A responsible
     <a href="docs.html#role-setup-admin">setup admin</a> adds a new
     <a href="docs.html#schema-oc-aeHost">aeHost</a> entry for the canonical
-    hostname and sets a new random password for this entry<br>
+    hostname (FQDN) and sets a new random password for this entry<br>
     or just sets a new random password for an existing
     <a href="docs.html#schema-oc-aeHost">aeHost</a> entry.
   </li>
@@ -213,8 +213,9 @@
     request on behalf of the locally configured host bind DN.
   </li>
   <li>
-    In case the host password is correct it is written to a separate
-    <em>aehostd</em> password file in case the password stored therein is
+    In case the host password is correct it is written to the
+    <em>aehostd</em> password file (located by configuration option
+    <var>bindpwfile</var>) in case the password stored therein is
     different.
   </li>
   <li>
