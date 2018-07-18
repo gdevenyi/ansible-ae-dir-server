@@ -245,7 +245,7 @@
   --with-module-name=aedir \
   --disable-nslcd --disable-pynslcd --disable-kerberos \
   --libdir=/lib64 \
-  --with-pam-seclib-dir=/%{_lib}/security \
+  --with-pam-seclib-dir=/lib/security \
   --disable-utils \
   --with-nss-maps=passwd,group,hosts \
   --with-ldap-lib=openldap \
@@ -260,12 +260,26 @@ make install
 passwd: files aedir
 group:  files aedir
 </pre>
-<p>
-  For openSUSE and SLES there are ready-to-use packages available at
-  <a href="https://build.opensuse.org/package/show/home:stroeder:AE-DIR/aehostd-modules">
-    openSUSE build service: Package <em>aehostd-modules</em>
-  </a>
-</p>
+
+<p>OS-specific build files:</p>
+<ul>
+  <li>
+    For building Debian packages you can use files in directory<br>
+    <em>client-examples/aehostd-modules/debian/</em>
+  </li>
+  <li>
+    For building RedHat, CentOS, Fedora packages you can use file<br>
+    <em>client-examples/aehostd-modules/redhat-rpmbuild/SPECS/aehostd-modules.spec</em>
+  </li>
+  <li>
+    For <a href="https://www.opensuse.org">openSUSE</a> and
+    <a href="https://www.suse.com/products/server/">SLES</a>
+    there are ready-to-use packages available at
+    <a href="https://build.opensuse.org/package/show/home:stroeder:AE-DIR/aehostd-modules">
+      openSUSE build service: Package <em>aehostd-modules</em>
+    </a>
+  </li>
+</ul>
 
 <h2 id="config">ansible</h2>
 <p>
