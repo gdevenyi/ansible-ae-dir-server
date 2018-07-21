@@ -268,15 +268,8 @@ access to
     by set="user/-1/aeProxyFor/aeVisibleGroups & this" read
     by set="user/aeSrvGroup/aeVisibleGroups & this" read
     by set="user/aeSrvGroup/aeProxyFor/aeVisibleGroups & this" read
-    by * none break
-# group members can only read their own member attribute values
-access to
-  dn.subtree="{{ aedir_suffix }}"
-  filter="(objectClass=groupOfEntries)"
-  attrs=member
-  val.regex="^(.+)$"
-    by set.expand="user & [${v1}]" read
-    by * none break
+    by dnattr=member selfread
+    by * auth
 
 access to
   dn.subtree="{{ aedir_suffix }}"
