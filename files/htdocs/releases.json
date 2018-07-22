@@ -7,6 +7,14 @@
    "tags": "iam, identity-management, ldap, openldap, pam, nss, security, authentication-directory",
    "releases": [
       {
+         "version": "0.3.0",
+         "state": "stable",
+         "scope": "major feature",
+         "changes": "Added new ansible role for installing custom NSS/PAM service (aehostd)",
+         "download": "https://ae-dir.com/install.html",
+         "published": "2018-07-23T12:00:00+00:00"
+      },
+      {
          "version": "0.2.0",
          "state": "stable",
          "scope": "minor feature",
