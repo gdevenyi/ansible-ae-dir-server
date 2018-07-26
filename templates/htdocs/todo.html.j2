@@ -109,57 +109,17 @@
 </p>
 
 <h2 id="sso">WebSSO</h2>
-<p>Possible IdP implementations for SAML 2.0, OAuth 2.0, Open ID connect:</p>
-<table>
-  <tr>
-    <th>Project name</th>
-    <th>License</th>
-    <th>Programming<br>Language</th>
-    <th>Notes</th>
-  </tr>
-  <tr>
-    <td>
-      <a href="https://pypi.python.org/pypi/pysaml2">pysaml2</a>
-      and
-      <a href="https://pypi.python.org/pypi/oic">oic</a> /
-      <a href="https://pypi.python.org/pypi/pyop">pyop</a>
-    </td>
-    <td>Apache License 2.0</td>
-    <td>Python</td>
-    <td>
-      <ul>
-        <li>no ready-to-use web application</li>
-        <li>much work to implement missing pieces</li>
-        <li>highest flexibility</li>
-      </ul>
-    </td>
-  </tr>
-  <tr>
-    <td><a href="https://ipsilon-project.org/">ipsilon</a></td>
-    <td>GPLv3</td>
-    <td>Python</td>
-    <td>
-      <ul>
-        <li>many dependencies especially on FreeIPA/sssd modules</li>
-        <li>hard to install</li>
-        <li>bad documentation</li>
-        <li>seems unmaintained</li>
-      </ul>
-    </td>
-  </tr>
-  <tr>
-    <td><a href="http://www.keycloak.org/documentation.html">keycloak</a></td>
-    <td>Apache License 2.0</td>
-    <td>Java</td>
-    <td>
-      <ul>
-        <li>runs within <em>wildfly</em></li>
-        <li>easy too install test deployment</li>
-        <li>complex hardening needed</li>
-      </ul>
-    </td>
-  </tr>
-</table>
+<p>
+  Custom IdP implementation supporting SAML 2.0, OAuth 2.0, Open ID Connect
+  checking login relationship of user and service based on
+  <a href="docs.html#schema-oc-aeSrvGroup">aeSrvGroup - aeLoginGroups</a>.
+</p>
+<p>
+  Python modules to be used:
+  <a href="https://pypi.python.org/pypi/pysaml2">pysaml2</a>,
+  <a href="https://pypi.python.org/pypi/oic">oic</a>,
+  <a href="https://pypi.python.org/pypi/pyop">pyop</a>
+</p>
 
 <h2 id="pki">X.509 PKI</h2>
 <ul>
