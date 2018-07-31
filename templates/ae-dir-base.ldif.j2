@@ -679,7 +679,7 @@ objectClass: aeGroup
 aeMemberZone: cn=ae,{{ aedir_suffix }}
 {% for ae_user in aedir_init_aeadmins %}
 member: uid={{ ae_user.uid }},cn=ae,{{ aedir_suffix }}
-memberUID: {{ ae_user.uid }}
+memberUid: {{ ae_user.uid }}
 {% endfor %}
 
 dn: cn=ae-auditors,cn=ae,{{ aedir_suffix }}
@@ -921,12 +921,12 @@ aeMemberZone: cn=ae,{{ aedir_suffix }}
 {% for host in aedir_hosts['provider'] %}
 {% set replica = hostvars[host].get('openldap_service_fqdn',host) -%}
 member: uid=ae-dir-slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
-memberUID: ae-dir-slapd_{{ replica.split('.')[0] }}
+memberUid: ae-dir-slapd_{{ replica.split('.')[0] }}
 {% endfor %}
 {% for host in aedir_hosts['consumer'] %}
 {% set replica = hostvars[host].get('openldap_service_fqdn',host) -%}
 member: uid=ae-dir-slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
-memberUID: ae-dir-slapd_{{ replica.split('.')[0] }}
+memberUid: ae-dir-slapd_{{ replica.split('.')[0] }}
 {% endfor %}
 
 dn: cn=ae-providers,cn=ae,{{ aedir_suffix }}
@@ -947,7 +947,7 @@ aeMemberZone: cn=ae,{{ aedir_suffix }}
 {% for host in aedir_hosts['provider'] %}
 {% set replica = hostvars[host].get('openldap_service_fqdn',host) -%}
 member: uid=ae-dir-slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
-memberUID: ae-dir-slapd_{{ replica.split('.')[0] }}
+memberUid: ae-dir-slapd_{{ replica.split('.')[0] }}
 {% endfor %}
 
 #---------------------------------------------------------------------------

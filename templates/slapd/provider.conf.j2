@@ -51,7 +51,7 @@ index departmentNumber eq
 index uidNumber eq
 index gidNumber eq
 index member eq
-index memberUID eq
+index memberUid eq
 index rfc822MailMember sub,eq
 index memberURL pres
 index memberOf eq
@@ -844,7 +844,7 @@ access to
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=posixGroup)"
-  attrs=memberUID
+  attrs=memberUid
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeVisibleGroups & this" read
     by set="user/-1/aeProxyFor/aeVisibleGroups & this" read
@@ -854,7 +854,7 @@ access to
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=posixGroup)"
-  attrs=memberUID
+  attrs=memberUid
   val.regex="^(.+)$"
     by set.expand="user/uid & [${v1}]" read
     by * none break
@@ -1479,14 +1479,14 @@ constraint_attribute member
   set "this/member/aePerson/aeDept & this/aeDept"
   restrict="ldap:///{{ aedir_suffix }}??sub?(&(objectClass=groupOfEntries)(aeDept=*))"
 
-# restrict memberUID to be uid of an active posixAccount
-constraint_attribute memberUID
+# restrict memberUid to be uid of an active posixAccount
+constraint_attribute memberUid
   uri "ldap:///{{ aedir_suffix }}?uid?sub?(&(|(objectClass=aeUser)(objectClass=aeService))(objectClass=posixAccount)(aeStatus=0))"
   restrict="ldap:///{{ aedir_suffix }}??sub"
 
-# restrict memberUID to be consistent with group membership defined in member
-constraint_attribute memberUID,member
-  set "this/memberUID & this/member/uid"
+# restrict memberUid to be consistent with group membership defined in member
+constraint_attribute memberUid,member
+  set "this/memberUid & this/member/uid"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=posixGroup)"
 
 # restrict rfc822MailMember to be mail of an active local e-mail account
