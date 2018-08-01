@@ -9,7 +9,8 @@
   <li><a href="#installation">Installation</a></li>
   <li><a href="#maintenance">Maintenance</a></li>
   <li><a href="#client-integration">Client integration</a></li>
-  <li><a href="#security">Security</a></li>
+  <li><a href="#security">Security and Privacy</a></li>
+  <li><a href="#privacy">Privacy / Data Protection</a></li>
   <li><a href="#audit">Auditing</a></li>
 </ol>
 
@@ -372,6 +373,37 @@
       this succeeds or fails. &AElig;-DIR deliberately does not tell
       the user which authentication factor was wrong. This avoids the
       authentication factors being attacked separately.
+    </p>
+  </li>
+
+</ol>
+
+<h1 id="privacy">Privacy / Data Protection</h1>
+
+<ol>
+
+  <li id="gdpr">
+    <p class="faq_q">
+      So you <a href="#delete">cannot delete users</a>.
+      How to comply to privacy / data protection rules, e.g.
+      <a href="https://ec.europa.eu/info/law/law-topic/data-protection_en">EU GDPR</a>?
+    </p>
+    <p class="faq_a">
+      <ol>
+        <li>
+          In default configuration the user names are generated as short
+          random strings without personal naming information.
+          So it's impossible to directly have a reference to a person just
+          by looking at a username, e.g. by reviewing archived log files.
+        </li>
+        <li>
+          The attribute <a href="docs.html#schema-at-aeStatus">aeStatus</a>
+          is used to adjust visibility of person records and user accounts.
+          This allows to preserve the data for enforcing global ID
+          uniqueness and for complying to audit requirements while limiting
+          access to a small group of people to meet privacy requirements.
+        </li>
+      </ol>
     </p>
   </li>
 
