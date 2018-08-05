@@ -109,10 +109,10 @@ aedir_systemd_hardening:
   - "SystemCallArchitectures=native"
   - "RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX"
   - "PrivateDevices=yes"
+  - "LockPersonality=yes"
+  - "RestrictRealtime=yes"
 #  - "InaccessiblePaths=/run/systemd"
 #  - "SystemCallFilter=~ ptrace madvise @clock @cpu-emulation @debug @keyring @module @mount @privileged @raw-io @reboot @swap"
-#  - "CapabilityBoundingSet=CAP_NET_BIND_SERVICE"
-#  - "AmbientCapabilities=CAP_NET_BIND_SERVICE"
 
 # regex patterns for enforcing naming conventions (substring match!)
 # Important notes:
