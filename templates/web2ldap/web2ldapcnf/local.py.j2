@@ -27,6 +27,11 @@ web2ldapcnf.session_per_ip_limit = 20
 # and the session data is removed silently without the possibility to relogin.
 web2ldapcnf.session_remove = 900
 
+# unsuspicious target URLs accept by redirector even without a session
+web2ldapcnf.good_redirect_targets=set((
+  '/web2ldap.html',
+))
+
 #-----------------------------------------------------------------------
 
 import web2ldapcnf.hosts
