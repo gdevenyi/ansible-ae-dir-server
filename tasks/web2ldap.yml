@@ -1,10 +1,19 @@
 ---
 # Install and configure web2ldap
 
-- name: "Create {{ aedir_python_sitepackages }}/web2ldapcnf/local.py"
+- name: "Remove obsolete {{ aedir_python_sitepackages }}/web2ldapcnf"
+  file:
+    state: absent
+    path: "{{ aedir_python_sitepackages }}/web2ldapcnf"
+    recurse: yes
+  ignore_errors: yes
+  notify:
+    - restart web2ldap
+
+- name: "Create {{ web2ldapcnf_prefix }}/web2ldapcnf/local.py"
   template:
     src: "{{ item }}"
-    dest: "{{ aedir_python_sitepackages }}/web2ldapcnf/local.py"
+    dest: "{{ web2ldapcnf_prefix }}/web2ldapcnf/local.py"
     owner: root
     group: root
     mode: 0644
@@ -15,10 +24,10 @@
   notify:
     - restart web2ldap
 
-- name: "Create {{ aedir_python_sitepackages }}/web2ldapcnf/hosts.py"
+- name: "Create {{ web2ldapcnf_prefix }}/web2ldapcnf/hosts.py"
   template:
     src: "{{ item }}"
-    dest: "{{ aedir_python_sitepackages }}/web2ldapcnf/hosts.py"
+    dest: "{{ web2ldapcnf_prefix }}/web2ldapcnf/hosts.py"
     owner: root
     group: root
     mode: 0644
