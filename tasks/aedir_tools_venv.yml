@@ -63,7 +63,7 @@
     - restart hotp_validator
     - restart web2ldap
 
-- name: "PIP install web2ldap and modules in virtualenv {{ aedir_prefix }} on {{ openldap_role }} on {{ lsb_id }}"
+- name: "PIP install web2ldap in virtualenv {{ aedir_prefix }} on {{ openldap_role }} on {{ lsb_id }}"
   pip:
     name:
       - web2ldap
