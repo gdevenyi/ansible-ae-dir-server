@@ -127,6 +127,8 @@
     owner: root
     group: "{{ openldap_slapd_group }}"
     mode: 0640
+  notify:
+  - "restart ae-slapd"
 
 - name: "Create /etc/sasl2/slapd.conf on {{ lsb_id }}"
   template:
