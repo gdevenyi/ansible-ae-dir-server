@@ -47,6 +47,10 @@
   </li>
   <li>
     <a href="#eer">Entity Relationship</a>
+    <ol>
+      <li><a href="#eer-roles">Role References</a></li>
+      <li><a href="#eer-example">Example</a></li>
+    </ol>
   </li>
   <li>
     <a href="#schema">Schema</a>
@@ -676,6 +680,7 @@
   </li>
 </ul>
 
+<h2 id="eer-roles">Role References</h2>
 <p>
   The following smaller diagram shows only references for assigning
   <a href="#roles">&AElig;-DIR roles</a>.
@@ -737,6 +742,21 @@
     <a href="#schema-oc-aeGroup">aeGroup</a>.
   </li>
 </ol>
+
+<h2 id="eer-example">Example</h2>
+<p>
+  Here is a diagram which shows an example of the various entries
+  and their references stored in:
+  <a href="https://demo.ae-dir.com/web2ldap/dit?ldapi://%2Fopt%2Fae-dir%2Frun%2Fslapd%2Fldapi/cn=test,ou=ae-dir????bindname=zots,X-BINDPW=CorrectHorseBatteryStaple">
+    <em>test</em> on demo server
+  </a>:
+</p>
+
+{% set img_anchor="eer-demo" -%}
+{% set img_file="demo.ae-dir.com-zone-test.svg" -%}
+{% set img_title="entity relationship diagram of zone test on ldaps://demo.ae-dir.com" -%}
+{% include "includes/img.html.j2" %}
+
 
 <h1 id="schema">Schema</h1>
 
