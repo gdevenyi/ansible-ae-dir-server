@@ -1,7 +1,7 @@
 ---
 # Install and configure web2ldap
 
-- name: "Remove obsolete {{ aedir_python_sitepackages }}/web2ldapcnf"
+- name: "Remove obsolete web2ldapcnf/ directory"
   file:
     state: absent
     path: "{{ aedir_python_sitepackages }}/web2ldapcnf"
@@ -10,16 +10,25 @@
   notify:
     - restart web2ldap
 
-- name: "Create {{ web2ldapcnf_prefix }}/web2ldapcnf/local.py"
+- name: "Remove obsolete {{ web2ldapcnf_prefix }}/web2ldapcnf/local.py"
+  file:
+    state: absent
+    path: "{{ web2ldapcnf_prefix }}/web2ldapcnf/local.py"
+    recurse: no
+  ignore_errors: yes
+  notify:
+    - restart web2ldap
+
+- name: "Create {{ web2ldapcnf_prefix }}/web2ldapcnf/__init__.py"
   template:
     src: "{{ item }}"
-    dest: "{{ web2ldapcnf_prefix }}/web2ldapcnf/local.py"
+    dest: "{{ web2ldapcnf_prefix }}/web2ldapcnf/__init__.py"
     owner: root
     group: root
     mode: 0644
   with_first_found:
     - files:
-       - "web2ldap/web2ldapcnf/local.py.j2"
+       - "web2ldap/web2ldapcnf/__init__.py.j2"
       paths: "{{ aedir_templates_dirs }}"
   notify:
     - restart web2ldap
@@ -34,6 +43,20 @@
   with_first_found:
     - files:
        - "web2ldap/web2ldapcnf/hosts.py.j2"
+      paths: "{{ aedir_templates_dirs }}"
+  notify:
+    - restart web2ldap
+
+- name: "Create {{ web2ldapcnf_prefix }}/web2ldapcnf/plugins.py"
+  template:
+    src: "{{ item }}"
+    dest: "{{ web2ldapcnf_prefix }}/web2ldapcnf/plugins.py"
+    owner: root
+    group: root
+    mode: 0644
+  with_first_found:
+    - files:
+       - "web2ldap/web2ldapcnf/plugins.py.j2"
       paths: "{{ aedir_templates_dirs }}"
   notify:
     - restart web2ldap
