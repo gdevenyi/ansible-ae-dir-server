@@ -3,6 +3,7 @@
 # {{ ansible_managed }}
 #---------------------------------------------------------------------------
 [uwsgi]
+plugin = python
 socket = {{ aedir_rundir }}/uwsgi/{{ name }}/{{ name }}.sock
 chmod-socket = 666
 chdir = {{ aedir_rundir }}/uwsgi/{{ name }}
@@ -19,7 +20,6 @@ enable-threads = true
 {% endif %}
 buffer-size = {{ buffer_size }}
 harakiri = {{ harakiri }}
-plugin = python
 {% if aedir_python_sitepackages.startswith(aedir_prefix) %}
 virtualenv = {{ aedir_prefix }}
 {% endif  %}
