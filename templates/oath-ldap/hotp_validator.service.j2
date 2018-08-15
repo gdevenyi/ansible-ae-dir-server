@@ -8,14 +8,15 @@
 
 [Unit]
 Description={{ oath_bind_listener }} - AE-DIR bind listener
-Requires=network.target
-After=network.target
+Requires=local-fs.target
+After=local-fs.target
 
 [Service]
 Type=simple
 {% if aedir_malloc_ld_preload %}
 Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
 {% endif %}
+Environment=LDAPNOINIT=1
 Environment=PYTHONOPTIMIZE=2
 Environment=PYTHONDONTWRITEBYTECODE=1
 ExecStart={{ aedir_python }} {{ aedir_sbin }}/{{ oath_bind_listener }}.py "{{ oath_ldap_socket_path }}" "{{ openldap_ldapi_uri|replace('%','%%') }}????x-saslmech=EXTERNAL"

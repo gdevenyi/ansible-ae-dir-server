@@ -8,10 +8,8 @@
 
 [Unit]
 Description=aedirpwd - AE-DIR password self-service web application
-Requires=network.target local-fs.target remote-fs.target
-After=local-fs.target remote-fs.target network.target
-#Wants=ldap.service
-#After=ldap.service
+Requires=local-fs.target network.target
+After=local-fs.target network.target
 
 [Service]
 Type=simple
