@@ -19,6 +19,9 @@ profile {{ name }} {
 {% if name=="aedirpwd" or name=="oathenroll" %}
   # access to CA cert for sending e-mail
   {{ smtp_cacert_pathname }} r,
+
+  # Allow us to signal ourselves
+  signal peer=@{profile_name},
 {% endif %}
 
   # access to uwsgi config
