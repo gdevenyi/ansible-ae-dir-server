@@ -13,7 +13,6 @@
     - python-aedir
     - python-cryptography
     - python-jwcrypto
-    - python-virtualenv
   notify:
     - restart aedirpwd
     - restart hotp_validator
