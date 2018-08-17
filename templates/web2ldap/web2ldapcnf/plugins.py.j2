@@ -22,20 +22,20 @@ import web2ldap.app.plugins.quirks
 # X.500 DSAs
 #---------------------------------------------------------------------------
 
-import web2ldap.app.plugins.x500dsa
+#import web2ldap.app.plugins.x500dsa
 
 #---------------------------------------------------------------------------
 # Subentries (see RFC 3672)
 #---------------------------------------------------------------------------
 
-import web2ldap.app.plugins.subentries
+#import web2ldap.app.plugins.subentries
 
 #---------------------------------------------------------------------------
 # NIS (see RFC 2307) and NSS
 #---------------------------------------------------------------------------
 
 import web2ldap.app.plugins.nis
-import web2ldap.app.plugins.ldapns
+#import web2ldap.app.plugins.ldapns
 
 #---------------------------------------------------------------------------
 # Extended plugin classes for NIS attributes with auto-generated
@@ -66,7 +66,7 @@ import web2ldap.app.plugins.sudoers
 # pilotPerson
 #---------------------------------------------------------------------------
 
-import web2ldap.app.plugins.pilotperson
+#import web2ldap.app.plugins.pilotperson
 
 #---------------------------------------------------------------------------
 # Just an example for person's schema of stroeder.com
@@ -348,7 +348,7 @@ web2ldap.app.plugins.aedir.AETicketId.reObj = re.compile('^{{ aeticketid_regex }
 web2ldap.app.plugins.aedir.AETicketId.html_tmpl = '<a href="https://issues.example.com/browse/{av}">{av}</a>'
 
 # Check hostname in DNS and reverse DNS
-web2ldap.app.plugins.aedir.AEHostname.host_lookup=2
+web2ldap.app.plugins.aedir.AEHostname.host_lookup=0
 
 # regex patterns for enforcing naming conventions (substring match necessary!)
 web2ldap.app.plugins.aedir.AECommonNameAEZone.reObj = re.compile('^{{ aedir_aezone_cn_regex }}$')
