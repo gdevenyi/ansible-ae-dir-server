@@ -25,6 +25,12 @@ ErrorLog {{ apache_error_log }}
 # applications to stderr (e.g. web2ldap)
 LogLevel {{ apache_log_level }}
 
+# disable ETag response header
+FileETag None
+
+# disable TRACE requests
+TraceEnable off
+
 {% if apache_pid_file!="" %}
 PidFile {{ apache_pid_file }}
 {% endif %}
