@@ -258,16 +258,23 @@ access to
     by users none break
     by * none
 
-# Active users may authenticate via LDAP simple bind and change own password
+# Password of active personal user accounts
+# - can never be read by anyone
+# - AE admins can search and write
+# - AE auditors can search
+# - password self-service app can write
+# - user can write own password
+# - anonymous can authenticate
 access to
   dn.subtree="{{ aedir_suffix }}"
   attrs=userPassword
   filter="(&(objectClass=aeUser)(aeStatus=0))"
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =sw
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" =s
     by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" =w
     by set="(user & this/-1/aePasswordAdmins/member) & (user & this/-1/aeZoneAdmins/member)" =w
     by self =wx
-    by * auth
+    by anonymous auth
 
 # Subordinate aeHost and aeService entries beneath aeSrvGroup entries
 # Important note:
