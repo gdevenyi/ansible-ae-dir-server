@@ -85,9 +85,9 @@
     Install on your admin workstation (the <em>ansible controller</em>):
     <ul>
       <li>
-        <a href="https://docs.ansible.com/ansible/intro_installation.html">ansible 2.4.x</a>
-        (Use Jinja2 2.8.x! <em>ansible</em> does not work with 2.9+ yet!
-        (see <a href="https://github.com/ansible/ansible/issues/20063">issue 20063</a>)
+        <a href="https://docs.ansible.com/ansible/intro_installation.html">ansible 2.4+</a>
+        (Use Jinja2 2.8.x! <em>ansible</em> has some issues with 2.9+!,
+        see <a href="https://github.com/ansible/ansible/issues/20063">issue 20063</a>)
       </li>
       <li>
         <a href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git">git</a>
@@ -99,7 +99,7 @@
     Simple approach:
     <pre>
       # virtualenv-2.7 /opt/ansible
-      # /opt/ansible/bin/pip2 install --upgrade ansible==2.4.4.0 Jinja2==2.8.1 dnspython paramiko
+      # /opt/ansible/bin/pip2 install --upgrade ansible Jinja2==2.8.1 dnspython paramiko
     </pre>
   </li>
   <li>
