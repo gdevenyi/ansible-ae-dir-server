@@ -403,6 +403,9 @@ def run_this():
 
     script_name = os.path.abspath(sys.argv[0])
 
+    # explicitly set CA cert file from libldap env var
+    ldap0.set_option(ldap0.OPT_X_TLS_CACERTFILE, os.environ['LDAPTLS_CACERT'])
+
     log_level = LOG_LEVEL
     console_log_format = None
     if __debug__ and os.environ.get('DEBUG', 'no') == 'yes':
