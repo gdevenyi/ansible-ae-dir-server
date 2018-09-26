@@ -16,7 +16,7 @@
     comment: "{{ aedir_ldapi_services[aedir_pwsync_listener_user].description }}"
     uid: "{{ aedir_ldapi_services[aedir_pwsync_listener_user].uid_number }}"
     group: "{{ aedir_ldapi_services[aedir_pwsync_listener_user].gid_number }}"
-    shell: "/bin/true"
+    shell: "/usr/sbin/nologin"
     state: present
     system: yes
     createhome: no
