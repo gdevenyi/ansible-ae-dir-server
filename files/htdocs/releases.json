@@ -7,6 +7,14 @@
    "tags": "iam, identity-management, ldap, openldap, pam, nss, security, authentication-directory",
    "releases": [
       {
+         "version": "0.3.4",
+         "state": "stable",
+         "scope": "minor feature",
+         "changes": "Config change in web2ldap, minor improvements and fixes",
+         "download": "https://ae-dir.com/install.html",
+         "published": "2018-09-28T20:00:00+00:00"
+      },
+      {
          "version": "0.3.3",
          "state": "stable",
          "scope": "minor feature",
