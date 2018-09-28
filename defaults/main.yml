@@ -161,9 +161,13 @@ aedir_homedirectory_prefixes:
 # magic value which make homeDirectory attribute invisible
 aedir_homedirectory_hidden: "-/-"
 
+# shell used for denying login
+aedir_nologin_shell: "/usr/sbin/nologin"
+
 # available values for attribute 'loginShell'
 aedir_login_shells:
   - /bin/bash
+  - "{{ aedir_nologin_shell }}"
   - /bin/true
   - /bin/false
 

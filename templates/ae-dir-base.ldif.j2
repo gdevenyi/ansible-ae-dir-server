@@ -760,7 +760,7 @@ description: {{ s.cn }}
 uidNumber: {{ s.uid_number }}
 gidNumber: {{ s.gid_number }}
 homeDirectory: {{ s.get('home_directory', '/home/'+uid) }}
-loginShell: /bin/true
+loginShell: {{ aedir_nologin_shell }}
 objectClass: account
 objectClass: aeObject
 objectClass: aeService

@@ -11,5 +11,5 @@ seeAlso: cn=.ae-dir.example.com,{{ openldap_tls_cert_suffixes[0] }}
 aeStatus: 0
 pwdPolicySubentry: cn=ppolicy-sasl-external,cn=ae,{{ aedir_suffix }}
 aeNotBefore: now
-loginShell: /bin/true
+loginShell: {{ aedir_nologin_shell }}
 
