@@ -164,7 +164,7 @@ access to
   dn.subtree="{{ aedir_suffix }}"
   attrs=userPassword
   filter="(&(aeStatus=0)(|(objectClass=aeUser)(objectClass=aeHost)(objectClass=aeService))(!(|(uidNumber<={{ aedir_min_gid-1 }})(gidNumber<={{ aedir_min_gid-1 }})(uidNumber>={{ aedir_max_uid+1 }})(gidNumber>={{ aedir_max_gid+1 }}))))"
-    by * auth
+    by anonymous auth
 
 # no access to userPassword as last catch
 access to

@@ -244,7 +244,7 @@ access to
     by dn.base="uid=ae-dir-otpenroll,cn=ae,{{ aedir_suffix }}" =w
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =s
     by self =z
-    by * auth
+    by anonymous auth
 
 # Safety net for bugs in (H/T)OTP validator:
 # Block auth access to password of users with assigned OTP token
@@ -288,7 +288,7 @@ access to
     by set="user & this/-2/aeZoneAdmins/member" =w
     by set="user & this/-1/aeZoneAdmins/member" =w
     by set="user & this/-1/aeSetupGroups/member" =w
-    by * auth
+    by anonymous auth
 
 # no access to userPassword as last catch
 access to
