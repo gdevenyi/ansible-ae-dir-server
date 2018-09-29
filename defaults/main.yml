@@ -337,8 +337,9 @@ aedir_confidential_person_attrs:
   - aeNotBefore
   - aeNotAfter
 
-# aePerson attributes readable by all base users
-aedir_public_person_attrs:
+# Attributes in aeContact, aePerson, aeMailGroup entries
+# readable by address book users of the zone
+aedir_addressbook_attrs:
   - cn
   - sn
   - givenName

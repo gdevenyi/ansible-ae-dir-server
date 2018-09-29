@@ -766,6 +766,7 @@ syntax_registry.registerAttrType(
     AE_OID_PREFIX+'.4.4',  # aeLoginGroups
     AE_OID_PREFIX+'.4.6',  # aeSetupGroups
     AE_OID_PREFIX+'.4.7',  # aeLogStoreGroups
+    AE_OID_PREFIX+'.4.37', # aeABAccessGroups
   ]
 )
 
