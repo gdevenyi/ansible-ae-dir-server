@@ -1217,8 +1217,12 @@ unique_uri "ldap:///{{ aedir_suffix }}?mailLocalAddress?sub?(objectClass=*)"
 unique_uri "ldap:///{{ aedir_suffix }}?seeAlso?sub?(objectClass=*)"
 unique_uri "ldap:///{{ aedir_suffix }}?ipHostNumber,host,aeFqdn,macAddress?sub?(objectClass=*)"
 unique_uri "ldap:///{{ aedir_suffix }}?employeeNumber,uniqueIdentifier,displayName?sub"
-# only one primary aeUser entry per aePerson
-unique_uri "ldap:///cn={{ aedir_base_zone }},{{ aedir_suffix }}?aePerson?sub"
+{% if aedir_unique_person_zones %}
+# only one aeUser entry per aePerson in these zones
+{% for zone in aedir_unique_person_zones %}
+unique_uri "ldap:///cn={{ zone }},{{ aedir_suffix }}?aePerson?sub"
+{% endfor %}
+{% endif %}
 # these two constraints are only possible with a negation filter
 unique_uri "ldap:///{{ aedir_suffix }}?cn?sub?(!(|(objectClass=aePerson)(objectClass=aeUser)(objectClass=aeNwDevice)))"
 unique_uri "ldap:///{{ aedir_suffix }}?gidNumber?sub"

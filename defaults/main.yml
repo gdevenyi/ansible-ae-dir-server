@@ -291,6 +291,10 @@ aedir_org_zone: people
 # (must be listed in aedir_init_aezones below)
 aedir_base_zone: base
 
+# zones in which there must be only one unique user account per person
+aedir_unique_person_zones:
+  - "{{ aedir_base_zone }}"
+
 # List of aeZone entries to be added to ae-dir-base.ldif
 aedir_init_aezones:
   people:
