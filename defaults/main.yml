@@ -64,7 +64,9 @@ aedir_suffix: "ou=ae-dir"
 aedir_accesslog_suffix: "cn=accesslog-ae-dir"
 
 # base DN / search root for session entries
-aedir_session_suffix: "cn=ae-session"
+# (if empty string, the session database is disabled)
+#aedir_session_suffix: "cn=ae-session"
+aedir_session_suffix: ""
 
 # POSIX-GID number range served by AE-DIR
 aedir_min_gid: 30000

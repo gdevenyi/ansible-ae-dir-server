@@ -1691,6 +1691,8 @@ syncrepl rid=0{{ loop.index }}
 mirrormode true
 {% endif %}
 
+{% if aedir_session_suffix %}
 {% include 'session.conf.j2' %}
+{% endif %}
 
 {% include 'monitor.conf.j2' %}
