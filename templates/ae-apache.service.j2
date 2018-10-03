@@ -27,12 +27,11 @@ KillMode=mixed
 CapabilityBoundingSet=CAP_NET_BIND_SERVICE CAP_SETUID CAP_SETGID CAP_KILL
 AmbientCapabilities=CAP_NET_BIND_SERVICE CAP_SETUID CAP_SETGID CAP_KILL
 MemoryDenyWriteExecute=yes
-{% if aedir_systemd_hardening %}
 # various hardening options
 {% for systemd_option in aedir_systemd_hardening %}
 {{ systemd_option }}
 {% endfor %}
-{% endif %}
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 {% if apparmor_enabled %}
 AppArmorProfile=ae-apache
 {% endif %}

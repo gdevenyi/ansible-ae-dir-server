@@ -109,7 +109,6 @@ aedir_systemd_hardening:
   - "NoNewPrivileges=yes"
   - "MountFlags=private"
   - "SystemCallArchitectures=native"
-  - "RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX"
   - "PrivateDevices=yes"
   - "LockPersonality=yes"
   - "RestrictRealtime=yes"

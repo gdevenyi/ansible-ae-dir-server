@@ -21,13 +21,11 @@ Environment=PYTHONOPTIMIZE=2
 Environment=PYTHONDONTWRITEBYTECODE=1
 Environment=LDAPTLS_CACERT={{ openldap_cacert_pathname }}
 ExecStart={{ aedir_python }} {{ aedir_sbin }}/{{ oath_bind_listener }}.py "{{ oath_ldap_socket_path }}" "{{ openldap_ldapi_uri|replace('%','%%') }}????x-saslmech=EXTERNAL" {% for host in openldap_syncrepl_providers %} ldaps://{{ hostvars[host].get('openldap_service_fqdn',host) }}{% endfor %}
-
-{% if aedir_systemd_hardening %}
 # various hardening options
 {% for systemd_option in aedir_systemd_hardening %}
 {{ systemd_option }}
 {% endfor %}
-{% endif %}
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 {% if apparmor_enabled %}
 AppArmorProfile={{ oath_bind_listener }}
 {% endif %}
