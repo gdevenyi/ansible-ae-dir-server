@@ -112,8 +112,9 @@ aedir_systemd_hardening:
   - "PrivateDevices=yes"
   - "LockPersonality=yes"
   - "RestrictRealtime=yes"
+  - "RestrictNamespaces=yes"
+  - "SystemCallFilter=~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete" # madvise @privileged"
 #  - "InaccessiblePaths=/run/systemd"
-#  - "SystemCallFilter=~ ptrace madvise @clock @cpu-emulation @debug @keyring @module @mount @privileged @raw-io @reboot @swap"
 
 # regex patterns for enforcing naming conventions (substring match!)
 # Important notes:
