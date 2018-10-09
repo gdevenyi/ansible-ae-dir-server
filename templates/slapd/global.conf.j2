@@ -41,8 +41,9 @@ include {{ aedir_schema_prefix }}/stroeder.com.schema
 # for webldappwd (password self-service)
 include {{ aedir_schema_prefix }}/mspwdreset.schema
 
-# AE-DIR -- Yet another LDAP User Management
+# AE-DIR
 include {{ aedir_schema_prefix }}/ae-dir.schema
+include {{ aedir_schema_prefix }}/ae-dir-dcr.schema
 {% if openldap_role=="provider" %}
 include {{ aedir_schema_prefix }}/ae-dir-session.schema
 {% endif %}
