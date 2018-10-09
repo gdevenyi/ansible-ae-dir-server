@@ -1,5 +1,7 @@
 #=======================================================================
-# Schema for Æ-DIR -- Yet another LDAP user and systems management
+# Schema for Æ-DIR -- Attributes types and object classes
+#
+# DIT content rules are defined in file ae-dir-dcr.schema
 #=======================================================================
 
 objectidentifier ae-dir-at stroeder-com-pub-ae-dir:4
@@ -135,10 +137,6 @@ objectclass ( ae-dir-oc:24
   SUP ( namedObject )
   MUST ( aeStatus $ description ) )
 
-ditcontentrule ( ae-dir-oc:24
-  NAME 'aeTag-dcr'
-  NOT ( uniqueIdentifier ) )
-
 # Base classes not used directly
 #-----------------------------------------------------------------------
 
@@ -208,10 +206,6 @@ objectclass ( ae-dir-oc:26
   SUP ( namedPolicy $ aeObject )
   MUST ( description ) )
 
-ditcontentrule ( ae-dir-oc:26
-  NAME 'aePolicy-dcr'
-  AUX ( pwdPolicy $ oathHOTPParams $ oathTOTPParams $ msPwdResetPolicy ) )
-
 # search root entry
 #-----------------------------------------------------------------------
 
@@ -221,10 +215,6 @@ objectclass ( ae-dir-oc:22
   DESC 'AE-DIR: Top-level search root entry'
   SUP ( aeObject )
   MAY ( cn $ dc $ o $ ou  ) )
-
-ditcontentrule ( ae-dir-oc:22
-  NAME 'aeRoot-dcr'
-  AUX ( aePosixIdRanges ) )
 
 # Departments
 #-----------------------------------------------------------------------
@@ -244,14 +234,6 @@ objectclass ( ae-dir-oc:29
   MUST ( departmentNumber )
   MAY ( o $ displayName $ manager $ aeSourceUri ) )
 
-ditcontentrule ( ae-dir-oc:29
-  NAME 'aeDept-dcr'
-  AUX ( labeledURIObject )
-  NOT ( businessCategory $ destinationIndicator $ internationaliSDNNumber $
-        postOfficeBox $ preferredDeliveryMethod $ registeredAddress $
-        searchGuide $ seeAlso $ st $ teletexTerminalIdentifier $
-        telexNumber $ userPassword $ x121Address ) )
-
 # Locations
 #-----------------------------------------------------------------------
 
@@ -270,11 +252,6 @@ objectclass ( ae-dir-oc:35
   MUST ( cn )
   MAY ( postalCode $ telephoneNumber $ facsimileTelephoneNumber $
         c $ ou $ displayName $ aeSourceUri ) )
-
-ditcontentrule ( ae-dir-oc:35
-  NAME 'aeLocation-dcr'
-  AUX ( labeledURIObject )
-  NOT (  searchGuide $ seeAlso ) )
 
 # Zones
 #-----------------------------------------------------------------------
@@ -313,11 +290,6 @@ objectclass ( ae-dir-oc:20
   MAY ( aeDept $ aeLocation $
         aeZoneAdmins $ aeZoneAuditors $ aePasswordAdmins $ aeABAccessGroups ) )
 
-ditcontentrule ( ae-dir-oc:20
-  NAME 'aeZone-dcr'
-  AUX ( aePosixIdRanges )
-  NOT ( uniqueIdentifier ) )
-
 # Group entries
 #-----------------------------------------------------------------------
 
@@ -338,12 +310,6 @@ objectclass ( ae-dir-oc:1
   MUST ( description )
   MAY ( aeMemberZone $ aeDept $ aeLocation ) )
 
-ditcontentrule ( ae-dir-oc:1
-  NAME 'aeGroup-dcr'
-  AUX ( mailboxRelatedObject )
-  NOT ( businessCategory $ o $ ou $ owner $ seeAlso $ userPassword ) )
-
-
 # also "dynamic groups" based on groupOfURLs/memberURL
 objectclass ( ae-dir-oc:27
   NAME 'aeMailGroup'
@@ -353,12 +319,6 @@ objectclass ( ae-dir-oc:27
   SUP ( groupOfEntries $ nisMailAlias $ groupOfURLs $ aeObject )
   MUST ( mail $ description )
   MAY ( aeMemberZone $ aeDept $ aeLocation ) )
-
-ditcontentrule ( ae-dir-oc:27
-  NAME 'aeMailGroup-dcr'
-  AUX ( mailboxRelatedObject )
-  NOT ( businessCategory $ o $ ou $ owner $ seeAlso $ userPassword ) )
-
 
 # SUDO rules
 #-----------------------------------------------------------------------
@@ -371,10 +331,6 @@ objectclass ( ae-dir-oc:7
   SUP ( sudoRole $ aeObject )
   MUST ( sudoUser $ description ) )
 
-ditcontentrule ( ae-dir-oc:7
-  NAME 'aeSudoRule-dcr'
-  NOT ( sudoOrder ) )
-
 # Personal user accounts
 #-----------------------------------------------------------------------
 
@@ -386,24 +342,6 @@ objectclass ( ae-dir-oc:2
   SUP ( inetOrgPerson $ account $ aeObject )
   MUST ( uid $ aePerson $ givenName $ displayName )
   MAY ( aeRemoteHost $ aeSSHPermissions ) )
-
-ditcontentrule ( ae-dir-oc:2
-  NAME 'aeUser-dcr'
-  AUX ( posixAccount $ inetLocalMailRecipient $ pkiUser $ ldapPublicKey $
-        msPwdResetObject $ oathHOTPUser $ oathTOTPUser )
-  NOT ( gecos $ audio $ businessCategory $ carLicense $
-        destinationIndicator $ facsimileTelephoneNumber $
-        homePhone $ homePostalAddress $ host $ l $ labeledURI $ manager $
-        o $ ou $ telephoneNumber $ initials $ internationaliSDNNumber $
-        jpegPhoto $ pager $ photo $ physicalDeliveryOfficeName $
-        postalAddress $ postalCode $ postOfficeBox $
-        preferredDeliveryMethod $ preferredLanguage $ registeredAddress $
-        roomNumber $ secretary $ st $ street $
-        teletexTerminalIdentifier $ telexNumber $ title $
-        userPKCS12 $ userSMIMECertificate $
-        x121Address $ x500UniqueIdentifier $
-        departmentNumber $ employeeNumber $ employeeType $ seeAlso $ mobile ) )
-
 
 # Server groups
 #-----------------------------------------------------------------------
@@ -491,11 +429,6 @@ objectclass ( ae-dir-oc:5
   MUST ( mail )
   MAY ( o $ nickName $ userCertificate ) )
 
-ditcontentrule ( ae-dir-oc:5
-  NAME 'aeContact-dcr'
-  AUX ( inetLocalMailRecipient $ mailboxRelatedObject )
-  NOT ( seeAlso ) )
-
 # Host and network device entries
 #-----------------------------------------------------------------------
 
@@ -578,11 +511,6 @@ objectclass ( ae-dir-oc:6.1
   MUST ( host )
   MAY ( aeSrvGroup $ aeStockId $ aeRemoteHost $ aeLocation $ userPassword ) )
 
-ditcontentrule ( ae-dir-oc:6.1
-  NAME 'aeHost-dcr'
-  AUX ( posixAccount $ ldapPublicKey $ pkiUser $ ipHost )
-  NOT ( gecos $ o $ ou $ owner $ seeAlso ) )
-
 # Object class for network adaptors built into servers, switches, routers etc.
 objectclass ( ae-dir-oc:6.2
   NAME 'aeNwDevice'
@@ -591,11 +519,6 @@ objectclass ( ae-dir-oc:6.2
   STRUCTURAL
   SUP aeDevice
   MAY ( aeFqdn $ aeDeviceSlot $ aeDevicePort $ aeNwDevice ) )
-
-ditcontentrule ( ae-dir-oc:6.2
-  NAME 'aeNwDevice-dcr'
-  AUX ( ipHost $ ieee802Device $ bootableDevice )
-  NOT ( l $ o $ ou ) )
 
 # Person entries
 #-----------------------------------------------------------------------
@@ -609,15 +532,6 @@ objectclass ( ae-dir-oc:8
   MUST ( givenName $ aeDept $ aeLocation )
   MAY ( aeSourceUri $ uniqueIdentifier $ employeeNumber $ c ) )
 
-ditcontentrule ( ae-dir-oc:8
-  NAME 'aePerson-dcr'
-  AUX ( msPerson )
-  NOT ( audio $ carLicense $ destinationIndicator $ homePostalAddress $
-        host $ initials $ internationaliSDNNumber $ pager $ photo $
-        preferredDeliveryMethod $ registeredAddress $ secretary $
-        teletexTerminalIdentifier $ telexNumber $ uid $ userSMIMECertificate $
-        x121Address $ x500UniqueIdentifier $ seeAlso $ userPassword ) )
-
 # Service user accounts
 #-----------------------------------------------------------------------
 
@@ -630,13 +544,6 @@ objectclass ( ae-dir-oc:4
   MUST ( uid $ description )
   MAY ( aeRemoteHost $ aeSSHPermissions $ aeHost $ aeSrvGroup $ userPassword ) )
 
-ditcontentrule ( ae-dir-oc:4
-  NAME 'aeService-dcr'
-  AUX ( posixAccount $ pkiUser $ ldapPublicKey $
-        mailboxRelatedObject $ inetLocalMailRecipient $
-        oathHOTPUser $ oathTOTPUser )
-  NOT ( gecos $ host $ l $ o $ ou ) )
-
 # Authentication tokens (yubikey etc.)
 #-----------------------------------------------------------------------
 
@@ -648,8 +555,3 @@ objectclass ( ae-dir-oc:25
   SUP aeDevice
   MUST ( aeHwSerialNumber $ serialNumber $ displayName )
   MAY ( userPassword ) )
-
-ditcontentrule ( ae-dir-oc:25
-  NAME 'aeAuthcToken-dcr'
-  AUX ( oathHOTPToken $ oathTOTPToken $ ldapPublicKey $ pkiUser )
-  NOT ( l $ o $ ou $ seeAlso ) )
