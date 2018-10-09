@@ -133,6 +133,12 @@ index oathTOTPParams eq
 # search/time limits for {{ aedir_suffix }}
 #---------------------------------------------------------------------------
 
+# Maximum number of entries to return from a search operation
+sizelimit {{ openldap_sizelimit }}
+
+# Maximum number of time [secs] slapd will spend answering a search request
+timelimit {{ openldap_timelimit }}
+
 # no limits for AE admins
 limits
   group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}"

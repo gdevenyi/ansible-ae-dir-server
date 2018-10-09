@@ -568,6 +568,12 @@ openldap_log_purge: "23+00:00 01+00:00"
 # list of syncrepl providers used on a certain replica
 openldap_syncrepl_providers: "{{ aedir_hosts['provider'] }}"
 
+# Maximum number of entries to return from a search operation
+openldap_sizelimit: 3000
+
+# Maximum number of time [secs] slapd will spend answering a search request
+openldap_timelimit: 60
+
 #---------------------------------------------------------------------------
 # password sync parameters
 #---------------------------------------------------------------------------
