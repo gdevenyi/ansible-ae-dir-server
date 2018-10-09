@@ -2,17 +2,16 @@
 
 - name: "Install base packages on {{ lsb_id }}"
   zypper:
-    name: "{{ item }}"
+    name:
+      - python-pyasn1>=0.3.7
+      - python-pyasn1-modules>=0.1.5
+      - python-ldap0
+      - python-aedir
+      - python-cryptography
+      - python-jwcrypto
     state: present
     disable_recommends: yes
     type: package
-  with_items:
-    - python-pyasn1>=0.3.7
-    - python-pyasn1-modules>=0.1.5
-    - python-ldap0
-    - python-aedir
-    - python-cryptography
-    - python-jwcrypto
   notify:
     - restart aedirpwd
     - restart hotp_validator
@@ -32,18 +31,17 @@
 
 - name: "Install additional packages on {{ openldap_role }} on {{ lsb_id }}"
   zypper:
-    name: "{{ item }}"
+    name:
+      - python-paramiko
+      - python-mailutil
+      - python-passlib
+      - python-asn1crypto
+      - python-xlwt
+      - python-pycryptodome
+      - web2ldap
     state: present
     disable_recommends: yes
     type: package
-  with_items:
-    - python-paramiko
-    - python-mailutil
-    - python-passlib
-    - python-asn1crypto
-    - python-xlwt
-    - python-pycryptodome
-    - web2ldap
   when: openldap_role == 'provider'
   notify:
     - restart aedirpwd
@@ -53,12 +51,11 @@
 
 - name: "Install additional packages for simple web apps on {{ openldap_role }} on {{ lsb_id }}"
   zypper:
-    name: "{{ item }}"
+    name:
+      - python-web.py
     state: present
     disable_recommends: yes
     type: package
-  with_items:
-    - python-web.py
   when: openldap_role == 'provider'
   notify:
     - restart aedirpwd
@@ -66,14 +63,13 @@
 
 - name: "Install additional packages for web2ldap on {{ openldap_role }} on {{ lsb_id }}"
   zypper:
-    name: "{{ item }}"
+    name:
+      - python-pyweblib>=1.3.13
+      - python-dnspython
+      - python-certifi
     state: present
     disable_recommends: yes
     type: package
-  with_items:
-    - python-pyweblib>=1.3.13
-    - python-dnspython
-    - python-certifi
   when: openldap_role == 'provider'
   notify:
     - restart web2ldap

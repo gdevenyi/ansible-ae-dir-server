@@ -3,24 +3,22 @@
 
 - name: "Install packages needed for running Apache 2.4 on {{ lsb_id }}"
   zypper:
-    name: "{{ item }}"
+    name:
+      - apache2
+      - apache2-prefork
     state: present
     disable_recommends: yes
     type: package
   notify:
     - "restart ae-apache"
-  with_items:
-    - apache2
-    - apache2-prefork
 
 - name: "Install UWSGI packages {{ lsb_id }}"
   zypper:
-    name: "{{ item }}"
+    name:
+      - uwsgi
+      - uwsgi-python
     state: present
     disable_recommends: yes
     type: package
   notify:
     - "restart ae-apache"
-  with_items:
-    - uwsgi
-    - uwsgi-python

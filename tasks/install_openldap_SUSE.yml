@@ -3,16 +3,15 @@
 
 - name: Install OpenLDAP packages and dependencies
   zypper:
-    name: "{{ item }}"
+    name:
+      - cyrus-sasl
+      - openldap2
+      - openldap2-back-sock
+      - openldap2-client
+      - openldap2-contrib
+      - openldap2-ppolicy-check-password
     state: latest
     disable_recommends: yes
     type: package
   notify:
     - "restart ae-slapd"
-  with_items:
-    - cyrus-sasl
-    - openldap2
-    - openldap2-back-sock
-    - openldap2-client
-    - openldap2-contrib
-    - openldap2-ppolicy-check-password

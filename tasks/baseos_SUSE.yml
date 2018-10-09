@@ -3,19 +3,18 @@
 
 - name: "Install base OS packages"
   zypper:
-    name: "{{ item }}"
+    name:
+      - openssl
+      - "{{ cron_pkg_name }}"
+      - tar
+      - gzip
+      - ca-certificates
+      - python
+      - python-xml
+      - zypper
     state: present
     disable_recommends: yes
     type: package
-  with_items:
-    - openssl
-    - "{{ cron_pkg_name }}"
-    - tar
-    - gzip
-    - ca-certificates
-    - python
-    - python-xml
-    - zypper
 
 - name: "Install alternative malloc package {{ aedir_malloc_package }}"
   zypper:
