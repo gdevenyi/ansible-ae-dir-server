@@ -3,19 +3,18 @@
 
 - name: "Install base OS packages"
   yum:
-    name: "{{ item }}"
+    name:
+      - openssl
+      - "{{ cron_pkg_name }}"
+      - tar
+      - gzip
+      - ca-certificates
+      - python
+      - libxml2-python
+      - polkit
+      - epel-release
     state: present
     update_cache: yes
-  with_items:
-    - openssl
-    - "{{ cron_pkg_name }}"
-    - tar
-    - gzip
-    - ca-certificates
-    - python
-    - libxml2-python
-    - polkit
-    - epel-release
 
 - name: "Install alternative malloc package {{ aedir_malloc_package }}"
   yum:

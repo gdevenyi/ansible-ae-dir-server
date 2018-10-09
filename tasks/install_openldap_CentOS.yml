@@ -19,18 +19,17 @@
 
 - name: Install OpenLDAP packages and dependencies
   yum:
-    name: "{{ item }}"
+    name:
+      - openldap-ltb
+      - openldap-ltb-contrib-overlays
+      - openldap-ltb-mdb-utils
+      - openldap-ltb-ppm
+      - openldap-ltb-check-password
+      - cracklib
     state: latest
     update_cache: yes
   notify:
     - "restart ae-slapd"
-  with_items:
-    - openldap-ltb
-    - openldap-ltb-contrib-overlays
-    - openldap-ltb-mdb-utils
-    - openldap-ltb-ppm
-    - openldap-ltb-check-password
-    - cracklib
 
 - name: "Fix ownership of LTB directory"
   file:

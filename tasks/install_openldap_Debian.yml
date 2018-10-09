@@ -23,7 +23,13 @@
 
 - name: "Install LTB OpenLDAP packages and dependencies"
   apt:
-    name: "{{ item }}"
+    name:
+      - openldap-ltb
+      - openldap-ltb-contrib-overlays
+      - openldap-ltb-mdb-utils
+      - openldap-ltb-ppm
+      - openldap-ltb-check-password
+      - cracklib-runtime
     state: latest
     update_cache: yes
     cache_valid_time: 3600
@@ -31,13 +37,6 @@
     dpkg_options: 'force-confold,force-confdef'
   notify:
   - "restart ae-slapd"
-  with_items:
-  - openldap-ltb
-  - openldap-ltb-contrib-overlays
-  - openldap-ltb-mdb-utils
-  - openldap-ltb-ppm
-  - openldap-ltb-check-password
-  - cracklib-runtime
 
 - name: "Remove Debian package ldap-utils"
   apt:

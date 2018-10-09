@@ -3,20 +3,19 @@
 
 - name: "Install base OS packages"
   apt:
-    name: "{{ item }}"
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - "{{ cron_pkg_name }}"
+      - gzip
+      - openssl
+      - python
+      - tar
     state: present
     update_cache: yes
     cache_valid_time: 3600
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
-  with_items:
-    - apt-transport-https
-    - ca-certificates
-    - "{{ cron_pkg_name }}"
-    - gzip
-    - openssl
-    - python
-    - tar
 
 - name: "Install alternative malloc package {{ aedir_malloc_package }}"
   apt:

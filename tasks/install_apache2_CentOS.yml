@@ -3,25 +3,23 @@
 
 - name: "Install packages needed for running Apache 2.4 on {{ lsb_id }}"
   yum:
-    name: "{{ item }}"
+    name:
+      - httpd
+      - mod_ssl
+      - mod_proxy_uwsgi
     state: present
     update_cache: yes
   notify:
     - "restart ae-apache"
-  with_items:
-    - httpd
-    - mod_ssl
-    - mod_proxy_uwsgi
 
 - name: "Install UWSGI packages on {{ lsb_id }}"
   yum:
-    name: "{{ item }}"
+    name:
+      - uwsgi
+      - uwsgi-plugin-python2
     state: present
     update_cache: yes
   notify:
     - "restart aedirpwd"
     - "restart oathenroll"
     - "restart web2ldap"
-  with_items:
-    - uwsgi
-    - uwsgi-plugin-python2

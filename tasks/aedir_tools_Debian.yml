@@ -2,35 +2,33 @@
 
 - name: "Install C compiler packages on {{ lsb_id }}"
   apt:
-    name: "{{ item }}"
+    name:
+      - gcc
+      - libssl-dev
+      - libsasl2-dev
+      - libldap-dev
+      - python-dev
+      - libpython-dev
+      - libffi-dev
     state: present
     update_cache: yes
     cache_valid_time: 3600
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
-  with_items:
-    - gcc
-    - libssl-dev
-    - libsasl2-dev
-    - libldap-dev
-    - python-dev
-    - libpython-dev
-    - libffi-dev
   when: aedir_pip_needs_compiler==True
 
 - name: "Install base packages on {{ lsb_id }}"
   apt:
-    name: "{{ item }}"
+    name:
+      - python-setuptools
+      - virtualenv
+      - python-virtualenv
+      - python-pip
+      - python-cffi
     state: present
     update_cache: no
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
-  with_items:
-    - python-setuptools
-    - virtualenv
-    - python-virtualenv
-    - python-pip
-    - python-cffi
   notify:
     - restart aedirpwd
     - restart hotp_validator

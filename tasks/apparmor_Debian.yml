@@ -3,16 +3,15 @@
 
 - name: "Install AppArmor packages on {{ lsb_id }}"
   apt:
-    name: "{{ item }}"
+    name:
+      - libapparmor1
+      - libapparmor-perl
+      - apparmor
     state: present
     update_cache: yes
     cache_valid_time: 3600
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
-  with_items:
-    - libapparmor1
-    - libapparmor-perl
-    - apparmor
   notify:
     - restart apparmor
     - restart aedirpwd

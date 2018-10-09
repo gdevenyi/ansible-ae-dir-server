@@ -2,28 +2,26 @@
 
 - name: "Install C compiler packages on {{ lsb_id }}"
   yum:
-    name: "{{ item }}"
+    name:
+      - gcc
+      - openssl-devel
+      - cyrus-sasl-devel
+      - openldap-devel
+      - python-devel
+      - libffi-devel
     state: present
     update_cache: yes
-  with_items:
-    - gcc
-    - openssl-devel
-    - cyrus-sasl-devel
-    - openldap-devel
-    - python-devel
-    - libffi-devel
   when: aedir_pip_needs_compiler==True
 
 - name: "Install base packages on {{ lsb_id }}"
   yum:
-    name: "{{ item }}"
+    name:
+      - python-setuptools
+      - python-virtualenv
+      - python-pip
+      - python-cffi
     state: present
     update_cache: yes
-  with_items:
-    - python-setuptools
-    - python-virtualenv
-    - python-pip
-    - python-cffi
   notify:
     - restart aedirpwd
     - restart hotp_validator

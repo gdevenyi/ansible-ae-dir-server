@@ -3,7 +3,9 @@
 
 - name: "Install packages needed for running Apache 2.4 on {{ lsb_id }}"
   apt:
-    name: "{{ item }}"
+    name:
+      - apache2
+      - libapache2-mod-proxy-uwsgi
     state: present
     update_cache: yes
     cache_valid_time: 3600
@@ -11,13 +13,12 @@
     dpkg_options: 'force-confold,force-confdef'
   notify:
     - "restart ae-apache"
-  with_items:
-    - apache2
-    - libapache2-mod-proxy-uwsgi
 
 - name: "Install UWSGI packages on {{ lsb_id }}"
   apt:
-    name: "{{ item }}"
+    name:
+      - uwsgi
+      - uwsgi-plugin-python
     state: present
     update_cache: yes
     cache_valid_time: 3600
@@ -27,6 +28,3 @@
     - "restart aedirpwd"
     - "restart oathenroll"
     - "restart web2ldap"
-  with_items:
-    - uwsgi
-    - uwsgi-plugin-python
