@@ -134,7 +134,7 @@ limits
     size=unlimited
 
 #---------------------------------------------------------------------------
-# access control rules for {{ aedir_suffix }}
+# Access control rules for {{ aedir_suffix }}
 #---------------------------------------------------------------------------
 
 # First disallow non-active entities to proceed to rest of ACLs
@@ -151,10 +151,8 @@ access to
 
 # give read access to pseudo-attribute 'entry' in database
 # naming context to all users and stop further ACL processing
-#------------------------------------------------------------------
-
 access to
-  dn.exact="{{ aedir_suffix }}"
+  dn.base="{{ aedir_suffix }}"
   attrs=entry
     by users read
     by * none
@@ -171,6 +169,7 @@ access to
   attrs=userPassword
   filter="(&(aeStatus=0)(|(objectClass=aeUser)(objectClass=aeHost)(objectClass=aeService))(!(|(uidNumber<={{ aedir_min_gid-1 }})(gidNumber<={{ aedir_min_gid-1 }})(uidNumber>={{ aedir_max_uid+1 }})(gidNumber>={{ aedir_max_gid+1 }}))))"
     by anonymous auth
+    by * none
 
 # no access to userPassword as last catch
 access to
@@ -210,10 +209,9 @@ access to
     by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
     by * none break
 
-# Block access to archived entries from here no matter what
+# Inactive entries not visible to normal users/systems from here
 access to
-  dn.subtree="{{ aedir_suffix }}"
-  filter="(aeStatus=2)"
+  filter="(|(aeStatus=-1)(aeStatus=1)(aeStatus=2))"
     by * none
 
 # block cross-zone access to zone 'ae'
@@ -222,22 +220,11 @@ access to
     by dn.subtree="cn=ae,{{ aedir_suffix }}" none break
     by * auth
 
-# Public defaults
-#------------------------------------------------------------------
-
+# Public entries
 access to
   dn.subtree="cn=pub,{{ aedir_suffix }}"
   attrs=entry,entryDN,entryUUID,children,objectClass,hasSubordinates,modifyTimestamp,cn,description,@namedObject,@posixGroup,@sudoRole,@DUAConfigProfile,@pkiCA
     by users read
-
-#---------------------------------------------------------------------------
-# Inactive entries not visible to normal users/systems from here
-#---------------------------------------------------------------------------
-
-access to
-  dn.subtree="{{ aedir_suffix }}"
-  filter="(&(aeStatus=*)(!(aeStatus=0)))"
-    by * none
 
 #------------------------------------------------------------------
 # Access to active zones is stripped down to reviewing all entries within
@@ -328,10 +315,10 @@ access to
   filter="(|(objectClass=aeUser)(objectClass=aeService)(objectClass=aeContact))"
   attrs=cn,mail,mailLocalAddress,givenName,sn,displayName
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
-    by set="user/-1/aeDisplayNameGroups/member & this" read
-    by set="user/-1/aeProxyFor/aeDisplayNameGroups/member & this" read
-    by set="user/aeSrvGroup/aeDisplayNameGroups/member & this" read
-    by set="user/aeSrvGroup/aeProxyFor/aeDisplayNameGroups/member & this" read
+    by set="user/-1/aeDisplayNameGroups & this/memberOf" read
+    by set="user/-1/aeProxyFor/aeDisplayNameGroups & this/memberOf" read
+    by set="user/aeSrvGroup/aeDisplayNameGroups & this/memberOf" read
+    by set="user/aeSrvGroup/aeProxyFor/aeDisplayNameGroups & this/memberOf" read
     by * none break
 
 # Grant read access to aeContact entries for services/hosts
@@ -340,10 +327,10 @@ access to
   filter="(objectClass=aeContact)"
   attrs=entry,entryDN,entryUUID,objectClass,structuralObjectClass,aeStatus,modifyTimestamp,cn,mail,mailLocalAddress,displayName
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
-    by set="user/-1/aeDisplayNameGroups/member & this" read
-    by set="user/-1/aeProxyFor/aeDisplayNameGroups/member & this" read
-    by set="user/aeSrvGroup/aeDisplayNameGroups/member & this" read
-    by set="user/aeSrvGroup/aeProxyFor/aeDisplayNameGroups/member & this" read
+    by set="user/-1/aeDisplayNameGroups & this/memberOf" read
+    by set="user/-1/aeProxyFor/aeDisplayNameGroups & this/memberOf" read
+    by set="user/aeSrvGroup/aeDisplayNameGroups & this/memberOf" read
+    by set="user/aeSrvGroup/aeProxyFor/aeDisplayNameGroups & this/memberOf" read
     by * none break
 
 # Give read access to SSH keys, X.509 cert and loginShell to servers which
@@ -353,10 +340,10 @@ access to
   filter="(objectClass=posixAccount)"
   attrs=sshPublicKey,userCertificate,loginShell,aeRemoteHost,aeSSHPermissions
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
-    by set="user/-1/aeLoginGroups/member & this" read
-    by set="user/-1/aeProxyFor/aeLoginGroups/member & this" read
-    by set="user/aeSrvGroup/aeLoginGroups/member & this" read
-    by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups/member & this" read
+    by set="user/-1/aeLoginGroups & this/memberOf" read
+    by set="user/-1/aeProxyFor/aeLoginGroups & this/memberOf" read
+    by set="user/aeSrvGroup/aeLoginGroups & this/memberOf" read
+    by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups & this/memberOf" read
     by * none break
 
 # Read access to server groups filtered by (objectClass=aeSrvGroup)
@@ -439,10 +426,10 @@ access to
   filter="(objectClass=posixAccount)"
   attrs=entry,entryDN,entryUUID,objectClass,structuralObjectClass,aeStatus,modifyTimestamp,uid,uidNumber,gidNumber,homeDirectory
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
-    by set="user/-1/aeVisibleGroups/member & this" read
-    by set="user/-1/aeProxyFor/aeVisibleGroups/member & this" read
-    by set="user/aeSrvGroup/aeVisibleGroups/member & this" read
-    by set="user/aeSrvGroup/aeProxyFor/aeVisibleGroups/member & this" read
+    by set="user/-1/aeVisibleGroups & this/memberOf" read
+    by set="user/-1/aeProxyFor/aeVisibleGroups & this/memberOf" read
+    by set="user/aeSrvGroup/aeVisibleGroups & this/memberOf" read
+    by set="user/aeSrvGroup/aeProxyFor/aeVisibleGroups & this/memberOf" read
     by self read
     by * none break
 
@@ -452,10 +439,10 @@ access to
   filter="(objectClass=account)"
   attrs=pwdChangedTime
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
-    by set="user/-1/aeLoginGroups/member & this" search
-    by set="user/-1/aeProxyFor/aeLoginGroups/member & this" search
-    by set="user/aeSrvGroup/aeLoginGroups/member & this" search
-    by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups/member & this" search
+    by set="user/-1/aeLoginGroups & this/memberOf" search
+    by set="user/-1/aeProxyFor/aeLoginGroups & this/memberOf" search
+    by set="user/aeSrvGroup/aeLoginGroups & this/memberOf" search
+    by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups & this/memberOf" search
     by * none break
 
 # Grant read access to OATH-LDAP token reference
@@ -464,10 +451,10 @@ access to
   filter="(objectClass=oathUser)"
   attrs=oathHOTPToken,oathTOTPToken
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
-    by set="user/-1/aeLoginGroups/member & this" search
-    by set="user/-1/aeProxyFor/aeLoginGroups/member & this" search
-    by set="user/aeSrvGroup/aeLoginGroups/member & this" search
-    by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups/member & this" search
+    by set="user/-1/aeLoginGroups & this/memberOf" search
+    by set="user/-1/aeProxyFor/aeLoginGroups & this/memberOf" search
+    by set="user/aeSrvGroup/aeLoginGroups & this/memberOf" search
+    by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups & this/memberOf" search
     by * none break
 
 # Read access to specific memberOf *values* to all services and hosts
@@ -497,7 +484,7 @@ access to
 #------------------------------------------------------------------
 
 access to
-  dn.exact="{{ aedir_suffix }}"
+  dn.base="{{ aedir_suffix }}"
   attrs=children,objectClass,ou,description
     by users read
     by * auth
