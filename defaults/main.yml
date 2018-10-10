@@ -456,6 +456,7 @@ aedir_schema_prefix: "{{ openldap_slapd_conf|dirname }}/schema"
 # All additional schema files needed
 openldap_schema_files:
   - ae-dir.schema
+  - ae-dir-dcr.schema
   - ae-dir-session.schema
   - draft-findlay-ldap-groupofentries.schema
   - draft-stroeder-mailboxrelatedobject.schema
