@@ -570,7 +570,10 @@ ae_dir_config = Web2LDAPConfig(
   passwd_genchars=ur'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
   passwd_genlength=24,
   groupadm_filterstr_template=r'(&(|(objectClass=aeGroup)(objectClass=aeMailGroup))(aeStatus=0)(!(memberURL=*))(|%s))',
-  groupadm_optgroup_bounds=(-2,-1),
+  groupadm_optgroup_bounds=(
+    -len(ldap0.dn.explode_dn('{{ aedir_suffix }}'))-1,
+    -len(ldap0.dn.explode_dn('{{ aedir_suffix }}')),
+  ),
   groupadm_defs={
     'groupOfEntries':('member',None,True),
     'posixGroup':('memberUid','uid',False),
