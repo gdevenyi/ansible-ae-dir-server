@@ -190,7 +190,7 @@ access to
 #------------------------------------------------------------------
 
 access to
-  dn.exact="{{ aedir_suffix }}"
+  dn.base="{{ aedir_suffix }}"
   attrs=entry
     by users read
     by * none
@@ -1183,7 +1183,7 @@ access to
 #------------------------------------------------------------------
 
 access to
-  dn.exact="{{ aedir_suffix }}"
+  dn.base="{{ aedir_suffix }}"
   attrs=auditContext
     by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}" read
     by * none
@@ -1192,7 +1192,7 @@ access to
 #------------------------------------------------------------------
 
 access to
-  dn.exact="{{ aedir_suffix }}"
+  dn.base="{{ aedir_suffix }}"
   attrs=children,objectClass,ou,description
     by users read
     by * auth
