@@ -355,6 +355,9 @@ aedir_addressbook_attrs:
 # Specifies whether a AE-DIR instance should send e-mail notifications to users or not
 aedir_user_mail_enabled: "{{ aedir_hosts.provider[0]==ansible_fqdn }}"
 
+# Boolean for enabling use of aeProxyFor reference attribute
+aedir_aeproxyfor_enabled: False
+
 # some stupid LDAP clients insist on searching user or group entries in
 # separate container trees beneath the separately configured search root
 # => always map to {{ aedir_suffix }}

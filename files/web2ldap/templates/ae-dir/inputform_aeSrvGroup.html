@@ -94,9 +94,11 @@
       <td>Retention period for logs (aeLogRetentionPeriod):</td>
       <td>%(aeLogRetentionPeriod)s</td>
     </tr>
+{% if aedir_aeproxyfor_enabled %}
     <tr>
       <td>Used as proxy by (aeProxyFor):</td>
       <td>%(aeProxyFor)s</td>
     </tr>
+{% endif %}
   </table>
 </fieldset>

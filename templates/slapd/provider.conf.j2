@@ -837,9 +837,11 @@ access to
   attrs=entry,entryDN,entryUUID,objectClass,structuralObjectClass,aeStatus,modifyTimestamp,cn,gidNumber
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeVisibleGroups & this" read
-    by set="user/-1/aeProxyFor/aeVisibleGroups & this" read
     by set="user/aeSrvGroup/aeVisibleGroups & this" read
+{% if aedir_aeproxyfor_enabled %}
+    by set="user/-1/aeProxyFor/aeVisibleGroups & this" read
     by set="user/aeSrvGroup/aeProxyFor/aeVisibleGroups & this" read
+{% endif %}
     by set="this/member & user" read
     by * none break
 
@@ -849,9 +851,11 @@ access to
   attrs=member
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeVisibleGroups & this" read
-    by set="user/-1/aeProxyFor/aeVisibleGroups & this" read
     by set="user/aeSrvGroup/aeVisibleGroups & this" read
+{% if aedir_aeproxyfor_enabled %}
+    by set="user/-1/aeProxyFor/aeVisibleGroups & this" read
     by set="user/aeSrvGroup/aeProxyFor/aeVisibleGroups & this" read
+{% endif %}
     by dnattr=member read
     by * auth
 
@@ -861,9 +865,11 @@ access to
   attrs=memberUid
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeVisibleGroups & this" read
-    by set="user/-1/aeProxyFor/aeVisibleGroups & this" read
     by set="user/aeSrvGroup/aeVisibleGroups & this" read
+{% if aedir_aeproxyfor_enabled %}
+    by set="user/-1/aeProxyFor/aeVisibleGroups & this" read
     by set="user/aeSrvGroup/aeProxyFor/aeVisibleGroups & this" read
+{% endif %}
     by * none break
 access to
   dn.subtree="{{ aedir_suffix }}"
@@ -879,9 +885,11 @@ access to
   attrs=mail,rfc822MailMember,displayName
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeDisplayNameGroups & this" read
-    by set="user/-1/aeProxyFor/aeDisplayNameGroups & this" read
     by set="user/aeSrvGroup/aeDisplayNameGroups & this" read
+{% if aedir_aeproxyfor_enabled %}
+    by set="user/-1/aeProxyFor/aeDisplayNameGroups & this" read
     by set="user/aeSrvGroup/aeProxyFor/aeDisplayNameGroups & this" read
+{% endif %}
     by * none break
 access to
   dn.subtree="{{ aedir_suffix }}"
@@ -907,9 +915,11 @@ access to
   attrs=cn,mail,mailLocalAddress,givenName,sn,displayName
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeDisplayNameGroups & this/memberOf" read
-    by set="user/-1/aeProxyFor/aeDisplayNameGroups & this/memberOf" read
     by set="user/aeSrvGroup/aeDisplayNameGroups & this/memberOf" read
+{% if aedir_aeproxyfor_enabled %}
+    by set="user/-1/aeProxyFor/aeDisplayNameGroups & this/memberOf" read
     by set="user/aeSrvGroup/aeProxyFor/aeDisplayNameGroups & this/memberOf" read
+{% endif %}
     by * none break
 
 # Grant read access to aeContact entries for services/hosts
@@ -919,9 +929,11 @@ access to
   attrs=entry,entryDN,entryUUID,objectClass,structuralObjectClass,aeStatus,modifyTimestamp,cn,mail,mailLocalAddress,displayName
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeDisplayNameGroups & this/memberOf" read
-    by set="user/-1/aeProxyFor/aeDisplayNameGroups & this/memberOf" read
     by set="user/aeSrvGroup/aeDisplayNameGroups & this/memberOf" read
+{% if aedir_aeproxyfor_enabled %}
+    by set="user/-1/aeProxyFor/aeDisplayNameGroups & this/memberOf" read
     by set="user/aeSrvGroup/aeProxyFor/aeDisplayNameGroups & this/memberOf" read
+{% endif %}
     by * none break
 
 # Give read access to SSH keys, X.509 cert and loginShell to servers which
@@ -932,9 +944,11 @@ access to
   attrs=sshPublicKey,userCertificate,loginShell,aeRemoteHost,aeSSHPermissions
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeLoginGroups & this/memberOf" read
-    by set="user/-1/aeProxyFor/aeLoginGroups & this/memberOf" read
     by set="user/aeSrvGroup/aeLoginGroups & this/memberOf" read
+{% if aedir_aeproxyfor_enabled %}
+    by set="user/-1/aeProxyFor/aeLoginGroups & this/memberOf" read
     by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups & this/memberOf" read
+{% endif %}
     by * none break
 
 # Read access to server groups filtered by (objectClass=aeSrvGroup)
@@ -949,10 +963,12 @@ access to
   attrs=aeSetupGroups
   val.regex="^(.+)$"
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
-    by set="user/-1/aeProxyFor & this" read
-    by set="user/aeSrvGroup/aeProxyFor & this" read
     by set.expand="user/-1/aeLoginGroups & [${v1}]" read
     by set.expand="user/aeSrvGroup/aeLoginGroups & [${v1}]" read
+{% if aedir_aeproxyfor_enabled %}
+    by set="user/-1/aeProxyFor & this" read
+    by set="user/aeSrvGroup/aeProxyFor & this" read
+{% endif %}
     by * none break
 
 # Read access to some attrs of aeSrvGroup entries
@@ -964,8 +980,10 @@ access to
   attrs=entry,entryDN,entryUUID,objectClass,structuralObjectClass,aeStatus,aeVisibleGroups,aeVisibleSudoers,aeLogStorePeriod,aeLoginGroups,aeLogStoreGroups
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by self.level{1} read
+{% if aedir_aeproxyfor_enabled %}
     by set="user/-1/aeProxyFor & this" read
     by set="user/aeSrvGroup/aeProxyFor & this" read
+{% endif %}
     by * none break
 
 # Read access to server entries filtered by (objectClass=aeHost)
@@ -976,9 +994,11 @@ access to
   filter="(objectClass=aeHost)"
   attrs=entry,objectClass,structuralObjectClass,aeStatus,cn,host,aeSrvGroup
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
+    by self read
+{% if aedir_aeproxyfor_enabled %}
     by set="user/-1/aeProxyFor & this/-1" read
     by set="user/aeSrvGroup/aeProxyFor & this/-1" read
-    by self read
+{% endif %}
     by * none break
 
 # Read access to network device entries filtered by (objectClass=aeNwDevice)
@@ -1018,10 +1038,12 @@ access to
   attrs=entry,entryDN,entryUUID,objectClass,structuralObjectClass,aeStatus,modifyTimestamp,uid,uidNumber,gidNumber,homeDirectory
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeVisibleGroups & this/memberOf" read
-    by set="user/-1/aeProxyFor/aeVisibleGroups & this/memberOf" read
     by set="user/aeSrvGroup/aeVisibleGroups & this/memberOf" read
-    by set="user/aeSrvGroup/aeProxyFor/aeVisibleGroups & this/memberOf" read
     by self read
+{% if aedir_aeproxyfor_enabled %}
+    by set="user/-1/aeProxyFor/aeVisibleGroups & this/memberOf" read
+    by set="user/aeSrvGroup/aeProxyFor/aeVisibleGroups & this/memberOf" read
+{% endif %}
     by * none break
 
 # Search access to pwdChangedTime for referenced login user groups
@@ -1031,9 +1053,11 @@ access to
   attrs=pwdChangedTime
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeLoginGroups & this/memberOf" search
-    by set="user/-1/aeProxyFor/aeLoginGroups & this/memberOf" search
     by set="user/aeSrvGroup/aeLoginGroups & this/memberOf" search
+{% if aedir_aeproxyfor_enabled %}
+    by set="user/-1/aeProxyFor/aeLoginGroups & this/memberOf" search
     by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups & this/memberOf" search
+{% endif %}
     by * none break
 
 # Grant read access to OATH-LDAP token reference
@@ -1043,9 +1067,11 @@ access to
   attrs=oathHOTPToken,oathTOTPToken
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="user/-1/aeLoginGroups & this/memberOf" search
-    by set="user/-1/aeProxyFor/aeLoginGroups & this/memberOf" search
     by set="user/aeSrvGroup/aeLoginGroups & this/memberOf" search
+{% if aedir_aeproxyfor_enabled %}
+    by set="user/-1/aeProxyFor/aeLoginGroups & this/memberOf" search
     by set="user/aeSrvGroup/aeProxyFor/aeLoginGroups & this/memberOf" search
+{% endif %}
     by * none break
 
 # Read access to specific memberOf *values* to all services and hosts
