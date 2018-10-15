@@ -23,6 +23,17 @@
   based on <a href="https://www.openldap.org">OpenLDAP</a>
 </p>
 
+{% if aedir_news %}
+<p id="news" class="pagesubtitle">
+  News:
+</p>
+<ul>
+{% for news_item in aedir_news %}
+    <li>{{ news_item }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+
 <p id="objectives" class="pagesubtitle">
   Main Objectives
 </p>
@@ -53,16 +64,5 @@
   <a href="https://stroeder.com/publications.html">
   &AElig;-DIR conference presentations</a>.
 </p>
-
-{% if aedir_news %}
-<p id="news" class="pagesubtitle">
-  News:
-</p>
-<ul>
-{% for news_item in aedir_news %}
-    <li>{{ news_item }}</li>
-{% endfor %}
-</ul>
-{% endif %}
 
 {% endblock content %}
