@@ -1018,8 +1018,8 @@ access to
   attrs=memberOf
   val.regex="^(.+)$"
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
-    by set.expand="{{ aedir_who_srvgroup }} & [ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeSrvGroup)(aeStatus=0)(aeVisibleGroups=${v1}))]/entryDN" read
     by set.expand="user/memberOf & [${v1}]" read
+    by set.expand="{{ aedir_who_srvgroup }} & [ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeSrvGroup)(aeStatus=0)(aeVisibleGroups=${v1}))]/entryDN" read
     by * none
 access to
   dn.subtree="{{ aedir_suffix }}"
