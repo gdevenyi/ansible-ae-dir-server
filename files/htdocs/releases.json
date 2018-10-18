@@ -7,6 +7,14 @@
    "tags": "iam, identity-management, ldap, openldap, pam, nss, security, authentication-directory",
    "releases": [
       {
+         "version": "0.4.0",
+         "state": "stable",
+         "scope": "major feature",
+         "changes": "Major refactoring of OpenLDAP ACLs, minor other fixes and enhancements",
+         "download": "https://ae-dir.com/install.html",
+         "published": "2018-10-18T20:00:00+00:00"
+      },
+      {
          "version": "0.3.4",
          "state": "stable",
          "scope": "minor feature",
