@@ -423,7 +423,7 @@ aedir_uwsgi_params:
 # only support for direct parent service groups, no supplemental or proxy service groups
 #aedir_who_srvgroup: "(user/-1)"
 # full features including
-aedir_who_srvgroup: "(user/-1 | user/aeSrvGroup | user/aeProxyFor/-1 | user/aeProxyFor/aeSrvGroup)"
+aedir_who_srvgroup: "(user/-1 | user/aeSrvGroup | user/-1/aeProxyFor)"
 
 #---------------------------------------------------------------------------
 # OpenLDAP parameters
