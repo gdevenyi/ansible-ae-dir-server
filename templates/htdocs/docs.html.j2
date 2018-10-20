@@ -2124,4 +2124,39 @@
     <a href="https://www.openldap.org/faq/data/cache/1133.html">FAQ-O-MATIC: Sets in Access Control</a>
   </li>
 </ul>
+
+<h2 id="hardening">Hardening</h2>
+
+<h3 id="apparmor">AppArmor</h3>
+<p>
+  If you set ansible variable <var>apparmor_enabled: True</var> then
+  <a href="http://wiki.apparmor.net">AppArmor</a> profiles and abstractions
+  are installed to confine all components to enforce mode.<br>
+  Only supported on <em>Debian Stretch</em> and <em>openSUSE/SLE</em>.
+</p>
+
+<h3 id="systemd">systemd</h3>
+<p>
+  Various systemd security configuration options are used when starting
+  services via systemd units. See ansible variable
+  <var>aedir_systemd_hardening</var> for global settings.
+</p>
+<p>
+  See also:
+</p>
+<ul>
+  <li>
+    <a href="https://www.freedesktop.org/software/systemd/man/index.html">systemd.index — List all manpages from the systemd project</a>
+  </li>
+  <li>
+    <a href="https://www.freedesktop.org/software/systemd/man/systemd.exec.html">systemd.exec(5)</a>
+  </li>
+  <li>
+    <a href="https://lwn.net/Articles/709755/">lwn.net: Using systemd for more secure services in Fedora</a>
+  </li>
+  <li>
+    <a href="https://github.com/konstruktoid/hardening/blob/master/systemd.adoc">Security focused systemd configuration</a>
+  </li>
+</ul>
+
 {% endblock content %}
