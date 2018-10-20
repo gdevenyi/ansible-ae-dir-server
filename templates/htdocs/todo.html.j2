@@ -5,91 +5,26 @@
 
 {% block content %}
 
-<ol>
-  <li>
-    <a href="#done">Done</a>
-    <ol>
-      <li><a href="#mfa">Multi-factor authc</a></li>
-      <li>
-        <a href="#hardening">Hardening</a>
-        <ol>
-          <li><a href="#apparmor">AppArmor</a></li>
-          <li><a href="#systemd">systemd</a></li>
-        </ol>
-      </li>
-    </ol>
-  </li>
-  <li>
-    <a href="#open">Open</a>
-    <ol>
-      <li><a href="#sso">WebSSO</a></li>
-      <li><a href="#pki">X.509 PKI</a></li>
-      <li><a href="#devops">DevOps tooling</a></li>
-      <li><a href="#logging">Logging</a></li>
-      <li><a href="#pxe">PXE/DHCP/TFTP integration</a></li>
-      <li><a href="#nac">Network Access Control (NAC)</a></li>
-      <li><a href="#radius">RADIUS</a></li>
-      <li><a href="#dns">DNS</a></li>
-      <li><a href="#ui">User Interface</a></li>
-      <li><a href="#mod-security">ModSecurity</a></li>
-      <li><a href="#cli">Command-line tool</a></li>
-      <li><a href="#browser">Browser integration/security</a></li>
-      <li><a href="#python3">Python 3.x</a></li>
-      <li><a href="#compliance">Compliance checks</a></li>
-    </ol>
-  </li>
-</ol>
-
-<h1 id="done">Done</h1>
-
-<h2 id="mfa">Multi-factor authc</h2>
-<ul>
-  <li>
-    integrated <a href="https://oath-ldap.stroeder.com/">OATH-LDAP</a>
-  </li>
-  <li>
-    based on <a href="https://www.stroeder.com/slapdsock.html">slapd-sock listener</a>
-  </li>
-</ul>
-
-<h2 id="hardening">Hardening</h2>
-
-<h3 id="apparmor">AppArmor</h3>
-<p>
-  If you set ansible variable <var>apparmor_enabled: True</var> then
-  <a href="http://wiki.apparmor.net">AppArmor</a> profiles and abstractions
-  are installed to confine all components to enforce mode.<br>
-  Only supported on <em>Debian Stretch</em> and <em>openSUSE/SLE</em>.
-</p>
-
-<h3 id="systemd">systemd</h3>
-<p>
-  Using various systemd security configuration options for starting services via systemd units.
-  See ansible variable <var>aedir_systemd_hardening</var> for global settings.
-</p>
-<p>
-  See also:
-</p>
-<ul>
-  <li>
-    <a href="https://www.freedesktop.org/software/systemd/man/index.html">systemd.index — List all manpages from the systemd project</a>
-  </li>
-  <li>
-    <a href="https://www.freedesktop.org/software/systemd/man/systemd.exec.html">systemd.exec(5)</a>
-  </li>
-  <li>
-    <a href="https://lwn.net/Articles/709755/">lwn.net: Using systemd for more secure services in Fedora</a>
-  </li>
-  <li>
-    <a href="https://github.com/konstruktoid/hardening/blob/master/systemd.adoc">Security focused systemd configuration</a>
-  </li>
-</ul>
-
-
-<h1 id="open">Open</h1>
 <p>
   In no particular order...
 </p>
+
+<ol>
+  <li><a href="#sso">WebSSO</a></li>
+  <li><a href="#pki">X.509 PKI</a></li>
+  <li><a href="#devops">DevOps tooling</a></li>
+  <li><a href="#logging">Logging</a></li>
+  <li><a href="#pxe">PXE/DHCP/TFTP integration</a></li>
+  <li><a href="#nac">Network Access Control (NAC)</a></li>
+  <li><a href="#radius">RADIUS</a></li>
+  <li><a href="#dns">DNS</a></li>
+  <li><a href="#ui">User Interface</a></li>
+  <li><a href="#mod-security">ModSecurity</a></li>
+  <li><a href="#cli">Command-line tool</a></li>
+  <li><a href="#browser">Browser integration/security</a></li>
+  <li><a href="#python3">Python 3.x</a></li>
+  <li><a href="#compliance">Compliance checks</a></li>
+</ol>
 
 <h2 id="sso">WebSSO</h2>
 <p>
