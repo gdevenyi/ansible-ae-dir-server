@@ -17,7 +17,6 @@
           <li><a href="#systemd">systemd</a></li>
         </ol>
       </li>
-      <li><a href="#aehostd">Custom PAM/NSS caching demon</a></li>
     </ol>
   </li>
   <li>
@@ -30,7 +29,6 @@
       <li><a href="#pxe">PXE/DHCP/TFTP integration</a></li>
       <li><a href="#nac">Network Access Control (NAC)</a></li>
       <li><a href="#radius">RADIUS</a></li>
-      <li><a href="#aehostd">aehostd -- custom PAM/NSS demon</a></li>
       <li><a href="#dns">DNS</a></li>
       <li><a href="#ui">User Interface</a></li>
       <li><a href="#mod-security">ModSecurity</a></li>
@@ -86,22 +84,6 @@
     <a href="https://github.com/konstruktoid/hardening/blob/master/systemd.adoc">Security focused systemd configuration</a>
   </li>
 </ul>
-
-<h2 id="aehostd">aehostd -- custom PAM/NSS demon</h2>
-<p><a href="aehostd.html">aehostd</a> is now ready for QA tests.</p>
-<p>Some details still to be improved:</p>
-<dl>
-  <dt>Location-specific replicas</dt>
-  <dd>
-    read DC locations in attribute <var>aeLocation</var> of
-    <a href="docs.html#schema-oc-aeHost">aeHost</a> entry
-    to determine &quot;near&quot; consumer replicas to access
-  </dd>
-  <dt>Monitoring</dt>
-  <dd>
-    integrated monitoring (alarming and performance)
-  </dd>
-</dl>
 
 
 <h1 id="open">Open</h1>
