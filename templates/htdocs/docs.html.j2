@@ -46,10 +46,10 @@
     </ol>
   </li>
   <li>
-    <a href="#eer">Entity Relationship</a>
+    <a href="#er">Entity Relationship</a>
     <ol>
-      <li><a href="#eer-roles">Role References</a></li>
-      <li><a href="#eer-example">Example</a></li>
+      <li><a href="#er-roles">Role References</a></li>
+      <li><a href="#er-example">Example</a></li>
     </ol>
   </li>
   <li>
@@ -652,7 +652,7 @@
   </tr>
 </table>
 
-<h1 id="eer">Entity Relationship</h1>
+<h1 id="er">Entity Relationship</h1>
 <p>
   The following diagram illustrates how the different entities in
   &AElig;-DIR are referenced from each other. This entity
@@ -660,8 +660,8 @@
   rights of bound entity.
 </p>
 
-{% set img_anchor="eer-complete" -%}
-{% set img_file="eer-complete.svg" -%}
+{% set img_anchor="er-complete" -%}
+{% set img_file="er-complete.svg" -%}
 {% set img_title="complete entity relationship diagram" -%}
 {% include "includes/img.html.j2" %}
 
@@ -687,14 +687,14 @@
   </li>
 </ul>
 
-<h2 id="eer-roles">Role References</h2>
+<h2 id="er-roles">Role References</h2>
 <p>
   The following smaller diagram shows only references for assigning
   <a href="#roles">&AElig;-DIR roles</a>.
 </p>
 
-{% set img_anchor="eer-roles" -%}
-{% set img_file="eer-roles.png" -%}
+{% set img_anchor="er-roles" -%}
+{% set img_file="er-roles.png" -%}
 {% set img_title="entity roles relationship diagram" -%}
 {% include "includes/img.html.j2" %}
 
@@ -750,7 +750,7 @@
   </li>
 </ol>
 
-<h2 id="eer-example">Example</h2>
+<h2 id="er-example">Example</h2>
 <p>
   Here is a diagram which shows an example of the various entries
   and their references stored in:
@@ -759,7 +759,7 @@
   </a>:
 </p>
 
-{% set img_anchor="eer-demo" -%}
+{% set img_anchor="er-demo" -%}
 {% set img_file="demo.ae-dir.com-zone-test.svg" -%}
 {% set img_title="entity relationship diagram of zone test on ldaps://demo.ae-dir.com" -%}
 {% include "includes/img.html.j2" %}
@@ -807,8 +807,7 @@
     (see <a href="https://tools.ietf.org/html/rfc4512#section-4.1.7">RFC 4512 section 4.1.7</a>)
   </li>
   <li>
-    constraints enforcing the entity relationship
-    (see <a href="#eer">EER</a>)
+    constraints enforcing the <a href="#er">entity relationship</a>
   </li>
 </ul>
 
@@ -2108,7 +2107,7 @@
   <dt>sets</dt>
   <dd>
     Access rights are granted based on (indirect)
-    <a href="#eer">entity relationship</a> by following the references from
+    <a href="#er">entity relationship</a> by following the references from
     entries to other entries.
   </dd>
 </dl>
