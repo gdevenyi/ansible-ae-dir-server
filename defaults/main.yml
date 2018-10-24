@@ -407,17 +407,17 @@ ae_expiry_status_defaults: {}
 # some uwsgi parameters per service
 aedir_uwsgi_params:
   web2ldap:
-    buffer_size: 16384
-    harakiri: 20
+    buffer_size: 32768
+    harakiri: 45
     threads: 10
   oathenroll:
     buffer_size: 8192
     harakiri: 10
-    processes: 10
+    processes: 5
   aedirpwd:
     buffer_size: 8192
     harakiri: 10
-    processes: 10
+    processes: 5
 
 # All relevant aeSrvGroup entries in set-based who clauses for performance tuning:
 # support supplemental service groups, but no support for proxy service groups
