@@ -61,6 +61,8 @@ aedir_init: False
 aedir_suffix: "ou=ae-dir"
 
 # base DN / search root for accesslog entries
+# For disabling accesslog DB on the read-only consumers you can set this
+# to an empty string in group_vars/ae-dir-consumers
 aedir_accesslog_suffix: "cn=accesslog-ae-dir"
 
 # base DN / search root for session entries
