@@ -227,6 +227,7 @@ access to
   val.regex="^{{ aedir_suffix }}$"
     by * read
 
+{% if aedir_accesslog_suffix %}
 # grant read access to accesslog suffix value to all zone admins
 access to
   dn.base=""
@@ -234,6 +235,7 @@ access to
   val.regex="^{{ aedir_accesslog_suffix }}$"
     by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}" read
     by * none break
+{% endif %}
 
 # allow admin/auditor access to read all search bases
 access to
