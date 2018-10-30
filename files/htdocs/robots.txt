@@ -1,2 +1,5 @@
 User-agent: *
 Disallow: /web2ldap
+Disallow: /pwd
+Disallow: /oath
+
