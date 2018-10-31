@@ -230,13 +230,6 @@ a:active {
     padding:1.5em;
   }
 
-  :target:before {
-    content:"";
-    display:block;
-    height:4em;
-    margin:-4em 0 0;
-  }
-
 }
 
 kbd.return {
