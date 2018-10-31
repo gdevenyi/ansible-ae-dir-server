@@ -853,11 +853,10 @@ access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=posixGroup)"
   attrs=memberUid
-  val.regex="^(.+)$"
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by set="{{ aedir_who_srvgroup }}/aeVisibleGroups & this" read
-    by set.expand="user/uid & [${v1}]" read
-    by * none break
+    by dnattr=member read
+    by * none
 
 access to
   dn.subtree="{{ aedir_suffix }}"
