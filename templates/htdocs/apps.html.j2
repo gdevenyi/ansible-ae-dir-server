@@ -290,15 +290,56 @@
 
 <h1 id="ssh-proxy">SSH proxy</h1>
 <p>
-  It is possible to implement an authorizing SSH proxy which uses exactly
-  the same &AElig;-DIR entry references to check whether a user is allowed
-  to login to target SSH host.
+  It is possible to implement an authorizing SSH proxy which queries
+  exactly the same <a href="docs.html#er">&AElig;-DIR login relationship</a>
+  to check whether an user is allowed to login to a specific target SSH
+  host through the SSH proxy.
 </p>
 
 {% set img_anchor="ssh-proxy" -%}
 {% set img_file="ssh-proxy.svg" -%}
 {% set img_title="SSH proxy integrated with &AElig;-DIR" -%}
 {% include "includes/img.html.j2" %}
+
+<p>
+  Notes:
+</p>
+<ul>
+  <li>
+    The <a href="docs.html#schema-oc-aeSrvGroup">aeSrvGroup</a>
+    of the SSH proxy's <a href="docs.html#schema-oc-aeHost">aeHost</a>
+    must have attribute <em>aeProxyFor</em> set referencing the
+    <em>aeSrvGroup</em> of the target system or must have the general role
+    <a href="docs.html#role-ae-login-proxy">&AElig; Login Proxy</a>.
+  </li>
+  <li>
+    The user authentication at the SSH proxy is done via SSH authorized key
+    and PAM using password + OTP.
+  </li>
+  <li>
+    The user has to use
+    <a href="https://man.openbsd.org/ssh_config#ProxyCommand">ProxyCommand</a>
+    to open the proxy connection prior to the SSH connection to the target host.
+  </li>
+  <li>
+    <a href="https://man.openbsd.org/ssh_config#ControlMaster">ControlMaster</a>
+    connection should be used by the client to avoid reauthentication
+    at the SSH proxy for subsequent connections to target systems.
+  </li>
+  <li>
+    <a href="https://man.openbsd.org/sshd_config#ForceCommand">ForceCommand in sshd_config</a>
+    restricts normal users to only invoke a wrapper script which sets up a
+    simple TCP relay. The wrapper script is run as the AE-DIR user
+    connecting to the SSH proxy.
+  </li>
+  <li>
+    A small demon on the SSH proxy queried by the wrapper script over a
+    Unix domain socket for deciding whether to actually allow the login or
+    not. It queries <a href="docs.html#er">&AElig;-DIR login relationship</a>
+    defined for the <a href="docs.html#schema-oc-aeSrvGroup">aeSrvGroup</a>
+    of the target system.
+  </li>
+</ul>
 
 <p>
   See also:
@@ -331,7 +372,7 @@
 {% set img_title="LDAP proxy integrated with &AElig;-DIR" -%}
 {% include "includes/img.html.j2" %}
 
-<p>Further notes:</p>
+<p>Notes:</p>
 <ul>
   <li>
     The admin is authenticated via LDAP simple bind pass-through.
@@ -383,7 +424,7 @@
 {% set img_title="Wifi access point integrated with &AElig;-DIR" -%}
 {% include "includes/img.html.j2" %}
 
-<p>Further notes:</p>
+<p>Notes:</p>
 <ul>
   <li>
     With its <a href="docs.html#schema-oc-aeService">service entry</a> the
