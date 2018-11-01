@@ -290,8 +290,8 @@
 
 <h1 id="ssh-proxy">SSH proxy</h1>
 <p>
-  It is possible to implement an authorizing SSH proxy which queries
-  exactly the same <a href="docs.html#er">&AElig;-DIR login relationship</a>
+  It is possible to implement an authorizing SSH proxy which queries exactly
+  the same <a href="docs.html#er-roles">&AElig;-DIR login relationship</a>
   to check whether an user is allowed to login to a specific target SSH
   host through the SSH proxy.
 </p>
@@ -335,7 +335,7 @@
   <li>
     A small demon on the SSH proxy queried by the wrapper script over a
     Unix domain socket for deciding whether to actually allow the login or
-    not. It queries <a href="docs.html#er">&AElig;-DIR login relationship</a>
+    not. It queries <a href="docs.html#er-roles">&AElig;-DIR login relationship</a>
     defined for the <a href="docs.html#schema-oc-aeSrvGroup">aeSrvGroup</a>
     of the target system.
   </li>
