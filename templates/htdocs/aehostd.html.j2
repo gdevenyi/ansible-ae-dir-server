@@ -185,15 +185,23 @@
   other agents besides <em>aehostd</em> to be installed on the host. Mainly
   it is based on a PAM authentication with host password.
 </p>
+
+{% set img_anchor="aehost-init" -%}
+{% set img_file="aehost-init.svg" -%}
+{% set img_title="Initializing host password in aehostd" -%}
+{% include "includes/img.html.j2" %}
+
+<p>Prerequisites:</p>
+<p>
+  Host gets installed with correctly configured short bind-DN
+  based on the canonical hostname (FQDN)
+  (usually in file <em>/etc/aehostd.conf</em>)
+  but without a host password
+  (usually in file <em>/var/lib/aehostd/aehostd.pw</em>).
+</p>
+
 <p>Process steps:</p>
 <ol>
-  <li>
-    Host gets installed with correctly configured short bind-DN
-    based on the canonical hostname (FQDN)
-    (usually in file <em>/etc/aehostd.conf</em>)
-    but without a host password
-    (usually in file <em>/var/lib/aehostd/aehostd.pw</em>).
-  </li>
   <li>
     A responsible
     <a href="docs.html#role-setup-admin">setup admin</a> adds a new
@@ -208,8 +216,14 @@
     <var>aehost-init</var> with the new host password set before.
   </li>
   <li>
+    <em>pam_aedir</em> receives the PAM authentication request from <em>sshd</em>.
+  </li>
+  <li>
     <em>aehostd</em> receives the PAM authentication request for the system
-    user account <var>aehost-init</var> and checks it with a simple bind
+    user account <var>aehost-init</var>.
+  </li>
+  <li>
+    The host password is validated by sending a simple bind
     request on behalf of the locally configured host bind DN.
   </li>
   <li>
@@ -217,10 +231,6 @@
     <em>aehostd</em> password file (located by configuration option
     <var>bindpwfile</var>) in case the password stored therein is
     different.
-  </li>
-  <li>
-    <em>aehostd</em> receives the PAM authorization request for the system
-    user account <var>aehost-init</var> and rejects it.
   </li>
 </ol>
 
