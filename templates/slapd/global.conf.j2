@@ -186,7 +186,7 @@ authz-regexp
   "ldap:///$1??base?(&(|(objectClass=aeUser)(objectClass=aeService)(objectClass=aeHost))(aeStatus=0))"
 
 #---------------------------------------------------------------------------
-# Global access control and security restrictions
+# Global access control, security restrictions and limits
 #---------------------------------------------------------------------------
 
 require LDAPv3
@@ -195,6 +195,12 @@ require LDAPv3
 localSSF 256
 # minimum required SSF value (security strength factor)
 security ssf=128
+
+# Maximum incoming LDAP PDU size for anonymous sessions
+sockbuf_max_incoming {{ openldap_sockbuf_max_incoming }}
+
+# Maximum incoming LDAP PDU size for authenticated sessions
+sockbuf_max_incoming_auth {{ openldap_sockbuf_max_incoming_auth }}
 
 # enable proxy authorization with authzTo attribute
 authz-policy to
