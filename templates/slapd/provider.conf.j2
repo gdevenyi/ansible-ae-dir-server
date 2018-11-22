@@ -1197,7 +1197,6 @@ unique_uri "ldap:///cn={{ zone }},{{ aedir_suffix }}?aePerson?sub"
 # these two constraints are only possible with a negation filter
 unique_uri "ldap:///{{ aedir_suffix }}?cn?sub?(!(|(objectClass=aePerson)(objectClass=aeUser)(objectClass=aeNwDevice)))"
 unique_uri "ldap:///{{ aedir_suffix }}?gidNumber?sub"
-unique_uri "ldap:///{{ aedir_suffix }}?aeRemoteHost?sub?(!(!(objectClass=aeUser)))"
 unique_uri "ldap:///{{ aedir_suffix }}?serialNumber?sub?(objectClass=*)"
 
 # Enforce constraints on attribute values
