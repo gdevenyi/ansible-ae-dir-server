@@ -7,6 +7,14 @@
    "tags": "iam, identity-management, ldap, openldap, nis, pam, nss, security, authentication-directory",
    "releases": [
       {
+         "version": "0.4.3",
+         "state": "stable",
+         "scope": "minor feature",
+         "changes": "Small improvements for ae-dir-hostd role, some tuning parameters for slapd",
+         "download": "https://ae-dir.com/install.html",
+         "published": "2018-11-22T10:00:00+00:00"
+      },
+      {
          "version": "0.4.2",
          "state": "stable",
          "scope": "minor feature",
