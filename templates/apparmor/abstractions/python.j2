@@ -13,9 +13,9 @@
   {{ aedir_python.split(' ', 1)[0] }} ix,
   {{ aedir_python_sitepackages }}/ r,
   {{ aedir_python_sitepackages }}/** r,
-  {{ aedir_prefix }}/lib/python{{ aedir_python_version }}/orig-prefix.txt r,
-  {{ aedir_prefix }}/lib/python{{ aedir_python_version }}/**.py{,c,o} r,
-  {{ aedir_prefix }}/lib/python{{ aedir_python_version }}/**.so* rm,
+  {{ aedir_prefix }}/lib/python{{ aedir_python_version[lsb_id] }}/orig-prefix.txt r,
+  {{ aedir_prefix }}/lib/python{{ aedir_python_version[lsb_id] }}/**.py{,c,o} r,
+  {{ aedir_prefix }}/lib/python{{ aedir_python_version[lsb_id] }}/**.so* rm,
 
   # Python logging config file
   {{ aedir_etc }}/ae-logging.conf r,
