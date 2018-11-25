@@ -29,17 +29,23 @@ aedir_package_repos:
       repo: "{{ aedir_suse_repo.get(ansible_lsb.description, '') }}"
       key: ""
 
+# currently used Python version
+aedir_python_version:
+  CentOS: "2.7"
+  Debian: "2.7"
+  SUSE: "2.7"
+
 # OS-specific Python paths
 aedir_python_paths:
   CentOS:
-    python_exec: "{{ aedir_prefix }}/bin/python2.7"
-    site_packages: "{{ aedir_prefix }}/lib/python2.7/site-packages"
+    python_exec: "{{ aedir_prefix }}/bin/python{{ aedir_python_version }}"
+    site_packages: "{{ aedir_prefix }}/lib/python{{ aedir_python_version }}/site-packages"
   Debian:
-    python_exec: "{{ aedir_prefix }}/bin/python2.7"
-    site_packages: "{{ aedir_prefix }}/lib/python2.7/site-packages"
+    python_exec: "{{ aedir_prefix }}/bin/python{{ aedir_python_version }}"
+    site_packages: "{{ aedir_prefix }}/lib/python{{ aedir_python_version }}/site-packages"
   SUSE:
-    python_exec: "/usr/bin/python2.7"
-    site_packages: "/usr/lib/python2.7/site-packages"
+    python_exec: "/usr/bin/python{{ aedir_python_version }}"
+    site_packages: "/usr/lib/python{{ aedir_python_version }}/site-packages"
 
 # Maximum incoming LDAP PDU size for authenticated sessions
 openldap_sockbuf_max_incoming_auth_default:
