@@ -46,6 +46,16 @@
       &AElig; admins/auditors, Zone admins
     </td>
   </tr>
+    <td>
+      <a class="CommandLink"
+         href="/web2ldap?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub?(&(objectClass=aeGroup)(aeStatus=0)(!(member=*)))?bindname=">
+        Search active groups without members
+      </a>
+    </td>
+    <td>
+      &AElig; admins/auditors, Zone admins
+    </td>
+  </tr>
   <tr>
     <td>
       <a class="CommandLink"
