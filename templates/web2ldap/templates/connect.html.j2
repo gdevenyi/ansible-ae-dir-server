@@ -100,7 +100,7 @@
     <th>Host</th>
     <th>Id</th>
   </tr>
-{% for host in aedir_hosts[role] %}
+{% for host in aedir_hosts[role]|sort %}
 {% set replica = hostvars[host].get('openldap_service_fqdn',host) -%}
 {% set server_id = hostvars[host].get('openldap_server_id','') -%}
   <tr>
