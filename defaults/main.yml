@@ -503,7 +503,7 @@ openldap_backup_compressor: "xz -9"
 openldap_backup_max_days: 21
 
 # List of servers to be added to rootDSE attribute altServer (see RFC 4512)
-openldap_rootdse_alt_servers: "{{ aedir_hosts[openldap_role] }}"
+openldap_rootdse_alt_servers: "{{ aedir_hosts[openldap_role]|sort }}"
 
 # The CA certificate file for validating the server certs
 openldap_cacert_filename: "ca-chain.pem"
