@@ -17,6 +17,7 @@ import getpass
 os.environ['LDAPRC'] = '/opt/ae-dir/etc/ldap.conf'
 import ldap0
 from ldap0.pw import random_string
+from ldap0.filter import escape_filter_chars
 
 import aedir
 
@@ -39,7 +40,7 @@ except IndexError:
     sys.stderr.write('Usage: {} <username|hostname>\n'.format(sys.argv[0]))
     sys.exit(9)
 
-ldap_filter = aedir.AUTHC_ENTITY_FILTER_TMPL.format(arg_value)
+ldap_filter = aedir.AUTHC_ENTITY_FILTER_TMPL.format(escape_filter_chars(arg_value))
 
 ldap_conn = aedir.AEDirObject(None, trace_level=PYLDAP_TRACE_LEVEL)
 logger.debug('successfully connected to %r as %r', ldap_conn._uri, ldap_conn.whoami_s())
