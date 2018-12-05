@@ -10,7 +10,7 @@
       - python-devel
       - libffi-devel
     state: present
-    update_cache: yes
+    update_cache: no
   when: aedir_pip_needs_compiler==True
 
 - name: "Install base packages on {{ lsb_id }}"
@@ -21,7 +21,7 @@
       - python-pip
       - python-cffi
     state: present
-    update_cache: yes
+    update_cache: no
   notify:
     - restart aedirpwd
     - restart hotp_validator

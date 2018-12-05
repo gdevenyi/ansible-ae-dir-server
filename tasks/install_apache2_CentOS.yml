@@ -8,7 +8,7 @@
       - mod_ssl
       - mod_proxy_uwsgi
     state: present
-    update_cache: yes
+    update_cache: no
   notify:
     - "restart ae-apache"
 
@@ -18,7 +18,7 @@
       - uwsgi
       - uwsgi-plugin-python2
     state: present
-    update_cache: yes
+    update_cache: no
   notify:
     - "restart aedirpwd"
     - "restart oathenroll"
