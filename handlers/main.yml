@@ -2,38 +2,72 @@
 # handlers file for roles/ae-dir
 
 - name: "restart apparmor"
-  service: name=apparmor state=restarted
+  listen:
+    - "restart apparmor"
+  service:
+    name: "apparmor"
+    state: restarted
   when: apparmor_enabled == True
 
 - name: "restart ae-slapd"
-  service: name=ae-slapd state=restarted
+  listen:
+    - "restart ae-slapd"
+  service:
+    name: "ae-slapd"
+    state: restarted
 
 - name: "restart aedirpwd"
-  service: name=aedirpwd state=restarted
+  listen:
+    - "restart aedirpwd"
+  service:
+    name: "aedirpwd"
+    state: restarted
   when: openldap_role == 'provider'
 
 - name: "restart hotp_validator"
-  service: name=hotp_validator state=restarted
+  listen:
+    - "restart hotp_validator"
+  service:
+    name: hotp_validator
+    state: restarted
   when: openldap_role == 'provider' and oath_ldap_enabled == True
 
 - name: "restart oathenroll"
-  service: name=oathenroll state=restarted
+  listen:
+    - "restart oathenroll"
+  service:
+    name: "oathenroll"
+    state: restarted
   when: openldap_role == 'provider' and oath_ldap_enabled == True
 
 - name: "restart bind_proxy"
-  service: name=bind_proxy state=restarted
+  listen:
+    - "restart bind_proxy"
+  service:
+    name: "bind_proxy"
+    state: restarted
   when: openldap_role == 'consumer' and oath_ldap_enabled == True
 
 - name: "restart ae-apache"
-  service: name=ae-apache state=restarted
+  listen:
+    - "restart ae-apache"
+  service:
+    name: "ae-apache"
+    state: restarted
   when: openldap_role == 'provider'
 
 - name: "restart web2ldap"
+  listen:
+    - "restart web2ldap"
   service:
     name: "web2ldap"
     state: restarted
   when: openldap_role == 'provider'
 
 - name: "restart passmod"
-  service: name=passmod state=restarted
+  listen:
+    - "restart passmod"
+  service:
+    name: "passmod"
+    state: restarted
   when: openldap_role == 'provider' and aedir_pwsync_targeturl
