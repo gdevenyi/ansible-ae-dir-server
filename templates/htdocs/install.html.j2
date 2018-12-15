@@ -124,8 +124,8 @@
     The trailing comma after the FQDN is needed when using a hostname!
   </li>
   <li>
-    Get the ansible playbooks:
-    <pre>git clone https://ae-dir.com/git/ae-dir.git</pre>
+    Get the ansible playbooks and roles:
+    <pre>git clone --recurse-submodules https://gitlab.com/ae-dir/ansible-example-site myenv</pre>
   </li>
   <li>
     Issue X.509 TLS server certificates with appropriate <var>CN</var> and
@@ -143,16 +143,12 @@
 <h1 id="install">Installation</h1>
 <ol>
   <li>
-    Create environment directory structure (e.g. copy directory <em>example/</em>):
-    <code>cp -av example myenv</code>.
-  </li>
-  <li>
     Edit ansible inventory file <em>myenv/hosts</em> to match your
     hosts/VMs/containers of your installation environment.
   </li>
   <li>
     Read comments in file
-    <code>ansible/roles/ae-dir-server/defaults/main.yml</code> and adjust
+    <code>myenv/roles/ae-dir-server/defaults/main.yml</code> and adjust
     <a href="https://docs.ansible.com/ansible/playbooks_variables.html">
     ansible group and host vars</a> to match your environment.
   </li>
