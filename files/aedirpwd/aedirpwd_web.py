@@ -458,7 +458,7 @@ class CheckPassword(BaseApp):
         ppolicy_control = PasswordPolicyControl()
         session_tracking_control = self._sess_track_ctrl()
         # Do the password check itself by sending LDAP simple bind
-        _, _, _, bind_srv_ctrls = self.ldap_conn.simple_bind_s(
+        ldap_res = self.ldap_conn.simple_bind_s(
             user_dn,
             old_password_ldap,
             serverctrls=[
@@ -468,10 +468,10 @@ class CheckPassword(BaseApp):
         )
         # Extract the password policy response control and raise appropriate
         # warning exceptions
-        if bind_srv_ctrls:
+        if ldap_res.ctrls:
             ppolicy_ctrls = [
                 c
-                for c in bind_srv_ctrls
+                for c in ldap_res.ctrls
                 if c.controlType == PasswordPolicyControl.controlType
             ]
             if ppolicy_ctrls and len(ppolicy_ctrls) == 1:
