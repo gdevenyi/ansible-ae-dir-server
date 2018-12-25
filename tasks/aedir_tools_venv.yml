@@ -20,7 +20,7 @@
       - pyasn1
       - pyasn1_modules
       - ldap0>=0.1.0
-      - aedir
+      - aedir>=0.2.0
     state: present
     virtualenv: "{{ aedir_prefix }}"
     virtualenv_python: python2.7

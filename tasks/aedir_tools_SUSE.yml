@@ -6,7 +6,7 @@
       - python-pyasn1>=0.3.7
       - python-pyasn1-modules>=0.1.5
       - python-ldap0>=0.1.0
-      - python-aedir
+      - python-aedir>=0.2.0
       - python-cryptography
       - python-jwcrypto
     state: present
