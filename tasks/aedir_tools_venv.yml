@@ -19,7 +19,7 @@
       - jwcrypto
       - pyasn1
       - pyasn1_modules
-      - ldap0>=0.1.0
+      - ldap0>=0.1.1
       - aedir>=0.2.0
     state: present
     virtualenv: "{{ aedir_prefix }}"
@@ -50,8 +50,10 @@
       - passlib
       - xlwt
       - pyweblib
-      - web.py
       - dnspython
+      - Flask
+      - flask-WTForms
+      - flask-WTF
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
