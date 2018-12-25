@@ -539,21 +539,12 @@ class CheckPassword(BaseApp):
         except ldap0.LDAPError:
             return self.GET(message=u'Internal error!')
         # Try to display until when password is still valid
-        valid_until = u'unknown'
-        pwd_changed_timestamp = ldap0.functions.strp_secs(user_entry['pwdChangedTime'][0])
-        pwd_policy_subentry_dn = user_entry['pwdPolicySubentry'][0]
         try:
-            pwd_policy_subentry = self.ldap_conn.read_s(
-                pwd_policy_subentry_dn,
-                attrlist=PWDPOLICY_EXPIRY_ATTRS,
-            )
-        except ldap0.LDAPError:
-            return self.GET(message=u'Internal error!')
-        try:
-            pwd_max_age = int(pwd_policy_subentry['pwdMaxAge'][0])
+            pwd_max_age = int(user_entry['pwdMaxAge'][0])
         except (ValueError, KeyError):
-            pass
+            valid_until = u'unknown'
         else:
+            pwd_changed_timestamp = ldap0.functions.strp_secs(user_entry['pwdChangedTime'][0])
             expire_timestamp = pwd_changed_timestamp+pwd_max_age
             valid_until = unicode(
                 time.strftime(
