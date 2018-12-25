@@ -8,7 +8,7 @@ Author: Michael Ströder <michael@stroeder.com>
 
 from __future__ import absolute_import
 
-__version__ = '0.5.1'
+__version__ = '0.5.2'
 
 # from Python's standard lib
 import re
@@ -82,7 +82,6 @@ PWDPOLICY_DEREF_CONTROL = DereferenceControl(
 # initialize a custom logger
 APP_LOGGER = aedir.init_logger(
     log_name=os.path.basename(sys.argv[0]),
-    #logger_qualname='aedir.syslog',
 )
 
 # Mapping of request URL path to Python handler class
@@ -345,7 +344,7 @@ class BaseApp(Default):
             self.ldap_conn.ldap_url_obj.dn,
             filterstr,
         )
-        msg_id = self.ldap_conn.search(
+        user_dn, user_entry, user_controls = self.ldap_conn.find_unique_entry(
             self.ldap_conn.ldap_url_obj.dn,
             ldap0.SCOPE_SUBTREE,
             filterstr=filterstr,
@@ -358,31 +357,9 @@ class BaseApp(Default):
                 'pwdChangedTime',
                 'pwdPolicySubentry',
             ],
-            sizelimit=2,
             serverctrls=[PWDPOLICY_DEREF_CONTROL],
-        )
-        resp_data = self.ldap_conn.result(
-            msg_id,
-            all=1,
             add_ctrls=1,
-        )[1]
-        if not resp_data or len(resp_data) != 1:
-            self.logger.warn(
-                '%s.search_user_entry() base=%r filterstr=%r -> No unique search result: %r',
-                self.__class__.__name__,
-                self.ldap_conn.ldap_url_obj.dn,
-                filterstr,
-                resp_data,
-            )
-            raise ldap0.NO_UNIQUE_ENTRY('No unique search result')
-        self.logger.info(
-            '%s.search_user_entry() beneath %r with %r returned: %r',
-            self.__class__.__name__,
-            self.ldap_conn.ldap_url_obj.dn,
-            filterstr,
-            resp_data[0],
         )
-        user_dn, user_entry, user_controls = resp_data[0]
         if user_controls:
             _, deref_entry = user_controls[0].derefRes['pwdPolicySubentry'][0]
             user_entry.update(deref_entry)
