@@ -5,7 +5,7 @@
     name:
       - python-pyasn1>=0.3.7
       - python-pyasn1-modules>=0.1.5
-      - python-ldap0
+      - python-ldap0>=0.1.0
       - python-aedir
       - python-cryptography
       - python-jwcrypto

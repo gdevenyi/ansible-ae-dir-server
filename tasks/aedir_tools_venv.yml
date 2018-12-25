@@ -19,7 +19,7 @@
       - jwcrypto
       - pyasn1
       - pyasn1_modules
-      - ldap0
+      - ldap0>=0.1.0
       - aedir
     state: present
     virtualenv: "{{ aedir_prefix }}"
