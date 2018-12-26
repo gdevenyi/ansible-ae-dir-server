@@ -8,7 +8,7 @@ Author: Michael Ströder <michael@stroeder.com>
 
 from __future__ import absolute_import
 
-__version__ = '0.5.2'
+__version__ = '0.6.0'
 
 # from Python's standard lib
 import re
@@ -52,6 +52,16 @@ from aedirpwd_cnf import \
     PWD_ADMIN_LEN, PWD_ADMIN_MAILTO, PWD_EXPIRETIMESPAN, PWD_LENGTH, \
     PWD_RESET_ENABLED, PWD_TMP_CHARS, PWD_TMP_HASH_ALGO, \
     SMTP_DEBUGLEVEL, SMTP_FROM, SMTP_LOCALHOSTNAME, SMTP_TLSARGS, SMTP_URL
+
+USER_ATTRS = [
+    'objectClass',
+    'uid',
+    'cn',
+    'mail',
+    'displayName',
+    'pwdChangedTime',
+    'pwdPolicySubentry',
+]
 
 PWDPOLICY_EXPIRY_ATTRS = [
     'pwdMaxAge',
@@ -328,13 +338,11 @@ class BaseApp(Default):
         """
         Search a user entry for the user specified by username
         """
-        filterstr_inputs_dict = dict([
-            (i.name, escape_filter_chars(i.get_value()))
-            for i in inputs
-        ])
-        filterstr_inputs_dict['currenttime'] = escape_filter_chars(
-            ldap0.functions.strf_secs(time.time())
-        )
+        filterstr_inputs_dict = {
+            'currenttime': escape_filter_chars(ldap0.functions.strf_secs(time.time())),
+        }
+        for key, value in inputs.items():
+            filterstr_inputs_dict[key] = escape_filter_chars(value)
         filterstr = (
             self.filterstr_template.format(**filterstr_inputs_dict)
         ).encode('utf-8')
@@ -344,26 +352,66 @@ class BaseApp(Default):
             self.ldap_conn.ldap_url_obj.dn,
             filterstr,
         )
-        user_dn, user_entry, user_controls = self.ldap_conn.find_unique_entry(
-            self.ldap_conn.ldap_url_obj.dn,
-            ldap0.SCOPE_SUBTREE,
-            filterstr=filterstr,
-            attrlist=[
-                'objectClass',
-                'uid',
-                'cn',
-                'mail',
-                'displayName',
-                'pwdChangedTime',
-                'pwdPolicySubentry',
-            ],
-            serverctrls=[PWDPOLICY_DEREF_CONTROL],
-            add_ctrls=1,
-        )
+        try:
+            user_dn, user_entry, user_controls = self.ldap_conn.find_unique_entry(
+                self.ldap_conn.ldap_url_obj.dn,
+                ldap0.SCOPE_SUBTREE,
+                filterstr=filterstr,
+                attrlist=USER_ATTRS,
+                serverctrls=[PWDPOLICY_DEREF_CONTROL],
+                add_ctrls=1,
+            )
+        except ldap0.LDAPError as ldap_err:
+            self.logger.warn(
+                '%s.search_user_entry() search failed: %s',
+                self.__class__.__name__,
+                ldap_err,
+            )
+            raise
         if user_controls:
             _, deref_entry = user_controls[0].derefRes['pwdPolicySubentry'][0]
             user_entry.update(deref_entry)
         return user_dn, user_entry
+
+    def _open_ldap_conn(self):
+        """
+        Open LDAP connection
+        """
+        try:
+            self.ldap_conn = aedir.AEDirObject(PWD_LDAP_URL, trace_level=0)
+        except ldap0.LDAPError as ldap_err:
+            self.logger.error(
+                '%s - Error connecting to %r: %s',
+                self.__class__.__name__, PWD_LDAP_URL, ldap_err,
+            )
+            raise
+        self.logger.debug(
+            '%s - Successfully bound to %r as %r',
+            self.__class__.__name__,
+            self.ldap_conn.ldap_url_obj.initializeUrl(),
+            self.ldap_conn.whoami_s(),
+        )
+        return # end of _open_ldap_conn()
+
+    def _close_ldap_conn(self):
+        """
+        Close LDAP connection
+        """
+        self.logger.debug(
+            '%s - Unbind from %r',
+            self.__class__.__name__,
+            self.ldap_conn.ldap_url_obj.initializeUrl(),
+        )
+        try:
+            self.ldap_conn.unbind_s()
+        except (AttributeError, ldap0.LDAPError) as ldap_err:
+            self.logger.warn(
+                '%s - Error during unbinding from %r: %s',
+                self.__class__.__name__,
+                self.ldap_conn.ldap_url_obj.initializeUrl(),
+                ldap_err,
+            )
+        return # end of _close_ldap_conn()
 
     def POST(self):
         """
@@ -373,54 +421,25 @@ class BaseApp(Default):
         """
         self.form = self.post_form()
         if not self.form.validates():
-            return self.GET(message=u'Invalid input!')
-        # Make connection to LDAP server
+            return RENDER.error('Invalid input!')
         try:
-            self.ldap_conn = aedir.AEDirObject(PWD_LDAP_URL, trace_level=0)
-        except ldap0.SERVER_DOWN as ldap_err:
-            self.logger.error(
-                '%s.POST() Error connecting to %r: %s',
-                self.__class__.__name__, PWD_LDAP_URL, ldap_err,
-            )
-            res = self.GET(message=u'LDAP server not reachable!')
+            self._open_ldap_conn()
         except ldap0.LDAPError as ldap_err:
-            self.logger.error(
-                '%s.POST() LDAPError when binding to %r: %s',
-                self.__class__.__name__, PWD_LDAP_URL, ldap_err,
-            )
-            res = self.GET(message=u'Internal LDAP error!')
-        else:
-            self.logger.debug(
-                '%s.POST() Successfully bound to %r as %r',
-                self.__class__.__name__,
-                self.ldap_conn.ldap_url_obj.initializeUrl(),
-                self.ldap_conn.whoami_s(),
-            )
-            try:
-                # search user entry
-                user_dn, user_entry = self.search_user_entry(self.form.inputs)
-            except ValueError:
-                res = self.GET(message=u'Error searching user entry!')
-            except ldap0.LDAPError:
-                res = self.GET(message=u'LDAP error searching user entry!')
-            else:
-                # Call specific handler for LDAP user
-                res = self.handle_user_request(user_dn, user_entry)
-        # Anyway we should try to close the LDAP connection
-        self.logger.debug(
-            '%s.POST() Unbind from %r',
-            self.__class__.__name__,
-            self.ldap_conn.ldap_url_obj.initializeUrl(),
-        )
+            return RENDER.error(u'Internal error!')
         try:
-            self.ldap_conn.unbind_s()
-        except (AttributeError, ldap0.LDAPError), unbind_err:
-            self.logger.warn(
-                '%s.POST() Error during unbinding from %r: %s',
-                self.__class__.__name__,
-                self.ldap_conn.ldap_url_obj.initializeUrl(),
-                unbind_err,
-            )
+            # search user entry
+            user_dn, user_entry = self.search_user_entry(dict([
+                (i.name, i.get_value())
+                for i in self.form.inputs
+            ]))
+        except ValueError:
+            res = RENDER.error('Invalid input!')
+        except ldap0.LDAPError:
+            res = self.GET(message=u'Error searching user!')
+        else:
+            # Call specific handler for LDAP user
+            res = self.handle_user_request(user_dn, user_entry)
+        self._close_ldap_conn()
         return res
 
 
@@ -537,7 +556,7 @@ class CheckPassword(BaseApp):
                 unicode(str(ppolicy_error))
             )
         except ldap0.LDAPError:
-            return self.GET(message=u'Internal error!')
+            return RENDER.error(u'Internal error!')
         # Try to display until when password is still valid
         try:
             pwd_max_age = int(user_entry['pwdMaxAge'][0])
@@ -887,23 +906,26 @@ class FinishPasswordReset(ChangePassword):
         handle GET request by returning input form with username and
         1st temporary password part pre-filled
         """
+        get_input = web.input(username=u'', temppassword1=u'')
+        if not get_input.username or not get_input.temppassword1:
+            return RENDER.error(u'Invalid input')
         try:
-            get_input = web.input(username=u'', temppassword1=u'')
-        except UnicodeError:
-            return RENDER.resetpw_form(u'', u'', u'Invalid input')
-        else:
-#            user_dn, user_entry = self.search_user_entry(self.form)
-#            temp_pwd_len = int(user_entry.get('msPwdResetPwLen', [str(PWD_LENGTH)])[0])
-#            pwd_admin_len = int(user_entry.get('msPwdResetAdminPwLen', [str(PWD_ADMIN_LEN)])[0])
-            temp_pwd_len = 30
-            pwd_admin_len = 16
-            return RENDER.resetpw_form(
-                get_input.username,
-                temp_pwd_len-pwd_admin_len,
-                pwd_admin_len,
-                get_input.temppassword1,
-                message
-            )
+            self._open_ldap_conn()
+        except ldap0.LDAPError as ldap_err:
+            return RENDER.error(u'Internal LDAP error!')
+        try:
+            user_dn, user_entry = self.search_user_entry({'username': get_input.username})
+        except ldap0.LDAPError as ldap_err:
+            return RENDER.error(u'Error searching user!')
+        self._close_ldap_conn()
+        temp_pwd_len = int(user_entry.get('msPwdResetPwLen', [str(PWD_LENGTH)])[0])
+        pwd_admin_len = int(user_entry.get('msPwdResetAdminPwLen', [str(PWD_ADMIN_LEN)])[0])
+        return RENDER.resetpw_form(
+            get_input.username,
+            pwd_admin_len,
+            get_input.temppassword1,
+            message
+        ) # end of FinishPasswordReset.GET()
 
     def _ldap_user_operations(self, user_dn, user_entry, temp_pwd_hash, new_password_ldap):
         pwd_admin_len = int(user_entry.get('msPwdResetAdminPwLen', [str(PWD_ADMIN_LEN)])[0])
@@ -921,17 +943,35 @@ class FinishPasswordReset(ChangePassword):
             ldap_mod_list.append(
                 (ldap0.MOD_DELETE, 'msPwdResetAdminPw', None)
             )
-        self.ldap_conn.modify_s(
-            user_dn,
-            ldap_mod_list,
-            serverctrls=[self._sess_track_ctrl(user_dn)],
-        )
-        self.ldap_conn.passwd_s(
-            user_dn,
-            None,
-            new_password_ldap,
-            serverctrls=[self._sess_track_ctrl(user_dn)],
-        )
+        try:
+            self.ldap_conn.modify_s(
+                user_dn,
+                ldap_mod_list,
+                serverctrls=[self._sess_track_ctrl(user_dn)],
+            )
+        except ldap0.LDAPError as ldap_err:
+            self.logger.warn(
+                '%s modify_s() failed for %r: %s',
+                self.__class__.__name__,
+                user_dn,
+                ldap_err,
+            )
+            raise
+        try:
+            self.ldap_conn.passwd_s(
+                user_dn,
+                None,
+                new_password_ldap,
+                serverctrls=[self._sess_track_ctrl(user_dn)],
+            )
+        except ldap0.LDAPError as ldap_err:
+            self.logger.warn(
+                '%s passwd_s() failed for %r: %s',
+                self.__class__.__name__,
+                user_dn,
+                ldap_err,
+            )
+            raise
         return
 
     def handle_user_request(self, user_dn, user_entry):
@@ -941,29 +981,39 @@ class FinishPasswordReset(ChangePassword):
         temppassword1 = self.form.d.temppassword1
         temppassword2 = self.form.d.temppassword2
         temp_pwd_len = int(user_entry.get('msPwdResetPwLen', [str(PWD_LENGTH)])[0])
-        if len(temppassword1)+len(temppassword2) != temp_pwd_len:
-            return self.GET(message=u'Temporary password parts wrong!')
+        pwd_admin_len = int(user_entry.get('msPwdResetAdminPwLen', [str(PWD_ADMIN_LEN)])[0])
         temp_pwd_hash = pwd_hash(
             u''.join((temppassword1, temppassword2)).encode('utf-8'),
             user_entry.get('msPwdResetHashAlgorithm', [PWD_TMP_HASH_ALGO])[0],
         )
         pw_input_check_msg = self._check_pw_input(user_entry)
         if not pw_input_check_msg is None:
-            return self.GET(message=pw_input_check_msg)
+            return RENDER.resetpw_form(
+                self.form.d.username,
+                pwd_admin_len,
+                self.form.d.temppassword1,
+                pw_input_check_msg,
+            )
         new_password_ldap = self.form.d.newpassword1.encode('utf-8')
         try:
             self._ldap_user_operations(user_dn, user_entry, temp_pwd_hash, new_password_ldap)
         except ldap0.NO_SUCH_ATTRIBUTE:
-            res = self.GET(message=u'Temporary password(s) wrong!')
-        except ldap0.CONSTRAINT_VIOLATION as ldap_error:
-            res = self.GET(
-                message=(
+            res = RENDER.resetpw_form(
+                self.form.d.username,
+                pwd_admin_len,
+                self.form.d.temppassword1,
+                u'Temporary password(s) wrong!',
+            )
+        except ldap0.CONSTRAINT_VIOLATION as ldap_err:
+            res = RENDER.requestpw_form(
+                self.form.d.username,
+                (
                     u'Constraint violation (password rules): {0}'
                     u' / You have to request password reset again!'
-                ).format(unicode(ldap_error.args[0]['info']))
+                ).format(unicode(ldap_err.args[0]['info']))
             )
         except ldap0.LDAPError:
-            res = self.GET(message=u'Internal error!')
+            res = RENDER.error(u'Internal error!')
         else:
             res = RENDER.resetpw_action(self.form.d.username, user_dn)
         return res
