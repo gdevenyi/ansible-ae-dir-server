@@ -51,7 +51,7 @@
       - xlwt
       - pyweblib
       - dnspython
-      - python-web.py
+      - web.py
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
