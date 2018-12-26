@@ -51,9 +51,7 @@
       - xlwt
       - pyweblib
       - dnspython
-      - Flask
-      - flask-WTForms
-      - flask-WTF
+      - python-web.py
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"

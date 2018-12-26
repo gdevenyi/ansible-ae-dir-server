@@ -52,9 +52,7 @@
 - name: "Install additional packages for simple web apps on {{ openldap_role }} on {{ lsb_id }}"
   zypper:
     name:
-      - python2-Flask
-      - python2-WTForms
-      - python2-Flask-WTF
+      - web.py
     state: present
     disable_recommends: yes
     type: package
