@@ -7,7 +7,7 @@ Author: Michael Ströder <michael@stroeder.com>
 
 from __future__ import absolute_import
 
-__version__ = '0.6.1'
+__version__ = '0.6.2'
 
 # from Python's standard lib
 import re
@@ -126,9 +126,8 @@ def read_template_file(filename):
     """
     return UTF-8 encoded text file as decoded Unicode string
     """
-    file_obj = open(filename, 'rb')
-    file_content = file_obj.read().decode('utf-8')
-    file_obj.close()
+    with open(filename, 'rb') as file_obj:
+        file_content = file_obj.read().decode('utf-8')
     return file_content
 
 
@@ -534,20 +533,6 @@ class ChangePassword(BaseApp):
         else:
             return RENDER.changepw_form(get_input.username, u'')
 
-    def _ldap_user_operations(self, user_dn, old_pw, new_pw):
-        self.ldap_conn.simple_bind_s(
-            user_dn,
-            old_pw.encode('utf-8'),
-            serverctrls=[self._sess_track_ctrl()],
-        )
-        self.ldap_conn.passwd_s(
-            user_dn,
-            None,
-            new_pw.encode('utf-8'),
-            serverctrls=[self._sess_track_ctrl(user_dn)],
-        )
-        return
-
     def _check_pw_input(self, user_entry):
         if self.form.d.newpassword1 != self.form.d.newpassword2:
             return u'New password values differ!'
@@ -573,10 +558,16 @@ class ChangePassword(BaseApp):
         if not pw_input_check_msg is None:
             return RENDER.changepw_form(self.form.d.username, pw_input_check_msg)
         try:
-            self._ldap_user_operations(
+            self.ldap_conn.simple_bind_s(
                 user_dn,
-                self.form.d.oldpassword,
-                self.form.d.newpassword1,
+                self.form.d.oldpassword.encode('utf-8'),
+                serverctrls=[self._sess_track_ctrl()],
+            )
+            self.ldap_conn.passwd_s(
+                user_dn,
+                None,
+                self.form.d.newpassword1.encode('utf-8'),
+                serverctrls=[self._sess_track_ctrl(user_dn)],
             )
         except ldap0.INVALID_CREDENTIALS:
             res = RENDER.changepw_form(
@@ -667,20 +658,17 @@ class RequestPasswordReset(BaseApp):
         #-----------------------------------------------------------------------
         pwd_admin_len = int(user_entry.get('msPwdResetAdminPwLen', [str(PWD_ADMIN_LEN)])[0])
         if pwd_admin_len:
-            smtp_message_tmpl = read_template_file(EMAIL_TEMPLATE_ADMIN)
             user_data_admin = {
-                'username':username,
-                'temppassword2':temp_pwd_clear[
-                    len(temp_pwd_clear)-pwd_admin_len:
-                ],
-                'remote_ip':self.remote_ip,
-                'fromaddr':SMTP_FROM,
-                'userdn':user_dn.decode('utf-8'),
-                'web_ctx_host':web.ctx.host,
-                'app_path_prefix':APP_PATH_PREFIX,
-                'ldap_uri':self.ldap_conn.ldap_url_obj.initializeUrl(),
+                'username': username,
+                'temppassword2': temp_pwd_clear[len(temp_pwd_clear)-pwd_admin_len:],
+                'remote_ip': self.remote_ip,
+                'fromaddr': SMTP_FROM,
+                'userdn': user_dn.decode('utf-8'),
+                'web_ctx_host': web.ctx.host,
+                'app_path_prefix': APP_PATH_PREFIX,
+                'ldap_uri': self.ldap_conn.ldap_url_obj.initializeUrl(),
             }
-            smtp_message = smtp_message_tmpl.format(**user_data_admin)
+            smtp_message = read_template_file(EMAIL_TEMPLATE_ADMIN).format(**user_data_admin)
             smtp_subject = EMAIL_SUBJECT_ADMIN.format(**user_data_admin)
             admin_addrs = self._get_admin_mailaddrs(user_dn)
             smtp_conn.send_simple_message(
@@ -700,19 +688,18 @@ class RequestPasswordReset(BaseApp):
         # Now send (rest of) clear-text password to user
         #-----------------------------------------------------------------------
 
-        smtp_message_tmpl = read_template_file(EMAIL_TEMPLATE_PERSONAL)
         user_data_user = {
-            'username':username,
-            'temppassword1':temp_pwd_clear[:len(temp_pwd_clear)-pwd_admin_len],
-            'remote_ip':self.remote_ip,
-            'fromaddr':SMTP_FROM,
-            'userdn':user_dn.decode('utf-8'),
-            'web_ctx_host':web.ctx.host,
-            'app_path_prefix':APP_PATH_PREFIX,
-            'ldap_uri':self.ldap_conn.ldap_url_obj.initializeUrl(),
-            'admin_email_addrs':u'\n'.join(admin_addrs),
+            'username': username,
+            'temppassword1': temp_pwd_clear[:len(temp_pwd_clear)-pwd_admin_len],
+            'remote_ip': self.remote_ip,
+            'fromaddr': SMTP_FROM,
+            'userdn': user_dn.decode('utf-8'),
+            'web_ctx_host': web.ctx.host,
+            'app_path_prefix': APP_PATH_PREFIX,
+            'ldap_uri': self.ldap_conn.ldap_url_obj.initializeUrl(),
+            'admin_email_addrs': u'\n'.join(admin_addrs),
         }
-        smtp_message = smtp_message_tmpl.format(**user_data_user)
+        smtp_message = read_template_file(EMAIL_TEMPLATE_PERSONAL).format(**user_data_user)
         smtp_subject = EMAIL_SUBJECT_PERSONAL.format(**user_data_user)
         smtp_conn.send_simple_message(
             SMTP_FROM,
