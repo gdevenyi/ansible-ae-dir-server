@@ -65,7 +65,7 @@
 - name: "PIP install web2ldap in virtualenv {{ aedir_prefix }} on {{ openldap_role }} on {{ lsb_id }}"
   pip:
     name:
-      - web2ldap>=1.3.36
+      - web2ldap>=1.3.37
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
