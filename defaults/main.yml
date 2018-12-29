@@ -429,14 +429,14 @@ aedir_who_srvgroup: "(user/-1 | user/aeSrvGroup | user/-1/aeProxyFor)"
 
 # additional restrictions added to <who> clauses of provider ACLs
 # Example for restricting all providers' access to come from IPv4 network 10.54.1.0/24:
-# aedir_provider_restrictions: ['peername.ip="10.54.1.0%255.255.255.0"']
+# aedir_providers_restrictions: ['peername.ip="10.54.1.0%255.255.255.0"']
 aedir_providers_restrictions: []
 
 # additional restrictions added to <who> clauses of all replica ACLs
 # aedir_replicas_restrictions should include all aedir_providers_restrictions
 # because the providers are a subset of all replicas
 # Example for restricting all replica' access to come from IPv4 network 10.54.1.0/24:
-# aedir_replica_restrictions: ['peername.ip="10.54.1.0%255.255.255.0"']
+# aedir_replicas_restrictions: ['peername.ip="10.54.1.0%255.255.255.0"']
 aedir_replicas_restrictions: "{{ aedir_providers_restrictions }}"
 
 #---------------------------------------------------------------------------
