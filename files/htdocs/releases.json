@@ -7,6 +7,14 @@
    "tags": "iam, identity-management, ldap, openldap, nis, pam, nss, security, authentication-directory",
    "releases": [
       {
+         "version": "0.5.1",
+         "state": "stable",
+         "scope": "minor fix",
+         "changes": "Fixed non-unique schema IDs in web2ldap supplemental schema file",
+         "download": "https://ae-dir.com/install.html",
+         "published": "2018-12-31T10:00:00+00:00"
+      },
+      {
          "version": "0.5.0",
          "state": "stable",
          "scope": "minor feature",
