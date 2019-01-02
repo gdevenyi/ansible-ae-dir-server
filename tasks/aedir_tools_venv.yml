@@ -34,7 +34,7 @@
 
 - name: "PIP package slapdsock in virtualenv {{ aedir_prefix }}"
   pip:
-    name: slapdsock
+    name: slapdsock>=0.10.0
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
