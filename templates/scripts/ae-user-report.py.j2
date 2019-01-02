@@ -6,7 +6,7 @@ Generates a report of active aeUser entries and their aePerson attributes
 
 from __future__ import absolute_import
 
-__version__ = '0.0.2'
+__version__ = '0.0.3'
 
 import sys
 import os
@@ -16,9 +16,9 @@ import csv
 os.environ['LDAPRC'] = '/opt/ae-dir/etc/ldap.conf'
 import ldap0
 import aedir
-from ldap0.controls.deref import DereferenceControl
 
-USER_ATTRS = [
+AEUSER_ATTRS = [
+    'aePerson',
     'uid',
     'uidNumber',
     'entryUUID',
@@ -32,7 +32,7 @@ USER_ATTRS = [
     'modifyTimestamp',
 ]
 
-DEREF_PERSON_ATTRS = [
+AEPERSON_ATTRS = [
     'sn',
     'givenName',
     'cn',
@@ -51,13 +51,6 @@ DEREF_PERSON_ATTRS = [
     'c',
 ]
 
-DEREF_CONTROL = DereferenceControl(
-    True,
-    {
-        'aePerson': DEREF_PERSON_ATTRS,
-    }
-)
-
 VIRTUAL_ATTRS = [
     'aeZoneName',
 ]
@@ -66,7 +59,7 @@ VIRTUAL_ATTRS = [
 # main()
 #---------------------------------------------------------------------------
 
-ldap_conn = aedir.AEDirObject(None)
+ldap_conn = aedir.AEDirObject(None, cache_ttl=1800.0)
 
 aedir_search_base = ldap_conn.find_search_base()
 
@@ -74,33 +67,10 @@ msg_id = ldap_conn.search(
     aedir_search_base,
     ldap0.SCOPE_SUBTREE,
     '(&(objectClass=aeUser)(aeStatus=0))',
-    attrlist=USER_ATTRS,
-    serverctrls = [DEREF_CONTROL],
+    attrlist=AEUSER_ATTRS,
 )
 
-user_dict = {}
-
-for res_type, res_data, res_msgid, res_controls in ldap_conn.results(
-    msg_id,
-    add_ctrls=1
-):
-    for dn, entry, controls in res_data:
-        entry['aeZoneName'] = [aedir.extract_zone(dn, aeroot_dn=aedir_search_base)]
-        user_dict[dn] = dict([
-            (at,'|'.join(av))
-            for at,av in entry.items()
-        ])
-        # process dn and entry
-        if controls:
-            deref_control = controls[0]
-            deref_dn, deref_entry = deref_control.derefRes['aePerson'][0]
-            user_dict[dn].update(dict([
-                (at,'|'.join(av))
-                for at,av in deref_entry.items()
-            ]))
-
-COLUMN_ATTRS = USER_ATTRS+DEREF_PERSON_ATTRS+VIRTUAL_ATTRS
-
+COLUMN_ATTRS = AEUSER_ATTRS + AEPERSON_ATTRS + VIRTUAL_ATTRS
 csv_writer = csv.DictWriter(sys.stdout, COLUMN_ATTRS, dialect='excel')
 csv_writer.writerow(
     dict([
@@ -108,4 +78,17 @@ csv_writer.writerow(
         for at in COLUMN_ATTRS
     ])
 )
-csv_writer.writerows(user_dict.values())
+
+for res in ldap_conn.results(msg_id, add_ctrls=0):
+    for user_dn, user_entry in res.data:
+        user_entry['aeZoneName'] = [aedir.extract_zone(user_dn, aeroot_dn=aedir_search_base)]
+        # merge referenced aePerson entry into user entry dict
+        person_entry = ldap_conn.read_s(user_entry['aePerson'][0], attrlist=AEPERSON_ATTRS)
+        user_entry.update(person_entry)
+        # merge multiple values into one string
+        user_dict = dict([
+            (at,'|'.join(av))
+            for at,av in user_entry.items()
+        ])
+        # write the CSV row to output file
+        csv_writer.writerow(user_dict)
