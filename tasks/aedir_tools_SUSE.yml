@@ -5,8 +5,8 @@
     name:
       - python-pyasn1>=0.3.7
       - python-pyasn1-modules>=0.1.5
-      - python-ldap0>=0.1.6
-      - python-aedir>=0.2.2
+      - python-ldap0>=0.2.0
+      - python-aedir>=0.3.0
       - python-cryptography
       - python-jwcrypto
     state: present
@@ -38,7 +38,7 @@
       - python-asn1crypto
       - python-xlwt
       - python-pycryptodome
-      - web2ldap>=1.3.37
+      - web2ldap>=1.3.38
     state: present
     disable_recommends: yes
     type: package
