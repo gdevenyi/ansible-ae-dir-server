@@ -9,18 +9,16 @@ This script must run locally on a Æ-DIR provider
 
 from __future__ import absolute_import
 
-__version__ = '0.0.3'
+__version__ = '0.0.4'
 
 import sys
 import os
 import random
 
-# set LDAPRC env var *before* importing ldap
+# set LDAPRC env var *before* importing ldap0
 os.environ['LDAPRC'] = '/opt/ae-dir/etc/ldap.conf'
 import ldap0
 import aedir
-
-LDAP0_TRACE_LEVEL = int(os.environ.get('LDAP0_TRACE_LEVEL', '0'))
 
 #---------------------------------------------------------------------------
 # main()
@@ -30,8 +28,6 @@ logger = aedir.init_logger(log_name=sys.argv[0])
 
 logger.info('Starting %s %s', sys.argv[0], __version__)
 logger.debug('Imported aedir %s', aedir.__version__)
-
-ldap0._trace_level = LDAP0_TRACE_LEVEL
 
 try:
     zone_cn, ticket_id, zone_desc = [
@@ -47,7 +43,7 @@ except Exception, err:
     )
     sys.exit(9)
 
-ldap_conn = aedir.AEDirObject(None, trace_level=LDAP0_TRACE_LEVEL)
+ldap_conn = aedir.AEDirObject(None)
 aedir_searchbase = ldap_conn.find_search_base()
 
 try:

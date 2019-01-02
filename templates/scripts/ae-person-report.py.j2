@@ -6,23 +6,20 @@ Generates a report of aePerson entries referenced by active aeUser entries
 
 from __future__ import absolute_import
 
-__version__ = '0.0.2'
+__version__ = '0.0.3'
 
 import sys, os, csv, pprint
 
-# set LDAPRC env var *before* importing ldap
+# set LDAPRC env var *before* importing ldap0
 os.environ['LDAPRC'] = '/opt/ae-dir/etc/ldap.conf'
 import ldap0
-import aedir
 from ldap0.controls.deref import DereferenceControl
 
-LDAP0_TRACE_LEVEL = 0
+import aedir
 
-USER_ATTRS = [
-    '1.1'
-]
+USER_ATTRS = ['1.1']
 
-DEREF_PERSON_ATTRS = [
+AEPERSON_ATTRS = [
     'sn',
     'givenName',
     'cn',
@@ -40,21 +37,15 @@ DEREF_PERSON_ATTRS = [
     'c',
 ]
 
-DEREF_CONTROL = DereferenceControl(
-    True,
-    {
-        'aePerson': DEREF_PERSON_ATTRS,
-    }
-)
+# dereference the AEPERSON_ATTRS from the aeUser entry via attribute aePerson
+DEREF_CONTROL = DereferenceControl(True, {'aePerson': AEPERSON_ATTRS})
 
 
 #---------------------------------------------------------------------------
 # main()
 #---------------------------------------------------------------------------
 
-ldap0._trace_level = LDAP0_TRACE_LEVEL
-
-ldap_conn = aedir.AEDirObject(None, trace_level=LDAP0_TRACE_LEVEL)
+ldap_conn = aedir.AEDirObject(None)
 
 msg_id = ldap_conn.search(
     ldap_conn.find_search_base(),
@@ -66,11 +57,8 @@ msg_id = ldap_conn.search(
 
 person_dict = {}
 
-for res_type, res_data, res_msgid, res_controls in ldap_conn.results(
-    msg_id,
-    add_ctrls=1
-):
-    for dn, entry, controls in res_data:
+for res in ldap_conn.results(msg_id,add_ctrls=1):
+    for dn, entry, controls in res.data:
         # process dn and entry
         if controls:
             deref_control = controls[0]
@@ -82,13 +70,13 @@ for res_type, res_data, res_msgid, res_controls in ldap_conn.results(
 
 csv_writer = csv.DictWriter(
     sys.stdout,
-    DEREF_PERSON_ATTRS,
+    AEPERSON_ATTRS,
     dialect='excel'
 )
 csv_writer.writerow(
     dict([
         (at, at)
-        for at in DEREF_PERSON_ATTRS
+        for at in AEPERSON_ATTRS
     ])
 )
 csv_writer.writerows(person_dict.values())

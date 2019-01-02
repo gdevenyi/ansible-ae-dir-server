@@ -6,7 +6,7 @@ Prepare moving aeUser entries beneath aeZone with appropriate aeDept set
 
 from __future__ import absolute_import
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
 
 import sys
 import os
@@ -19,8 +19,6 @@ os.environ['LDAPRC'] = '/opt/ae-dir/etc/ldap.conf'
 import ldap0
 import aedir
 from ldap0.controls.deref import DereferenceControl
-
-LDAP0_TRACE_LEVEL = 0
 
 CACHE_TTL = 10
 
@@ -35,13 +33,7 @@ DEREF_CONTROL = DereferenceControl(
 # main()
 #---------------------------------------------------------------------------
 
-ldap0._trace_level = LDAP0_TRACE_LEVEL
-
-ldap_conn = aedir.AEDirObject(
-    None,
-    trace_level=LDAP0_TRACE_LEVEL,
-    cache_ttl=CACHE_TTL,
-)
+ldap_conn = aedir.AEDirObject(None cache_ttl=CACHE_TTL)
 
 aedir_search_base = ldap_conn.find_search_base()
 
