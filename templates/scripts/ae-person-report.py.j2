@@ -16,7 +16,7 @@ import ldap0
 import aedir
 from ldap0.controls.deref import DereferenceControl
 
-PYLDAP_TRACE_LEVEL = 0
+LDAP0_TRACE_LEVEL = 0
 
 USER_ATTRS = [
     '1.1'
@@ -52,9 +52,9 @@ DEREF_CONTROL = DereferenceControl(
 # main()
 #---------------------------------------------------------------------------
 
-ldap0._trace_level = PYLDAP_TRACE_LEVEL
+ldap0._trace_level = LDAP0_TRACE_LEVEL
 
-ldap_conn = aedir.AEDirObject(None, trace_level=PYLDAP_TRACE_LEVEL)
+ldap_conn = aedir.AEDirObject(None, trace_level=LDAP0_TRACE_LEVEL)
 
 msg_id = ldap_conn.search(
     ldap_conn.find_search_base(),

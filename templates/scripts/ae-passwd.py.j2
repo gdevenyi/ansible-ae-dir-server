@@ -21,7 +21,7 @@ from ldap0.filter import escape_filter_chars
 
 import aedir
 
-PYLDAP_TRACE_LEVEL = int(os.environ.get('PYLDAP_TRACE_LEVEL', '0'))
+LDAP0_TRACE_LEVEL = int(os.environ.get('LDAP0_TRACE_LEVEL', '0'))
 
 #---------------------------------------------------------------------------
 # main()
@@ -32,7 +32,7 @@ logger = aedir.init_logger(log_name=sys.argv[0])
 logger.info('Starting %s %s', sys.argv[0], __version__)
 logger.debug('Imported aedir %s', aedir.__version__)
 
-ldap0._trace_level = PYLDAP_TRACE_LEVEL
+ldap0._trace_level = LDAP0_TRACE_LEVEL
 
 try:
     arg_value = sys.argv[1]
@@ -42,7 +42,7 @@ except IndexError:
 
 ldap_filter = aedir.AUTHC_ENTITY_FILTER_TMPL.format(escape_filter_chars(arg_value))
 
-ldap_conn = aedir.AEDirObject(None, trace_level=PYLDAP_TRACE_LEVEL)
+ldap_conn = aedir.AEDirObject(None, trace_level=LDAP0_TRACE_LEVEL)
 logger.debug('successfully connected to %r as %r', ldap_conn._uri, ldap_conn.whoami_s())
 aedir_search_base = ldap_conn.find_search_base()
 

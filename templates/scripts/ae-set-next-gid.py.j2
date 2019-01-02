@@ -25,7 +25,7 @@ UID_ATTR = 'uidNumber'
 
 UID_GID_ALIGN = True
 
-PYLDAP_TRACE_LEVEL = int(os.environ.get('PYLDAP_TRACE_LEVEL', '0'))
+LDAP0_TRACE_LEVEL = int(os.environ.get('LDAP0_TRACE_LEVEL', '0'))
 
 #---------------------------------------------------------------------------
 # Classes and functions
@@ -83,9 +83,9 @@ def main():
     logger.info('Starting %s %s', sys.argv[0], __version__)
     logger.debug('Imported aedir %s', aedir.__version__)
 
-    ldap0._trace_level = PYLDAP_TRACE_LEVEL
+    ldap0._trace_level = LDAP0_TRACE_LEVEL
 
-    ldap_conn = aedir.AEDirObject(None, trace_level=PYLDAP_TRACE_LEVEL)
+    ldap_conn = aedir.AEDirObject(None, trace_level=LDAP0_TRACE_LEVEL)
     aedir_searchbase = ldap_conn.find_search_base()
 
     search_highest_id = max_id_searcher(ldap_conn, logger, aedir_searchbase)

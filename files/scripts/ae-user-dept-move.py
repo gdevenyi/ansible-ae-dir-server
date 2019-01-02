@@ -20,7 +20,7 @@ import ldap0
 import aedir
 from ldap0.controls.deref import DereferenceControl
 
-PYLDAP_TRACE_LEVEL = 0
+LDAP0_TRACE_LEVEL = 0
 
 CACHE_TTL = 10
 
@@ -35,11 +35,11 @@ DEREF_CONTROL = DereferenceControl(
 # main()
 #---------------------------------------------------------------------------
 
-ldap0._trace_level = PYLDAP_TRACE_LEVEL
+ldap0._trace_level = LDAP0_TRACE_LEVEL
 
 ldap_conn = aedir.AEDirObject(
     None,
-    trace_level=PYLDAP_TRACE_LEVEL,
+    trace_level=LDAP0_TRACE_LEVEL,
     cache_ttl=CACHE_TTL,
 )
 

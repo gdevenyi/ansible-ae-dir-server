@@ -35,9 +35,6 @@ import aedir.process
 # Configuration constants
 #-----------------------------------------------------------------------
 
-# ldap0 trace level
-PYLDAP_TRACELEVEL = int(os.environ.get('PYLDAP_TRACELEVEL', '0'))
-
 # Attribute containing the group members references
 MEMBER_ATTR = 'member'
 # Attribute containing the LDAP URLs to be searched
@@ -101,7 +98,6 @@ class AEGroupUpdater(aedir.process.AEProcess):
     Group update process class
     """
     script_version = __version__
-    pyldap_tracelevel = PYLDAP_TRACELEVEL
     deref_person_attrs = ('aeDept', 'aeLocation')
 
     def _update_members(

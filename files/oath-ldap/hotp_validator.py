@@ -95,7 +95,7 @@ ALLOWED_GIDS = [0, 'ae-dir-slapd']
 SOCKET_PERMISSIONS = '0666'
 
 # Trace level for ldap0 logs
-PYLDAP_TRACELEVEL = 0
+LDAP0_TRACE_LEVEL = 0
 
 # Number of times connecting to local LDAPI is retried before sending a
 # failed response for a query
@@ -1136,7 +1136,7 @@ def run_this():
         )
         slapd_sock_listener.ldapi_uri = local_ldap_uri_obj.initializeUrl()
         slapd_sock_listener.ldap_trace_level = \
-            int(local_ldap_uri_obj.trace_level or '0') or PYLDAP_TRACELEVEL
+            int(local_ldap_uri_obj.trace_level or '0') or LDAP0_TRACE_LEVEL
         try:
             slapd_sock_listener.serve_forever()
         except KeyboardInterrupt:

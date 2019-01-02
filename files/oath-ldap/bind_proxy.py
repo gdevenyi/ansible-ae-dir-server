@@ -73,7 +73,7 @@ ALLOWED_GIDS = [0]
 SOCKET_PERMISSIONS = '0666'
 
 # Trace level for ldap0 logs
-PYLDAP_TRACELEVEL = 0
+LDAP0_TRACE_LEVEL = 0
 
 # Number of times connecting to local LDAPI is retried before sending a
 # failed response for a query
@@ -461,7 +461,7 @@ def run_this():
             log_vars=DEBUG_VARS,
         )
         listener.ldapi_uri = local_ldap_uri_obj.initializeUrl()
-        listener.ldap_trace_level = int(local_ldap_uri_obj.trace_level or '0') or PYLDAP_TRACELEVEL
+        listener.ldap_trace_level = int(local_ldap_uri_obj.trace_level or '0') or LDAP0_TRACE_LEVEL
         listener.remote_ldap_uris = remote_ldap_uris
         try:
             listener.serve_forever()

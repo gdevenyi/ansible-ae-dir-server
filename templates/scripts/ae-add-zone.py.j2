@@ -20,7 +20,7 @@ os.environ['LDAPRC'] = '/opt/ae-dir/etc/ldap.conf'
 import ldap0
 import aedir
 
-PYLDAP_TRACE_LEVEL = int(os.environ.get('PYLDAP_TRACE_LEVEL', '0'))
+LDAP0_TRACE_LEVEL = int(os.environ.get('LDAP0_TRACE_LEVEL', '0'))
 
 #---------------------------------------------------------------------------
 # main()
@@ -31,7 +31,7 @@ logger = aedir.init_logger(log_name=sys.argv[0])
 logger.info('Starting %s %s', sys.argv[0], __version__)
 logger.debug('Imported aedir %s', aedir.__version__)
 
-ldap0._trace_level = PYLDAP_TRACE_LEVEL
+ldap0._trace_level = LDAP0_TRACE_LEVEL
 
 try:
     zone_cn, ticket_id, zone_desc = [
@@ -47,7 +47,7 @@ except Exception, err:
     )
     sys.exit(9)
 
-ldap_conn = aedir.AEDirObject(None, trace_level=PYLDAP_TRACE_LEVEL)
+ldap_conn = aedir.AEDirObject(None, trace_level=LDAP0_TRACE_LEVEL)
 aedir_searchbase = ldap_conn.find_search_base()
 
 try:

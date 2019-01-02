@@ -58,7 +58,6 @@ class SyncProcess(aedir.process.TimestampStateMixin, aedir.process.AEProcess):
     The sync process
     """
     script_version = __version__
-    pyldap_tracelevel = int(os.environ.get('PYLDAP_TRACELEVEL', '0'))
 
     def __init__(self, state_filename):
         aedir.process.AEProcess.__init__(self)

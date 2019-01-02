@@ -25,12 +25,6 @@ import ldap0
 import aedir
 import aedir.process
 
-#-----------------------------------------------------------------------
-# Configuration constants
-#-----------------------------------------------------------------------
-
-# ldap0 trace level
-PYLDAP_TRACELEVEL = int(os.environ.get('PYLDAP_TRACELEVEL', '0'))
 
 #-----------------------------------------------------------------------
 # Classes and functions
@@ -41,7 +35,6 @@ class AEStatusUpdater(aedir.process.AEProcess):
     Status update process class
     """
     script_version = __version__
-    pyldap_tracelevel = PYLDAP_TRACELEVEL
 
     def __init__(self):
         aedir.process.AEProcess.__init__(self)

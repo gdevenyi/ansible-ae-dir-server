@@ -44,7 +44,7 @@ from oathenroll_cnf import \
     FILTERSTR_ADMIN_LOGIN, FILTERSTR_OWNER_READ, FILTERSTR_TOKEN_SEARCH, \
     LDAPI_AUTHZ_ID, LDAP_URL, \
     PWD_ADMIN_LEN, PWD_LENGTH, PWD_TMP_CHARS, \
-    PYLDAP_TRACELEVEL, \
+    LDAP0_TRACE_LEVEL, \
     SMTP_DEBUGLEVEL, SMTP_FROM, SMTP_LOCALHOSTNAME, SMTP_TLSARGS, SMTP_URL, \
     LAYOUT, TEMPLATES_DIRNAME,  \
     WEB_CONFIG_DEBUG, WEB_ERROR
@@ -189,7 +189,7 @@ class BaseApp(Default):
         """
         self.ldap_conn = ReconnectLDAPObject(
             self.ldap_url.initializeUrl(),
-            trace_level=PYLDAP_TRACELEVEL,
+            trace_level=LDAP0_TRACE_LEVEL,
             trace_file=sys.stderr,
         )
         # Send SASL bind request with mechanism EXTERNAL
@@ -217,7 +217,7 @@ class BaseApp(Default):
                 )
                 self.user_ldap_conn = ReconnectLDAPObject(
                     self.ldap_url.initializeUrl(),
-                    trace_level=PYLDAP_TRACELEVEL,
+                    trace_level=LDAP0_TRACE_LEVEL,
                     trace_file=sys.stderr,
                 )
                 self.user_ldap_conn.simple_bind_s(user_dn, password.encode('utf-8'))
@@ -636,7 +636,7 @@ class InitToken(BaseApp):
         try:
             token_ldap_conn = ReconnectLDAPObject(
                 self.ldap_url.initializeUrl(),
-                trace_level=PYLDAP_TRACELEVEL,
+                trace_level=LDAP0_TRACE_LEVEL,
                 trace_file=sys.stderr,
             )
             token_ldap_conn.simple_bind_s(token_binddn, token_password)

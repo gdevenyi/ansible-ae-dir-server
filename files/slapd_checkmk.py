@@ -136,10 +136,10 @@ CERT_ERROR_DAYS = 10
 CERT_WARN_DAYS = 50
 
 # set debug parameters for development (normally not needed)
-PYLDAP_TRACE_LEVEL = int(os.environ.get('PYLDAP_TRACE_LEVEL', '0'))
-PYLDAP_TRACE_FILE = sys.stderr
-ldap0._trace_level = PYLDAP_TRACE_LEVEL
-ldap0._trace_file = PYLDAP_TRACE_FILE
+LDAP0_TRACE_LEVEL = int(os.environ.get('LDAP0_TRACE_LEVEL', '0'))
+LDAP0_TRACE_FILE = sys.stderr
+ldap0._trace_level = LDAP0_TRACE_LEVEL
+ldap0._trace_file = LDAP0_TRACE_FILE
 # ldap0.set_option(ldap0.OPT_DEBUG_LEVEL,255)
 
 #-----------------------------------------------------------------------
@@ -619,8 +619,8 @@ class SlapdConnection(LDAPObject, OpenLDAPObject):
     def __init__(
             self,
             uri,
-            trace_level=PYLDAP_TRACE_LEVEL,
-            trace_file=PYLDAP_TRACE_FILE,
+            trace_level=LDAP0_TRACE_LEVEL,
+            trace_file=LDAP0_TRACE_FILE,
             trace_stack_limit=8,
             tls_options=None,
             network_timeout=None,

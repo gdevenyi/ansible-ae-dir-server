@@ -40,8 +40,6 @@ import aedir.process
 
 from aedirpwd_cnf import *
 
-ldap0._trace_level = int(os.environ.get('PYLDAP_TRACELEVEL', '0'))
-
 #-----------------------------------------------------------------------
 # Classes and functions
 #-----------------------------------------------------------------------
@@ -52,7 +50,6 @@ class AEDIRPwdJob(aedir.process.AEProcess):
     """
     script_version = __version__
     ldap_url = PWD_LDAP_URL
-    pyldap_tracelevel = int(os.environ.get('PYLDAP_TRACELEVEL', '0'))
     notify_oldest_timespan = NOTIFY_OLDEST_TIMESPAN
     user_attrs = [
         'objectClass',

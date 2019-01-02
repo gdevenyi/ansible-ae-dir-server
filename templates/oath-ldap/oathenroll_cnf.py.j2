@@ -6,7 +6,7 @@ Configuration module for oathenroll
 import os.path
 
 # Trace level for ldap0 logs
-PYLDAP_TRACELEVEL = 0
+LDAP0_TRACE_LEVEL = 0
 
 # LDAP-URL describing the connection parameters and bind information
 LDAP_URL = r'{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub??trace=0,x-saslmech=EXTERNAL'
