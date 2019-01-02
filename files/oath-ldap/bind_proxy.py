@@ -318,7 +318,6 @@ class BindProxyHandler(SlapdSockHandler):
                         remote_ldap_conn = LDAPObject(
                             remote_ldap_uri,
                             trace_level=0,
-                            trace_file=self.server._logger_fileobj,
                         )
                         remote_ldap_conn.simple_bind_s(
                             request_dn_utf8,

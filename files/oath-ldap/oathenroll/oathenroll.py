@@ -8,7 +8,7 @@ Author: Michael Ströder <michael@stroeder.com>
 
 from __future__ import absolute_import
 
-__version__ = '0.2.1'
+__version__ = '0.2.2'
 
 # from Python's standard lib
 import sys
@@ -190,7 +190,6 @@ class BaseApp(Default):
         self.ldap_conn = ReconnectLDAPObject(
             self.ldap_url.initializeUrl(),
             trace_level=LDAP0_TRACE_LEVEL,
-            trace_file=sys.stderr,
         )
         # Send SASL bind request with mechanism EXTERNAL
         self.ldap_conn.sasl_non_interactive_bind_s('EXTERNAL', authz_id=authz_id)
@@ -218,7 +217,6 @@ class BaseApp(Default):
                 self.user_ldap_conn = ReconnectLDAPObject(
                     self.ldap_url.initializeUrl(),
                     trace_level=LDAP0_TRACE_LEVEL,
-                    trace_file=sys.stderr,
                 )
                 self.user_ldap_conn.simple_bind_s(user_dn, password.encode('utf-8'))
             except LDAPError:
@@ -637,7 +635,6 @@ class InitToken(BaseApp):
             token_ldap_conn = ReconnectLDAPObject(
                 self.ldap_url.initializeUrl(),
                 trace_level=LDAP0_TRACE_LEVEL,
-                trace_file=sys.stderr,
             )
             token_ldap_conn.simple_bind_s(token_binddn, token_password)
             token_dn = token_ldap_conn.whoami_s()[3:]

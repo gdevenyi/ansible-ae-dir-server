@@ -137,9 +137,7 @@ CERT_WARN_DAYS = 50
 
 # set debug parameters for development (normally not needed)
 LDAP0_TRACE_LEVEL = int(os.environ.get('LDAP0_TRACE_LEVEL', '0'))
-LDAP0_TRACE_FILE = sys.stderr
 ldap0._trace_level = LDAP0_TRACE_LEVEL
-ldap0._trace_file = LDAP0_TRACE_FILE
 # ldap0.set_option(ldap0.OPT_DEBUG_LEVEL,255)
 
 #-----------------------------------------------------------------------
@@ -620,8 +618,6 @@ class SlapdConnection(LDAPObject, OpenLDAPObject):
             self,
             uri,
             trace_level=LDAP0_TRACE_LEVEL,
-            trace_file=LDAP0_TRACE_FILE,
-            trace_stack_limit=8,
             tls_options=None,
             network_timeout=None,
             timeout=None,
@@ -634,8 +630,6 @@ class SlapdConnection(LDAPObject, OpenLDAPObject):
             self,
             uri,
             trace_level=trace_level,
-            trace_file=trace_file,
-            trace_stack_limit=trace_stack_limit,
         )
         # Set timeout values
         if network_timeout is None:

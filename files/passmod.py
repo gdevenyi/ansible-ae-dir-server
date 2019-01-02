@@ -30,7 +30,6 @@ import ldap0
 from ldap0.dn import str2dn
 from ldap0.functions import strf_secs as ldap_strf_secs
 from ldap0.ldapurl import LDAPUrl
-from ldap0.logger import LoggerFileObj
 from ldap0.lock import LDAPLock
 from ldap0.pw import unicode_pwd
 
@@ -203,7 +202,6 @@ class PWSyncWorker(threading.Thread, LocalLDAPConn):
                 self._target_conn = MyLDAPObject(
                     self._target_ldap_url.initializeUrl(),
                     trace_level=LDAP0_TRACE_LEVEL,
-                    trace_file=LoggerFileObj(self.logger, logging.DEBUG),
                     cache_ttl=LDAP_CACHE_TTL,
                     retry_max=LDAP_MAXRETRYCOUNT,
                     retry_delay=LDAP_RETRYDELAY,
