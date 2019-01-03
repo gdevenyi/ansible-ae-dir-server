@@ -29,5 +29,6 @@ profile {{ name }} {
 
   # allow r/w access to own Unix domain socket
   {{ aedir_rundir }}/uwsgi/{{ name }}/{{ name }}.sock rw,
+  {{ aedir_rundir }}/uwsgi/{{ name }}/{{ name }}-stats.sock rw,
 
 }
