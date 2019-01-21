@@ -1208,6 +1208,16 @@ constraint_attribute aeStatus
 constraint_attribute aeExpiryStatus
   regex "^(1|2)$"
 
+# Limit some attributes to be SINGLE-VALUE by constraint
+constraint_attribute uid
+  count 1
+  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeObject)"
+constraint_attribute cn
+  count 1
+  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeObject)"
+constraint_attribute mail
+  count 1
+  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=inetLocalMailRecipient)"
 constraint_attribute authzTo
   count 1
 
@@ -1235,9 +1245,6 @@ constraint_attribute uid
 constraint_attribute uid
   regex "^{{ aedir_aeservice_uid_regex }}$"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeService)"
-constraint_attribute uid
-  count 1
-  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeObject)"
 
 # Regex constraint on 'cn' in zone entries
 constraint_attribute cn
@@ -1258,11 +1265,6 @@ constraint_attribute gidNumber
 constraint_attribute uidNumber,gidNumber
   set "this/uidNumber & this/gidNumber"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=posixAccount)"
-
-# Treat 'cn' as SINGLE-VALUE by constraint
-constraint_attribute cn
-  count 1
-  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeObject)"
 
 # naming convention for 'cn' in 'aeSrvGroup' entries
 constraint_attribute cn
