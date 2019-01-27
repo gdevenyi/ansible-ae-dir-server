@@ -8,9 +8,9 @@ socket = {{ aedir_rundir }}/uwsgi/{{ name }}/{{ name }}.sock
 chmod-socket = 666
 chdir = {{ aedir_rundir }}/uwsgi/{{ name }}
 module = {{ module }}
-stats = {{ aedir_rundir }}/uwsgi/{{ name }}/{{ name }}-stats.sock
+stats = 127.0.0.1:{{ stats_port }}
 manage-script-name = true
-master = true
+master = {{ master }}
 {% if processes >= 1 %}
 processes = {{ processes }}
 {% endif %}

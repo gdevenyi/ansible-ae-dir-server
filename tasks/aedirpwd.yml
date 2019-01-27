@@ -79,8 +79,10 @@
     name: aedirpwd
     user: ae-dir-pwd
     module: "aedirpwd_web:application"
+    master: "true"
     processes: "{{ aedir_uwsgi_params.aedirpwd.processes }}"
     threads: 0
+    stats_port: 9092
     buffer_size: "{{ aedir_uwsgi_params.aedirpwd.buffer_size }}"
     harakiri: "{{ aedir_uwsgi_params.aedirpwd.harakiri }}"
   notify:
