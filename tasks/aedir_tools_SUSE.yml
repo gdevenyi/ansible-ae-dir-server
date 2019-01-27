@@ -38,7 +38,7 @@
       - python-asn1crypto
       - python-xlwt
       - python-pycryptodome
-      - web2ldap>=1.3.38
+      - web2ldap>=1.4.0
     state: present
     disable_recommends: yes
     type: package
@@ -64,7 +64,6 @@
 - name: "Install additional packages for web2ldap on {{ openldap_role }} on {{ lsb_id }}"
   zypper:
     name:
-      - python-pyweblib>=1.3.13
       - python-dnspython
       - python-certifi
     state: present

@@ -3,7 +3,7 @@
 {text_error}
 
 <p>
-  <a class="CommandLink"
+  <a class="CL"
     href="/web2ldap/searchform?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}????bindname=">
     Login to &AElig;-DIR
   </a>
@@ -37,7 +37,7 @@
   </tr>
   <tr>
     <td>
-      <a class="CommandLink"
+      <a class="CL"
          href="/web2ldap?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub?(&(objectClass=aeUser)(aeStatus=0)(!(userPassword=*)))?bindname=">
         Search active personal user accounts without password
       </a>
@@ -47,7 +47,7 @@
     </td>
   </tr>
     <td>
-      <a class="CommandLink"
+      <a class="CL"
          href="/web2ldap?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub?(&(objectClass=aeGroup)(aeStatus=0)(!(member=*)))?bindname=">
         Search active groups without members
       </a>
@@ -58,7 +58,7 @@
   </tr>
   <tr>
     <td>
-      <a class="CommandLink"
+      <a class="CL"
          href="/web2ldap?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub?(&(objectClass=aeObject)(aeStatus=0)(aeNotAfter<={value_currenttime}))?bindname=">
         Search expired entries still active
       </a>
@@ -69,7 +69,7 @@
   </tr>
   <tr>
     <td>
-      <a class="CommandLink"
+      <a class="CL"
          href="/web2ldap?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub?(objectClass=msPwdResetObject)?bindname=">
         Search on-going password resets
       </a>
@@ -80,7 +80,7 @@
   </tr>
   <tr>
     <td>
-      <a class="CommandLink"
+      <a class="CL"
          href="/web2ldap/searchform?{{ openldap_ldapi_uri }}/{{ aedir_accesslog_suffix }}????bindname=">
         Search access log
       </a>
@@ -105,7 +105,7 @@
 {% set server_id = hostvars[host].get('openldap_server_id','') -%}
   <tr>
     <td>
-      <a class="CommandLink" href="/web2ldap/searchform?ldaps://{{ replica }}/{{ aedir_suffix }}????bindname=">{{ replica }}</a>
+      <a class="CL" href="/web2ldap/searchform?ldaps://{{ replica }}/{{ aedir_suffix }}????bindname=">{{ replica }}</a>
     </td>
 {% if replica!=host %}
     <td>

@@ -101,24 +101,6 @@
   with_fileglob:
     "../templates/web2ldap/templates/ae-dir/*.*.j2"
 
-- name: "Install AE-DIR plugin module {{ aedir_python_sitepackages }}/web2ldap/app/plugins/aedir.py"
-  copy:
-    src: "web2ldap/aedir.py"
-    dest: "{{ aedir_python_sitepackages }}/web2ldap/app/plugins/aedir.py"
-    owner: root
-    group: root
-    mode: 0644
-  notify:
-    - restart web2ldap
-
-- name: "Create supplemental schema file {{ web2ldapcnf_prefix }}/ae-suppl-schema.ldif"
-  copy:
-    src: "web2ldap/ae-suppl-schema.ldif"
-    dest: "{{ web2ldapcnf_prefix }}/ae-suppl-schema.ldif"
-    owner: root
-    group: root
-    mode: 0644
-
 - name: "Create UWSGI socket directory {{ aedir_rundir }}/uwsgi/web2ldap"
   file:
     path: "{{ aedir_rundir }}/uwsgi/web2ldap"

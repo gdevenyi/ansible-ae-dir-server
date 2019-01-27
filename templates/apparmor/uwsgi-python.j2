@@ -8,6 +8,9 @@ profile {{ name }} {
 
   #include <ae-dir/abstractions/uwsgi-python>
 
+  # access to uwsgi executable
+  {{ uwsgi_paths[lsb_id].exec }} r,
+
   # access to {{ name }} application config
   {{ cfgdir }}/** r,
 
