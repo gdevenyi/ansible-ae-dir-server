@@ -940,10 +940,6 @@ GLOBAL_DEFAULTS = Web2LDAPConfig(
         'oathTOTPParams':os.path.join(templates_dir, 'oath', 'inputform_oathTOTPParams.html'),
     },
 
-    # HTML template file used for displaying operational attributes
-    # in a footer when displaying a single entry
-    read_operationalattrstemplate=os.path.join(templates_dir, 'read_operationalattrs.html'),
-
     # Number of columns for print output
     print_cols=4,
 
@@ -1030,6 +1026,12 @@ GLOBAL_DEFAULTS = Web2LDAPConfig(
 ldap_def = {
 
     '_': GLOBAL_DEFAULTS,
+
+  # For dynamic configuration via cn=config
+  'ldap:///cn=config': CN_CONFIG,
+
+  # Example for cn=Monitor covering various server implementations
+  'ldap:///cn=Monitor': OPENLDAP_MONITOR_CONFIG,
 
   # Æ-DIR's main DB
   'ldap:///{{ aedir_suffix }}': AE_DIR_CONFIG,
