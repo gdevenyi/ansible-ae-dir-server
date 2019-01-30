@@ -203,11 +203,12 @@
 
 <h2 id="linux-login">NSS/PAM self-integration</h2>
 <p>
-  For PAM/NSS client self-integration invoke ansible play in sub-directory <code>ansible/</code>
+  For PAM/NSS client self-integration invoke this ansible play to install
+  and configure <a href="aehostd.html">aehostd</a>
   (here using command <code>su</code>):
 </p>
 <pre class="cli">
-/opt/ansible/bin/ansible-playbook ae-dir-clients.yml -i myenv/hosts --become -K --become-method=su -l ae-dir-servers
+/opt/ansible/bin/ansible-playbook aehostd.yml -i myenv/hosts --become -K --become-method=su -l ae-dir-servers
 </pre>
 
 <h2 id="oath-ldap">Two-factor authentication (OATH-LDAP)</h2>
