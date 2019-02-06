@@ -7,6 +7,14 @@
    "tags": "iam, identity-management, ldap, openldap, nis, pam, nss, security, authentication-directory",
    "releases": [
       {
+         "version": "0.6.3",
+         "state": "stable",
+         "scope": "minor feature",
+         "changes": "Update to web2ldap 1.4.2 with new UI style, small fixes",
+         "download": "https://ae-dir.com/install.html",
+         "published": "2019-01-31T21:00:00+00:00"
+      },
+      {
          "version": "0.6.1",
          "state": "stable",
          "scope": "minor feature",
