@@ -7,7 +7,7 @@ Needs full read access to rootDSE and cn=config and cn=monitor
 (or whereever rootDSE attributes 'configContext' and 'monitorContext'
 are pointing to)
 
-Copyright 2015-2017 Michael Ströder <michael@stroeder.com>
+Copyright 2015-2019 Michael Ströder <michael@stroeder.com>
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may
 not use files and content provided on this web site except in compliance
@@ -163,7 +163,7 @@ def slapd_pid_fromfile(config_attrs):
 
 class MonitoringCheck(object):
     """
-    base class for a monitoting check
+    base class for a monitoring check
     """
 
     item_names = None
@@ -1183,8 +1183,6 @@ class SlapdCheck(CheckMkLocalCheck):
             'cn=Current,cn=Connections',
             'monitorCounter',
         )
-        # We expect one per existing machine, plus a low number for web2ldap,
-        # equally distributed over the nodes:
         state = CHECK_RESULT_WARNING * int(
             current_connections < CONNECTIONS_WARN_LOWER or
             current_connections > CONNECTIONS_WARN_UPPER
