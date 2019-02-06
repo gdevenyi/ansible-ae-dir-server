@@ -4,7 +4,7 @@
   pip:
     name:
       - pip
-      - setuptools==40.6.3
+      - setuptools
     state: latest
     virtualenv: "{{ aedir_prefix }}"
     virtualenv_site_packages: no
