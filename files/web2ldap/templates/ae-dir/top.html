@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 
+  <!--web2ldap {web2ldap_version}-->
+
   <head>
     <title>&AElig;-DIR :: {ldap_uri} :: {dn} :: {title_text}</title>
     <meta name="generator" content="web2ldap {web2ldap_version}, see www.web2ldap.de">
@@ -15,7 +17,6 @@
       media="screen"
       href="/css/web2ldap/ae-dir.css"
     >
-    <!--?{web2ldap_version}-1-->
     <link rel="stylesheet" type="text/css" media="print" href="/css/web2ldap/print.css">
     <link rel="search"
       type="application/opensearchdescription+xml"
@@ -50,9 +51,9 @@
 
           <table>
             <tr>
-              <td>
-                Server:
-              </td>
+              <th>
+                Connected to:
+              </th>
               <td>
                 <a
                   href="{script_name}/{command}?{ldap_url}"
@@ -60,20 +61,19 @@
                   rel="bookmark"
                   title="Bookmark URL"
                 >
-                  {ldap_uri}
+                  <span class="server">{ldap_uri} {description}</span>
                 </a>
-                <strong>{description}</strong>
               </td>
               <td class="About">
                 web2ldap {web2ldap_version}
               </td>
             </tr>
             <tr>
-              <td>
+              <th>
                 Bound as:
-              </td>
+              </th>
               <td>
-                {who}
+                <span class="whoami">{who}</span>
               </td>
               <td class="About">
                 <a
@@ -92,7 +92,7 @@
         <div id="DITNavigation" role="navigation" aria-label="DIT navigation">
 
           <nav title="Current search base in directory information tree (DIT)">
-            Base: {dit_navi}
+            {dit_navi}
           </nav>
         </div>
 

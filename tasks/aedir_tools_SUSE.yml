@@ -38,7 +38,7 @@
       - python-asn1crypto
       - python-xlwt
       - python-pycryptodome
-      - web2ldap>=1.4.2
+      - web2ldap>=1.4.3
     state: present
     disable_recommends: yes
     type: package
