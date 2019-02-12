@@ -575,6 +575,9 @@ openldap_conn_max_pending_auth: 1000
 # rule-of-thumb: 1 for up to 16 cores
 openldap_listener_threads: 1
 
+# number of file descriptors for LDAP connections
+openldap_limit_nofile: 1024
+
 # how many worker threads are started
 # RAM needed per thread: 4MB on 32 bit systems, 8MB on 64 bit systems
 # rule-of-thumb: 4 per real CPU core
