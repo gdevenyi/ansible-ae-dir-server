@@ -28,20 +28,10 @@
   <li>
     <a href="#pam-nss">PAM/NSS services</a>
     <ol>
-      <li>
-        <a href="#pam-nss-simple">Simple PAM/NSS clients</a>
-        <ol>
-          <li><a href="#pam-nss-sssd">sssd</a></li>
-          <li><a href="#pam-nss-nslcd">nss-pam-ldapd (aka nslcd)</a></li>
-          <li><a href="#nsscache">nsscache</a></li>
-        </ol>
-      </li>
-      <li>
-        <a href="#pam-nss-smart">Smart PAM/NSS clients</a>
-        <ol>
-          <a href="#pam-nss-aehostd">aehostd -- Custom NSS/PAM demon</a>
-        </ol>
-      </li>
+      <li><a href="#pam-nss-aehostd">aehostd -- Custom NSS/PAM demon</a></li>
+      <li><a href="#pam-nss-sssd">sssd</a></li>
+      <li><a href="#pam-nss-nslcd">nss-pam-ldapd (aka nslcd)</a></li>
+      <li><a href="#nsscache">nsscache</a></li>
     </ol>
   </li>
   <li>
@@ -209,18 +199,13 @@
   useful when using &AElig;-DIR.
 </p>
 
-<h2 id="pam-nss-simple">Simple PAM/NSS clients</h2>
+<h2 id="pam-nss-sssd">sssd</h2>
 <p>
-  Simple PAM/NSS clients do not have any special knowledge about
-  &AElig;-DIR DIT and schema.
-</p>
-
-<h3 id="pam-nss-sssd">sssd</h3>
-<p>
-  While the <a href="https://pagure.io/SSSD/sssd/">System Security Services Daemon (SSSD)</a>
-  for Linux is not a simple component the configuration of
-  <em>sssd-ldap(5)</em> for &AElig;-DIR does deliberately not use any
-  of its special features.
+  While the
+  <a href="https://pagure.io/SSSD/sssd/">System Security Services Daemon (SSSD)</a>
+  for Linux provides lots of special features for enforcing security
+  policies locally the configuration of <em>sssd-ldap(5)</em> for
+  &AElig;-DIR deliberately does not make use of them.
 </p>
 <p>
   The following diagram illustrates the integration of <em>sssd</em> into
@@ -251,7 +236,7 @@
   </li>
 </ul>
 
-<h3 id="pam-nss-nslcd">nss-pam-ldapd (aka nslcd)</h3>
+<h2 id="pam-nss-nslcd">nss-pam-ldapd (aka nslcd)</h2>
 <p>
   Arthur de Jong's <a href="https://arthurdejong.org/nss-pam-ldapd/">nss-pam-ldapd</a>
   is also a demon providing NSS and PAM services and runs on various POSIX (non-Linux) platforms.
@@ -280,7 +265,7 @@
   </li>
 </ul>
 
-<h3 id="nsscache">nsscache</h3>
+<h2 id="nsscache">nsscache</h2>
 <p>
   If you like syncing the NSS maps locally for off-line use you can
   look at <a href="https://github.com/google/nsscache">nsscache</a>
