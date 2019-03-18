@@ -178,8 +178,8 @@
     state: present
     user: root
     cron_file: ae_dir_slapcat
-    minute: "23"
-    hour: "*/12"
+    minute: "{{openldap_backup_cron_args.minute }}"
+    hour: "{{openldap_backup_cron_args.hour }}"
     job: "{{ openldap_backup_script }}"
   when: openldap_role == 'provider'
 

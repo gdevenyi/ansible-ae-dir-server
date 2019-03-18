@@ -501,6 +501,10 @@ openldap_backup_path: "{{ openldap_data }}"
 openldap_backup_compressor: "xz -9"
 # maximum number of days to keep local backup files
 openldap_backup_max_days: 21
+# backup cron values
+openldap_backup_cron_args:
+  hour: "*/12"
+  minute: "23"
 
 # List of servers to be added to rootDSE attribute altServer (see RFC 4512)
 openldap_rootdse_alt_servers: "{{ aedir_hosts[openldap_role]|sort }}"
