@@ -899,6 +899,12 @@ aeHost: host={{ host }},cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir_suffix }}
 {% set gid_number = gid_number + aedir_hosts[role]|length -%}
 {% endfor %}
 {% set gid_number = gid_number + aedir_hosts['provider']|length + aedir_hosts['consumer']|length + 1 -%}
+dn: cn=ae-dir-consumer-hosts,cn=ae,{{ aedir_suffix }}
+changetype: modify
+add: aeRequires
+aeRequires: cn=ae-dir-provider-hosts,cn=ae,{{ aedir_suffix }}
+-
+
 #
 #---------------------------------------------------------------------------
 # AE-DIR slapd replica groups

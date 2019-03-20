@@ -405,6 +405,12 @@ attributetype ( ae-dir-at:21
   DESC 'AE-DIR: DN(s) of sudoer entries usable with a certain server group or server'
   SUP aeObjectReference )
 
+attributetype ( ae-dir-at:48
+  NAME 'aeRequires'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: DN of server groups this server group depends on'
+  SUP aeObjectReference )
+
 objectclass ( ae-dir-oc:13
   NAME 'aeSrvGroup'
   X-ORIGIN 'AE-DIR'
@@ -415,7 +421,7 @@ objectclass ( ae-dir-oc:13
   MAY ( aeProxyFor $ aeLogStorePeriod $
         aeSetupGroups $ aeLogStoreGroups $ aeLoginGroups $
         aeVisibleGroups $ aeDisplayNameGroups $ aeVisibleSudoers $
-        aeSSHProxyCommand $ aeFqdn ) )
+        aeSSHProxyCommand $ aeFqdn $ aeRequires ) )
 
 # Contact entries
 #-----------------------------------------------------------------------

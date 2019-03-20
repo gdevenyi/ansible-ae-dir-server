@@ -84,12 +84,13 @@ index mail sub,eq
 index o sub,eq
 index ou sub,eq
 
-# server groups
+# service groups
 index aeLoginGroups eq
 index aeVisibleGroups eq
 index aeVisibleSudoers eq
 index aeProxyFor pres,eq
 index aeSSHProxyCommand pres,eq,sub
+index aeRequires eq
 
 # zones
 index aeZoneAdmins pres,eq
@@ -1368,6 +1369,11 @@ constraint_attribute aeProxyFor
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeSrvGroup)"
 constraint_attribute aeProxyFor,entryDN
   set "this/aeProxyFor/-1 & this/-1"
+  restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeSrvGroup)"
+
+# restrict aeRequires in aeSrvGroup entry to reference solely active aeSrvGroup
+constraint_attribute aeRequires
+  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(objectClass=aeSrvGroup)(aeStatus=0))"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeSrvGroup)"
 
 # restrict aeSrvGroup in aeHost and aeService entries to reference solely active aeSrvGroup in same zone
