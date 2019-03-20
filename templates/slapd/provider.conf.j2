@@ -885,8 +885,8 @@ access to
 # Give read access to SUDO rules to servers
 access to
   dn.subtree="{{ aedir_suffix }}"
-  attrs=entry,entryDN,entryUUID,objectClass,structuralObjectClass,aeStatus,modifyTimestamp,@sudoRole
   filter="(objectClass=sudoRole)"
+  attrs=entry,entryDN,entryUUID,objectClass,structuralObjectClass,aeStatus,modifyTimestamp,@sudoRole
     by set="(user/-1 | user/aeSrvGroup)/aeVisibleSudoers & this" read
     by * none
 
