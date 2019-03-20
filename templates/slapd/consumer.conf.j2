@@ -374,7 +374,7 @@ access to
     by * none break
 {% endif %}
 
-# aeNwDevice entries have to be subordinate entries of aeHost entries
+# aeHost instances can read their own subordinate aeNwDevice entries
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=aeNwDevice)"
