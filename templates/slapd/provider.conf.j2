@@ -961,13 +961,15 @@ access to
 # Read access to network device entries filtered by (objectClass=aeNwDevice)
 #------------------------------------------------------------------
 
-{% if aedir_aenwdevice_visibility_set %}
+{% if aedir_aenwdevice_visibility_sets %}
 # aeNwDevice entries can be read by some aeHost entries
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(&(objectClass=aeNwDevice)(aeFqdn=*)(ipHostNumber=*))"
   attrs=entry,entryDN,entryUUID,objectClass,aeFqdn,ipHostNumber
-    by set="{{ aedir_aenwdevice_visibility_set }}" read
+{% for who_set in aedir_aenwdevice_visibility_sets %}
+    by set="{{ who_set }}" read
+{% endfor %}
     by * none break
 {% endif %}
 

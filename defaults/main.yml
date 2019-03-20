@@ -180,12 +180,14 @@ aedir_init_ticket_id: "INIT-42"
 
 # who clause for set-based ACL determining visibility of IP address
 # attributes for hosts map
-# 1. only aeHost can see own network devices
-aedir_aenwdevice_visibility_set: "user & this/-1"
-# 2. only aeHost beneath same aeSrvGroup can see host's  network devices
-#aedir_aenwdevice_visibility_set: "user/-1 & this/-2"
-# 3. only aeHost within same aeZone can see host's  network devices
-#aedir_aenwdevice_visibility_set: "user/-2 & this/-3"
+aedir_aenwdevice_visibility_sets:
+  # 1. only aeHost beneath same aeSrvGroup can see host's network devices
+  - "this/-2 & user/-1"
+  # 2. only aeHost within same aeZone can see host's network devices
+  #- "this/-3 & user/-2"
+  # 3. only aeHost being member of aeSrvGroup which depends on
+  #    the aeSrvGroup can see host's network devices
+  - "this/-2 & user/-1/aeRequires"
 
 # Usernames and POSIX-UID/-GID numbers for system accounts of services
 # running on providers and accessing AE-DIR via LDAPI
