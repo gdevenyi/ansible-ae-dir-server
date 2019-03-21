@@ -13,9 +13,11 @@ umask 077
 
 # slapcat all real database backends found
 {{ openldap_bin }}/ldapsearch \
+  -Q \
   -LLL \
   -b 'cn=config' \
-  -s one olcSuffix '(olcSuffix=*)' \
+  -s one \
+  '(olcSuffix=*)' \
   olcSuffix | \
   grep olcSuffix| \
   cut -d' ' -f2 | \
