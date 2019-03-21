@@ -507,7 +507,7 @@ openldap_backup_compressor: "xz -3"
 openldap_backup_max_days: 21
 # backup cron values
 openldap_backup_cron_args:
-  hour: "*/12"
+  hour: "{{ (openldap_server_id - 1) * (24 / (groups['ae-dir-providers']|length))|int }}"
   minute: "23"
 
 # List of servers to be added to rootDSE attribute altServer (see RFC 4512)
