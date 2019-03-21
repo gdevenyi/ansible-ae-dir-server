@@ -7,6 +7,14 @@
    "tags": "iam, identity-management, ldap, openldap, nis, pam, nss, security, authentication-directory",
    "releases": [
       {
+         "version": "0.6.6",
+         "state": "stable",
+         "scope": "minor feature",
+         "changes": "backup CRON job parameters, new attribute aeRequires in aeSrvGroup entries, minor AppArmor fix",
+         "download": "https://ae-dir.com/install.html",
+         "published": "2019-03-21T21:00:00+00:00"
+      },
+      {
          "version": "0.6.5",
          "state": "stable",
          "scope": "minor fix",
