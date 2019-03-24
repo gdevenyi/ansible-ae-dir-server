@@ -102,6 +102,7 @@ aedir_systemd_dir: "/etc/systemd/system"
 
 # various systemd.exec options for hardening the service units
 aedir_systemd_hardening:
+  - "PrivateUsers=no"
   - "PrivateTmp=yes"
   - "ProtectSystem=full"
   - "ProtectHome=yes"
