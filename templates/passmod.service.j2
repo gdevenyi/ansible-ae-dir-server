@@ -20,11 +20,13 @@ Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
 ExecStart={{ aedir_python }} {{ aedir_sbin }}/passmod.py "{{ aedir_pwsync_socket_path }}" "{{ openldap_ldapi_uri|replace('%','%%') }}????x-saslmech=EXTERNAL" "{{ aedir_pwsync_targeturl }}" "{{ aedir_pwsync_targetpwfile }}"
 User={{ aedir_pwsync_listener_user }}
 Group={{ aedir_pwsync_listener_user }}
-# various hardening options
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+{% if aedir_systemd_hardening %}
+# various hardening options from ansible var aedir_systemd_hardening
 {% for systemd_option in aedir_systemd_hardening %}
 {{ systemd_option }}
 {% endfor %}
-RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+{% endif %}
 
 [Install]
 WantedBy=multi-user.target

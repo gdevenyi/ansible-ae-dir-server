@@ -25,13 +25,15 @@ CapabilityBoundingSet=CAP_NET_BIND_SERVICE
 AmbientCapabilities=CAP_NET_BIND_SERVICE
 MemoryDenyWriteExecute=yes
 LimitNOFILE={{ openldap_limit_nofile }}
-# various hardening options
-{% for systemd_option in aedir_systemd_hardening %}
-{{ systemd_option }}
-{% endfor %}
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 {% if apparmor_enabled %}
 AppArmorProfile=ae-slapd
+{% endif %}
+{% if aedir_systemd_hardening %}
+# various hardening options from ansible var aedir_systemd_hardening
+{% for systemd_option in aedir_systemd_hardening %}
+{{ systemd_option }}
+{% endfor %}
 {% endif %}
 
 [Install]
