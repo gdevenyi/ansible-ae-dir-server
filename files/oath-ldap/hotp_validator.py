@@ -7,7 +7,7 @@ HOTP validation on intercepted BIND requests
 
 from __future__ import absolute_import
 
-__version__ = '0.10.1'
+__version__ = '0.10.2'
 __author__ = u'Michael Ströder <michael@stroeder.com>'
 
 #-----------------------------------------------------------------------
@@ -483,7 +483,7 @@ class HOTPValidationHandler(SlapdSockHandler):
         except ldap0.NO_SUCH_OBJECT as err:
             self._log(
                 logging.INFO,
-                'Entry %r not found: %s => CONTINUE',
+                'User entry %r not found: %s => CONTINUE',
                 request.dn,
                 err,
             )
@@ -491,7 +491,7 @@ class HOTPValidationHandler(SlapdSockHandler):
         except LDAPError as err:
             self._log(
                 logging.WARN,
-                'Error reading %r: %s => %s',
+                'Reading user entry %r failed: %s => %s',
                 request.dn,
                 err,
                 failure_response_class.__name__,
@@ -502,7 +502,7 @@ class HOTPValidationHandler(SlapdSockHandler):
             if not user_entry:
                 self._log(
                     logging.INFO,
-                    'No result reading %r with filter %r => CONTINUE',
+                    'No result reading user entry %r with filter %r => CONTINUE',
                     request.dn,
                     self.user_filter,
                 )
