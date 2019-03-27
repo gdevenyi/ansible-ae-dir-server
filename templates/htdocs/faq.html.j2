@@ -142,7 +142,7 @@
       <ul>
         <li>Passwords (hashes)</li>
         <li>User names</li>
-        <li>POSIX-IDs</li>
+        <li>POSIX-IDs (passwd and group)</li>
         <li>Custom schema used by your data</li>
         <li>Access control requirements</li>
         <li>Client capabilities and configuration</li>
@@ -169,8 +169,10 @@
       <a href="https://www.openldap.org/doc/admin24/maintenance.html"
          title="OpenLDAP Software 2.4 Administrator's Guide: Maintenance">
          OpenLDAP Admin Guide</a>).
-      How often this happens and where the files are stored can be
-      configured with ansible vars.
+      How often this happens, where the files are stored and how long they
+      are kept around can be configured with ansible vars
+      <var>openldap_backup_cron_args</var>, <var>openldap_backup_path</var>
+      and <var>openldap_backup_max_days</var>.
     </p>
   </li>
 
