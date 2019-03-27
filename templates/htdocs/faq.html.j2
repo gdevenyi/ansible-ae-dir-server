@@ -207,6 +207,29 @@
     </p>
   </li>
 
+  <li id="ssh_user_keys">
+    <p class="faq_q">
+      Why is the SSH key of a user entry not a self-service attribute?
+    </p>
+    <p class="faq_a">
+      Managing so-called authorized keys for SSH access to your servers
+      requires that the authenticity of the keys is reliably checked to meet
+      security requirements like
+      <a
+        href="https://csrc.nist.gov/publications/detail/nistir/7966/final"
+        title="NISTIR 7966 - Security of Interactive and Automated Access Management Using Secure Shell (SSH)"
+      >
+        NISTIR 7966, section 5.2.
+      </a>.
+      If users would be able to add SSH keys themselves the SSH
+      authentication would only be as strong as the password
+      authentication.
+      Thus the zone admin responsible for a certain user has to check with
+      some out-of-band process that the public key really belongs to this
+      user and only the user has control over the private key.
+    </p>
+  </li>
+
   <li id="reports">
     <p class="faq_q">
       How to report list of active users?
