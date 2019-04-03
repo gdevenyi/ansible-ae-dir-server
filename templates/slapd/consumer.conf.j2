@@ -34,7 +34,7 @@ access to
 lastmod on
 
 # database parameters
-maxsize {{ openldap_db_um_maxsize }}
+maxsize {{ openldap_db_params.um.mdb_maxsize }}
 dbnosync
 checkpoint 20000 1
 envflags writemap
@@ -107,10 +107,10 @@ index aeHwSerialNumber eq,sub
 #---------------------------------------------------------------------------
 
 # Maximum number of entries to return from a search operation
-sizelimit {{ openldap_sizelimit }}
+sizelimit {{ openldap_db_params.um.sizelimit }}
 
 # Maximum number of time [secs] slapd will spend answering a search request
-timelimit {{ openldap_timelimit }}
+timelimit {{ openldap_db_params.um.timelimit }}
 
 # no limits for AE admins
 limits

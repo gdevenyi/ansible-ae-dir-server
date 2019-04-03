@@ -32,7 +32,7 @@ access to
 lastmod on
 
 # database parameters
-maxsize {{ openldap_db_um_maxsize }}
+maxsize {{ openldap_db_params.um.mdb_maxsize }}
 dbnosync
 checkpoint 20000 1
 envflags writemap
@@ -135,10 +135,10 @@ index oathTOTPParams eq
 #---------------------------------------------------------------------------
 
 # Maximum number of entries to return from a search operation
-sizelimit {{ openldap_sizelimit }}
+sizelimit {{ openldap_db_params.um.sizelimit }}
 
 # Maximum number of time [secs] slapd will spend answering a search request
-timelimit {{ openldap_timelimit }}
+timelimit {{ openldap_db_params.um.timelimit }}
 
 # no limits for AE admins
 limits
@@ -1640,7 +1640,7 @@ overlay lastbind
 # syncrepl-Overlay
 overlay syncprov
 syncprov-checkpoint 1000 2
-syncprov-sessionlog 1000
+syncprov-sessionlog {{ openldap_db_params.um.syncprov_sessionlog }}
 syncprov-reloadhint TRUE
 
 {% if openldap_syncrepl_providers %}

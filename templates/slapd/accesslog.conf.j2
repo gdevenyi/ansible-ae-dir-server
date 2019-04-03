@@ -20,12 +20,16 @@ access to
 lastmod on
 
 # database parameters
-maxsize {{ openldap_db_accesslog_maxsize }}
+maxsize {{ openldap_db_params.accesslog.mdb_maxsize }}
 dbnosync
 checkpoint 20000 1
 envflags writemap
 
-sizelimit -1
+# Maximum number of entries to return from a search operation
+sizelimit {{ openldap_db_params.accesslog.sizelimit }}
+
+# Maximum number of time [secs] slapd will spend answering a search request
+timelimit {{ openldap_db_params.accesslog.timelimit }}
 
 # Indexing configuration
 index reqStart eq

@@ -20,12 +20,16 @@ access to
 lastmod on
 
 # database parameters
-maxsize {{ openldap_db_session_maxsize }}
+maxsize {{ openldap_db_params.session.mdb_maxsize }}
 dbnosync
 checkpoint 20000 1
 envflags writemap
 
-sizelimit -1
+# Maximum number of entries to return from a search operation
+sizelimit {{ openldap_db_params.session.sizelimit }}
+
+# Maximum number of time [secs] slapd will spend answering a search request
+timelimit {{ openldap_db_params.session.timelimit }}
 
 add_content_acl yes
 
@@ -150,7 +154,7 @@ constraint_attribute
 # syncrepl-Overlay
 overlay syncprov
 syncprov-checkpoint 1000 2
-syncprov-sessionlog 1000
+syncprov-sessionlog {{ openldap_db_params.session.syncprov_sessionlog }}
 syncprov-reloadhint TRUE
 
 {% if openldap_syncrepl_providers %}
