@@ -69,7 +69,7 @@ from ldap0.ldif import LDIFParser
 # Configuration constants
 #-----------------------------------------------------------------------
 
-__version__ = '2.1.0'
+__version__ = '2.1.1'
 
 STATE_FILENAME = 'slapd_checkmk.state'
 
@@ -116,9 +116,8 @@ OPS_WAITING_CRIT = 60
 # if real connection count falls below this treshold it could mean
 # that slapd is not reachable from LDAP clients
 CONNECTIONS_WARN_LOWER = 3
-# too many connections are bad too - depends on your expected number
-# of LDAP clients with persistent connections
-CONNECTIONS_WARN_UPPER = 1000
+# warn if this percentage of max. file descriptors is reached
+CONNECTIONS_WARN_PERCENTAGE = 80.0
 
 # Tresholds for thread-count-related warnings
 # There should always be at least one active thread
@@ -1183,15 +1182,23 @@ class SlapdCheck(CheckMkLocalCheck):
             'cn=Current,cn=Connections',
             'monitorCounter',
         )
+        max_connections = self._monitor_cache.get_value(
+            'cn=Max File Descriptors,cn=Connections',
+            'monitorCounter',
+        )
+        current_connections_percentage = 100.0 * current_connections / max_connections
         state = CHECK_RESULT_WARNING * int(
             current_connections < CONNECTIONS_WARN_LOWER or
-            current_connections > CONNECTIONS_WARN_UPPER
+            current_connections_percentage >= CONNECTIONS_WARN_PERCENTAGE
         )
         self.result(
             state,
             'SlapdConns',
-            performance_data={'count': current_connections},
-            check_output='%d open connections' % (current_connections),
+            performance_data={
+                'count': current_connections,
+                'percent': current_connections_percentage,
+            },
+            check_output='%d open connections (max. %d)' % (current_connections, max_connections),
         )
         return # end of _check_conns()
 
