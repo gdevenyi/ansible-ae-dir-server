@@ -25,9 +25,6 @@
   deny /etc/python{{ aedir_python_version[lsb_id] }} r,
 {% endif %}
 
-  /sbin/ldconfig ix,
-  {{ aedir_python.split(' ', 1)[0] }} ix,
-
 {% if lsb_id!="SUSE" %}
   # Separate Python virtual env on {{ lsb_id }}
   {{ aedir_python_sitepackages }}/ r,
