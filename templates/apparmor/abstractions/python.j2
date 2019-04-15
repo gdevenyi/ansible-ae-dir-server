@@ -3,19 +3,39 @@
 
   #include <ae-dir/abstractions/base>
   #include <ae-dir/abstractions/nameservice>
-  #include <abstractions/python>
-
   #include <ae-dir/abstractions/ldapclient>
 
-  /sbin/ldconfig ix,
+  # grant read access to system-wide Python modules
+  /usr/lib{,32,64}/python{{ aedir_python_version[lsb_id] }}/**.{pyc,so} mr,
+  /usr/lib{,32,64}/python{{ aedir_python_version[lsb_id] }}/**.{egg,py,pth} r,
+  /usr/lib{,32,64}/python{{ aedir_python_version[lsb_id] }}/{site,dist}-packages/ r,
+{% if aedir_python_version[lsb_id][0]=="3" %}
+  # grant read access to Python 3 shared libs
+  /usr/lib{,32,64}/python3.[0-9]/lib-dynload/*.so mr,
+{% endif %}
 
-  # Python and its modules
+{% if lsb_id=="Debian" %}
+  # some special rules for Debian's shared Python module directories
+  # shared python paths and config
+  /usr/share/{pyshared,pycentral,python-support}/**      r,
+  /{var,usr}/lib/{pyshared,pycentral,python-support}/**  r,
+  /usr/lib/{pyshared,pycentral,python-support}/**.so     mr,
+  /var/lib/{pyshared,pycentral,python-support}/**.pyc    mr,
+  /usr/{,local/}lib/python3/dist-packages/**.so          mr,
+  deny /etc/python{{ aedir_python_version[lsb_id] }} r,
+{% endif %}
+
+  /sbin/ldconfig ix,
   {{ aedir_python.split(' ', 1)[0] }} ix,
+
+{% if lsb_id!="SUSE" %}
+  # Separate Python virtual env on {{ lsb_id }}
   {{ aedir_python_sitepackages }}/ r,
   {{ aedir_python_sitepackages }}/** r,
   {{ aedir_prefix }}/lib/python{{ aedir_python_version[lsb_id] }}/orig-prefix.txt r,
   {{ aedir_prefix }}/lib/python{{ aedir_python_version[lsb_id] }}/**.py{,c,o} r,
   {{ aedir_prefix }}/lib/python{{ aedir_python_version[lsb_id] }}/**.so* rm,
+{% endif %}
 
   # Python logging config file
   {{ aedir_etc }}/ae-logging.conf r,
