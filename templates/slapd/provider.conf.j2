@@ -6,6 +6,15 @@
 
 {% include 'global.conf.j2' %}
 
+#---------------------------------------------------------------------------
+# password hash parameters
+#---------------------------------------------------------------------------
+
+password-hash {{ openldap_password_hash }}
+{% if openldap_password_hash.upper()=='{CRYPT}' %}
+password-crypt-salt-format "{{ openldap_password_crypt_salt_format }}"
+{% endif %}
+
 {% include 'config.conf.j2' %}
 
 {% include 'accesslog.conf.j2' %}
