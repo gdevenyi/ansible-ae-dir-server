@@ -50,21 +50,8 @@ from slapdsock.service import SlapdSockThreadingServer
 # Configuration constants
 #-----------------------------------------------------------------------
 
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 __author__ = u'Michael Ströder <michael@stroeder.com>'
-
-# DN of default pwdPolicy entry used
-# in case attribute pwdPolicySubentry is missing
-#PWD_POLICY_SUBENTRY_DEFAULT = 'cn=ppolicy-default,cn=ae,ou=ae-dir'
-PWD_POLICY_SUBENTRY_DEFAULT = None
-
-PWD_MIN_LENGTH = 0
-PWD_MIN_AGE = 0
-PWD_SCHEME = '{CRYPT}'
-PWD_CRYPT_SCHEME = 'sha512_crypt'
-PWD_CRYPT_SCHEME_ARGS = {
-    'rounds': 5000,
-}
 
 # UIDs and peer GIDS of peers which are granted access
 # (list of int/strings)
