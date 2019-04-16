@@ -22,7 +22,7 @@ aedir_package_repos:
       key: "RPM-GPG-KEY-LTB-project"
   Debian:
     "ltb_project_org":
-      repo: "deb https://ltb-project.org/debian/{{ ansible_distribution_release }} {{ ansible_distribution_release }} main"
+      repo: "deb https://ltb-project.org/debian/{{ ansible_lsb.codename }} {{ ansible_lsb.codename }} main"
       key: "RPM-GPG-KEY-LTB-project"
   SUSE:
     "home_stroeder_AE-DIR":
