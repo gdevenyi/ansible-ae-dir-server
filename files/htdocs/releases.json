@@ -7,6 +7,14 @@
    "tags": "iam, identity-management, ldap, openldap, nis, pam, nss, security, authentication-directory",
    "releases": [
       {
+         "version": "0.7.1",
+         "state": "stable",
+         "scope": "minor fix",
+         "changes": "small change for upcoming Debian buster",
+         "download": "https://ae-dir.com/install.html",
+         "published": "2019-04-17T18:00:00+00:00"
+      },
+      {
          "version": "0.7.0",
          "state": "stable",
          "scope": "minor feature",
