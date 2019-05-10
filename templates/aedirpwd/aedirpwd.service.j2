@@ -20,7 +20,7 @@ Environment=LDAPNOINIT=1
 Environment=PYTHONPATH={{ aedir_etc }}/aedirpwd
 Environment=PYTHONOPTIMIZE=2
 Environment=PYTHONDONTWRITEBYTECODE=1
-ExecStart={{ uwsgi_paths[lsb_id].exec }} --strict --ini {{ aedir_etc }}/uwsgi/aedirpwd.ini
+ExecStart={{ uwsgi_paths.exec }} --strict --ini {{ aedir_etc }}/uwsgi/aedirpwd.ini
 User={{ aedirpwd_web_user }}
 Group={{ aedirpwd_web_group }}
 Restart=always

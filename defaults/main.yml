@@ -40,7 +40,7 @@ aedir_pip_extra_args: "{{ aedir_pip_install_options|join(' ') }}"
 #---------------------------------------------------------------------------
 
 # Dictionary defining additional OS package repos
-aedir_pkg_repos: "{{ aedir_package_repos[lsb_id] }}"
+aedir_pkg_repos: "{{ aedir_package_repos }}"
 
 #---------------------------------------------------------------------------
 # AE-DIR parameters
@@ -92,10 +92,10 @@ aedir_sbin: "{{ aedir_prefix }}/sbin"
 aedir_etc: "{{ aedir_prefix }}/etc"
 aedir_etc_openldap: "{{ aedir_etc }}/openldap"
 aedir_rundir: "{{ aedir_prefix }}/run"
-aedir_python_sitepackages: "{{ aedir_python_paths[lsb_id].site_packages }}"
+aedir_python_sitepackages: "{{ aedir_python_paths.site_packages }}"
 
 # which Python interpreter to use
-aedir_python: "{{ aedir_python_paths[lsb_id].python_exec }} -ROOB"
+aedir_python: "{{ aedir_python_paths.python_exec }} -ROOB"
 
 # where to install systemd files
 aedir_systemd_dir: "/etc/systemd/system"
@@ -453,9 +453,9 @@ openldap_role: "consumer"
 openldap_service_fqdn: "{{ inventory_hostname }}"
 
 # Some paths
-openldap_prefix: "{{ os_openldap_paths[lsb_id].openldap_prefix }}"
+openldap_prefix: "{{ os_openldap_paths.openldap_prefix }}"
 openldap_bin: "{{ openldap_prefix }}/bin"
-openldap_conf_prefix: "{{ os_openldap_paths[lsb_id].openldap_conf_prefix }}"
+openldap_conf_prefix: "{{ os_openldap_paths.openldap_conf_prefix }}"
 openldap_schema_prefix: "{{ openldap_conf_prefix }}/schema"
 openldap_sbin: "{{ openldap_prefix }}/sbin"
 openldap_defaults: "/etc/default/slapd"
@@ -466,7 +466,7 @@ openldap_ldapi_uri: "ldapi://{{ openldap_ldapi_socket|urlencode|replace('/','%2F
 # where to place static config file for slapd (slapd.conf)
 openldap_slapd_conf: "{{ aedir_etc_openldap }}/slapd.conf"
 # where to find slapd executable
-openldap_slapd_exec: "{{ os_openldap_paths[lsb_id].openldap_slapd_exec }}"
+openldap_slapd_exec: "{{ os_openldap_paths.openldap_slapd_exec }}"
 # URIs specifying on which interface slapd shall listen
 openldap_listen_urls: "{{ openldap_ldapi_uri|replace('%','%%') }} ldap://*:389 ldaps://*:636"
 # system user/group to run slapd with
@@ -748,9 +748,9 @@ smtp_cacert_pathname: "{{ aedir_etc }}/{{ smtp_cacert_filename|basename }}"
 # CRON parameters
 #---------------------------------------------------------------------------
 
-cron_service_name: "{{ cron_config[lsb_id].service_name }}"
+cron_service_name: "{{ cron_config.service_name }}"
 
-cron_pkg_name: "{{ cron_config[lsb_id].pkg_name }}"
+cron_pkg_name: "{{ cron_config.pkg_name }}"
 
 #---------------------------------------------------------------------------
 # Parameters for monitoring script
@@ -780,7 +780,7 @@ slapd_check_lib_dirs:
 #---------------------------------------------------------------------------
 
 # Which web server to install
-web_server: "{{ apache2_config[lsb_id].service_name }}"
+web_server: "{{ apache2_config.service_name }}"
 
 # FQDN of service interface
 web_service_fqdn: "{{ inventory_hostname }}"
@@ -796,7 +796,7 @@ web_document_root: "{{ aedir_prefix }}/htdocs"
 #---------------------------------------------------------------------------
 
 # directory where the configuration files are located
-web2ldapcnf_prefix: "{{ web2ldap_paths[lsb_id].configdir }}"
+web2ldapcnf_prefix: "{{ web2ldap_paths.configdir }}"
 
 web2ldap_monitor_access_allowed:
   - 127.0.0.0/255.0.0.0
@@ -817,7 +817,7 @@ web2ldap_group: "ae-dir-web2ldap"
 #---------------------------------------------------------------------------
 
 # where to place static config file for slapd (slapd.conf)
-#apache_conf: "{{ apache2_config[lsb_id].conf_pathname }}"
+#apache_conf: "{{ apache2_config.conf_pathname }}"
 apache_conf: "{{ aedir_etc }}/apache2.conf"
 
 # directory used as rundir (for PID etc.)
@@ -832,7 +832,7 @@ apache_group: "ae-dir-httpd"
 
 # Apache ErrorLog value
 apache_error_log: "syslog:daemon"
-#apache_error_log: "{{ apache2_config[lsb_id].log_dir }}/error.log"
+#apache_error_log: "{{ apache2_config.log_dir }}/error.log"
 
 # Apache accesslog file
 apache_access_log: "/var/log/ae-apache/access.log"

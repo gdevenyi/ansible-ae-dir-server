@@ -19,7 +19,7 @@ profile ae-apache {
   signal peer=@{profile_name},
 
   # access to dynamically loadable modules
-  {{ apache2_config[lsb_id].mod_dir }}/mod_*.so rm,
+  {{ apache2_config.mod_dir }}/mod_*.so rm,
 
   # access to config files
   {{ apache_conf }} r,
@@ -31,7 +31,7 @@ profile ae-apache {
 {% endif %}
 
   # allow r/w access to SSL session cache
-  {{ apache2_config[lsb_id].run_dir }}/ssl_scache rw,
+  {{ apache2_config.run_dir }}/ssl_scache rw,
 
   # allow r/w access to access log file
   {{ apache_access_log }} rw,

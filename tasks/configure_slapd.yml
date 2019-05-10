@@ -12,14 +12,14 @@
     enabled: no
   ignore_errors: yes
 
-- name: "Delete the package dynamic configuration directory {{ os_openldap_paths[lsb_id].openldap_conf_prefix }}/slapd.d"
+- name: "Delete the package dynamic configuration directory {{ os_openldap_paths.openldap_conf_prefix }}/slapd.d"
   file:
-    path: "{{ os_openldap_paths[lsb_id].openldap_conf_prefix }}/slapd.d"
+    path: "{{ os_openldap_paths.openldap_conf_prefix }}/slapd.d"
     state: absent
 
-- name: "Delete the package static config file {{ os_openldap_paths[lsb_id].openldap_conf_prefix }}/slapd.conf"
+- name: "Delete the package static config file {{ os_openldap_paths.openldap_conf_prefix }}/slapd.conf"
   file:
-    path: "{{ os_openldap_paths[lsb_id].openldap_conf_prefix }}/slapd.conf"
+    path: "{{ os_openldap_paths.openldap_conf_prefix }}/slapd.conf"
     state: absent
 
 - name: "Create OpenLDAP config directories"

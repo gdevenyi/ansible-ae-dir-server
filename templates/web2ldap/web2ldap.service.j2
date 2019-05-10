@@ -19,7 +19,7 @@ Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
 Environment=LDAPNOINIT=1
 Environment=PYTHONOPTIMIZE=2
 Environment=PYTHONDONTWRITEBYTECODE=1
-ExecStart={{ uwsgi_paths[lsb_id].exec }} --strict --ini {{ aedir_etc }}/uwsgi/web2ldap.ini
+ExecStart={{ uwsgi_paths.exec }} --strict --ini {{ aedir_etc }}/uwsgi/web2ldap.ini
 User={{ web2ldap_user }}
 Group={{ web2ldap_group }}
 Restart=always

@@ -7,8 +7,8 @@
 #-----------------------------------------------------------------------
 
 # load required Apache modules
-{% for mod in apache2_config[lsb_id].modules %}
-LoadModule {{ mod }}_module {{ apache2_config[lsb_id].mod_dir }}/mod_{{ mod }}.so
+{% for mod in apache2_config.modules %}
+LoadModule {{ mod }}_module {{ apache2_config.mod_dir }}/mod_{{ mod }}.so
 {% endfor %}
 
 ServerTokens ProductOnly
@@ -68,7 +68,7 @@ Listen 0.0.0.0:80
 Listen 0.0.0.0:443
 
 # SSL Session Resumption
-SSLSessionCache        shmcb:{{ apache2_config[lsb_id].run_dir }}/ssl_scache(512000)
+SSLSessionCache        shmcb:{{ apache2_config.run_dir }}/ssl_scache(512000)
 SSLSessionCacheTimeout  7200
 SSLRandomSeed          startup file:/dev/urandom  512
 SSLRandomSeed          connect builtin

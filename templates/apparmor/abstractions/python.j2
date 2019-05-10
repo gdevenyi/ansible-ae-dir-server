@@ -6,10 +6,10 @@
   #include <ae-dir/abstractions/ldapclient>
 
   # grant read access to system-wide Python modules
-  /usr/lib{,32,64}/python{{ aedir_python_version[lsb_id] }}/**.{pyc,so} mr,
-  /usr/lib{,32,64}/python{{ aedir_python_version[lsb_id] }}/**.{egg,py,pth} r,
-  /usr/lib{,32,64}/python{{ aedir_python_version[lsb_id] }}/{site,dist}-packages/ r,
-{% if aedir_python_version[lsb_id][0]=="3" %}
+  /usr/lib{,32,64}/python{{ aedir_python_version }}/**.{pyc,so} mr,
+  /usr/lib{,32,64}/python{{ aedir_python_version }}/**.{egg,py,pth} r,
+  /usr/lib{,32,64}/python{{ aedir_python_version }}/{site,dist}-packages/ r,
+{% if aedir_python_version[0]=="3" %}
   # grant read access to Python 3 shared libs
   /usr/lib{,32,64}/python3.[0-9]/lib-dynload/*.so mr,
 {% endif %}
@@ -22,16 +22,16 @@
   /usr/lib/{pyshared,pycentral,python-support}/**.so     mr,
   /var/lib/{pyshared,pycentral,python-support}/**.pyc    mr,
   /usr/{,local/}lib/python3/dist-packages/**.so          mr,
-  deny /etc/python{{ aedir_python_version[lsb_id] }} r,
+  deny /etc/python{{ aedir_python_version }} r,
 {% endif %}
 
 {% if lsb_id!="SUSE" %}
   # Separate Python virtual env on {{ lsb_id }}
   {{ aedir_python_sitepackages }}/ r,
   {{ aedir_python_sitepackages }}/** r,
-  {{ aedir_prefix }}/lib/python{{ aedir_python_version[lsb_id] }}/orig-prefix.txt r,
-  {{ aedir_prefix }}/lib/python{{ aedir_python_version[lsb_id] }}/**.py{,c,o} r,
-  {{ aedir_prefix }}/lib/python{{ aedir_python_version[lsb_id] }}/**.so* rm,
+  {{ aedir_prefix }}/lib/python{{ aedir_python_version }}/orig-prefix.txt r,
+  {{ aedir_prefix }}/lib/python{{ aedir_python_version }}/**.py{,c,o} r,
+  {{ aedir_prefix }}/lib/python{{ aedir_python_version }}/**.so* rm,
 {% endif %}
 
   # Python logging config file

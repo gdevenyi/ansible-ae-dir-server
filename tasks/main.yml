@@ -11,6 +11,11 @@
     - aedir_templates_dirs
     - aedir_files_dirs
 
+- name: "Include OS-specific variables"
+  include_vars: "{{ lsb_id }}.yml"
+  tags:
+    - always
+
 - name: "OS base configuration"
   include_tasks: "baseos_{{ lsb_id }}.yml"
 

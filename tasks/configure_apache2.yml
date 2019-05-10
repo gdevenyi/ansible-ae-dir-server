@@ -1,9 +1,9 @@
 ---
 # configuration for web server apache2
 
-- name: "Ensure {{ apache2_config[lsb_id].service_name }} is stopped"
+- name: "Ensure {{ apache2_config.service_name }} is stopped"
   service:
-    name: "{{ apache2_config[lsb_id].service_name }}"
+    name: "{{ apache2_config.service_name }}"
     state: stopped
     enabled: no
 
@@ -100,7 +100,7 @@
     - "restart ae-apache"
   when: aedir_service_manager == "systemd"
 
-- name: "Create AppArmor profile for {{ apache2_config[lsb_id].httpd_exec }}"
+- name: "Create AppArmor profile for {{ apache2_config.httpd_exec }}"
   template:
     src: "apparmor/ae-apache.j2"
     dest: "{{ apparmor_profiles_dir }}/ae-apache"

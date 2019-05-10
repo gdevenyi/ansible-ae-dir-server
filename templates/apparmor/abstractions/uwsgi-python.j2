@@ -13,8 +13,8 @@
   /tmp/ rw,
   owner /tmp/** rwkl,
 
-  # load the UWSGI plugin module for Python {{ aedir_python_version[lsb_id] }}
-  {{ uwsgi_paths[lsb_id].python_plugin }} rm,
+  # load the UWSGI plugin module for Python {{ aedir_python_version }}
+  {{ uwsgi_paths.python_plugin }} rm,
 
   deny /bin/bash r,
 

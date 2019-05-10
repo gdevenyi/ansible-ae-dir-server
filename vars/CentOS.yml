@@ -1,0 +1,69 @@
+---
+# vars file for roles/ae-dir-server
+
+# explicit use of a specific Python version
+aedir_python_version: "2.7"
+
+aedir_package_repos:
+  "ltb_project_org":
+    repo: "https://ltb-project.org/rpm/$releasever/$basearch"
+    key: "RPM-GPG-KEY-LTB-project"
+
+# OS-specific Python paths
+aedir_python_paths:
+  python_exec: "{{ aedir_prefix }}/bin/python{{ aedir_python_version }}"
+  site_packages: "{{ aedir_prefix }}/lib/python{{ aedir_python_version }}/site-packages"
+
+# OS-specific maps
+os_openldap_paths:
+  # LTB-based installation
+  openldap_prefix: /usr/local/openldap
+  openldap_conf_prefix: /usr/local/openldap/etc/openldap
+  openldap_data: /usr/local/openldap/var/openldap-data
+  openldap_rundir: /usr/local/openldap/var/run
+  openldap_slapd_exec: /usr/local/openldap/libexec/slapd
+  openldap_libdir: /usr/local/openldap/lib64
+  openldap_modules: /usr/local/openldap/libexec/openldap
+
+cron_config:
+  service_name: "crond"
+  pkg_name: "cronie"
+
+# conf_pathname: where to place the monolithic apache configuration file
+# mod_dir: directory where Apache modules are found
+# modules: which modules to load
+apache2_config:
+  service_name: "httpd"
+  user: "apache"
+  group: "apache"
+  pid_file: ""
+  httpd_exec: "/usr/sbin/httpd"
+  conf_pathname: "/etc/httpd/conf/httpd.conf"
+  mod_dir: "/usr/lib64/httpd/modules"
+  run_dir: "/var/run/httpd"
+  modules:
+    - socache_shmcb
+    - env
+    - unixd
+    - dir
+    - alias
+    - ssl
+    - mime
+    - authz_core
+    - authz_host
+    - headers
+    - deflate
+    - filter
+    - logio
+    - log_config
+    - mpm_worker
+    - proxy
+    - proxy_uwsgi
+
+web2ldap_paths:
+  configdir: "{{ aedir_prefix }}/etc/web2ldap"
+
+# which uwsgi executable to use
+uwsgi_paths:
+  exec: "/usr/sbin/uwsgi"
+  python_plugin: "/usr/lib64/uwsgi/python_plugin.so"
