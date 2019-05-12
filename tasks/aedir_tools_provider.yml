@@ -97,12 +97,3 @@
     cron_file: aedir_tools
     hour: "*/12"
     job: "rm {{ aedir_rundir }}/aeperson2aeuser.state > /dev/null 2>&1 || exit 0"
-
-- name: "Remove obsolete CRON jobs from /etc/cron.d/aedir_tools"
-  cron:
-    name: "{{ item }}"
-    state: absent
-    cron_file: aedir_tools
-  with_items:
-    - aedirpwd_cron
-    - aedirpwd_expiry_check
