@@ -1,24 +1,6 @@
 ---
 # Install and configure web2ldap
 
-- name: "Remove obsolete web2ldapcnf/ directory"
-  file:
-    state: absent
-    path: "{{ aedir_python_sitepackages }}/web2ldapcnf"
-    recurse: yes
-  ignore_errors: yes
-  notify:
-    - restart web2ldap
-
-- name: "Remove obsolete {{ web2ldapcnf_prefix }}/web2ldapcnf/local.py"
-  file:
-    state: absent
-    path: "{{ web2ldapcnf_prefix }}/web2ldapcnf/local.py"
-    recurse: no
-  ignore_errors: yes
-  notify:
-    - restart web2ldap
-
 - name: "Create {{ web2ldapcnf_prefix }}/web2ldapcnf/__init__.py"
   template:
     src: "{{ item }}"
