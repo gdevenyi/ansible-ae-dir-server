@@ -863,8 +863,11 @@ apache_oath_requires: "{{ apache_htdocs_requires }}"
 # which IP nets are allowed to access password self-service
 apache_pwd_requires: "{{ apache_htdocs_requires }}"
 
-# Apache TLS parameters
-apache_ssl_protocol: "+TLSv1.2"
+# Apache TLS protocol/cipher parameters
+#
+# See Apache docs: https://httpd.apache.org/docs/2.4/mod/mod_ssl.html#sslprotocol
+apache_ssl_protocol: "-SSLv2 -SSLv3 -TLSv1 -TLSv1.1"
+# See Apache docs: https://httpd.apache.org/docs/2.4/mod/mod_ssl.html#sslciphersuite
 apache_ssl_cipher_suite: "HIGH:!aNULL:!kDH:!kECDH:!MD5"
 
 # Path name of CA cert bundle file
