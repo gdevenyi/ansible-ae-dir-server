@@ -866,7 +866,7 @@ apache_pwd_requires: "{{ apache_htdocs_requires }}"
 # Apache TLS protocol/cipher parameters
 #
 # See Apache docs: https://httpd.apache.org/docs/2.4/mod/mod_ssl.html#sslprotocol
-apache_ssl_protocol: "-SSLv2 -SSLv3 -TLSv1 -TLSv1.1"
+apache_ssl_protocol: "ALL -SSLv2 -SSLv3 -TLSv1 -TLSv1.1"
 # See Apache docs: https://httpd.apache.org/docs/2.4/mod/mod_ssl.html#sslciphersuite
 apache_ssl_cipher_suite: "HIGH:!aNULL:!kDH:!kECDH:!MD5"
 
