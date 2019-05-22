@@ -8,6 +8,7 @@ aedir_python_version: "2.7"
 aedir_suse_repo:
   "SUSE Linux Enterprise Server 15": "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR/SLE_15/"
   "openSUSE Leap 15.0": "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR/openSUSE_Leap_15.0/"
+  "openSUSE Leap 15.1": "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR/openSUSE_Leap_15.1/"
   "openSUSE Tumbleweed": "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR/openSUSE_Tumbleweed/"
 
 aedir_package_repos:
