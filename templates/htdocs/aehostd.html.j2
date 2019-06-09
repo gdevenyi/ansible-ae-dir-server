@@ -28,11 +28,12 @@
   <li>
     <a href="#conf">Configuration</a>
     <ol>
-      <li><a href="#conf-general">General</a></li>
-      <li><a href="#conf-socket">Socket</a></li>
-      <li><a href="#conf-ldap">LDAP</a></li>
-      <li><a href="#conf-maps">NSS maps</a></li>
-      <li><a href="#conf-pam">PAM</a></li>
+      <li><a href="#conf-general">General process parameters</a></li>
+      <li><a href="#conf-socket">Socket parameters</a></li>
+      <li><a href="#conf-ldap">LDAP connection parameters</a></li>
+      <li><a href="#conf-maps">NSS map parameters</a></li>
+      <li><a href="#conf-maps">sudo parameters</a></li>
+      <li><a href="#conf-pam">PAM parameters</a></li>
     </ol>
   </li>
 </ol>
@@ -331,7 +332,7 @@ gid = aehostd
 #monitor = 60.0
 </pre>
 
-<h2 id="conf-socket">Unix domain socket</h2>
+<h2 id="conf-socket">Socket parameters</h2>
 <p>
   The following options specify handling of the Unix domain socket on which
   <em>aehostd</em> listens for NSS and PAM requests:
