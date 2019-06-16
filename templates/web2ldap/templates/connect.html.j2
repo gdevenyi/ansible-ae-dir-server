@@ -2,7 +2,11 @@
 
 {text_error}
 
-<form method="POST" action="/web2ldap/searchform?{{ openldap_ldapi_uri }}">
+<form method="POST" action="/web2ldap/searchform">
+
+  <input type="hidden" name="ldapurl" value="{{ openldap_ldapi_uri }}">
+  <input type="hidden" name="dn" value="{{ aedir_suffix }}">
+  <input type="hidden" name="login_search_root" value="{{ aedir_suffix }}">
 
   <table>
     <tr>
@@ -31,9 +35,6 @@
       </td>
     </tr>
   </table>
-
-  <input type="hidden" name="dn" value="{{ aedir_suffix }}">
-  <input type="hidden" name="login_search_root" value="{{ aedir_suffix }}">
 
   <p>
     <input type="submit" id="login_submit" value="Login">
