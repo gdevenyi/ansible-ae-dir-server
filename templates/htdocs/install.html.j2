@@ -132,10 +132,6 @@
     The trailing comma after the FQDN is needed when using a hostname!
   </li>
   <li>
-    Get the ansible playbooks and roles:
-    <pre>git clone --recurse-submodules https://gitlab.com/ae-dir/ansible-example-site myenv</pre>
-  </li>
-  <li>
     Issue X.509 TLS server certificates with appropriate <var>CN</var> and
     <var>subjectAltName</var> values for all replicas with your existing
     PKI's certificate authority.
@@ -149,8 +145,15 @@
   </li>
 </ol>
 
-<h1 id="install">Installation (ansible)</h1>
+<h1 id="install">Installation with ansible</h1>
+<p>
+  Note that there is no official way to install &AElig;-DIR manually.
+</p>
 <ol>
+  <li>
+    Get the ansible playbooks and roles:
+    <pre>git clone --recurse-submodules https://gitlab.com/ae-dir/ansible-example-site myenv</pre>
+  </li>
   <li>
     Edit ansible inventory file <em>myenv/hosts</em> to match your
     hosts/VMs/containers of your installation environment.
