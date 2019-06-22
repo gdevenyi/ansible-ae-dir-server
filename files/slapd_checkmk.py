@@ -69,7 +69,7 @@ from ldap0.ldif import LDIFParser
 # Configuration constants
 #-----------------------------------------------------------------------
 
-__version__ = '2.1.1'
+__version__ = '2.3.0'
 
 STATE_FILENAME = 'slapd_checkmk.state'
 
@@ -476,6 +476,12 @@ class OpenLDAPObject(object):
         'monitorTimestamp',
         'namingContexts'
         'seeAlso',
+        # see OpenLDAP ITS#7770
+        'olmMDBPagesMax',
+        'olmMDBPagesUsed',
+        'olmMDBPagesFree',
+        'olmMDBReadersMax',
+        'olmMDBReadersUsed',
     ]
 
     def __getattr__(self, name):
@@ -640,9 +646,9 @@ class SlapdConnection(LDAPObject, OpenLDAPObject):
         tls_options = tls_options or {}
         self.set_tls_options(**tls_options)
         # Send SASL/EXTERNAL bind which opens connection
-        if bind_method=='sasl':
+        if bind_method == 'sasl':
             self.sasl_non_interactive_bind_s(sasl_mech)
-        elif bind_method=='simple':
+        elif bind_method == 'simple':
             self.simple_bind_s(who or '', cred or '')
         else:
             raise ValueError('Unknown bind_method %r' % bind_method)
@@ -1093,7 +1099,7 @@ class SlapdCheck(CheckMkLocalCheck):
                 continue
             check_filename = config_attrs[fattr][0]
             try:
-                check_file_mtime = datetime.datetime.utcfromtimestamp(os.stat(check_filename).st_mtime)
+                check_file_mtime = datetime.datetime.utcfromtimestamp(int(os.stat(check_filename).st_mtime))
             except OSError:
                 pass
             else:
@@ -1341,6 +1347,77 @@ class SlapdCheck(CheckMkLocalCheck):
             )
         return # end of _get_slapd_perfstats()
 
+    def _check_mdb_size(self, db_num, db_suffix, db_type, db_dir):
+        if db_type != 'mdb':
+            return
+        item_name = '_'.join((
+            'SlapdMDBSize',
+            str(db_num),
+            self.subst_item_name_chars(db_suffix),
+        ))
+        self.add_item(item_name)
+        try:
+            mdb_pages_max = self._monitor_cache.get_value(
+                'cn=Database %d,cn=Databases' % (db_num),
+                'olmMDBPagesMax',
+            )
+            mdb_pages_used = self._monitor_cache.get_value(
+                'cn=Database %d,cn=Databases' % (db_num),
+                'olmMDBPagesUsed',
+            )
+        except KeyError:
+            # ITS#7770 not available (prior to OpenLDAP 2.4.48)
+            # => fall back to naive file stat method
+            mdb_filename = os.path.join(db_dir, 'data.mdb')
+            try:
+                mdb_max_size = os.stat(mdb_filename).st_size
+                mdb_real_size = os.stat(mdb_filename).st_blocks * 512
+            except OSError as exc:
+                self.result(
+                    CHECK_RESULT_ERROR,
+                    item_name,
+                    check_output='OS error stating %r: %s' % (
+                        mdb_filename,
+                        exc,
+                    ),
+                )
+            else:
+                mdb_use_percentage = 100 * \
+                    float(mdb_real_size) / float(mdb_max_size)
+                self.result(
+                    CHECK_RESULT_OK,
+                    item_name,
+                    check_output='DB file %r has %d of max. %d bytes (%0.1f %%)' % (
+                        mdb_filename,
+                        mdb_real_size,
+                        mdb_max_size,
+                        mdb_use_percentage,
+                    ),
+                    performance_data=dict(
+                        mdb_pages_used=mdb_real_size/4096,
+                        mdb_pages_max=mdb_max_size/4096,
+                        mdb_use_percentage=mdb_use_percentage,
+                    ),
+                )
+        else:
+            mdb_use_percentage = 100 * float(mdb_pages_used) / float(mdb_pages_max)
+            self.result(
+                CHECK_RESULT_OK,
+                item_name,
+                check_output='LMDB in %r uses %d of max. %d pages (%0.1f %%)' % (
+                    db_dir,
+                    mdb_pages_used,
+                    mdb_pages_max,
+                    mdb_use_percentage,
+                ),
+                performance_data=dict(
+                    mdb_pages_used=mdb_pages_used,
+                    mdb_pages_max=mdb_pages_max,
+                    mdb_use_percentage=mdb_use_percentage,
+                ),
+            )
+        # end of _check_mdb_size()
+
     def _check_databases(self):
         try:
             db_suffixes = self._ldapi_conn.db_suffixes()
@@ -1350,145 +1427,114 @@ class SlapdCheck(CheckMkLocalCheck):
                 'SlapdDatabases',
                 check_output='error retrieving DB suffixes: %s' % (exc)
             )
-        else:
-            self.result(
-                CHECK_RESULT_OK,
-                'SlapdDatabases',
-                check_output='Found %d real databases: %s' % (
-                    len(db_suffixes),
-                    ' / '.join([
-                        '{%d}%s: %s' % (n, t, s)
-                        for n, s, t, _ in db_suffixes
-                    ]),
-                )
+            return
+        self.result(
+            CHECK_RESULT_OK,
+            'SlapdDatabases',
+            check_output='Found %d real databases: %s' % (
+                len(db_suffixes),
+                ' / '.join([
+                    '{%d}%s: %s' % (n, t, s)
+                    for n, s, t, _ in db_suffixes
+                ]),
             )
-            for db_num, db_suffix, db_type, db_dir in db_suffixes:
-                # Check file sizes of MDB database files
-                if db_type == 'mdb':
-                    item_name = '_'.join((
-                        'SlapdMDBSize',
-                        str(db_num),
-                        self.subst_item_name_chars(db_suffix),
-                    ))
-                    self.add_item(item_name)
-                    mdb_filename = os.path.join(db_dir, 'data.mdb')
-                    try:
-                        mdb_max_size = os.stat(mdb_filename).st_size
-                        mdb_real_size = os.stat(mdb_filename).st_blocks * 512
-                    except OSError as exc:
+        )
+        for db_num, db_suffix, db_type, db_dir in db_suffixes:
+            # Check file sizes of MDB database files
+            self._check_mdb_size(db_num, db_suffix, db_type, db_dir)
+
+            # Count LDAP entries with no-op search controls
+            item_name = '_'.join((
+                'SlapdEntryCount',
+                str(db_num),
+                self.subst_item_name_chars(db_suffix),
+            ))
+            self.add_item(item_name)
+            try:
+                noop_start_timestamp = time.time()
+                noop_result = self._ldapi_conn.noop_search(
+                    db_suffix,
+                    timeout=NOOP_SEARCH_TIMEOUT,
+                )
+            except ldap0.TIMEOUT:
+                self.result(
+                    CHECK_RESULT_WARNING,
+                    item_name,
+                    check_output='Request timeout %0.1f s reached while retrieving entry count for %r.' % (
+                        LDAP_TIMEOUT,
+                        db_suffix,
+                    )
+                )
+            except ldap0.TIMELIMIT_EXCEEDED:
+                self.result(
+                    CHECK_RESULT_WARNING,
+                    item_name,
+                    check_output='Search time limit %0.1f s exceeded while retrieving entry count for %r.' % (
+                        NOOP_SEARCH_TIMEOUT,
+                        db_suffix,
+                    )
+                )
+            except ldap0.UNAVAILABLE_CRITICAL_EXTENSION:
+                self.result(
+                    CHECK_RESULT_NOOP_SRCH_UNAVAILABLE,
+                    item_name,
+                    check_output='no-op search control not supported'
+                )
+            except CATCH_ALL_EXC as exc:
+                self.result(
+                    CHECK_RESULT_ERROR,
+                    item_name,
+                    check_output='Error retrieving entry count for %r: %s' % (db_suffix, exc)
+                )
+            else:
+                noop_response_time = time.time() - noop_start_timestamp
+                if noop_result is None:
+                    self.result(
+                        CHECK_RESULT_WARNING,
+                        item_name,
+                        check_output='Could not retrieve entry count (result was None)',
+                    )
+                else:
+                    num_all_search_results, num_all_search_continuations = noop_result
+                    if num_all_search_continuations:
                         self.result(
                             CHECK_RESULT_ERROR,
                             item_name,
-                            check_output='OS error stating %r: %s' % (
-                                mdb_filename,
-                                exc,
-                            ),
-                        )
-                    else:
-                        mdb_use_percentage = 100 * \
-                            float(mdb_real_size) / float(mdb_max_size)
-                        self.result(
-                            CHECK_RESULT_OK,
-                            item_name,
-                            check_output='DB file %r has %d of max. %d bytes (%0.1f %%)' % (
-                                mdb_filename,
-                                mdb_real_size,
-                                mdb_max_size,
-                                mdb_use_percentage,
+                            performance_data={
+                                'count': num_all_search_results,
+                            },
+                            check_output='%r has %d referrals! (response time %0.1f s)' % (
+                                db_suffix,
+                                num_all_search_continuations,
+                                noop_response_time,
                             )
                         )
-                # Count LDAP entries with no-op search controls
-                item_name = '_'.join((
-                    'SlapdEntryCount',
-                    str(db_num),
-                    self.subst_item_name_chars(db_suffix),
-                ))
-                self.add_item(item_name)
-                try:
-                    noop_start_timestamp = time.time()
-                    noop_result = self._ldapi_conn.noop_search(
-                        db_suffix,
-                        timeout=NOOP_SEARCH_TIMEOUT,
-                    )
-                except ldap0.TIMEOUT:
-                    self.result(
-                        CHECK_RESULT_WARNING,
-                        item_name,
-                        check_output='Request timeout %0.1f s reached while retrieving entry count for %r.' % (
-                            LDAP_TIMEOUT,
-                            db_suffix,
-                        )
-                    )
-                except ldap0.TIMELIMIT_EXCEEDED:
-                    self.result(
-                        CHECK_RESULT_WARNING,
-                        item_name,
-                        check_output='Search time limit %0.1f s exceeded while retrieving entry count for %r.' % (
-                            NOOP_SEARCH_TIMEOUT,
-                            db_suffix,
-                        )
-                    )
-                except ldap0.UNAVAILABLE_CRITICAL_EXTENSION:
-                    self.result(
-                        CHECK_RESULT_NOOP_SRCH_UNAVAILABLE,
-                        item_name,
-                        check_output='no-op search control not supported'
-                    )
-                except CATCH_ALL_EXC as exc:
-                    self.result(
-                        CHECK_RESULT_ERROR,
-                        item_name,
-                        check_output='Error retrieving entry count for %r: %s' % (db_suffix, exc)
-                    )
-                else:
-                    noop_response_time = time.time() - noop_start_timestamp
-                    if noop_result is None:
+                    elif num_all_search_results < MINIMUM_ENTRY_COUNT:
                         self.result(
                             CHECK_RESULT_WARNING,
                             item_name,
-                            check_output='Could not retrieve entry count (result was None)',
+                            performance_data={
+                                'count': num_all_search_results,
+                            },
+                            check_output='%r only has %d entries (response time %0.1f s)' % (
+                                db_suffix,
+                                num_all_search_results,
+                                noop_response_time,
+                            )
                         )
                     else:
-                        num_all_search_results, num_all_search_continuations = noop_result
-                        if num_all_search_continuations:
-                            self.result(
-                                CHECK_RESULT_ERROR,
-                                item_name,
-                                performance_data={
-                                    'count': num_all_search_results,
-                                },
-                                check_output='%r has %d referrals! (response time %0.1f s)' % (
-                                    db_suffix,
-                                    num_all_search_continuations,
-                                    noop_response_time,
-                                )
+                        self.result(
+                            CHECK_RESULT_OK,
+                            item_name,
+                            performance_data={
+                                'count': num_all_search_results,
+                            },
+                            check_output='%r has %d entries (response time %0.1f s)' % (
+                                db_suffix,
+                                num_all_search_results,
+                                noop_response_time,
                             )
-                        elif num_all_search_results < MINIMUM_ENTRY_COUNT:
-                            self.result(
-                                CHECK_RESULT_WARNING,
-                                item_name,
-                                performance_data={
-                                    'count': num_all_search_results,
-                                },
-                                check_output='%r only has %d entries (response time %0.1f s)' % (
-                                    db_suffix,
-                                    num_all_search_results,
-                                    noop_response_time,
-                                )
-                            )
-                        else:
-                            self.result(
-                                CHECK_RESULT_OK,
-                                item_name,
-                                performance_data={
-                                    'count': num_all_search_results,
-                                },
-                                check_output='%r has %d entries (response time %0.1f s)' % (
-                                    db_suffix,
-                                    num_all_search_results,
-                                    noop_response_time,
-                                )
-                            )
+                        )
         return # end of _check_databases()
 
     def _check_providers(self, syncrepl_topology):
