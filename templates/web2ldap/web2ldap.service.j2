@@ -24,7 +24,6 @@ User={{ web2ldap_user }}
 Group={{ web2ldap_group }}
 Restart=always
 KillSignal=SIGQUIT
-Type=notify
 StandardError=syslog
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 {% if apparmor_enabled %}
