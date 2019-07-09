@@ -1547,7 +1547,18 @@
     group.
   </dd>
   <dt>meta attributes</dt>
-  <dd>see <a href="#schema-oc-aeObject-attributes">aeObject</a></dd>
+  <dd>
+    <ul>
+      <li>
+        see <a href="#schema-oc-aeObject-attributes">aeObject</a>
+      </li>
+      <li>
+        When <var>aeStatus</var> is set to archived (2) all group members
+        will be removed, which means attributes <var>member</var> and
+        <var>rfc822MailMember</var> will be deleted.
+      </li>
+    </ul>
+  </dd>
 </dl>
 
 <h3 id="schema-oc-aeMailGroup">aeMailGroup</h3>
@@ -1600,7 +1611,16 @@
     group.
   </dd>
   <dt>meta attributes</dt>
-  <dd>see <a href="#schema-oc-aeObject-attributes">aeObject</a></dd>
+    <ul>
+      <li>
+        see <a href="#schema-oc-aeObject-attributes">aeObject</a>
+      </li>
+      <li>
+        When <var>aeStatus</var> is set to archived (2) all group members
+        will be removed, which means attributes <var>member</var> and
+        <var>rfc822MailMember</var> will be deleted.
+      </li>
+    </ul>
 </dl>
 
 <h3 id="schema-oc-aeSrvGroup">aeSrvGroup</h3>
