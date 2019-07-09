@@ -12,7 +12,7 @@ Author: Michael Ströder <michael@stroeder.com>
 
 from __future__ import absolute_import
 
-__version__ = '0.3.1'
+__version__ = '0.4.0'
 
 #-----------------------------------------------------------------------
 # Imports
@@ -274,9 +274,46 @@ class AEGroupUpdater(aedir.process.AEProcess):
         ])
         return res # end of _constrained_persons()
 
+    def empty_archived_groups(self):
+        """
+        2. remove all members from archived groups
+        """
+        non_empty_archived_groups = self.ldap_conn.search_s(
+            self.ldap_conn.find_search_base(),
+            ldap0.SCOPE_SUBTREE,
+            '(&(objectClass=aeGroup)(aeStatus=2)({0}=*))'.format(MEMBER_ATTR),
+            attrlist=[
+                'structuralObjectClass',
+                MEMBER_ATTR,
+            ]+MEMBER_ATTRS,
+        )
+        for group_dn, group_entry in non_empty_archived_groups:
+            mod_list = [
+                (ldap0.MOD_DELETE, attr, None)
+                for attr in [MEMBER_ATTR] + MEMBER_ATTRS
+                if attr in group_entry
+            ]
+            try:
+                self.ldap_conn.modify_s(group_dn, mod_list)
+            except ldap0.LDAPError as ldap_error:
+                self.logger.error(
+                    u'LDAPError modifying %r: %s mod_list = %r',
+                    group_dn,
+                    ldap_error,
+                    mod_list,
+                )
+            else:
+                self.logger.info(
+                    u'Removed all %d members from %r: mod_list = %r',
+                    len(group_entry[MEMBER_ATTR]),
+                    group_dn,
+                    mod_list,
+                )
+        # end of empty_archived_groups()
+
     def update_memberurl_groups(self):
         """
-        2. Update all static aeGroup entries which contain attribute 'memberURL'
+        3. Update all static aeGroup entries which contain attribute 'memberURL'
         """
         dynamic_groups = self.ldap_conn.search_s(
             self.ldap_conn.find_search_base(),
@@ -401,12 +438,14 @@ class AEGroupUpdater(aedir.process.AEProcess):
                 old_member_attr_values,
                 new_member_attr_values
             )
-        return # end of update_memberurl_groups()
+        # end of update_memberurl_groups()
 
     def run_worker(self, state):
         """
         the main program
         """
+        self.logger.debug('invoke empty_archived_groups()')
+        self.empty_archived_groups()
         self.logger.debug('invoke update_memberurl_groups()')
         self.update_memberurl_groups()
         self.logger.debug('invoke fix_static_groups()')
