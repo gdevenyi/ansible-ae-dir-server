@@ -7,6 +7,14 @@
    "tags": "iam, identity-management, ldap, openldap, nis, pam, nss, security, authentication-directory",
    "releases": [
       {
+         "version": "0.7.5",
+         "state": "stable",
+         "scope": "minor feature",
+         "changes": "enforce removal of group members in for archived group entries",
+         "download": "https://ae-dir.com/install.html",
+         "published": "2019-07-09T16:00:00+00:00"
+      },
+      {
          "version": "0.7.4",
          "state": "stable",
          "scope": "minor feature",
