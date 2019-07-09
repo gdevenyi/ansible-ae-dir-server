@@ -12,7 +12,7 @@ Author: Michael Ströder <michael@stroeder.com>
 
 from __future__ import absolute_import
 
-__version__ = '0.4.0'
+__version__ = '0.4.1'
 
 #-----------------------------------------------------------------------
 # Imports
@@ -286,6 +286,7 @@ class AEGroupUpdater(aedir.process.AEProcess):
                 'structuralObjectClass',
                 MEMBER_ATTR,
             ]+MEMBER_ATTRS,
+            attrsonly=True,
         )
         for group_dn, group_entry in non_empty_archived_groups:
             mod_list = [
@@ -304,8 +305,7 @@ class AEGroupUpdater(aedir.process.AEProcess):
                 )
             else:
                 self.logger.info(
-                    u'Removed all %d members from %r: mod_list = %r',
-                    len(group_entry[MEMBER_ATTR]),
+                    u'Removed all member attributes from %r: mod_list = %r',
                     group_dn,
                     mod_list,
                 )
