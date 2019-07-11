@@ -606,6 +606,13 @@ access to
     by set="user & this/-1/aeZoneAdmins/member" =arscxd
     by set="user & this/-1/aeZoneAuditors/member" read
     by * none break
+# block write access for zone admins to some attributes assumed to have NO-USER-MODIFICATION
+access to
+  dn.regex="^uid=({{ aedir_aeuser_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(objectClass=aeUser)"
+  attrs=memberOf
+    by set="user & this/-1/aeZoneAdmins/member" read
+    by * none break
 # aeUser entries not archived
 access to
   dn.regex="^uid=({{ aedir_aeuser_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
@@ -622,6 +629,13 @@ access to
   attrs=objectClass,entry,uid,uidNumber
     by set="user & this/-1/aeZoneAdmins/member" =arscxd
     by set="user & this/-1/aeZoneAuditors/member" read
+    by * none break
+# block write access for zone admins to some attributes assumed to have NO-USER-MODIFICATION
+access to
+  dn.regex="^uid=({{ aedir_aeservice_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(objectClass=aeService)"
+  attrs=memberOf
+    by set="user & this/-1/aeZoneAdmins/member" read
     by * none break
 # aeService entries
 access to
