@@ -65,7 +65,6 @@
   zypper:
     name:
       - python-dnspython
-      - python-certifi
     state: present
     disable_recommends: yes
     type: package
