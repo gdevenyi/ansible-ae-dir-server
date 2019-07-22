@@ -101,6 +101,8 @@
   <li>
     Create DNS entries for all your &AElig;-DIR servers
     following <a href="bcp.html#ae-dir-hostnames">best practices for hostnames</a>.
+    Don't forget to add correct reverse DNS entries (PTR RRs) required
+    for correctly creating LDIF data for initial load.
   </li>
   <li>
     Configure time synchronisation (NTP) required for reliable replication.
