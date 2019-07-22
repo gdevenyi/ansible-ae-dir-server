@@ -177,9 +177,6 @@ aedir_login_shells:
   - /bin/true
   - /bin/false
 
-# ticket identifier of initial ldapadd
-aedir_init_ticket_id: "INIT-42"
-
 # who clause for set-based ACL determining visibility of IP address
 # attributes for hosts map
 aedir_aenwdevice_visibility_sets:
@@ -302,6 +299,9 @@ aedir_base_zone: base
 # zones in which there must be only one unique user account per person
 aedir_unique_person_zones:
   - "{{ aedir_base_zone }}"
+
+# ticket identifier of initial ldapadd
+aedir_init_ticket_id: "INIT-42"
 
 # List of aeZone entries to be added to ae-dir-base.ldif
 aedir_init_aezones:
