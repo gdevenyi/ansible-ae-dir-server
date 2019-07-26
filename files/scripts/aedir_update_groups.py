@@ -12,7 +12,7 @@ Author: Michael Ströder <michael@stroeder.com>
 
 from __future__ import absolute_import
 
-__version__ = '0.4.1'
+__version__ = '0.5.0'
 
 #-----------------------------------------------------------------------
 # Imports
@@ -25,7 +25,7 @@ os.environ['LDAPRC'] = '/opt/ae-dir/etc/ldap.conf'
 
 # from ldap0 package
 import ldap0
-from ldap0.filter import escape_filter_chars
+from ldap0.filter import escape_filter_chars, compose_filter, map_filter_parts
 from ldap0.controls.deref import DereferenceControl
 import ldap0.ldapurl
 import aedir
@@ -52,33 +52,6 @@ USER_ATTRS = [attr[1] for attr in MEMBER_ATTRS_MAP.values()]
 #-----------------------------------------------------------------------
 # Classes and functions
 #-----------------------------------------------------------------------
-
-def map_filter_parts(assertion_type, assertion_values, escape_mode=0):
-    """
-    return a list of (assertion_type=assertion_value) filters
-    """
-    assert assertion_values, ValueError("'assertion_values' must be non-zero iterator")
-    return [
-        '(%s=%s)' % (
-            assertion_type,
-            escape_filter_chars(assertion_value, escape_mode=escape_mode),
-        )
-        for assertion_value in assertion_values
-    ]
-
-
-def compose_filter(operand, filter_parts):
-    """
-    combine filter list with operand
-    """
-    assert operand in '&|', ValueError("Invalid 'operand': %r" % operand)
-    assert filter_parts, ValueError("'filter_parts' must be non-zero iterator")
-    if len(filter_parts) == 1:
-        res = filter_parts[0]
-    elif len(filter_parts) > 1:
-        res = '(%s%s)' % (operand, ''.join(filter_parts))
-    return res
-
 
 def member_zones_filter(aegroup_entry):
     """
