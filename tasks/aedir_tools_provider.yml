@@ -41,7 +41,7 @@
     user: root
     cron_file: aedir_update
 
-- name: "set env var LDAPRC={{ aedir_etc }}/ldap.conf in /etc/cron.d/aedir_update"
+- name: "set env vars in /etc/cron.d/aedir_update"
   cron:
     env: yes
     name: "{{ item.key }}"
