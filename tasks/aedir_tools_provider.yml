@@ -24,18 +24,6 @@
     - ae-set-next-gid.py
     - ae-user-report.py
 
-- name: "Install various CRON scripts"
-  copy:
-    src: "scripts/{{ item }}"
-    dest: "{{ aedir_sbin }}/{{ item }}"
-    owner: root
-    group: root
-    mode: 0750
-  with_items:
-    - aeperson2aeuser.py
-    - aedir_update_groups.py
-    - aedir_update_status.py
-
 - name: "Install backup script from template"
   template:
     src: "scripts/ae-dir-slapcat.sh.j2"
@@ -44,56 +32,60 @@
     group: root
     mode: 0750
 
-- name: "set env var HOME={{ aedir_rundir }} in /etc/cron.d/aedir_tools"
+- name: "set env var HOME={{ aedir_rundir }} in /etc/cron.d/aedir_update"
   cron:
     env: yes
     name: "HOME"
     value: "{{ aedir_rundir }}"
     state: present
     user: root
-    cron_file: aedir_tools
+    cron_file: aedir_update
 
-- name: "set env var LDAPRC={{ aedir_etc }}/ldap.conf in /etc/cron.d/aedir_tools"
+- name: "set env var LDAPRC={{ aedir_etc }}/ldap.conf in /etc/cron.d/aedir_update"
   cron:
     env: yes
-    name: "LDAPRC"
-    value: "{{ aedir_etc }}/ldap.conf"
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
     state: present
     user: root
-    cron_file: aedir_tools
+    cron_file: aedir_update
+  with_dict:
+    LDAPRC: "{{ aedir_etc }}/ldap.conf"
+    PYTHONOPTIMIZE: "2"
+    PYTHONDONTWRITEBYTECODE: "1"
 
 - name: "Run aedir_update_groups.py as CRON job"
   cron:
     name: "aedir_update_groups"
     state: present
     user: root
-    cron_file: aedir_tools
+    cron_file: aedir_update
     minute: "*/3"
-    job: "{{ aedir_python }} {{ aedir_sbin }}/aedir_update_groups.py"
+    job: "{{ aedir_python }} -m aedir_update.groups"
 
-- name: "Run aedir_update_status.py as CRON job"
+- name: "Run aedir_update.status as CRON job"
   cron:
     name: "aedir_update_status"
     state: present
     user: root
-    cron_file: aedir_tools
+    cron_file: aedir_update
     minute: "*/13"
-    job: "{{ aedir_python }} {{ aedir_sbin }}/aedir_update_status.py"
+    job: "{{ aedir_python }} -m aedir_update.status"
 
-- name: "Run aeperson2aeuser.py as CRON job"
+- name: "Run aedir_update.persattrs as CRON job"
   cron:
-    name: "aeperson2aeuser"
+    name: "aedir_update_persattrs"
     state: present
     user: root
-    cron_file: aedir_tools
+    cron_file: aedir_update
     minute: "*/2"
-    job: "{{ aedir_python }} {{ aedir_sbin }}/aeperson2aeuser.py {{ aedir_rundir }}/aeperson2aeuser.state"
+    job: "{{ aedir_python }} -m aedir_update.persattrs {{ aedir_rundir }}/aedir_update_persattrs.state"
 
-- name: "Reset aeperson2aeuser.py as CRON job"
+- name: "Reset aedir_update.persattrs as CRON job"
   cron:
-    name: "aeperson2aeuser_reset"
+    name: "reset_aedir_update_persattrs"
     state: present
     user: root
-    cron_file: aedir_tools
+    cron_file: aedir_update
     hour: "*/12"
-    job: "rm {{ aedir_rundir }}/aeperson2aeuser.state > /dev/null 2>&1 || exit 0"
+    job: "rm {{ aedir_rundir }}/aedir_update_persattrs.state > /dev/null 2>&1 || exit 0"

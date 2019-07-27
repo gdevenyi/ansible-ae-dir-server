@@ -38,7 +38,6 @@
       - python-asn1crypto
       - python-xlwt
       - python-pycryptodome
-      - web2ldap>=1.4.9
     state: present
     disable_recommends: yes
     type: package
@@ -47,6 +46,26 @@
     - restart aedirpwd
     - restart oathenroll
     - restart hotp_validator
+    - restart web2ldap
+
+- name: "Install ae-dir-update on {{ openldap_role }} on {{ lsb_id }}"
+  zypper:
+    name:
+      - ae-dir-update
+    state: present
+    disable_recommends: yes
+    type: package
+  when: openldap_role == 'provider'
+
+- name: "Install web2ldap on {{ openldap_role }} on {{ lsb_id }}"
+  zypper:
+    name:
+      - web2ldap>=1.4.9
+    state: present
+    disable_recommends: yes
+    type: package
+  when: openldap_role == 'provider'
+  notify:
     - restart web2ldap
 
 - name: "Install additional packages for simple web apps on {{ openldap_role }} on {{ lsb_id }}"
