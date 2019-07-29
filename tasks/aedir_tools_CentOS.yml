@@ -23,7 +23,7 @@
     state: present
     update_cache: no
   notify:
-    - restart aedirpwd
+    - restart ae-dir-pwd
     - restart hotp_validator
     - restart oathenroll
     - restart bind_proxy

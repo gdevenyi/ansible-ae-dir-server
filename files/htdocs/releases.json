@@ -7,12 +7,12 @@
    "tags": "iam, identity-management, ldap, openldap, nis, pam, nss, security, authentication-directory",
    "releases": [
       {
-         "version": "0.7.7",
+         "version": "0.8.0",
          "state": "stable",
-         "scope": "minor fix",
-         "changes": "documentation details",
+         "scope": "major feature",
+         "changes": "moved Python process code out to separate Python module package",
          "download": "https://ae-dir.com/install.html",
-         "published": "2019-07-23T08:00:00+00:00"
+         "published": "2019-07-30T08:00:00+00:00"
       },
       {
          "version": "0.7.6",

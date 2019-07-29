@@ -170,7 +170,7 @@ ProxyPreserveHost On
 
   RedirectPermanent /pwd /pwd/
   <Location /pwd/>
-    ProxyPass unix:{{ aedir_rundir }}/uwsgi/aedirpwd/aedirpwd.sock|uwsgi://aedirpwd/pwd/
+    ProxyPass unix:{{ aedir_rundir }}/uwsgi/ae-dir-pwd/ae-dir-pwd.sock|uwsgi://ae-dir-pwd/pwd/
     <Limit GET POST>
 {% for require in apache_pwd_requires %}
       Require {{ require }}

@@ -1,0 +1,113 @@
+---
+# Install AE-DIR password service (ae-dir-pwd)
+
+- name: "Create directories for ae-dir-pwd"
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: u=rwx,g=rx,o=rx
+  with_items:
+    - "{{ aedir_etc }}/ae-dir-pwd"
+    - "{{ aedir_etc }}/ae-dir-pwd/templates"
+    - "{{ aedir_etc }}/ae-dir-pwd/templates/en"
+
+- name: "Copy ae-dir-pwd HTML templates to {{ aedir_etc }}/ae-dir-pwd/templates"
+  copy:
+    src: "ae-dir-pwd/templates/"
+    dest: "{{ aedir_etc }}/ae-dir-pwd/templates"
+    follow: no
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+    directory_mode: u=rwx,g=rx,o=rx
+
+- name: "Create {{ aedir_etc }}/ae-dir-pwd/aedirpwd_cnf.py"
+  template:
+    src: "{{ item }}"
+    dest: "{{ aedir_etc }}/ae-dir-pwd/aedirpwd_cnf.py"
+    owner: root
+    group: root
+    mode: 0644
+  with_first_found:
+    - files:
+       - "ae-dir-pwd/aedirpwd_cnf.py.j2"
+      paths: "{{ aedir_templates_dirs }}"
+  notify:
+    - "restart ae-dir-pwd"
+
+- name: "Create directory {{ aedir_rundir }}/uwsgi/ae-dir-pwd"
+  file:
+    path: "{{ aedir_rundir }}/uwsgi/ae-dir-pwd"
+    state: directory
+    owner: ae-dir-pwd
+    group: ae-dir-httpd
+    mode: u=rwx,g=rx,o=
+  notify:
+    - "restart ae-dir-pwd"
+
+- name: "Create UWSGI config {{ aedir_etc }}/uwsgi/{{ name }}.ini"
+  template:
+    src: "uwsgi.ini.j2"
+    dest: "{{ aedir_etc }}/uwsgi/{{ name }}.ini"
+    owner: root
+    group: root
+    mode: 0644
+  vars:
+    name: ae-dir-pwd
+    user: ae-dir-pwd
+    module: "aedir_pproc.pwd.web:application"
+    master: "true"
+    processes: "{{ aedir_uwsgi_params.pwd.processes }}"
+    threads: 0
+    stats_port: 9092
+    buffer_size: "{{ aedir_uwsgi_params.pwd.buffer_size }}"
+    harakiri: "{{ aedir_uwsgi_params.pwd.harakiri }}"
+  notify:
+    - "restart ae-dir-pwd"
+
+- name: "Install systemd unit {{ aedir_systemd_dir }}/ae-dir-pwd.service"
+  template:
+    src: "ae-dir-pwd/ae-dir-pwd.service.j2"
+    dest: "{{ aedir_systemd_dir }}/ae-dir-pwd.service"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - "restart ae-dir-pwd"
+  when: aedir_service_manager == "systemd"
+
+- name: "Create AppArmor profile for ae-dir-pwd"
+  template:
+    src: "apparmor/uwsgi-python.j2"
+    dest: "{{ apparmor_profiles_dir }}/ae-dir-pwd"
+    owner: root
+    group: root
+    mode: 0644
+  vars:
+    name: ae-dir-pwd
+    cfgdir: "{{ aedir_etc }}/ae-dir-pwd"
+  notify:
+    - "restart apparmor"
+    - "restart ae-dir-pwd"
+  when: apparmor_enabled == True
+
+- name: "Install provider Python-based CRON jobs"
+  cron:
+    name: "{{ item.key }}"
+    state: present
+    user: ae-dir-pwd
+    cron_file: "{{ aedir_cron_file }}"
+    hour: "{{ item.value['hour']|default('*') }}"
+    minute: "{{ item.value.minute }}"
+    job: "{{ aedir_python }} -m {{ item.value.pyjob }}"
+  with_dict:
+    aedir_pwd_expreset:
+      hour: "*/2"
+      minute: "37"
+      pyjob: "aedir_pproc.pwd.expreset"
+    aedir_pwd_expwarn:
+      hour: "0"
+      minute: "0"
+      pyjob: "aedir_pproc.pwd.expwarn"

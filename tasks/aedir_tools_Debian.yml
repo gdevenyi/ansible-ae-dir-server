@@ -30,7 +30,7 @@
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
   notify:
-    - restart aedirpwd
+    - restart ae-dir-pwd
     - restart hotp_validator
     - restart oathenroll
     - restart bind_proxy

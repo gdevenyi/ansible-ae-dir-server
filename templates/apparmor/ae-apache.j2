@@ -49,7 +49,7 @@ profile ae-apache {
 
   # access to UWSGI's Unix domain sockets
   {{ aedir_rundir }}/uwsgi/web2ldap/web2ldap.sock r,
-  {{ aedir_rundir }}/uwsgi/aedirpwd/aedirpwd.sock r,
+  {{ aedir_rundir }}/uwsgi/ae-dir-pwd/ae-dir-pwd.sock r,
   {{ aedir_rundir }}/uwsgi/oathenroll/oathenroll.sock r,
 
 }

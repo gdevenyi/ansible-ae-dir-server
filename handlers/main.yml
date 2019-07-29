@@ -16,11 +16,11 @@
     name: "ae-slapd"
     state: restarted
 
-- name: "restart aedirpwd"
+- name: "restart ae-dir-pwd"
   listen:
-    - "restart aedirpwd"
+    - "restart ae-dir-pwd"
   service:
-    name: "aedirpwd"
+    name: "ae-dir-pwd"
     state: restarted
   when: openldap_role == 'provider'
 

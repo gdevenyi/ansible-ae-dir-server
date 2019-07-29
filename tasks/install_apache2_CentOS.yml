@@ -20,6 +20,6 @@
     state: present
     update_cache: no
   notify:
-    - "restart aedirpwd"
+    - "restart ae-dir-pwd"
     - "restart oathenroll"
     - "restart web2ldap"

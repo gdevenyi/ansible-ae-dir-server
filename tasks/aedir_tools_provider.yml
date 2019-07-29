@@ -32,60 +32,44 @@
     group: root
     mode: 0750
 
-- name: "set env var HOME={{ aedir_rundir }} in /etc/cron.d/aedir_update"
+- name: "set env var HOME={{ aedir_rundir }} in /etc/cron.d/{{ aedir_cron_file }}"
   cron:
     env: yes
     name: "HOME"
     value: "{{ aedir_rundir }}"
     state: present
     user: root
-    cron_file: aedir_update
+    cron_file: "{{ aedir_cron_file }}"
 
-- name: "set env vars in /etc/cron.d/aedir_update"
+- name: "Set env vars in {{ aedir_cron_file }}"
   cron:
     env: yes
     name: "{{ item.key }}"
     value: "{{ item.value }}"
     state: present
     user: root
-    cron_file: aedir_update
+    cron_file: "{{ aedir_cron_file }}"
   with_dict:
     LDAPRC: "{{ aedir_etc }}/ldap.conf"
     PYTHONOPTIMIZE: "2"
     PYTHONDONTWRITEBYTECODE: "1"
 
-- name: "Run aedir_update_groups.py as CRON job"
+- name: "Install provider Python-based CRON jobs"
   cron:
-    name: "aedir_update_groups"
+    name: "{{ item.key }}"
     state: present
     user: root
-    cron_file: aedir_update
-    minute: "*/3"
-    job: "{{ aedir_python }} -m aedir_update.groups"
-
-- name: "Run aedir_update.status as CRON job"
-  cron:
-    name: "aedir_update_status"
-    state: present
-    user: root
-    cron_file: aedir_update
-    minute: "*/13"
-    job: "{{ aedir_python }} -m aedir_update.status"
-
-- name: "Run aedir_update.persattrs as CRON job"
-  cron:
-    name: "aedir_update_persattrs"
-    state: present
-    user: root
-    cron_file: aedir_update
-    minute: "*/2"
-    job: "{{ aedir_python }} -m aedir_update.persattrs {{ aedir_rundir }}/aedir_update_persattrs.state"
-
-- name: "Reset aedir_update.persattrs as CRON job"
-  cron:
-    name: "reset_aedir_update_persattrs"
-    state: present
-    user: root
-    cron_file: aedir_update
-    hour: "*/12"
-    job: "rm {{ aedir_rundir }}/aedir_update_persattrs.state > /dev/null 2>&1 || exit 0"
+    cron_file: "{{ aedir_cron_file }}"
+    hour: "{{ item.value['hour']|default('*') }}"
+    minute: "{{ item.value.minute }}"
+    job: "{{ aedir_python }} -m {{ item.value.pyjob }}"
+  with_dict:
+    aedir_pproc_groups:
+      minute: "*/3"
+      pyjob: aedir_pproc.groups
+    aedir_pproc_status:
+      minute: "*/13"
+      pyjob: "aedir_pproc.status"
+    aedir_pproc_persattrs:
+      minute: "*/2"
+      pyjob: "aedir_pproc.persattrs {{ aedir_rundir }}/aedir_pproc_persattrs.state"

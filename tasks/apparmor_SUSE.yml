@@ -11,7 +11,7 @@
     type: package
   notify:
     - restart apparmor
-    - restart aedirpwd
+    - restart ae-dir-pwd
     - restart hotp_validator
     - restart oathenroll
     - restart bind_proxy

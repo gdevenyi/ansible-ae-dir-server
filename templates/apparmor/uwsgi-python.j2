@@ -19,7 +19,7 @@ profile {{ name }} {
   {{ openldap_cacert_pathname }} r,
 {% endif %}
 
-{% if name=="aedirpwd" or name=="oathenroll" %}
+{% if name=="ae-dir-pwd" or name=="oathenroll" %}
   # access to CA cert for sending e-mail
   {{ smtp_cacert_pathname }} r,
 

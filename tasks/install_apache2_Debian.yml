@@ -25,6 +25,6 @@
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
   notify:
-    - "restart aedirpwd"
+    - "restart ae-dir-pwd"
     - "restart oathenroll"
     - "restart web2ldap"

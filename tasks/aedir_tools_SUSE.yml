@@ -13,7 +13,7 @@
     disable_recommends: yes
     type: package
   notify:
-    - restart aedirpwd
+    - restart ae-dir-pwd
     - restart hotp_validator
     - restart oathenroll
     - restart bind_proxy
@@ -43,15 +43,15 @@
     type: package
   when: openldap_role == 'provider'
   notify:
-    - restart aedirpwd
+    - restart ae-dir-pwd
     - restart oathenroll
     - restart hotp_validator
     - restart web2ldap
 
-- name: "Install ae-dir-update on {{ openldap_role }} on {{ lsb_id }}"
+- name: "Install ae-dir-pproc on {{ openldap_role }} on {{ lsb_id }}"
   zypper:
     name:
-      - ae-dir-update
+      - ae-dir-pproc
     state: present
     disable_recommends: yes
     type: package
@@ -77,7 +77,7 @@
     type: package
   when: openldap_role == 'provider'
   notify:
-    - restart aedirpwd
+    - restart ae-dir-pwd
     - restart oathenroll
 
 - name: "Install additional packages for web2ldap on {{ openldap_role }} on {{ lsb_id }}"

@@ -102,11 +102,11 @@
      - apache_conf
 
 - block:
-    - name: "Install AE-DIR password service (aedirpwd)"
-      include_tasks: "aedirpwd.yml"
+    - name: "Install AE-DIR password service (ae-dir-pwd)"
+      include_tasks: "pwd.yml"
       when: openldap_role=="provider"
   tags:
-    - aedirpwd
+    - pwd
 
 - block:
     - name: "Install and configure web2ldap on {{ openldap_role }}"

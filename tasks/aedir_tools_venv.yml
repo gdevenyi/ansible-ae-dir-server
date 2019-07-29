@@ -26,7 +26,7 @@
     virtualenv_python: python2.7
     extra_args: "{{ aedir_pip_extra_args }}"
   notify:
-    - restart aedirpwd
+    - restart ae-dir-pwd
     - restart hotp_validator
     - restart oathenroll
     - restart bind_proxy
@@ -56,19 +56,21 @@
     extra_args: "{{ aedir_pip_extra_args }}"
   when: openldap_role == 'provider'
   notify:
-    - restart aedirpwd
+    - restart ae-dir-pwd
     - restart oathenroll
     - restart hotp_validator
     - restart web2ldap
 
-- name: "PIP install aedir_update in virtualenv {{ aedir_prefix }} on {{ openldap_role }} on {{ lsb_id }}"
+- name: "PIP install provider processes in virtualenv {{ aedir_prefix }} on {{ openldap_role }} on {{ lsb_id }}"
   pip:
     name:
-      - aedir_update
+      - aedir_pproc
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
   when: openldap_role == 'provider'
+  notify:
+    - restart ae-dir-pwd
 
 - name: "PIP install web2ldap in virtualenv {{ aedir_prefix }} on {{ openldap_role }} on {{ lsb_id }}"
   pip:

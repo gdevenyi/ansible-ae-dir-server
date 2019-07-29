@@ -418,7 +418,7 @@ aedir_uwsgi_params:
     buffer_size: 8192
     harakiri: 10
     processes: 5
-  aedirpwd:
+  pwd:
     buffer_size: 8192
     harakiri: 10
     processes: 5
@@ -442,6 +442,9 @@ aedir_providers_restrictions: []
 # Example for restricting all replica' access to come from IPv4 network 10.54.1.0/24:
 # aedir_replicas_restrictions: ['peername.ip="10.54.1.0%255.255.255.0"']
 aedir_replicas_restrictions: "{{ aedir_providers_restrictions }}"
+
+# name of CRON file in /etc/cron.d
+aedir_cron_file: "ae-dir-{{ openldap_role }}"
 
 #---------------------------------------------------------------------------
 # OpenLDAP parameters
@@ -710,15 +713,6 @@ oath_ldap_socket_path: "{{ oath_ldap_socket_dir }}/socket"
 # must be in {{ aedir_ldapi_services }}
 oath_ldap_oathenroll_web_user: ae-dir-otpenroll
 oath_ldap_oathenroll_web_group: ae-dir-otpenroll
-
-#---------------------------------------------------------------------------
-# parameters for password services
-#---------------------------------------------------------------------------
-
-# user/group to run password self-service web application
-# must be in {{ aedir_ldapi_services }}
-aedirpwd_web_user: ae-dir-pwd
-aedirpwd_web_group: ae-dir-pwd
 
 #---------------------------------------------------------------------------
 # SMTP parameters
