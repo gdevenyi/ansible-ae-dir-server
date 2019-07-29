@@ -144,6 +144,13 @@
     - monitoring
 
 - block:
+    - name: "Install CRON jobs on {{ openldap_role }}"
+      include_tasks: "cron.yml"
+      when: openldap_role=="provider"
+  tags:
+    - cron
+
+- block:
     - name: "Services on {{ openldap_role }}"
       include_tasks: "services.yml"
   tags:
