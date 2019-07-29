@@ -3,7 +3,7 @@ $def with (content)
 <html>
 
   <head>
-    <title>$content.title</title>
+    <title>&AElig;-DIR - $content.title</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <base target="_top">
     <meta name="robots" content="noindex,nofollow">
@@ -18,10 +18,10 @@ $def with (content)
   <body>
 
     <div id="navigation">
-      <a title="Overview of OATH-LDAP Token Enrollment Service" href=".">OATH-LDAP</a> /
-      <!-- <a title="Register OATH token for a person" href="register">Register</a> / -->
-      <a title="Reset OATH token and request enrollment password" href="reset">Reset</a> /
-      <a title="Reset OATH token and request enrollment password" href="init">Init</a>
+      <a title="Overview of &AElig;-DIR password self-service" href=".">&AElig;-DIR PwS</a> /
+      <a title="Change own password" href="changepw">Change</a> /
+      <a title="Check own password" href="checkpw">Check</a> /
+      <a title="Request password reset" href="requestpw">Reset</a>
     </div>
 
     $:content
@@ -29,19 +29,17 @@ $def with (content)
     <p id="footer">
       <!--
       <a href="mailto:ae-dir-admins@example.com?SUBJECT=[&AElig;-DIR]%20Issue%20using%20Password%20Self-Service"
-         title="Send e-mail to ae-admins@example.com">Contact &AElig; admins</a>
-      //
+         title="Send e-mail to ae-admins@example.com">Contact &AElig; admins</a> //
       -->
-      <a href="/oath.html"
-         title="Read user guide for OATH-LDAP Token Enrollment Service">User guide</a>
-      //
+      <a href="/pwd.html"
+         title="Read user guide for &AElig;-DIR Password Self-Service">User guide</a> //
       <a href="/web2ldap"
-         title="Access to web2ldap application">web2ldap</a>
-      //
-      <a href="/pwd/"
-         title="Access to &AElig;-DIR password self-service">Password self-service</a>
+         title="Access to administration UI (web2ldap)">Admin UI (web2ldap)</a> //
+      <a href="/oath/"
+         title="Access to OATH-LDAP Token Enrollment Service">OATH enrollment</a>
     </p>
 
   </body>
 
 </html>
+
