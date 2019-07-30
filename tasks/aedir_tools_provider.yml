@@ -10,20 +10,6 @@
     mode: 0600
   when: aedir_init == True
 
-- name: "Install tool scripts"
-  template:
-    src: "scripts/{{ item }}.j2"
-    dest: "{{ aedir_bin }}/{{ item }}"
-    owner: root
-    group: root
-    mode: 0755
-  with_items:
-    - ae-add-zone.py
-    - ae-passwd.py
-    - ae-person-report.py
-    - ae-set-next-gid.py
-    - ae-user-report.py
-
 - name: "Install backup script from template"
   template:
     src: "scripts/ae-dir-slapcat.sh.j2"

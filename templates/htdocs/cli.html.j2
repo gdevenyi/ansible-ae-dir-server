@@ -22,8 +22,8 @@
   <li>
     <a href="#ae-dir">&AElig;-DIR command-line tools</a>
     <ol>
-      <li><a href="#ae-passwd">ae-passwd.py</a></li>
-      <li><a href="#ae-add-zone">ae-add-zone.py</a></li>
+      <li><a href="#ae-passwd">ae-dir-passwd</a></li>
+      <li><a href="#ae-add-zone">ae-dir-addzone</a></li>
     </ol>
   </li>
   <li>
@@ -151,18 +151,18 @@
   configuration file installed to <code>/opt/ae-dir/etc/ldap.conf</code>:
 </p>
 <dl>
-  <dt>ae-passwd.py</dt>
+  <dt>ae-dir-passwd</dt>
   <dd>
     Sets password of <em>aeUser</em>, <em>aeService</em> or <em>aeHost</em>
   </dd>
-  <dt>ae-add-zone.py</dt>
+  <dt>ae-dir-addzone</dt>
   <dd>
     Adds new <em>aeZone</em> with the two standard <em>aeGroup</em> entries
     for the zone admins and zone auditors.
   </dd>
 </dl>
 
-<h2 id="ae-passwd">ae-passwd.py</h2>
+<h2 id="ae-passwd">ae-dir-passwd</h2>
 
 <p>Roles:</p>
 <ul>
@@ -178,12 +178,12 @@
   Example usage setting password for user account:
 </p>
 <pre class="cli-ae-passwd-example">
-root@ae-dir-deb-p1:~# /opt/ae-dir/bin/ae-passwd.py bart
+root@ae-dir-deb-p1:~# /opt/ae-dir/bin/ae-dir-passwd bart
 new password for uid=bart,cn=ae,{{ aedir_suffix }}:
 repeat password:
 </pre>
 
-<h2 id="ae-add-zone">ae-add-zone.py</h2>
+<h2 id="ae-add-zone">ae-dir-addzone</h2>
 
 <p>Roles:</p>
 <ul>
@@ -194,7 +194,7 @@ repeat password:
   Example usage:
 </p>
 <pre class="cli-ae-add-zone-example">
-root@ae-dir-deb-p1:~# /opt/ae-dir/bin/ae-add-zone.py test42 IAM-42 "the definite answer"
+root@ae-dir-deb-p1:~# /opt/ae-dir/bin/ae-dir-addzone test42 IAM-42 "the definite answer"
 Added cn=test42,{{ aedir_suffix }}
 Added cn=test42-init,cn=test42,{{ aedir_suffix }}
 Tagged cn=test42,{{ aedir_suffix }}
