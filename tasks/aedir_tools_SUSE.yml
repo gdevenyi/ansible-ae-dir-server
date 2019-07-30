@@ -56,6 +56,8 @@
     disable_recommends: yes
     type: package
   when: openldap_role == 'provider'
+  notify:
+    - restart ae-dir-pwd
 
 - name: "Install web2ldap on {{ openldap_role }} on {{ lsb_id }}"
   zypper:
