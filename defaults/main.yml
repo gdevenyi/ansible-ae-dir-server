@@ -93,6 +93,7 @@ aedir_etc: "{{ aedir_prefix }}/etc"
 aedir_etc_openldap: "{{ aedir_etc }}/openldap"
 aedir_rundir: "{{ aedir_prefix }}/run"
 aedir_python_sitepackages: "{{ aedir_python_paths.site_packages }}"
+aedir_htdocsdir: "{{ aedir_prefix }}/htdocs"
 
 # which Python interpreter to use
 aedir_python: "{{ aedir_python_paths.python_exec }} -ROOB"
@@ -784,7 +785,7 @@ web_service_fqdn: "{{ openldap_service_fqdn }}"
 web_server_admin_email: "ae-admins@{{ web_service_fqdn }}"
 
 # document root used for https://hostname/
-web_document_root: "{{ aedir_prefix }}/htdocs"
+web_document_root: "{{ aedir_htdocsdir }}"
 
 #---------------------------------------------------------------------------
 # web2ldap parameters
