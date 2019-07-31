@@ -647,7 +647,7 @@
   </tr>
   <tr>
     <td>cn=dua-profile</td>
-    <td>client configuration profile (see <a href="https://tools.ietf.org/html/rfc4876">RFC 4876</a>)</td>
+    <td>client configuration profile (see {{ rfc(4876) }})</td>
     <td>DUAConfigProfile</td>
   </tr>
 </table>
@@ -782,8 +782,7 @@
 
 <p>
   For each entity in &AElig;-DIR there is a distinct
-  <em>structural object class</em> (see also
-  <a href="https://tools.ietf.org/html/rfc4512#section-2.4.2">RFC 4512 section 2.4.2</a>).
+  <em>structural object class</em> (see also {{ rfc(4512, '2.4.2') }}).
   All &AElig;-DIR object classes are derived from multiple abstract and
   structural object classes defined in various other standards.
 </p>
@@ -801,11 +800,11 @@
 <ul>
   <li>
     DIT content rules using <var>NOT</var> and <var>AUX</var>
-    (see <a href="https://tools.ietf.org/html/rfc4512#section-4.1.6">RFC 4512 section 4.1.6</a>)
+    (see {{ rfc(4512, '4.1.6') }})
   </li>
   <li>
     DIT structure rules and name forms for enforcing the <a href="#dit">DIT</a>
-    (see <a href="https://tools.ietf.org/html/rfc4512#section-4.1.7">RFC 4512 section 4.1.7</a>)
+    (see {{ rfc(4512, '4.1.7') }})
   </li>
   <li>
     constraints enforcing the <a href="#er">entity relationship</a>
@@ -1309,7 +1308,7 @@
     Descriptive name of department / organizational unit
   </dd>
   <dt>organizationalUnit attributes</dt>
-  <dd>see <a href="https://tools.ietf.org/html/rfc4519#section-3.11">RFC 4519: organizationalUnit</a></dd>
+  <dd>see {{ rfc(4519, '3.11') }}</dd>
   <dt>meta attributes</dt>
   <dd>see <a href="#schema-oc-aeObject-attributes">aeObject</a></dd>
 </dl>
@@ -1330,7 +1329,7 @@
     Short name of location
   </dd>
   <dt>locality attributes</dt>
-  <dd>see <a href="https://tools.ietf.org/html/rfc4519#section-3.7">RFC 4519: locality</a></dd>
+  <dd>see {{ rfc(4519, '3.7') }}</dd>
   <dt>meta attributes</dt>
   <dd>see <a href="#schema-oc-aeObject-attributes">aeObject</a></dd>
 </dl>
@@ -1447,8 +1446,7 @@
   </dd>
   <dt>inetOrgPerson attributes</dt>
   <dd>
-    A limited subset of the widely used attributes defined in
-    <a href="https://tools.ietf.org/html/rfc2798">RFC 2798</a>.
+    A limited subset of the widely used attributes defined in {{ rfc(2798) }}.
   </dd>
   <dt>meta attributes</dt>
   <dd>see <a href="#schema-oc-aeObject-attributes">aeObject</a></dd>
@@ -1507,7 +1505,7 @@
   <dt>posixGroup</dt>
   <dd>
     multiple attributes required for POSIX groups used for Unixoid operating systems
-    (see <a href="https://tools.ietf.org/html/rfc2307">RFC 2307</a>)
+    (see {{ rfc(2307) }})
   </dd>
 </dl>
 <p>
@@ -1922,7 +1920,7 @@
 <p>
   The auxiliary object class <var>posixAccount</var> contains multiple
   attributes required for POSIX login to Unixoid operating systems
-  (see <a href="https://tools.ietf.org/html/rfc2307">RFC 2307</a>).
+  (see {{ rfc(2307) }}).
 </p>
 <p>
   The following <var>posixAccount</var> attributes are always added to
@@ -1952,8 +1950,9 @@
 
 <h3 id="schema-oc-pkiUser">pkiUser</h3>
 <p>
-  The auxiliary object class <var>pkiUser</var> is used ...
-  (see <a href="https://tools.ietf.org/html/rfc4523">RFC 4523</a>).
+  The auxiliary object class <var>pkiUser</var> is used (see {{ rfc(4523) }})
+  to mark an system or personal account for being used with TLS client
+  authentication.
 </p>
 <p>
   The following <var>pkiUser</var> attribute is optionally added to
