@@ -1,8 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
 {% macro rfc(num, section='') -%}
 <a href="https://tools.ietf.org/html/rfc{{ num }}{{ '#section-'+section if section else '' }}">RFC {{ num }}{{ ' section '+section if section else '' }}</a>
 {%- endmacro %}
-<!DOCTYPE html>
-<html lang="en">
+{% macro img(img_anchor, img_file, img_title) -%}
+<figure>
+  <a href="#img_{{ img_anchor }}">
+    <img class="thumbnail" src="img/{{ img_file }}">
+  </a>
+  <figcaption>{{ img_title }}</figcaption>
+</figure>
+<figure class="lightbox" id="img_{{ img_anchor }}">
+  <a href="#_">
+    <img src="img/{{ img_file }}" title="{{ img_title }}">
+  </a>
+  <figcaption>{{ img_title }}</figcaption>
+</figure>
+{%- endmacro %}
 
   <head>
 

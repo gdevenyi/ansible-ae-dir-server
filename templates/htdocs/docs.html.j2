@@ -95,10 +95,7 @@
 
 <h1 id="sys-arch">System architecture</h1>
 
-{% set img_anchor="arch" -%}
-{% set img_file="arch.png" -%}
-{% set img_title="&AElig;-DIR overall system architecture" -%}
-{% include "includes/img.html.j2" %}
+{{ img('arch', 'arch.png', '&AElig;-DIR overall system architecture') }}
 
 <h2 id="sys-provider">&AElig;-DIR provider</h2>
 <p>
@@ -121,10 +118,7 @@
   the roles above.
 </p>
 
-{% set img_anchor="slapd-provider" -%}
-{% set img_file="slapd-provider.png" -%}
-{% set img_title="&AElig;-DIR provider components" -%}
-{% include "includes/img.html.j2" %}
+{{ img('slapd-provider', 'slapd-provider.png', '&AElig;-DIR provider components') }}
 
 <p>
   The following system components are running on each
@@ -463,20 +457,14 @@
   The tree structure is also formally specified (within web2ldap's
   configuration) with DIT structure rules and name forms.
 </p>
-{% set img_anchor="dit" -%}
-{% set img_file="dit.svg" -%}
-{% set img_title="Graph of &AElig;-DIR tree structure" -%}
-{% include "includes/img.html.j2" %}
+{{ img('dit', 'dit.svg', 'Graph of &AElig;-DIR tree structure') }}
 
 <h3 id="dit-zone-ae">cn=ae,{{ aedir_suffix }}</h3>
 <p>
   Zone <em>ae</em> is used for administration of &AElig;-DIR itself.
   Therefore some special restrictions apply.
 </p>
-{% set img_anchor="dit-zone-ae" -%}
-{% set img_file="dit-zone-ae.svg" -%}
-{% set img_title="Sub-tree structure of zone ae" -%}
-{% include "includes/img.html.j2" %}
+{{ img('dit-zone-ae', 'dit-zone-ae.svg', 'Sub-tree structure of zone ae') }}
 
 <table>
   <tr>
@@ -661,10 +649,7 @@
   rights of bound entity.
 </p>
 
-{% set img_anchor="er-complete" -%}
-{% set img_file="er-complete.svg" -%}
-{% set img_title="complete entity relationship diagram" -%}
-{% include "includes/img.html.j2" %}
+{{ img('er-complete', 'er-complete.svg', 'Complete entity relationship diagram') }}
 
 <ul>
   <li>
@@ -694,10 +679,7 @@
   <a href="#roles">&AElig;-DIR roles</a>.
 </p>
 
-{% set img_anchor="er-roles" -%}
-{% set img_file="er-roles.png" -%}
-{% set img_title="entity roles relationship diagram" -%}
-{% include "includes/img.html.j2" %}
+{{ img('er-roles', 'er-roles.png', 'Entity roles relationship diagram') }}
 
 <p>
   Setting cross-zone references allow zone admins to delegate tasks to
@@ -760,10 +742,7 @@
   </a>:
 </p>
 
-{% set img_anchor="er-demo" -%}
-{% set img_file="demo.ae-dir.com-zone-test.svg" -%}
-{% set img_title="entity relationship diagram of zone test on ldaps://demo.ae-dir.com" -%}
-{% include "includes/img.html.j2" %}
+{{ img('er-demo', 'demo.ae-dir.com-zone-test.svg', 'Entity relationship diagram of zone test on ldaps://demo.ae-dir.com') }}
 
 
 <h1 id="schema">Schema</h1>
@@ -773,10 +752,8 @@
 <p>
   The following diagram shows the attribute type hierarchy:
 </p>
-{% set img_anchor="attribute_types_graph" -%}
-{% set img_file="attribute_types_graph.svg" -%}
-{% set img_title="Graph of AE-DIR's attribute type" -%}
-{% include "includes/img.html.j2" %}
+
+{{ img('attribute_types_graph', 'attribute_types_graph.svg', 'Graph of &AElig;-DIR attribute types') }}
 
 <h2 id="schema-soc">Structural Object Classes</h2>
 
@@ -789,10 +766,8 @@
 <p>
   The following diagram shows the object class hierarchy:
 </p>
-{% set img_anchor="object_classes_graph" -%}
-{% set img_file="object_classes_graph.svg" -%}
-{% set img_title="Graph of AE-DIR's structural object classes" -%}
-{% include "includes/img.html.j2" %}
+
+{{ img('object_classes_graph', 'object_classes_graph.svg', 'Graph of &AElig;-DIR structural object classes') }}
 
 <p>
   The structural object classes are also referenced in the accompanying&hellip;
