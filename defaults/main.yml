@@ -778,10 +778,10 @@ slapd_check_lib_dirs:
 web_server: "{{ apache2_config.service_name }}"
 
 # FQDN of service interface
-web_service_fqdn: "{{ inventory_hostname }}"
+web_service_fqdn: "{{ openldap_service_fqdn }}"
 
 # e-mail address of web server admin(s)
-web_server_admin_email: "web2ldap-admin@example.com"
+web_server_admin_email: "ae-admins@{{ web_service_fqdn }}"
 
 # document root used for https://hostname/
 web_document_root: "{{ aedir_prefix }}/htdocs"
