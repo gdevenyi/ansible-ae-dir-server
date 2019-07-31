@@ -89,7 +89,13 @@
 
 - block:
     - name: "AE-DIR web pages {{ openldap_role }}"
-      include_tasks: "aedir_htdocs.yml"
+      include_role:
+        name: ae-dir-htdocs
+      vars:
+        document_root: "{{ aedir_htdocsdir }}"
+        htdocs_templates: "{{ aedir_htdocs_templates }}"
+        htdocs_layout: "{{ aedir_htdocs_layout }}"
+        news: "{{ aedir_news }}"
       when: openldap_role=="provider"
   tags:
     - htdocs
