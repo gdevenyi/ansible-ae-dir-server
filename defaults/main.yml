@@ -337,9 +337,9 @@ aedir_init_aeadmins:
 
 aedir_hosts:
   # inventory host names of *all* provider hosts
-  provider: "{{ groups['ae-dir-providers'] }}"
+  provider: "{{ groups.aedir_providers }}"
   # inventory host names of *all* consumer hosts
-  consumer: "{{ groups['ae-dir-consumers'] }}"
+  consumer: "{{ groups.aedir_consumers }}"
 
 # main provider hostname (e.g. for HA setups)
 aedir_main_provider_hostname: "{{ aedir_hosts.provider[0] }}"
@@ -513,7 +513,7 @@ openldap_backup_compressor: "xz -3"
 openldap_backup_max_days: 21
 # backup cron values
 openldap_backup_cron_args:
-  hour: "{{ (openldap_server_id - 1) * (12 / (groups['ae-dir-providers']|length))|int }},{{ 12 + (openldap_server_id - 1) * (12 / (groups['ae-dir-providers']|length))|int }}"
+  hour: "{{ (openldap_server_id - 1) * (12 / (groups.aedir_providers|length))|int }},{{ 12 + (openldap_server_id - 1) * (12 / (groups.aedir_providers|length))|int }}"
   minute: "23"
 
 # List of servers to be added to rootDSE attribute altServer (see RFC 4512)
