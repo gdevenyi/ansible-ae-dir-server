@@ -70,10 +70,10 @@
     extra_args: "{{ aedir_pip_extra_args }}"
   when: openldap_role == 'provider'
 
-- name: "PIP install provider processes in virtualenv {{ aedir_prefix }} on {{ openldap_role }} on {{ lsb_id }}"
+- name: "PIP install ae-dir-pproc in virtualenv {{ aedir_prefix }} on {{ openldap_role }} on {{ lsb_id }}"
   pip:
     name:
-      - aedir_pproc
+      - aedir_pproc==0.1.1
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
