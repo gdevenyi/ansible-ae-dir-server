@@ -51,7 +51,7 @@
 - name: "Install ae-dir-cli on {{ openldap_role }} on {{ lsb_id }}"
   zypper:
     name:
-      - ae-dir-cli
+      - ae-dir-cli==0.1.1
     state: present
     disable_recommends: yes
     type: package
