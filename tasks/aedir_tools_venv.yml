@@ -19,8 +19,8 @@
       - jwcrypto
       - pyasn1
       - pyasn1_modules
-      - ldap0>=0.2.0
-      - aedir>=0.3.0
+      - ldap0==0.2.7
+      - aedir==0.3.0
     state: present
     virtualenv: "{{ aedir_prefix }}"
     virtualenv_python: python2.7
@@ -34,7 +34,7 @@
 
 - name: "PIP package slapdsock in virtualenv {{ aedir_prefix }}"
   pip:
-    name: slapdsock>=0.10.0
+    name: slapdsock==0.10.0
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
@@ -45,7 +45,7 @@
 - name: "PIP install additional modules in virtualenv {{ aedir_prefix }} on {{ openldap_role }} on {{ lsb_id }}"
   pip:
     name:
-      - mailutil
+      - mailutil==0.2.0
       - paramiko
       - passlib
       - xlwt

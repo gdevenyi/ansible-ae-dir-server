@@ -5,8 +5,8 @@
     name:
       - python-pyasn1>=0.3.7
       - python-pyasn1-modules>=0.1.5
-      - python-ldap0>=0.2.0
-      - python-aedir>=0.3.0
+      - python-ldap0==0.2.7
+      - python-aedir==0.3.0
       - python-cryptography
       - python-jwcrypto
     state: present
@@ -21,7 +21,7 @@
 
 - name: "Install python-slapdsock packages on {{ lsb_id }}"
   zypper:
-    name: python-slapdsock>=0.10.0
+    name: python-slapdsock==0.10.0
     state: present
     disable_recommends: yes
     type: package
@@ -33,7 +33,7 @@
   zypper:
     name:
       - python-paramiko
-      - python-mailutil
+      - python-mailutil==0.2.0
       - python-passlib
       - python-asn1crypto
       - python-xlwt
