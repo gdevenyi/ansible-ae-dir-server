@@ -767,6 +767,10 @@ class SyncreplProviderTask(threading.Thread):
                     self.check_instance.result(
                         CHECK_RESULT_ERROR,
                         item_name,
+                        performance_data=dict(
+                            num_csn_values=len(self.remote_csn_dict[db_suffix]),
+                            connect_latency=ldap_conn.connect_latency,
+                        ),
                         check_output='no attribute contextCSN for %r on %r' % (
                             db_suffix,
                             ldap_conn.uri,
@@ -776,6 +780,10 @@ class SyncreplProviderTask(threading.Thread):
                     self.check_instance.result(
                         CHECK_RESULT_OK,
                         item_name,
+                        performance_data=dict(
+                            num_csn_values=len(self.remote_csn_dict[db_suffix]),
+                            connect_latency=ldap_conn.connect_latency,
+                        ),
                         check_output='%d contextCSN attribute values retrieved for %r from %r' % (
                             len(self.remote_csn_dict[db_suffix]),
                             db_suffix,
