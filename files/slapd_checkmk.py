@@ -1596,6 +1596,7 @@ class SlapdCheck(CheckMkLocalCheck):
             'SlapdProviders',
             performance_data={
                 'count': len(remote_csn_dict),
+                'total': len(syncrepl_topology),
                 'percent': slapd_provider_percentage,
                 'avg_latency': sum(task_connect_latency.values())/len(task_connect_latency) if task_connect_latency else 0.0,
                 'max_latency': max(task_connect_latency.values()) if task_connect_latency else 0.0,
