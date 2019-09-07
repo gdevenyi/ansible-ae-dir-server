@@ -631,6 +631,7 @@ class SlapdConnection(LDAPObject, OpenLDAPObject):
             who=None,
             cred=None,
         ):
+        self.connect_latency = None
         LDAPObject.__init__(
             self,
             uri,
@@ -645,6 +646,7 @@ class SlapdConnection(LDAPObject, OpenLDAPObject):
         self.set_option(ldap0.OPT_TIMEOUT, timeout)
         tls_options = tls_options or {}
         self.set_tls_options(**tls_options)
+        conect_start = time.time()
         # Send SASL/EXTERNAL bind which opens connection
         if bind_method == 'sasl':
             self.sasl_non_interactive_bind_s(sasl_mech)
@@ -652,6 +654,7 @@ class SlapdConnection(LDAPObject, OpenLDAPObject):
             self.simple_bind_s(who or '', cred or '')
         else:
             raise ValueError('Unknown bind_method %r' % bind_method)
+        self.connect_latency = time.time() - conect_start
 
 
 class SyncreplProviderTask(threading.Thread):
@@ -686,6 +689,7 @@ class SyncreplProviderTask(threading.Thread):
         )
         self.remote_csn_dict = {}
         self.err_msgs = []
+        self.connect_latency = None
 
     def run(self):
         """
@@ -734,6 +738,7 @@ class SyncreplProviderTask(threading.Thread):
             return
         else:
             syncrepl_target_uri = self.syncrepl_target_uri.lower()
+            self.connect_latency = ldap_conn.connect_latency
 
         for db_num, db_suffix, _ in self.syncrepl_topology[syncrepl_target_uri]:
             item_name = '_'.join((
@@ -982,6 +987,7 @@ class SlapdCheck(CheckMkLocalCheck):
                     self.result(
                         CHECK_RESULT_ERROR,
                         'SlapdSelfConn',
+                        performance_data={'connect_latency': ldaps_conn.connect_latency},
                         check_output='Received unexpected authz-DN from %r: %r' % (
                             ldaps_conn.uri,
                             wai,
@@ -991,6 +997,7 @@ class SlapdCheck(CheckMkLocalCheck):
                     self.result(
                         CHECK_RESULT_OK,
                         'SlapdSelfConn',
+                        performance_data={'connect_latency': ldaps_conn.connect_latency},
                         check_output='successfully bound to %r as %r' % (
                             ldaps_conn.uri,
                             wai,
@@ -1544,6 +1551,7 @@ class SlapdCheck(CheckMkLocalCheck):
         remote_csn_dict = {}
         syncrepl_target_fail_msgs = []
         task_dict = {}
+        task_connect_latency = {}
 
         for syncrepl_target_uri in syncrepl_topology.keys():
             # start separate threads for parallelly connecting to slapd providers
@@ -1562,6 +1570,8 @@ class SlapdCheck(CheckMkLocalCheck):
                 remote_csn_dict[syncrepl_target_uri] = task.remote_csn_dict
             if task.err_msgs:
                 syncrepl_target_fail_msgs.extend(task.err_msgs)
+            if task.connect_latency is not None:
+                task_connect_latency[syncrepl_target_uri] = task.connect_latency
 
         if syncrepl_target_fail_msgs or \
            len(remote_csn_dict) < len(syncrepl_topology):
@@ -1579,6 +1589,7 @@ class SlapdCheck(CheckMkLocalCheck):
             performance_data={
                 'count': len(remote_csn_dict),
                 'percent': slapd_provider_percentage,
+                'max_latency': max(task_connect_latency.values()),
             },
             check_output='Connected to %d of %d (%0.1f%%) providers: %s' % (
                 len(remote_csn_dict),
