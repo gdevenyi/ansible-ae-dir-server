@@ -1589,6 +1589,7 @@ class SlapdCheck(CheckMkLocalCheck):
             performance_data={
                 'count': len(remote_csn_dict),
                 'percent': slapd_provider_percentage,
+                'avg_latency': sum(task_connect_latency.values())/len(task_connect_latency),
                 'max_latency': max(task_connect_latency.values()),
             },
             check_output='Connected to %d of %d (%0.1f%%) providers: %s' % (
