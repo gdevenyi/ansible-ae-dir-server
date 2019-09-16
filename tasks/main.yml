@@ -10,6 +10,8 @@
     - role_path
     - aedir_templates_dirs
     - aedir_files_dirs
+  tags:
+    - always
 
 - name: "Include OS-specific variables"
   include_vars: "{{ lsb_id }}.yml"
