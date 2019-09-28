@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 """
 monitoring check script for OpenLDAP
@@ -69,7 +69,7 @@ from ldap0.ldif import LDIFParser
 # Configuration constants
 #-----------------------------------------------------------------------
 
-__version__ = '2.3.0'
+__version__ = '3.0.0'
 
 STATE_FILENAME = 'slapd_checkmk.state'
 
@@ -127,8 +127,11 @@ THREADS_ACTIVE_WARN_UPPER = 6
 # Too many pending threads should not occur
 THREADS_PENDING_WARN = 5
 
+class NoneException(BaseException):
+    pass
+
 CATCH_ALL_EXC = (Exception, ldap0.LDAPError)
-#CATCH_ALL_EXC = None
+#CATCH_ALL_EXC = NoneException
 
 # days to warn/error when checking server cert validity
 CERT_ERROR_DAYS = 10
@@ -149,7 +152,7 @@ def slapd_pid_fromfile(config_attrs):
     """
     pid_filename = config_attrs['olcPidFile'][0]
     try:
-        pid_file = open(pid_filename, 'rb')
+        pid_file = open(pid_filename, 'r', encoding='utf-8')
     except IOError:
         slapd_pid = None
     else:
@@ -160,7 +163,7 @@ def slapd_pid_fromfile(config_attrs):
 # Classes
 #-----------------------------------------------------------------------
 
-class MonitoringCheck(object):
+class MonitoringCheck:
     """
     base class for a monitoring check
     """
@@ -181,14 +184,14 @@ class MonitoringCheck(object):
         for item_name in self.item_names or []:
             self.add_item(item_name)
         self._output_file = output_file
-        if state_filename != None:
+        if state_filename is not None:
             # Initialize local state file and read old state if it exists
             self._state = CheckStateFile(state_filename)
             # Generate *new* state dict to be updated within check and stored
             # later
             self._next_state = {}
         self.script_name = os.path.basename(sys.argv[0])
-        return  # __init__()
+        # end of __init__()
 
     def _get_rate(self, key, current_val, time_span):
         last_val = int(self._state.data.get(key, '0'))
@@ -253,7 +256,8 @@ class MonitoringCheck(object):
                 s_list.append(char)
         return ''.join(s_list)  # _subst_item_name_chars()
 
-    def serialize_perf_data(self, performance_data):
+    @staticmethod
+    def serialize_perf_data(performance_data):
         return str(performance_data)
 
     def result(self, status, item_name, performance_data=None, check_output=None):
@@ -280,7 +284,7 @@ class MonitoringCheck(object):
             performance_data or {},
             check_output or u'',
         )
-        return  # result()
+        # end of result()
 
     def output(self):
         """
@@ -334,10 +338,10 @@ class CheckMkLocalCheck(MonitoringCheck):
                     msg=check_msg,
                 )
             )
-        return  # output()
+        # end of output()
 
 
-class CheckStateFile(object):
+class CheckStateFile:
     """
     Class for state file
     """
@@ -355,7 +359,7 @@ class CheckStateFile(object):
         """
         try:
             state_tuple_list = []
-            state_file = open(self._state_filename, 'rb')
+            state_file = open(self._state_filename, 'r', encoding='utf-8')
             state_string_list = state_file.read().split(self.line_sep)
             state_file.close()
             state_tuple_list = [
@@ -376,12 +380,12 @@ class CheckStateFile(object):
             for key, val in state.items()
         ]
         state_string_list.append('')
-        state_file = open(self._state_filename, 'wb')
+        state_file = open(self._state_filename, 'w', encoding='utf-8')
         state_file.write(self.line_sep.join(state_string_list))
         state_file.close()
 
 
-class OpenLDAPMonitorCache(object):
+class OpenLDAPMonitorCache:
     """
     Cache object for data read from back-monitor
     """
@@ -421,7 +425,7 @@ class OpenLDAPMonitorCache(object):
         ]
 
 
-class OpenLDAPObject(object):
+class OpenLDAPObject:
     """
     mix-in class for LDAPObject and friends which provides methods useful
     for OpenLDAP's slapd
@@ -494,12 +498,15 @@ class OpenLDAPObject(object):
         """
         returns dict of all monitoring entries
         """
-        return self.search_s(
-            self.monitorContext[0],
-            ldap0.SCOPE_SUBTREE,
-            self.all_monitor_entries_filter,
-            attrlist=self.all_monitor_entries_attrs,
-        )
+        return {
+            res.dn_s: res.entry_s
+            for res in self.search_s(
+                self.monitorContext[0],
+                ldap0.SCOPE_SUBTREE,
+                self.all_monitor_entries_filter,
+                attrlist=self.all_monitor_entries_attrs,
+            )
+        }
 
     def get_naming_context_attrs(self):
         """
@@ -507,8 +514,8 @@ class OpenLDAPObject(object):
         """
         rootdse = self.read_rootdse_s(attrlist=self.naming_context_attrs)
         for nc_attr in self.naming_context_attrs:
-            if nc_attr in rootdse:
-                self.__setattr__(nc_attr, rootdse[nc_attr])
+            if nc_attr in rootdse.entry_s:
+                setattr(self, nc_attr, rootdse.entry_s[nc_attr])
         return rootdse
 
     def get_sock_listeners(self):
@@ -522,11 +529,11 @@ class OpenLDAPObject(object):
             attrlist=['olcDbSocketPath', 'olcOvSocketOps'],
         )
         result = {}
-        for _, sock_entry in ldap_result:
-            socket_path = sock_entry['olcDbSocketPath'][0]
+        for ldap_res in ldap_result:
+            socket_path = ldap_res.entry_s['olcDbSocketPath'][0]
             result['SlapdSock_'+socket_path] = (
                 socket_path,
-                '/'.join(sorted(sock_entry['olcOvSocketOps'])),
+                '/'.join(sorted(ldap_res.entry_s['olcOvSocketOps'])),
             )
         return result
 
@@ -542,8 +549,8 @@ class OpenLDAPObject(object):
         )
         csn_dict = {}
         try:
-            context_csn_vals = ldap_result['contextCSN']
-        except (KeyError, IndexError):
+            context_csn_vals = ldap_result.entry_s['contextCSN']
+        except KeyError:
             pass
         else:
             for csn_value in context_csn_vals:
@@ -564,15 +571,15 @@ class OpenLDAPObject(object):
             attrlist=['olcDatabase', 'olcSuffix', 'olcSyncrepl'],
         )
         syncrepl_list = []
-        for _, ldap_entry in ldap_result:
-            db_num = int(ldap_entry['olcDatabase'][0].split('}')[0][1:])
+        for ldap_res in ldap_result:
+            db_num = int(ldap_res.entry_s['olcDatabase'][0].split('}')[0][1:])
             srd = [
                 SyncReplDesc(attr_value)
-                for attr_value in ldap_entry['olcSyncrepl']
+                for attr_value in ldap_res.entry_s['olcSyncrepl']
             ]
             syncrepl_list.append((
                 db_num,
-                ldap_entry['olcSuffix'][0],
+                ldap_res.entry_s['olcSuffix'][0],
                 srd,
             ))
         syncrepl_topology = {}
@@ -600,11 +607,11 @@ class OpenLDAPObject(object):
             attrlist=['olcDatabase', 'olcSuffix', 'olcDbDirectory'],
         )
         result = []
-        for _, entry in ldap_result:
-            db_num, db_type = entry['olcDatabase'][0][1:].split('}', 1)
+        for res in ldap_result:
+            db_num, db_type = res.entry_s['olcDatabase'][0][1:].split('}', 1)
             db_num = int(db_num)
-            db_suffix = entry['olcSuffix'][0]
-            db_dir = entry['olcDbDirectory'][0]
+            db_suffix = res.entry_s['olcSuffix'][0]
+            db_dir = res.entry_s['olcDbDirectory'][0]
             result.append((db_num, db_suffix, db_type, db_dir))
         return result  # db_suffixes()
 
@@ -644,7 +651,7 @@ class SlapdConnection(LDAPObject, OpenLDAPObject):
             timeout = LDAP_TIMEOUT
         self.set_option(ldap0.OPT_NETWORK_TIMEOUT, network_timeout)
         self.set_option(ldap0.OPT_TIMEOUT, timeout)
-        tls_options = tls_options or {}
+        tls_options = {key: val.encode('utf-8') for key, val in (tls_options or {}).items()}
         self.set_tls_options(**tls_options)
         conect_start = time.time()
         # Send SASL/EXTERNAL bind which opens connection
@@ -795,7 +802,7 @@ class SyncreplProviderTask(threading.Thread):
             ldap_conn.unbind_s()
         except CATCH_ALL_EXC as exc:
             pass
-        return # end of SyncreplProviderTask.run()
+        # end of SyncreplProviderTask.run()
 
 
 class SlapdCheck(CheckMkLocalCheck):
@@ -853,7 +860,7 @@ class SlapdCheck(CheckMkLocalCheck):
                     'SlapdSASLHostname',
                     check_output='olcSaslHost %r found' % (olc_sasl_host),
                 )
-        return # end of _check_sasl_hostname()
+        # end of _check_sasl_hostname()
 
     def _check_tls_file(self, config_attrs):
         # try to read CA and server cert/key files
@@ -945,7 +952,7 @@ class SlapdCheck(CheckMkLocalCheck):
                 crypto_module,
             ),
         )
-        return # end of _check_tls_file()
+        # end of _check_tls_file()
 
     def _check_local_ldaps(self, ldaps_uri, my_authz_id):
         """
@@ -1012,7 +1019,7 @@ class SlapdCheck(CheckMkLocalCheck):
                         ),
                     )
             ldaps_conn.unbind_s()
-        return # end of _check_local_ldaps()
+        # end of _check_local_ldaps()
 
     def _check_slapd_sock(self):
         """
@@ -1025,14 +1032,15 @@ class SlapdCheck(CheckMkLocalCheck):
             _sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
             _sock.connect(sock_path)
             _sock.settimeout(SLAPD_SOCK_TIMEOUT)
-            _sock_f = _sock.makefile()
-            _sock_f.write('MONITOR\n')
+            _sock_f = _sock.makefile('rwb')
+            _sock_f.write(b'MONITOR\n')
             _sock_f.flush()
-            return _sock_f.read() # end of _read_sock_monitor
+            return _sock_f.read()
+            # end of _read_sock_monitor
 
         def _parse_sock_response(sock_response):
             # strip ENTRY\n from response and parse the rest as LDIF
-            _, sock_monitor_entry = LDIFParser.fromstring(
+            _, sock_monitor_entry = LDIFParser.frombuf(
                 sock_response[6:],
                 ignored_attr_types=['sockLogLevel'],
                 max_entries=1
@@ -1093,7 +1101,7 @@ class SlapdCheck(CheckMkLocalCheck):
                         performance_data=sock_perf_data,
                         check_output=', '.join(check_msgs),
                     )
-        return # end of _check_slapd_sock()
+        # end of _check_slapd_sock()
 
     def _check_slapd_start(self, config_attrs):
         """
@@ -1141,7 +1149,7 @@ class SlapdCheck(CheckMkLocalCheck):
                     utc_now-start_time,
                 )
             )
-        return # end of _check_slapd_start()
+        # end of _check_slapd_start()
 
     def _get_local_csns(self, syncrepl_list):
         local_csn_dict = {}
@@ -1221,7 +1229,7 @@ class SlapdCheck(CheckMkLocalCheck):
             },
             check_output='%d open connections (max. %d)' % (current_connections, max_connections),
         )
-        return # end of _check_conns()
+        # end of _check_conns()
 
     def _check_threads(self):
         """
@@ -1250,7 +1258,7 @@ class SlapdCheck(CheckMkLocalCheck):
             check_output='Thread counts active:%d pending: %d' % (
                 threads_active, threads_pending)
         )
-        return # end of _check_threads()
+        # end of _check_threads()
 
     def _get_slapd_perfstats(self):
         """
@@ -1338,9 +1346,9 @@ class SlapdCheck(CheckMkLocalCheck):
             ops_all_completed_rate = self._get_rate('ops_all_completed', ops_all_completed, last_time_span)
             self._next_state['ops_all_initiated'] = ops_all_initiated
             self._next_state['ops_all_completed'] = ops_all_completed
-            if OPS_WAITING_CRIT != None and ops_all_waiting > OPS_WAITING_CRIT:
+            if OPS_WAITING_CRIT is not None and ops_all_waiting > OPS_WAITING_CRIT:
                 state = CHECK_RESULT_ERROR
-            elif OPS_WAITING_WARN != None and ops_all_waiting > OPS_WAITING_WARN:
+            elif OPS_WAITING_WARN is not None and ops_all_waiting > OPS_WAITING_WARN:
                 state = CHECK_RESULT_WARNING
             else:
                 state = CHECK_RESULT_OK
@@ -1360,7 +1368,7 @@ class SlapdCheck(CheckMkLocalCheck):
                     ops_all_waiting,
                 ),
             )
-        return # end of _get_slapd_perfstats()
+        # end of _get_slapd_perfstats()
 
     def _check_mdb_size(self, db_num, db_suffix, db_type, db_dir):
         if db_type != 'mdb':
@@ -1550,7 +1558,7 @@ class SlapdCheck(CheckMkLocalCheck):
                                 noop_response_time,
                             )
                         )
-        return # end of _check_databases()
+        # end of _check_databases()
 
     def _check_providers(self, syncrepl_topology):
         """
@@ -1637,7 +1645,7 @@ class SlapdCheck(CheckMkLocalCheck):
                     'olcTLSCertificateKeyFile',
                     'olcTLSDHParamFile',
                 ],
-            )
+            ).entry_s
         except CATCH_ALL_EXC as exc:
             self.result(
                 CHECK_RESULT_ERROR,
@@ -1795,7 +1803,7 @@ class SlapdCheck(CheckMkLocalCheck):
                             )
                         )
 
-            if SYNCREPL_TIMEDELTA_CRIT != None and \
+            if SYNCREPL_TIMEDELTA_CRIT is not None and \
                max_csn_timedelta > SYNCREPL_TIMEDELTA_CRIT:
                 old_critical_timestamp = float(
                     self._state.data.get(
@@ -1807,7 +1815,7 @@ class SlapdCheck(CheckMkLocalCheck):
                 self._next_state[item_name+'_critical'] = old_critical_timestamp
             else:
                 self._next_state[item_name + '_critical'] = -1.0
-            if SYNCREPL_TIMEDELTA_WARN != None and \
+            if SYNCREPL_TIMEDELTA_WARN is not None and \
                 max_csn_timedelta > SYNCREPL_TIMEDELTA_WARN:
                 old_warn_timestamp = float(
                     self._state.data.get(
@@ -1838,7 +1846,7 @@ class SlapdCheck(CheckMkLocalCheck):
                 ),
             )
 
-        return  # checks()
+        # end of checks()
 
 #-----------------------------------------------------------------------
 # Main
