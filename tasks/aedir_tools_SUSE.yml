@@ -3,12 +3,12 @@
 - name: "Install base packages on {{ lsb_id }}"
   zypper:
     name:
-      - python-pyasn1>=0.3.7
-      - python-pyasn1-modules>=0.1.5
-      - python-ldap0==0.2.7
-      - python-aedir==0.3.0
-      - python-cryptography
-      - python-jwcrypto
+      - python3-pyasn1>=0.3.7
+      - python3-pyasn1-modules>=0.1.5
+      - python3-ldap0>=0.6.0
+      - python3-aedir>=0.5.1
+      - python3-cryptography
+      - python3-jwcrypto
     state: present
     disable_recommends: yes
     type: package
@@ -19,9 +19,9 @@
     - restart bind_proxy
     - restart web2ldap
 
-- name: "Install python-slapdsock packages on {{ lsb_id }}"
+- name: "Install python3-slapdsock packages on {{ lsb_id }}"
   zypper:
-    name: python-slapdsock==0.10.0
+    name: python3-slapdsock>=0.11.0
     state: present
     disable_recommends: yes
     type: package
@@ -32,12 +32,12 @@
 - name: "Install additional packages on {{ openldap_role }} on {{ lsb_id }}"
   zypper:
     name:
-      - python-paramiko
-      - python-mailutil==0.2.0
-      - python-passlib
-      - python-asn1crypto
-      - python-xlwt
-      - python-pycryptodome
+      - python3-paramiko
+      - python3-mailutil>=0.3.0
+      - python3-passlib
+      - python3-asn1crypto
+      - python3-xlwt
+      - python3-pycryptodome
     state: present
     disable_recommends: yes
     type: package
@@ -60,7 +60,7 @@
 - name: "Install ae-dir-pproc on {{ openldap_role }} on {{ lsb_id }}"
   zypper:
     name:
-      - ae-dir-pproc>=0.1.2
+      - ae-dir-pproc>=0.3.0
     state: present
     disable_recommends: yes
     type: package
@@ -71,7 +71,7 @@
 - name: "Install web2ldap on {{ openldap_role }} on {{ lsb_id }}"
   zypper:
     name:
-      - web2ldap<1.5
+      - web2ldap>=1.5.5
     state: present
     disable_recommends: yes
     type: package
@@ -82,7 +82,7 @@
 - name: "Install additional packages for simple web apps on {{ openldap_role }} on {{ lsb_id }}"
   zypper:
     name:
-      - python-web.py<=0.40
+      - python3-web.py>=0.40
     state: present
     disable_recommends: yes
     type: package
@@ -94,7 +94,7 @@
 - name: "Install additional packages for web2ldap on {{ openldap_role }} on {{ lsb_id }}"
   zypper:
     name:
-      - python-dnspython
+      - python3-dnspython
     state: present
     disable_recommends: yes
     type: package

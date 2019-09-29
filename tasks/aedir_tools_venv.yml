@@ -8,7 +8,7 @@
     state: latest
     virtualenv: "{{ aedir_prefix }}"
     virtualenv_site_packages: no
-    virtualenv_python: python2.7
+    virtualenv_command: "python3 -m venv"
     extra_args: "{{ aedir_pip_extra_args }}"
 
 - name: "Additional PIP packages in virtualenv {{ aedir_prefix }}"
@@ -19,11 +19,11 @@
       - jwcrypto
       - pyasn1
       - pyasn1_modules
-      - ldap0==0.2.7
-      - aedir==0.3.0
+      - ldap0>=0.6.0
+      - aedir>=0.5.1
     state: present
     virtualenv: "{{ aedir_prefix }}"
-    virtualenv_python: python2.7
+    virtualenv_command: "python3 -m venv"
     extra_args: "{{ aedir_pip_extra_args }}"
   notify:
     - restart ae-dir-pwd
@@ -34,7 +34,7 @@
 
 - name: "PIP package slapdsock in virtualenv {{ aedir_prefix }}"
   pip:
-    name: slapdsock==0.10.0
+    name: slapdsock>=0.11.0
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
@@ -45,7 +45,7 @@
 - name: "PIP install additional modules in virtualenv {{ aedir_prefix }} on {{ openldap_role }}"
   pip:
     name:
-      - mailutil==0.2.0
+      - mailutil>=0.3.0
       - paramiko
       - passlib
       - xlwt
@@ -61,19 +61,10 @@
     - restart hotp_validator
     - restart web2ldap
 
-- name: "PIP install aedir_cli in virtualenv {{ aedir_prefix }} on {{ openldap_role }}"
+- name: "PIP install aedir_pproc in virtualenv {{ aedir_prefix }} on {{ openldap_role }} on {{ lsb_id }}"
   pip:
     name:
-      - aedir_cli==0.1.1
-    state: present
-    virtualenv: "{{ aedir_prefix }}"
-    extra_args: "{{ aedir_pip_extra_args }}"
-  when: openldap_role == 'provider'
-
-- name: "PIP install aedir_pproc in virtualenv {{ aedir_prefix }} on {{ openldap_role }}"
-  pip:
-    name:
-      - aedir_pproc>=0.1.0,<0.3
+      - aedir_pproc>=0.2.0
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
@@ -84,7 +75,7 @@
 - name: "PIP install web2ldap in virtualenv {{ aedir_prefix }} on {{ openldap_role }}"
   pip:
     name:
-      - web2ldap>=1.4.19,<1.5
+      - web2ldap>=1.5.5
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
