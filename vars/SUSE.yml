@@ -11,9 +11,19 @@ aedir_suse_repo:
   "openSUSE Leap 15.1": "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR/openSUSE_Leap_15.1/"
   "openSUSE Tumbleweed": "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR/openSUSE_Tumbleweed/"
 
+# which Python package repos on https://download.opensuse.org to use for openSUSE or SLES versions
+aedir_pymod_repo:
+  "SUSE Linux Enterprise Server 15": "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR:/py{{ aedir_python_version[0] }}/SLE_15/"
+  "openSUSE Leap 15.0": "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR:/py{{ aedir_python_version[0] }}/openSUSE_Leap_15.0/"
+  "openSUSE Leap 15.1": "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR:/py{{ aedir_python_version[0] }}/openSUSE_Leap_15.1/"
+  "openSUSE Tumbleweed": "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR:/py{{ aedir_python_version[0] }}/openSUSE_Tumbleweed/"
+
 aedir_package_repos:
   "home_stroeder_AE-DIR":
     repo: "{{ aedir_suse_repo.get(ansible_lsb.description, '') }}"
+    key: ""
+  "home_stroeder_AE-DIR_py{{ aedir_python_version[0] }}":
+    repo: "{{ aedir_pymod_repo.get(ansible_lsb.description, '') }}"
     key: ""
 
 # OS-specific Python paths
