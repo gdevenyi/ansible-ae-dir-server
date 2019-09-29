@@ -82,7 +82,7 @@
 - name: "Install additional packages for simple web apps on {{ openldap_role }} on {{ lsb_id }}"
   zypper:
     name:
-      - python-web.py
+      - python-web.py==0.40
     state: present
     disable_recommends: yes
     type: package
