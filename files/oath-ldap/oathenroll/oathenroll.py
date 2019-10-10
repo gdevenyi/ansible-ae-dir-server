@@ -483,7 +483,7 @@ class ResetToken(BaseApp):
         self.user_ldap_conn.modify_s(
             token_dn,
             token_mods,
-            serverctrls=[session_tracking_ctrl],
+            req_ctrls=[session_tracking_ctrl],
         )
         # Try to remove shared secret separately because with
         # strict access control we don't know whether it's set or not
@@ -491,7 +491,7 @@ class ResetToken(BaseApp):
             self.user_ldap_conn.modify_s(
                 token_dn,
                 [(ldap0.MOD_DELETE, 'oathSecret', None)],
-                serverctrls=[session_tracking_ctrl],
+                req_ctrls=[session_tracking_ctrl],
             )
         except ldap0.NO_SUCH_ATTRIBUTE:
             # We can happily ignore this case
@@ -501,7 +501,7 @@ class ResetToken(BaseApp):
         self.ldap_conn.passwd_s(
             token_dn,
             None, token_password,
-            serverctrls=[session_tracking_ctrl],
+            req_ctrls=[session_tracking_ctrl],
         )
         return # end of ResetToken.update_token()
 
@@ -648,7 +648,7 @@ class InitToken(BaseApp):
                     (ldap0.MOD_ADD, 'oathSecret', [oath_secret]),
                     #(ldap0.MOD_DELETE, 'userPassword', None),
                 ],
-                serverctrls=[
+                req_ctrls=[
                     SessionTrackingControl(
                         self.remote_ip,
                         web.ctx.homedomain,
