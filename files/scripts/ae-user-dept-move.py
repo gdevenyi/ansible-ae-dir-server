@@ -56,7 +56,7 @@ msg_id = ldap_conn.search(
     ldap0.SCOPE_SUBTREE,
     aeuser_filter,
     attrlist=['uid'],
-    serverctrls = [DEREF_CONTROL],
+    req_ctrls = [DEREF_CONTROL],
 )
 
 for res_type, res_data, res_msgid, res_controls in ldap_conn.results(
