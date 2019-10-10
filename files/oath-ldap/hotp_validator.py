@@ -377,7 +377,7 @@ class HOTPValidationHandler(SlapdSockHandler):
             self.ldap_conn.modify_s(
                 token_dn,
                 mods,
-                serverctrls=mod_ctrls,
+                req_ctrls=mod_ctrls,
             )
         except LDAPError as err:
             # Return unwillingToPerform to let clients fail hard
@@ -422,7 +422,7 @@ class HOTPValidationHandler(SlapdSockHandler):
             self.ldap_conn.modify_s(
                 user_dn.encode('utf-8'),
                 mods,
-                serverctrls=[RelaxRulesControl(True)],
+                req_ctrls=[RelaxRulesControl(True)],
             )
         except LDAPError as err:
             self._log(

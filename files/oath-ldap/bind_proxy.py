@@ -260,7 +260,7 @@ class BindProxyHandler(SlapdSockHandler):
 
         # We need current time in GeneralizedTime syntax later
         now_dt = datetime.datetime.utcnow()
-        now_str = unicode(ldap_datetime_str(now_dt))
+        now_str = ldap_datetime_str(now_dt)
 
         # We need UTF-8 encoded DN several times later
         request_dn_utf8 = request.dn.encode('utf-8')
@@ -322,7 +322,7 @@ class BindProxyHandler(SlapdSockHandler):
                         remote_ldap_conn.simple_bind_s(
                             request_dn_utf8,
                             request.cred,
-                            serverctrls=[
+                            req_ctrls=[
                                 self._gen_session_tracking_ctrl(request, request_dn_utf8)
                             ]
                         )
