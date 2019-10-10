@@ -2,19 +2,17 @@
 # vars file for roles/ae-dir-server
 
 # explicit use of a specific Python version
-aedir_python_version: "2.7"
+aedir_python_version: "3.7"
 
 # which repos on https://download.opensuse.org to use for openSUSE or SLES versions
 aedir_suse_repo:
   "SUSE Linux Enterprise Server 15": "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR/SLE_15/"
-  "openSUSE Leap 15.0": "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR/openSUSE_Leap_15.0/"
   "openSUSE Leap 15.1": "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR/openSUSE_Leap_15.1/"
   "openSUSE Tumbleweed": "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR/openSUSE_Tumbleweed/"
 
 # which Python package repos on https://download.opensuse.org to use for openSUSE or SLES versions
 aedir_pymod_repo:
   "SUSE Linux Enterprise Server 15": "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR:/py{{ aedir_python_version[0] }}/SLE_15/"
-  "openSUSE Leap 15.0": "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR:/py{{ aedir_python_version[0] }}/openSUSE_Leap_15.0/"
   "openSUSE Leap 15.1": "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR:/py{{ aedir_python_version[0] }}/openSUSE_Leap_15.1/"
   "openSUSE Tumbleweed": "http://download.opensuse.org/repositories/home:/stroeder:/AE-DIR:/py{{ aedir_python_version[0] }}/openSUSE_Tumbleweed/"
 
@@ -81,4 +79,4 @@ web2ldap_paths:
 # which uwsgi executable to use
 uwsgi_paths:
   exec: "/usr/sbin/uwsgi"
-  python_plugin: "/usr/lib64/uwsgi/python_plugin.so"
+  python_plugin: "/usr/lib64/uwsgi/python3_plugin.so"
