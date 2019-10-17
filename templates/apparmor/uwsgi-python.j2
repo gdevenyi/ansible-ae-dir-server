@@ -12,6 +12,7 @@ profile {{ name }} {
   {{ uwsgi_paths.exec }} r,
 
   # access to {{ name }} application config
+  {{ cfgdir }}/ r,
   {{ cfgdir }}/** r,
 
 {% if name=="web2ldap" %}
