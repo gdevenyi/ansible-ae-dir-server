@@ -3,7 +3,7 @@
 # {{ ansible_managed }}
 #---------------------------------------------------------------------------
 [uwsgi]
-plugin = python
+plugin = python3
 socket = {{ aedir_rundir }}/uwsgi/{{ name }}/{{ name }}.sock
 chmod-socket = 666
 chdir = {{ aedir_rundir }}/uwsgi/{{ name }}
