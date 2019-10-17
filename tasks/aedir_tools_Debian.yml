@@ -20,11 +20,10 @@
 - name: "Install base packages on {{ lsb_id }}"
   apt:
     name:
-      - python-setuptools
-      - virtualenv
-      - python-virtualenv
-      - python-pip
-      - python-cffi
+      - python3-setuptools
+      - python3-venv
+      - python3-pip
+      - python3-cffi
     state: present
     update_cache: no
     install_recommends: no
