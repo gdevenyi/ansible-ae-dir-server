@@ -8,7 +8,7 @@
     state: latest
     virtualenv: "{{ aedir_prefix }}"
     virtualenv_site_packages: no
-    virtualenv_command: "python3 -m venv"
+    virtualenv_python: "python3"
     extra_args: "{{ aedir_pip_extra_args }}"
 
 - name: "Additional PIP packages in virtualenv {{ aedir_prefix }}"
@@ -23,7 +23,6 @@
       - aedir>=0.5.1
     state: present
     virtualenv: "{{ aedir_prefix }}"
-    virtualenv_command: "python3 -m venv"
     extra_args: "{{ aedir_pip_extra_args }}"
   notify:
     - restart ae-dir-pwd
@@ -64,7 +63,7 @@
 - name: "PIP install aedir_pproc in virtualenv {{ aedir_prefix }} on {{ openldap_role }} on {{ lsb_id }}"
   pip:
     name:
-      - aedir_pproc>=0.2.0
+      - aedir_pproc>=0.3.0
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
