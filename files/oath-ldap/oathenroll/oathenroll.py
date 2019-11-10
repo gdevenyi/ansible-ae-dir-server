@@ -145,6 +145,7 @@ class Default(object):
         Add more HTTP headers to response
         """
         csp_value = ' '.join((
+            "base-uri 'none';",
             "child-src 'none';",
             "connect-src 'none';",
             "default-src 'none';",
@@ -153,6 +154,8 @@ class Default(object):
             "frame-ancestors 'none';",
             "frame-src 'none';",
             "img-src 'self' data:;",
+            "media-src 'none';",
+            "object-src 'none';",
             "script-src 'none';",
             "style-src 'self';",
         ))
