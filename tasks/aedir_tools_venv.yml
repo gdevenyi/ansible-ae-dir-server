@@ -11,7 +11,7 @@
     virtualenv_python: python2.7
     extra_args: "{{ aedir_pip_extra_args }}"
 
-- name: "Additional PIP packages in virtualenv {{ aedir_prefix }} on {{ lsb_id }}"
+- name: "Additional PIP packages in virtualenv {{ aedir_prefix }}"
   pip:
     name:
       - cryptography
@@ -42,7 +42,7 @@
     - restart hotp_validator
     - restart bind_proxy
 
-- name: "PIP install additional modules in virtualenv {{ aedir_prefix }} on {{ openldap_role }} on {{ lsb_id }}"
+- name: "PIP install additional modules in virtualenv {{ aedir_prefix }} on {{ openldap_role }}"
   pip:
     name:
       - mailutil==0.2.0
@@ -61,7 +61,7 @@
     - restart hotp_validator
     - restart web2ldap
 
-- name: "PIP install aedir_cli in virtualenv {{ aedir_prefix }} on {{ openldap_role }} on {{ lsb_id }}"
+- name: "PIP install aedir_cli in virtualenv {{ aedir_prefix }} on {{ openldap_role }}"
   pip:
     name:
       - aedir_cli==0.1.1
@@ -70,7 +70,7 @@
     extra_args: "{{ aedir_pip_extra_args }}"
   when: openldap_role == 'provider'
 
-- name: "PIP install aedir_pproc in virtualenv {{ aedir_prefix }} on {{ openldap_role }} on {{ lsb_id }}"
+- name: "PIP install aedir_pproc in virtualenv {{ aedir_prefix }} on {{ openldap_role }}"
   pip:
     name:
       - aedir_pproc>=0.1.0,<0.3
@@ -81,7 +81,7 @@
   notify:
     - restart ae-dir-pwd
 
-- name: "PIP install web2ldap in virtualenv {{ aedir_prefix }} on {{ openldap_role }} on {{ lsb_id }}"
+- name: "PIP install web2ldap in virtualenv {{ aedir_prefix }} on {{ openldap_role }}"
   pip:
     name:
       - web2ldap>=1.4.19,<1.5
