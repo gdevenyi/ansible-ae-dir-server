@@ -7,7 +7,7 @@ HOTP validation on intercepted BIND requests
 
 from __future__ import absolute_import
 
-__version__ = '0.10.2'
+__version__ = '0.11.0'
 __author__ = u'Michael Ströder <michael@stroeder.com>'
 
 #-----------------------------------------------------------------------
@@ -346,9 +346,9 @@ class HOTPValidationHandler(SlapdSockHandler):
             # Success case
             mods = [
                 # Reset failure counter
-                (ldap0.MOD_REPLACE, 'oathFailureCount', ['0']),
+                (ldap0.MOD_REPLACE, b'oathFailureCount', [b'0']),
                 # Store last login
-                (ldap0.MOD_REPLACE, 'oathLastLogin', [str(self.now_str)]),
+                (ldap0.MOD_REPLACE, b'oathLastLogin', [self.now_str.encode('ascii')]),
             ]
             # let slapd assert old value <= new value
         else:
@@ -359,15 +359,15 @@ class HOTPValidationHandler(SlapdSockHandler):
                         False: ldap0.MOD_ADD,
                         True: ldap0.MOD_INCREMENT,
                     }['oathFailureCount' in otp_token_entry],
-                    'oathFailureCount',
-                    ['1']
+                    b'oathFailureCount',
+                    [b'1']
                 ),
-                (ldap0.MOD_REPLACE, 'oathLastFailure', [str(self.now_str)]),
+                (ldap0.MOD_REPLACE, b'oathLastFailure', [self.now_str.encode('ascii')]),
             ]
         if oath_hotp_next_counter is not None:
             # Update HOTP counter value!
             mods.append(
-                (ldap0.MOD_REPLACE, 'oathHOTPCounter', [str(oath_hotp_next_counter)]),
+                (ldap0.MOD_REPLACE, b'oathHOTPCounter', [str(oath_hotp_next_counter).encode('ascii')]),
             )
             mod_ctrls = [
                 AssertionControl(True, '(oathHOTPCounter<=%d)' % oath_hotp_next_counter),
@@ -410,9 +410,9 @@ class HOTPValidationHandler(SlapdSockHandler):
         """
         if not success:
             # record failed login
-            mods = [(ldap0.MOD_ADD, 'pwdFailureTime', [str(self.now_str)])]
+            mods = [(ldap0.MOD_ADD, b'pwdFailureTime', [self.now_str.encode('ascii')])]
         elif 'pwdFailureTime' in user_entry:
-            mods = [(ldap0.MOD_DELETE, 'pwdFailureTime', None)]
+            mods = [(ldap0.MOD_DELETE, b'pwdFailureTime', None)]
         else:
             # nothing to be done
             self._log(logging.DEBUG, 'No update of user entry %r', user_dn)
@@ -420,7 +420,7 @@ class HOTPValidationHandler(SlapdSockHandler):
         # Update the login attribute in user's entry
         try:
             self.ldap_conn.modify_s(
-                user_dn.encode('utf-8'),
+                user_dn,
                 mods,
                 req_ctrls=[RelaxRulesControl(True)],
             )
@@ -466,9 +466,9 @@ class HOTPValidationHandler(SlapdSockHandler):
         """
         user_entry = response = None
         try:
-            user_entry = self.ldap_conn.read_s(
-                request.dn.encode('utf-8'),
-                self.user_filter.encode('utf-8'),
+            user = self.ldap_conn.read_s(
+                request.dn,
+                self.user_filter,
                 attrlist=filter(
                     None,
                     [
@@ -499,7 +499,7 @@ class HOTPValidationHandler(SlapdSockHandler):
             response = failure_response_class(request.msgid)
         else:
             # Check whether entry was really received
-            if not user_entry:
+            if user is None:
                 self._log(
                     logging.INFO,
                     'No result reading user entry %r with filter %r => CONTINUE',
@@ -509,9 +509,11 @@ class HOTPValidationHandler(SlapdSockHandler):
                 response = CONTINUE_RESPONSE
             else:
                 response = None
+                user_entry = user.entry_s
         assert (not user_entry and response) or (user_entry and not response), \
             ValueError('user_entry XOR response is violated!')
-        return user_entry, response # end of _get_user_entry()
+        return user_entry, response
+        # end of _get_user_entry()
 
     def _get_oath_token_entry(self, user_dn, user_entry):
         """
@@ -521,12 +523,12 @@ class HOTPValidationHandler(SlapdSockHandler):
         try:
             oath_token_dn = user_entry['oathHOTPToken'][0]
         except KeyError:
-            oath_token_dn = user_dn.encode('utf-8')
+            oath_token_dn = user_dn
         # Try to read the token entry
         try:
-            otp_token_entry = self.ldap_conn.read_s(
+            otp_token = self.ldap_conn.read_s(
                 oath_token_dn,
-                self.token_filter.encode('utf-8'),
+                self.token_filter,
                 attrlist=self.token_attr_list,
                 cache_ttl=0, # caching disabled! (because of counter or similar)
             )
@@ -539,14 +541,18 @@ class HOTPValidationHandler(SlapdSockHandler):
             )
             otp_token_entry = None
         else:
-            if not otp_token_entry:
+            if otp_token is None:
+                otp_token_entry = None
                 # No available token entry => invalidCredentials
                 self._log(
                     logging.ERROR,
                     'Empty result reading token %r',
                     oath_token_dn,
                 )
-        return oath_token_dn, otp_token_entry # end of _get_oath_token_entry()
+            else:
+                otp_token_entry = otp_token.entry_s
+        return oath_token_dn, otp_token_entry
+        # end of _get_oath_token_entry()
 
     def _get_oath_token_params(self, otp_token_entry):
         """
@@ -557,7 +563,7 @@ class HOTPValidationHandler(SlapdSockHandler):
             oath_params_dn = otp_token_entry['oathHOTPParams'][0]
             # Try to read the parameter entry
             try:
-                oath_params_entry = self.ldap_conn.read_s(
+                oath_params = self.ldap_conn.read_s(
                     oath_params_dn,
                     '(objectClass=oathHOTPParams)',
                     attrlist=[
@@ -576,7 +582,8 @@ class HOTPValidationHandler(SlapdSockHandler):
                     err,
                 )
             else:
-                oath_params_entry = oath_params_entry or {}
+                if oath_params is not None:
+                    oath_params_entry = oath_params.entry_s
         # Attributes from referenced parameter entry
         if not oath_params_entry:
             self._log(logging.WARN, 'No OATH params! Using defaults.')
@@ -793,7 +800,7 @@ class HOTPValidationHandler(SlapdSockHandler):
             )
             response = InvalidCredentialsResponse(request.msgid, self.infomsg.ENTRY_NOT_VALID)
 
-        elif oath_token_identifier != oath_token_identifier_req:
+        elif oath_token_identifier != oath_token_identifier_req.decode('utf-8'):
             # fail because stored and requested token identifiers different
             self._log(
                 logging.WARN,
@@ -1134,7 +1141,7 @@ def run_this():
             log_vars=DEBUG_VARS,
             key_files=JWK_KEY_FILES,
         )
-        slapd_sock_listener.ldapi_uri = local_ldap_uri_obj.initializeUrl()
+        slapd_sock_listener.ldapi_uri = local_ldap_uri_obj.connect_uri()
         slapd_sock_listener.ldap_trace_level = \
             int(local_ldap_uri_obj.trace_level or '0') or LDAP0_TRACE_LEVEL
         try:
