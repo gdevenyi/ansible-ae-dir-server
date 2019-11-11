@@ -459,7 +459,7 @@ def run_this():
             ALLOWED_UIDS, ALLOWED_GIDS,
             log_vars=DEBUG_VARS,
         )
-        listener.ldapi_uri = local_ldap_uri_obj.initializeUrl()
+        listener.ldapi_uri = local_ldap_uri_obj.connect_uri()
         listener.ldap_trace_level = int(local_ldap_uri_obj.trace_level or '0') or LDAP0_TRACE_LEVEL
         listener.remote_ldap_uris = remote_ldap_uris
         try:

@@ -191,7 +191,7 @@ class BaseApp(Default):
         Connect and bind to the LDAP directory as local system account
         """
         self.ldap_conn = ReconnectLDAPObject(
-            self.ldap_url.initializeUrl(),
+            self.ldap_url.connect_uri(),
             trace_level=LDAP0_TRACE_LEVEL,
         )
         # Send SASL bind request with mechanism EXTERNAL
@@ -218,7 +218,7 @@ class BaseApp(Default):
                     attrlist=['1.1'],
                 )
                 self.user_ldap_conn = ReconnectLDAPObject(
-                    self.ldap_url.initializeUrl(),
+                    self.ldap_url.connect_uri(),
                     trace_level=LDAP0_TRACE_LEVEL,
                 )
                 self.user_ldap_conn.simple_bind_s(user_dn, password.encode('utf-8'))
@@ -636,7 +636,7 @@ class InitToken(BaseApp):
         oath_secret = self.form.d.secret.encode('utf-8')
         try:
             token_ldap_conn = ReconnectLDAPObject(
-                self.ldap_url.initializeUrl(),
+                self.ldap_url.connect_uri(),
                 trace_level=LDAP0_TRACE_LEVEL,
             )
             token_ldap_conn.simple_bind_s(token_binddn, token_password)

@@ -187,7 +187,7 @@ class PWSyncWorker(threading.Thread, LocalLDAPConn):
             self._target_conn_lock.acquire()
             try:
                 self._target_conn = MyLDAPObject(
-                    self._target_ldap_url.initializeUrl(),
+                    self._target_ldap_url.connect_uri(),
                     trace_level=LDAP0_TRACE_LEVEL,
                     cache_ttl=LDAP_CACHE_TTL,
                     retry_max=LDAP_MAXRETRYCOUNT,
@@ -532,7 +532,7 @@ def run_this():
         target_ldap_url_obj,
         pwsync_queue,
     )
-    pwsync_worker.ldapi_uri = local_ldap_uri_obj.initializeUrl()
+    pwsync_worker.ldapi_uri = local_ldap_uri_obj.connect_uri()
     pwsync_worker.setDaemon(True)
     pwsync_worker.start()
 
@@ -546,7 +546,7 @@ def run_this():
             pwsync_queue,
             log_vars=DEBUG_VARS,
         )
-        slapd_sock_listener.ldapi_uri = local_ldap_uri_obj.initializeUrl()
+        slapd_sock_listener.ldapi_uri = local_ldap_uri_obj.connect_uri()
         slapd_sock_listener.ldap_trace_level = LDAP0_TRACE_LEVEL
         try:
             slapd_sock_listener.serve_forever()
