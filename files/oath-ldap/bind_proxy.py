@@ -1,4 +1,3 @@
-#!/opt/ae-dir/bin/python2.7 -ROOB
 # -*- coding: utf-8 -*-
 """
 slapd-sock listener demon which sends intercepted BIND requests
