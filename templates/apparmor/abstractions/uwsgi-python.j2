@@ -8,12 +8,16 @@
 
   # uwsgi needs to look at mounts
   @{PROC}/filesystems r,
+  # read access to own file descriptors
+  @{PROC}/@{pid}/fd/ r,
 
   # write temporary files
   /tmp/ rw,
   owner /tmp/** rwkl,
 
-  # load the UWSGI plugin module for Python {{ aedir_python_version }}
+  # UWSGI plugin module for syslog
+  {{ uwsgi_paths.syslog_plugin }} rm,
+  # UWSGI plugin module for Python {{ aedir_python_version }}
   {{ uwsgi_paths.python_plugin }} rm,
 
   deny /bin/bash r,

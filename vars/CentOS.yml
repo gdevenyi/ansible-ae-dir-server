@@ -66,4 +66,5 @@ web2ldap_paths:
 # which uwsgi executable to use
 uwsgi_paths:
   exec: "/usr/sbin/uwsgi"
+  syslog_plugin: "/usr/lib64/uwsgi/syslog_plugin.so"
   python_plugin: "/usr/lib64/uwsgi/python_plugin.so"
