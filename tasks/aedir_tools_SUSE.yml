@@ -51,7 +51,7 @@
 - name: "Install ae-dir-pproc on {{ openldap_role }} on {{ lsb_id }}"
   zypper:
     name:
-      - ae-dir-pproc>=0.3.0
+      - ae-dir-pproc >= 0.3.0
     state: present
     disable_recommends: yes
     type: package
@@ -62,7 +62,7 @@
 - name: "Install web2ldap on {{ openldap_role }} on {{ lsb_id }}"
   zypper:
     name:
-      - web2ldap>=1.5.5
+      - web2ldap >= 1.5.5
     state: present
     disable_recommends: yes
     type: package
@@ -73,7 +73,7 @@
 - name: "Install additional packages for simple web apps on {{ openldap_role }} on {{ lsb_id }}"
   zypper:
     name:
-      - python3-web.py>=0.40
+      - python3-web.py >= 0.40
     state: present
     disable_recommends: yes
     type: package
