@@ -88,7 +88,7 @@ SMTP_TLSARGS = {
 }
 
 # From address in sent e-mail
-SMTP_FROM = 'ae-dir-pwd@{{ openldap_service_fqdn }}'
+SMTP_FROM = '{{ smtp_from_address }}'
 
 # URL path prefix used when generating URLs in e-mails
 # handy for reverse proxy setups
