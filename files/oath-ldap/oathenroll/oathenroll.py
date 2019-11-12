@@ -8,7 +8,7 @@ Author: Michael Ströder <michael@stroeder.com>
 
 from __future__ import absolute_import
 
-__version__ = '0.2.3'
+__version__ = '0.3.0'
 
 # from Python's standard lib
 import sys
@@ -19,7 +19,7 @@ import smtplib
 import hashlib
 import random
 import logging
-from urllib import quote_plus as url_quote_plus
+from urllib.parse import quote_plus as url_quote_plus
 import email.utils
 
 # web.py
@@ -27,11 +27,12 @@ import web
 
 # from ldap0 package
 import ldap0
+import ldap0.filter
+import ldap0.err
 from ldap0 import LDAPError
 from ldap0.ldapobject import ReconnectLDAPObject
 from ldap0.controls.sessiontrack import SessionTrackingControl, SESSION_TRACKING_FORMAT_OID_USERNAME
 from ldap0.ldapurl import LDAPUrl
-from ldap0.filter import escape_filter_chars
 from ldap0.pw import random_string
 
 # from mailutil
@@ -209,19 +210,17 @@ class BaseApp(Default):
         try: # finally-block
             self.user_ldap_conn = None
             try:
-                user_dn, _ = self.ldap_conn.find_unique_entry(
+                user = self.ldap_conn.find_unique_entry(
                     self.ldap_url.dn,
                     scope=self.ldap_url.scope,
-                    filterstr=FILTERSTR_ADMIN_LOGIN.format(
-                        uid=username.encode('utf-8'),
-                    ),
+                    filterstr=FILTERSTR_ADMIN_LOGIN.format(uid=username),
                     attrlist=['1.1'],
                 )
                 self.user_ldap_conn = ReconnectLDAPObject(
                     self.ldap_url.connect_uri(),
                     trace_level=LDAP0_TRACE_LEVEL,
                 )
-                self.user_ldap_conn.simple_bind_s(user_dn, password.encode('utf-8'))
+                self.user_ldap_conn.simple_bind_s(user.dn_s, password.encode('utf-8'))
             except LDAPError:
                 self.user_uid = u''
                 result = False
@@ -240,12 +239,12 @@ class BaseApp(Default):
         """
         Search a token entry specified by serial number
         """
-        token_dn, token_entry = self.user_ldap_conn.find_unique_entry(
+        token = self.user_ldap_conn.find_unique_entry(
             self.ldap_url.dn,
             scope=self.ldap_url.scope,
             filterstr=FILTERSTR_TOKEN_SEARCH.format(
                 owner_attr=ATTR_OWNER_DN,
-                serial=token_serial.encode('utf-8'),
+                serial=token_serial,
             ),
             attrlist=[
                 'createTimestamp',
@@ -261,8 +260,7 @@ class BaseApp(Default):
                 ATTR_OWNER_DN,
             ],
         )
-        token_displayname = token_entry['displayName'][0].decode('utf-8')
-        return token_displayname, token_dn, token_entry
+        return token.entry_s['displayName'][0], token.dn_s, token.entry_s
         # endof BaseApp.search_token()
 
     def clean_up(self):
@@ -366,7 +364,7 @@ class ResetToken(BaseApp):
         # Construct the message
         #---------------------------------------------------------------
         smtp_message_tmpl = open(EMAIL_TEMPLATE, 'rb').read().decode('utf-8')
-        to_addr = owner_entry['mail']
+        to_addr = owner_entry['mail'][0]
         default_headers = (
             ('From', SMTP_FROM),
             ('Date', email.utils.formatdate(time.time(), True)),
@@ -387,7 +385,7 @@ class ResetToken(BaseApp):
         #---------------------------------------------------------------
         smtp_conn.send_simple_message(
             SMTP_FROM,
-            [to_addr.encode('utf-8')],
+            [to_addr],
             'utf-8',
             default_headers+(
                 ('Subject', smtp_subject),
@@ -406,7 +404,7 @@ class ResetToken(BaseApp):
             self.ldap_url.dn,
             ldap0.SCOPE_SUBTREE,
             filterstr='(&(objectClass=oathUser)(oathToken={dn}))'.format(
-                dn=escape_filter_chars(dn),
+                dn=ldap0.filter.escape_str(dn),
             ),
             attrlist=['uid', 'description']
         )
@@ -414,10 +412,10 @@ class ResetToken(BaseApp):
             return None
         return [
             (
-                entry['uid'][0].decode('utf-8'),
-                entry.get('description', [''])[0].decode('utf-8'),
+                res.entry_s['uid'][0],
+                res.entry_s.get('description', [''])[0],
             )
-            for dn, entry in ldap_result
+            for res in ldap_result
         ]
 
     def read_owner(self, dn):
@@ -436,10 +434,7 @@ class ResetToken(BaseApp):
             ],
         )
         if ldap_result:
-            result = dict([
-                (at, av[0].decode('utf-8'))
-                for at, av in ldap_result.items()
-            ])
+            result = ldap_result.entry_s
         else:
             raise ldap0.NO_SUCH_OBJECT('No result with %s' % repr(FILTERSTR_OWNER_READ))
         return result # end of read_owner()
@@ -465,8 +460,8 @@ class ResetToken(BaseApp):
             # => set shared secret time to current time here
             (
                 ldap0.MOD_REPLACE,
-                'oathSecretTime',
-                [time.strftime('%Y%m%d%H%M%SZ', time.gmtime(time.time()))],
+                b'oathSecretTime',
+                [time.strftime('%Y%m%d%H%M%SZ', time.gmtime(time.time())).encode('ascii')],
             ),
         ]
         for del_attr in (
@@ -477,7 +472,7 @@ class ResetToken(BaseApp):
             ):
             if del_attr in token_entry:
                 token_mods.append(
-                    (ldap0.MOD_DELETE, del_attr, None)
+                    (ldap0.MOD_DELETE, del_attr.encode('ascii'), None)
                 )
         # Reset the token entry
         self.user_ldap_conn.modify_s(
@@ -490,7 +485,7 @@ class ResetToken(BaseApp):
         try:
             self.user_ldap_conn.modify_s(
                 token_dn,
-                [(ldap0.MOD_DELETE, 'oathSecret', None)],
+                [(ldap0.MOD_DELETE, b'oathSecret', None)],
                 req_ctrls=[session_tracking_ctrl],
             )
         except ldap0.NO_SUCH_ATTRIBUTE:
@@ -525,7 +520,7 @@ class ResetToken(BaseApp):
                     repr(token_serial),
                     repr(owner_dn),
                     repr(sorted(accounts or [])),
-                ))
+                )).encode('ascii')
             ).hexdigest()
             if self.form.d.confirm != confirm_hash:
                 return RENDER.reset_form(
@@ -533,8 +528,8 @@ class ResetToken(BaseApp):
                     admin=self.form.d.admin,
                     serial=self.form.d.serial,
                     token=token_displayname,
-                    owner=owner_entry['displayName'],
-                    email=owner_entry['mail'],
+                    owner=owner_entry['displayName'][0],
+                    email=owner_entry['mail'][0],
                     accounts=accounts,
                     confirm=confirm_hash,
                 )
@@ -542,7 +537,7 @@ class ResetToken(BaseApp):
             enroll_pw2 = random_string(alphabet=PWD_TMP_CHARS, length=PWD_ADMIN_LEN)
             enroll_pw = enroll_pw1 + enroll_pw2
             self.update_token(token_dn, token_entry, enroll_pw)
-        except ldap0.NO_UNIQUE_ENTRY as ldap_err:
+        except ldap0.err.NoUniqueEntry as ldap_err:
             logging.error('LDAPError: %s', repr(ldap_err), exc_info=True)
             res = self.GET(message=u'Serial no. not found!')
         except LDAPError as ldap_err:
@@ -561,9 +556,9 @@ class ResetToken(BaseApp):
                 res = RENDER.reset_action(
                     'Token was reset',
                     serial=token_serial,
-                    token=token_entry['displayName'][0].decode('utf-8'),
-                    owner=owner_entry['displayName'],
-                    email=owner_entry['mail'],
+                    token=token_entry['displayName'][0],
+                    owner=owner_entry['displayName'][0],
+                    email=owner_entry['mail'][0],
                     enrollpw2=enroll_pw2,
                 )
         return res # end of ResetToken.do_the_work()
