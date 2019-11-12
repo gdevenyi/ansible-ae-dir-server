@@ -23,8 +23,8 @@
   /usr/lib/{pyshared,pycentral,python-support}/**.so     mr,
   /var/lib/{pyshared,pycentral,python-support}/**.pyc    mr,
   /usr/{,local/}lib/python3/dist-packages/**.so          mr,
-  deny /etc/python{{ aedir_python_version }} r,
-  deny /etc/python{{ aedir_python_version }}/sitecustomize.py r,
+  /etc/python{{ aedir_python_version }}/ r,
+  /etc/python{{ aedir_python_version }}/sitecustomize.py r,
 {% endif %}
 
 {% if lsb_id!="SUSE" %}
