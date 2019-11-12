@@ -38,13 +38,14 @@ from slapdsock.handler import SlapdSockHandler, SlapdSockHandlerError
 from slapdsock.message import RESULTResponse, InvalidCredentialsResponse
 
 # run multi-threaded
-from slapdsock.service import SlapdSockThreadingServer as SlapdSockServer
+#from slapdsock.service import SlapdSockThreadingServer as SlapdSockServer
+from slapdsock.service import SlapdSockServer
 
 #-----------------------------------------------------------------------
 # Configuration constants
 #-----------------------------------------------------------------------
 
-__version__ = '0.4.0'
+__version__ = '0.5.0'
 __author__ = u'Michael Ströder <michael@stroeder.com>'
 
 # If
@@ -267,14 +268,14 @@ class BindProxyHandler(SlapdSockHandler):
         if self.ldap_proxy_filter_tmpl:
 
             # Get LDAPObject instance for local LDAPI access
-            user_filterstr = self.ldap_proxy_filter_tmpl.format(now=now_str).encode('utf-8')
+            user_filterstr = self.ldap_proxy_filter_tmpl.format(now=now_str)
 
             # Try to read the user entry for the given request dn
             try:
                 try:
                     local_ldap_conn = self.server.get_ldapi_conn()
                     ldap_result = local_ldap_conn.search_s(
-                        request_dn_utf8,
+                        request.dn,
                         ldap0.SCOPE_BASE,
                         '(&{0}({1}=*))'.format(
                             user_filterstr,
@@ -319,10 +320,10 @@ class BindProxyHandler(SlapdSockHandler):
                             trace_level=0,
                         )
                         remote_ldap_conn.simple_bind_s(
-                            request_dn_utf8,
+                            request.dn,
                             request.cred,
                             req_ctrls=[
-                                self._gen_session_tracking_ctrl(request, request_dn_utf8)
+                                self._gen_session_tracking_ctrl(request, request.dn)
                             ]
                         )
                     except ldap0.SERVER_DOWN as ldap_error:
@@ -346,7 +347,7 @@ class BindProxyHandler(SlapdSockHandler):
                 except KeyError:
                     result_code = RESULT_CODE['other']
                 try:
-                    info = ldap_error.args[0]['info']
+                    info = ldap_error.args[0]['info'].decode('utf-8')
                 except (AttributeError, KeyError, TypeError):
                     info = None
                 self._log(
@@ -402,7 +403,7 @@ def run():
     script_name = os.path.abspath(sys.argv[0])
 
     # explicitly set CA cert file from libldap env var
-    ldap0.set_option(ldap0.OPT_X_TLS_CACERTFILE, os.environ['LDAPTLS_CACERT'])
+    ldap0.set_option(ldap0.OPT_X_TLS_CACERTFILE, os.environ['LDAPTLS_CACERT'].encode('utf-8'))
 
     log_level = LOG_LEVEL
     console_log_format = None
