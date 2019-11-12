@@ -1049,7 +1049,7 @@ class SlapdCheck(CheckMkLocalCheck):
             # only add numeric monitor data to performance metrics
             for metric_key in sock_monitor_entry.keys():
                 try:
-                    sock_perf_data[metric_key] = float(sock_monitor_entry[metric_key][0])
+                    sock_perf_data[metric_key.decode('ascii')] = float(sock_monitor_entry[metric_key][0])
                 except ValueError:
                     continue
             return sock_perf_data # end of _parse_sock_response()
