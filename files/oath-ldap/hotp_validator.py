@@ -1084,7 +1084,7 @@ class HOTPValidationHandler(SlapdSockHandler):
 # Main
 #-----------------------------------------------------------------------
 
-def run_this():
+def run():
     """
     The main script
     """
@@ -1154,8 +1154,8 @@ def run_this():
         except OSError:
             pass
 
-    return # run_this()
+    # end of run()
 
 
 if __name__ == '__main__':
-    run_this()
+    run()

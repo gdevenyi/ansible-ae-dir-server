@@ -477,7 +477,7 @@ class PassModServer(SlapdSockThreadingServer):
 # Main
 #-----------------------------------------------------------------------
 
-def run_this():
+def run():
     """
     The main script
     """
@@ -563,4 +563,4 @@ def run_this():
 
 
 if __name__ == '__main__':
-    run_this()
+    run()

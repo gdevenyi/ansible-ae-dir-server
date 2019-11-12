@@ -394,7 +394,7 @@ class BindProxyHandler(SlapdSockHandler):
 # Main
 #-----------------------------------------------------------------------
 
-def run_this():
+def run():
     """
     The main script
     """
@@ -464,7 +464,7 @@ def run_this():
         try:
             listener.serve_forever()
         except KeyboardInterrupt:
-            my_logger.warn('Received interrupt signal => shutdown')
+            my_logger.warning('Received interrupt signal => shutdown')
     finally:
         my_logger.debug('Remove socket path %r', socket_path)
         try:
@@ -472,8 +472,8 @@ def run_this():
         except OSError:
             pass
 
-    return # end of main()
+    # end of main()
 
 
 if __name__ == '__main__':
-    run_this()
+    run()
