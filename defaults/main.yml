@@ -96,7 +96,7 @@ aedir_python_sitepackages: "{{ aedir_python_paths.site_packages }}"
 aedir_htdocsdir: "{{ aedir_prefix }}/htdocs"
 
 # which Python interpreter to use
-aedir_python: "{{ aedir_python_paths.python_exec }} -ROOBsS"
+aedir_python: "{{ aedir_python_paths.python_exec }} -ROOBs"
 
 # where to install systemd files
 aedir_systemd_dir: "/etc/systemd/system"
