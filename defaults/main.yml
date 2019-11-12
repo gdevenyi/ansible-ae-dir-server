@@ -412,14 +412,17 @@ ae_expiry_status_defaults: {}
 # some uwsgi parameters per service
 aedir_uwsgi_params:
   web2ldap:
+    log_level: INFO
     buffer_size: 32768
     harakiri: 45
     threads: 10
   oathenroll:
+    log_level: INFO
     buffer_size: 8192
     harakiri: 10
     processes: 5
   pwd:
+    log_level: INFO
     buffer_size: 8192
     harakiri: 10
     processes: 5
