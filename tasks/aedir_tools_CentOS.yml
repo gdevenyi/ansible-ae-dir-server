@@ -17,7 +17,6 @@
   yum:
     name:
       - python3-setuptools
-      - python3-virtualenv
       - python3-pip
       - python3-cffi
     state: present
