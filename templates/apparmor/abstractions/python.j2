@@ -31,6 +31,7 @@
   # Separate Python virtual env on {{ lsb_id }}
   {{ aedir_python_sitepackages }}/ r,
   {{ aedir_python_sitepackages }}/** r,
+  {{ aedir_prefix }}/pyvenv.cfg r,
   {{ aedir_prefix }}/lib/python{{ aedir_python_version }}/ r,
   {{ aedir_prefix }}/lib/python{{ aedir_python_version }}/orig-prefix.txt r,
   {{ aedir_prefix }}/lib/python{{ aedir_python_version }}/**.py{,c,o} r,
