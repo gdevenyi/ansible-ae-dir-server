@@ -9,7 +9,7 @@
       - "{{ cron_pkg_name }}"
       - gzip
       - openssl
-      - python
+      - python3
       - tar
     state: present
     update_cache: yes
