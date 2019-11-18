@@ -201,7 +201,7 @@ class BindProxyHandler(SlapdSockHandler):
             return True
         if not peer_type == 'ip':
             return False
-        peer_ip_address = ipaddress.ip_address(peer_addr.decode('ascii'))
+        peer_ip_address = ipaddress.ip_address(peer_addr)
         for peer_net in self.ldap_proxy_peer_nets:
             if peer_ip_address in peer_net:
                 return True
