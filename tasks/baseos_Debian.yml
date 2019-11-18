@@ -13,6 +13,7 @@
       - tar
     state: present
     update_cache: yes
+    autoclean: yes
     cache_valid_time: 3600
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
