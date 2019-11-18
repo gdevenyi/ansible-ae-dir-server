@@ -8,7 +8,7 @@
       - libsasl2-dev
       - libldap-dev
       - python3-dev
-      - libpython-dev
+      - libpython3-dev
       - libffi-dev
     state: present
     update_cache: no
