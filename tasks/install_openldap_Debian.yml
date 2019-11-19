@@ -31,8 +31,7 @@
       - openldap-ltb-check-password
       - cracklib-runtime
     state: latest
-    update_cache: yes
-    cache_valid_time: 3600
+    update_cache: no
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
   notify:

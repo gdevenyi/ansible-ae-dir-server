@@ -9,10 +9,11 @@
       - "{{ cron_pkg_name }}"
       - gzip
       - openssl
-      - python
+      - python3
       - tar
     state: present
     update_cache: yes
+    autoclean: yes
     cache_valid_time: 3600
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
@@ -21,8 +22,7 @@
   apt:
     name: "{{ aedir_malloc_package }}"
     state: present
-    update_cache: yes
-    cache_valid_time: 3600
+    update_cache: no
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
   when: aedir_malloc_package!=""

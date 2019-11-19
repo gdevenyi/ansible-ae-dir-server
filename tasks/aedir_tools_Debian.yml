@@ -7,12 +7,11 @@
       - libssl-dev
       - libsasl2-dev
       - libldap-dev
-      - python-dev
-      - libpython-dev
+      - python3-dev
+      - libpython3-dev
       - libffi-dev
     state: present
-    update_cache: yes
-    cache_valid_time: 3600
+    update_cache: no
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
   when: aedir_pip_needs_compiler==True
@@ -20,11 +19,10 @@
 - name: "Install base packages on {{ lsb_id }}"
   apt:
     name:
-      - python-setuptools
-      - virtualenv
-      - python-virtualenv
-      - python-pip
-      - python-cffi
+      - python3-setuptools
+      - python3-venv
+      - python3-pip
+      - python3-cffi
     state: present
     update_cache: no
     install_recommends: no
@@ -35,6 +33,14 @@
     - restart oathenroll
     - restart bind_proxy
     - restart web2ldap
+
+- name: "Generate /etc/python{{ aedir_python_version }}/sitecustomize.py"
+  copy:
+    content: "# Managed by ansible!\n# Deliberately empty!\n# Do not edit!\n"
+    dest: "/etc/python{{ aedir_python_version }}/sitecustomize.py"
+    owner: root
+    group: root
+    mode: 0644
 
 - name: "AE-DIR tools installation in virtualenv {{ aedir_prefix }}"
   include_tasks: "aedir_tools_venv.yml"

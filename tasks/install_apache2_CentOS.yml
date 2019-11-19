@@ -16,7 +16,8 @@
   yum:
     name:
       - uwsgi
-      - uwsgi-plugin-python2
+      - uwsgi-logger-syslog
+      - "uwsgi-plugin-python{{ aedir_python_version|replace('.', '') }}"
     state: present
     update_cache: no
   notify:

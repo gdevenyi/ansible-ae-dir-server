@@ -22,7 +22,7 @@ LDAPI_AUTHZ_ID = 'dn:uid=ae-dir-otpenroll,cn=ae,{{ aedir_suffix }}'
 # - must require initialized 2FA user account with filter part (&(objectClass=oathUser)(oathHOTPToken=*))
 # - authorization is enforced via filter part (|(memberOf=cn=otp-zone-admins,cn=otp,{{ aedir_suffix }})(memberOf=cn=ae-admins,cn=ae,{{ aedir_suffix }}))
 FILTERSTR_ADMIN_LOGIN = (
-    ur'(&(objectClass=aeUser)(uid={uid})'
+    '(&(objectClass=aeUser)(uid={uid})'
 #        '(objectClass=oathUser)(oathHOTPToken=*)'          # enforces 2FA user account
         '(|(memberOf=cn=otp-zone-admins,cn=otp,{{ aedir_suffix }})' # is OTP zone admin
           '(memberOf=cn=ae-admins,cn=ae,{{ aedir_suffix }})))'      # is AE admin
@@ -32,10 +32,10 @@ ATTR_OWNER_DN = 'aeOwner'
 
 # Filter string template for reading a particular active owner entry
 # (require initialized 2FA user account herein)
-FILTERSTR_OWNER_READ = ur'(&(objectClass=aePerson)(aeStatus=0))'
+FILTERSTR_OWNER_READ = '(&(objectClass=aePerson)(aeStatus=0))'
 
 # Filter string template for finding an active token entry
-FILTERSTR_TOKEN_SEARCH = ur'(&(objectClass=aeAuthcToken)(aeStatus=0)({owner_attr}=*)(objectClass=oathToken)(serialNumber=yubikey-{serial})(aeHwSerialNumber={serial})(oathTokenSerialNumber={serial}))'
+FILTERSTR_TOKEN_SEARCH = '(&(objectClass=aeAuthcToken)(aeStatus=0)({owner_attr}=*)(objectClass=oathToken)(serialNumber=yubikey-{serial})(aeHwSerialNumber={serial})(oathTokenSerialNumber={serial}))'
 
 # Name of directory containing all the template files
 TEMPLATES_DIRNAME = '{{ aedir_etc }}/oathenroll/templates/'
@@ -88,7 +88,7 @@ SMTP_TLSARGS = {
 }
 
 # From address in sent e-mail
-SMTP_FROM = 'ae-dir-pwd@{{ openldap_service_fqdn }}'
+SMTP_FROM = '{{ smtp_from_address }}'
 
 # URL path prefix used when generating URLs in e-mails
 # handy for reverse proxy setups

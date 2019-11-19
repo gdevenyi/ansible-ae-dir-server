@@ -12,6 +12,7 @@ profile {{ name }} {
   {{ uwsgi_paths.exec }} r,
 
   # access to {{ name }} application config
+  {{ cfgdir }}/ r,
   {{ cfgdir }}/** r,
 
 {% if name=="web2ldap" %}
@@ -31,6 +32,7 @@ profile {{ name }} {
   {{ aedir_etc }}/uwsgi/{{ name }}.ini r,
 
   # allow r/w access to own Unix domain socket
+  {{ aedir_rundir }}/uwsgi/{{ name }}/ rw,
   {{ aedir_rundir }}/uwsgi/{{ name }}/{{ name }}.sock rw,
 
 }

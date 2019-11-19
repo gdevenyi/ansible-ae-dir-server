@@ -16,7 +16,7 @@
   zypper:
     name:
       - uwsgi
-      - uwsgi-python
+      - uwsgi-python3
     state: present
     disable_recommends: yes
     type: package
