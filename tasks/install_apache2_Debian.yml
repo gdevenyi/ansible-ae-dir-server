@@ -7,8 +7,7 @@
       - apache2
       - libapache2-mod-proxy-uwsgi
     state: present
-    update_cache: yes
-    cache_valid_time: 3600
+    update_cache: no
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
   notify:
@@ -18,10 +17,9 @@
   apt:
     name:
       - uwsgi
-      - uwsgi-plugin-python
+      - uwsgi-plugin-python3
     state: present
-    update_cache: yes
-    cache_valid_time: 3600
+    update_cache: no
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
   notify:

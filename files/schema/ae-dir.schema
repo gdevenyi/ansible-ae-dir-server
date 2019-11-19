@@ -280,6 +280,13 @@ attributetype ( ae-dir-at:37
   DESC 'AE-DIR: DN of groups of users allowed to read address book attributes'
   SUP aeGroupReference )
 
+attributetype ( ae-dir-at:49
+  NAME 'aeChildClasses'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Structural object classes allowed to be added in child entries'
+  EQUALITY objectIdentifierMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.38 )
+
 objectclass ( ae-dir-oc:20
   NAME 'aeZone'
   X-ORIGIN 'AE-DIR'
@@ -287,7 +294,7 @@ objectclass ( ae-dir-oc:20
   STRUCTURAL
   SUP ( namedObject $ aeObject )
   MUST ( description )
-  MAY ( aeDept $ aeLocation $
+  MAY ( aeChildClasses $ aeDept $ aeLocation $
         aeZoneAdmins $ aeZoneAuditors $ aePasswordAdmins $ aeABAccessGroups ) )
 
 # Group entries

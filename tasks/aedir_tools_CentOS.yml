@@ -7,7 +7,7 @@
       - openssl-devel
       - cyrus-sasl-devel
       - openldap-devel
-      - python-devel
+      - python3-devel
       - libffi-devel
     state: present
     update_cache: no
@@ -16,10 +16,9 @@
 - name: "Install base packages on {{ lsb_id }}"
   yum:
     name:
-      - python-setuptools
-      - python-virtualenv
-      - python-pip
-      - python-cffi
+      - python3-setuptools
+      - python3-pip
+      - python36-cffi
     state: present
     update_cache: no
   notify:

@@ -1,4 +1,3 @@
-#!/opt/ae-dir/bin/python2.7 -ROOB
 # -*- coding: utf-8 -*-
 """
 slapd-sock listener demon which sends intercepted BIND requests
@@ -39,13 +38,14 @@ from slapdsock.handler import SlapdSockHandler, SlapdSockHandlerError
 from slapdsock.message import RESULTResponse, InvalidCredentialsResponse
 
 # run multi-threaded
-from slapdsock.service import SlapdSockThreadingServer as SlapdSockServer
+#from slapdsock.service import SlapdSockThreadingServer as SlapdSockServer
+from slapdsock.service import SlapdSockServer
 
 #-----------------------------------------------------------------------
 # Configuration constants
 #-----------------------------------------------------------------------
 
-__version__ = '0.4.0'
+__version__ = '0.5.0'
 __author__ = u'Michael Ströder <michael@stroeder.com>'
 
 # If
@@ -201,7 +201,7 @@ class BindProxyHandler(SlapdSockHandler):
             return True
         if not peer_type == 'ip':
             return False
-        peer_ip_address = ipaddress.ip_address(peer_addr.decode('ascii'))
+        peer_ip_address = ipaddress.ip_address(peer_addr)
         for peer_net in self.ldap_proxy_peer_nets:
             if peer_ip_address in peer_net:
                 return True
@@ -260,7 +260,7 @@ class BindProxyHandler(SlapdSockHandler):
 
         # We need current time in GeneralizedTime syntax later
         now_dt = datetime.datetime.utcnow()
-        now_str = unicode(ldap_datetime_str(now_dt))
+        now_str = ldap_datetime_str(now_dt)
 
         # We need UTF-8 encoded DN several times later
         request_dn_utf8 = request.dn.encode('utf-8')
@@ -268,14 +268,14 @@ class BindProxyHandler(SlapdSockHandler):
         if self.ldap_proxy_filter_tmpl:
 
             # Get LDAPObject instance for local LDAPI access
-            user_filterstr = self.ldap_proxy_filter_tmpl.format(now=now_str).encode('utf-8')
+            user_filterstr = self.ldap_proxy_filter_tmpl.format(now=now_str)
 
             # Try to read the user entry for the given request dn
             try:
                 try:
                     local_ldap_conn = self.server.get_ldapi_conn()
                     ldap_result = local_ldap_conn.search_s(
-                        request_dn_utf8,
+                        request.dn,
                         ldap0.SCOPE_BASE,
                         '(&{0}({1}=*))'.format(
                             user_filterstr,
@@ -320,10 +320,10 @@ class BindProxyHandler(SlapdSockHandler):
                             trace_level=0,
                         )
                         remote_ldap_conn.simple_bind_s(
-                            request_dn_utf8,
+                            request.dn,
                             request.cred,
-                            serverctrls=[
-                                self._gen_session_tracking_ctrl(request, request_dn_utf8)
+                            req_ctrls=[
+                                self._gen_session_tracking_ctrl(request, request.dn)
                             ]
                         )
                     except ldap0.SERVER_DOWN as ldap_error:
@@ -347,7 +347,7 @@ class BindProxyHandler(SlapdSockHandler):
                 except KeyError:
                     result_code = RESULT_CODE['other']
                 try:
-                    info = ldap_error.args[0]['info']
+                    info = ldap_error.args[0]['info'].decode('utf-8')
                 except (AttributeError, KeyError, TypeError):
                     info = None
                 self._log(
@@ -395,7 +395,7 @@ class BindProxyHandler(SlapdSockHandler):
 # Main
 #-----------------------------------------------------------------------
 
-def run_this():
+def run():
     """
     The main script
     """
@@ -403,7 +403,7 @@ def run_this():
     script_name = os.path.abspath(sys.argv[0])
 
     # explicitly set CA cert file from libldap env var
-    ldap0.set_option(ldap0.OPT_X_TLS_CACERTFILE, os.environ['LDAPTLS_CACERT'])
+    ldap0.set_option(ldap0.OPT_X_TLS_CACERTFILE, os.environ['LDAPTLS_CACERT'].encode('utf-8'))
 
     log_level = LOG_LEVEL
     console_log_format = None
@@ -459,13 +459,13 @@ def run_this():
             ALLOWED_UIDS, ALLOWED_GIDS,
             log_vars=DEBUG_VARS,
         )
-        listener.ldapi_uri = local_ldap_uri_obj.initializeUrl()
+        listener.ldapi_uri = local_ldap_uri_obj.connect_uri()
         listener.ldap_trace_level = int(local_ldap_uri_obj.trace_level or '0') or LDAP0_TRACE_LEVEL
         listener.remote_ldap_uris = remote_ldap_uris
         try:
             listener.serve_forever()
         except KeyboardInterrupt:
-            my_logger.warn('Received interrupt signal => shutdown')
+            my_logger.warning('Received interrupt signal => shutdown')
     finally:
         my_logger.debug('Remove socket path %r', socket_path)
         try:
@@ -473,8 +473,8 @@ def run_this():
         except OSError:
             pass
 
-    return # end of main()
+    # end of main()
 
 
 if __name__ == '__main__':
-    run_this()
+    run()

@@ -20,6 +20,7 @@ Environment=LDAPNOINIT=1
 Environment=PYTHONPATH={{ aedir_etc }}/oathenroll
 Environment=PYTHONOPTIMIZE=2
 Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=LOG_LEVEL={{ aedir_uwsgi_params.oathenroll.log_level }}
 ExecStart={{ uwsgi_paths.exec }} --strict --ini {{ aedir_etc }}/uwsgi/oathenroll.ini
 User={{ oath_ldap_oathenroll_web_user }}
 Group={{ oath_ldap_oathenroll_web_group }}

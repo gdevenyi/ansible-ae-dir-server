@@ -9,8 +9,7 @@
       - tar
       - gzip
       - ca-certificates
-      - python
-      - python-xml
+      - python3-base
       - zypper
     state: present
     disable_recommends: yes
