@@ -3,10 +3,10 @@
 - name: "Install base packages on {{ lsb_id }}"
   zypper:
     name:
-      - python3-pyasn1>=0.3.7
-      - python3-pyasn1-modules>=0.1.5
-      - python3-ldap0>=0.6.0
-      - python3-aedir>=0.5.1
+      - python3-pyasn1 >= 0.4.5
+      - python3-pyasn1-modules >= 0.2.5
+      - python3-ldap0 >= 0.6.0
+      - python3-aedir >= 0.6.0
       - python3-cryptography
       - python3-jwcrypto
     state: present
