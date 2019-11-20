@@ -62,7 +62,7 @@
 - name: "Install web2ldap on {{ openldap_role }} on {{ lsb_id }}"
   zypper:
     name:
-      - web2ldap >= 1.5.7
+      - web2ldap >= 1.5.8
     state: present
     disable_recommends: yes
     type: package
