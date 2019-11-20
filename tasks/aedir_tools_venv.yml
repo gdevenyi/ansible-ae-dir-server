@@ -17,8 +17,8 @@
       - cryptography
       - asn1crypto
       - jwcrypto
-      - pyasn1
-      - pyasn1_modules
+      - pyasn1>=0.4.5
+      - pyasn1_modules>=0.2.5
       - ldap0>=0.6.0
       - aedir>=0.5.1
     state: present
