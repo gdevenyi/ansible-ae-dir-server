@@ -1,6 +1,6 @@
 ---
 
-- name: "Prepare virtualenv {{ aedir_prefix }} needed for PIP installation"
+- name: "Prepare virtualenv {{ aedir_prefix }} for Python 3"
   pip:
     name:
       - pip
