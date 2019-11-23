@@ -36,6 +36,24 @@
   when: openldap_role == 'provider'
 
 - block:
+    - name: "Check for old Python 2 virtualenv in {{ aedir_prefix }}"
+      stat:
+        path: "{{ aedir_bin }}/python2"
+      register: py2_venv
+
+    - name: "Remove old Python 2 virtualenv"
+      file:
+        path: "{{ item }}"
+        state: absent
+      ignore_errors: yes
+      with_items:
+        - "{{ aedir_bin }}"
+        - "{{ aedir_prefix }}/include"
+        - "{{ aedir_prefix }}/lib"
+        - "{{ aedir_prefix }}/lib64"
+        - "{{ aedir_prefix }}/pip-selfcheck.json"
+      when: py2_venv.stat.exists
+
     - name: "Create directory structure {{ aedir_prefix }}"
       file:
         path: "{{ item }}"
