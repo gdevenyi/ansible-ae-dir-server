@@ -21,7 +21,7 @@
     mode: 0600
   with_first_found:
     - files:
-       - "tls/gen_csr.cnf.j2"
+        - "tls/gen_csr.cnf.j2"
       paths: "{{ aedir_templates_dirs }}"
 
 - name: Create gen_csr.sh

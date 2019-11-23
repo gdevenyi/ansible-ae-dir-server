@@ -10,7 +10,7 @@
     mode: 0644
   with_first_found:
     - files:
-       - "web2ldap/web2ldapcnf/__init__.py.j2"
+        - "web2ldap/web2ldapcnf/__init__.py.j2"
       paths: "{{ aedir_templates_dirs }}"
   notify:
     - restart web2ldap
@@ -24,7 +24,7 @@
     mode: 0644
   with_first_found:
     - files:
-       - "web2ldap/web2ldapcnf/hosts.py.j2"
+        - "web2ldap/web2ldapcnf/hosts.py.j2"
       paths: "{{ aedir_templates_dirs }}"
   notify:
     - restart web2ldap
@@ -38,7 +38,7 @@
     mode: 0644
   with_first_found:
     - files:
-       - "web2ldap/web2ldapcnf/plugins.py.j2"
+        - "web2ldap/web2ldapcnf/plugins.py.j2"
       paths: "{{ aedir_templates_dirs }}"
   notify:
     - restart web2ldap
@@ -52,7 +52,7 @@
     mode: 0644
   with_first_found:
     - files:
-       - "web2ldap/templates/connect.html.j2"
+        - "web2ldap/templates/connect.html.j2"
       paths: "{{ aedir_templates_dirs }}"
 
 - name: "Create search provider file pointing to {{ aedir_main_provider_hostname }}"

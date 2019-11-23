@@ -32,7 +32,7 @@
     mode: 0644
   with_first_found:
     - files:
-       - "ae-dir-pwd/aedirpwd_cnf.py.j2"
+        - "ae-dir-pwd/aedirpwd_cnf.py.j2"
       paths: "{{ aedir_templates_dirs }}"
   notify:
     - "restart ae-dir-pwd"

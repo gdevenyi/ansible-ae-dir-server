@@ -35,7 +35,7 @@
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
   notify:
-  - "restart ae-slapd"
+    - "restart ae-slapd"
 
 - name: "Remove Debian package ldap-utils"
   apt:

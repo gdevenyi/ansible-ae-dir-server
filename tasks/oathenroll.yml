@@ -33,7 +33,7 @@
     mode: 0640
   with_first_found:
     - files:
-       - "oath-ldap/oathenroll_cnf.py.j2"
+        - "oath-ldap/oathenroll_cnf.py.j2"
       paths: "{{ aedir_templates_dirs }}"
   notify:
     - "restart oathenroll"

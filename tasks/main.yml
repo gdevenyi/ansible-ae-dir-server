@@ -63,7 +63,7 @@
     - name: "Configure OpenLDAP slapd for AE-DIR"
       include_tasks: configure_slapd.yml
   tags:
-     - slapd_conf
+    - slapd_conf
 
 - block:
     - name: "Install various AE-DIR tools"
@@ -107,7 +107,7 @@
       include_tasks: "configure_apache2.yml"
       when: openldap_role == 'provider'
   tags:
-     - apache_conf
+    - apache_conf
 
 - block:
     - name: "Install AE-DIR password service (ae-dir-pwd)"
@@ -135,8 +135,8 @@
       include_tasks: "oathenroll.yml"
       when: oath_ldap_enabled == True and openldap_role=="provider"
   tags:
-     - oath
-     - oathenroll
+    - oath
+    - oathenroll
 
 - block:
     - name: "Password sync tasks on {{ openldap_role }}"

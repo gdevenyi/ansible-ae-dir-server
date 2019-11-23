@@ -65,7 +65,7 @@
     mode: 0750
   with_first_found:
     - files:
-       - "oath-ldap/{{ oath_bind_listener }}.py"
+        - "oath-ldap/{{ oath_bind_listener }}.py"
       paths: "{{ aedir_files_dirs }}"
   notify:
     - "restart {{ oath_bind_listener }}"

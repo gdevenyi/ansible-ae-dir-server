@@ -34,7 +34,7 @@
     - "{{ aedir_schema_prefix }}"
     - "{{ aedir_rundir }}"
   notify:
-  - "restart ae-slapd"
+    - "restart ae-slapd"
 
 # database directory structure
 #-----------------------------------------------------------------------
@@ -47,7 +47,7 @@
     group: "{{ openldap_slapd_group }}"
     mode: 0775
   notify:
-  - "restart ae-slapd"
+    - "restart ae-slapd"
 
 - name: "Create OpenLDAP database root directory"
   file:
@@ -57,7 +57,7 @@
     group: "{{ openldap_slapd_group }}"
     mode: 0750
   notify:
-  - "restart ae-slapd"
+    - "restart ae-slapd"
 
 - name: "Create database directories"
   file:
@@ -70,7 +70,7 @@
     - accesslog
     - um
   notify:
-  - "restart ae-slapd"
+    - "restart ae-slapd"
 
 - name: "Create session database directory on {{ openldap_role }}"
   file:
@@ -80,7 +80,7 @@
     group: "{{ openldap_slapd_group }}"
     mode: 0750
   notify:
-  - "restart ae-slapd"
+    - "restart ae-slapd"
   when: openldap_role == 'provider'
 
 - name: "Fix ownership database directories"
@@ -93,7 +93,7 @@
     - accesslog
     - um
   notify:
-  - "restart ae-slapd"
+    - "restart ae-slapd"
 
 - name: "Fix ownership session database directory on {{ openldap_role }}"
   file:
@@ -103,7 +103,7 @@
     group: "{{ openldap_slapd_group }}"
     recurse: yes
   notify:
-  - "restart ae-slapd"
+    - "restart ae-slapd"
   when: openldap_role == 'provider'
 
 # slapd.conf and schema files
@@ -118,7 +118,7 @@
     mode: 0644
   with_items: "{{ openldap_schema_files }}"
   notify:
-  - "restart ae-slapd"
+    - "restart ae-slapd"
 
 - name: "Create rootDSE.ldif"
   template:
@@ -128,7 +128,7 @@
     group: "{{ openldap_slapd_group }}"
     mode: 0640
   notify:
-  - "restart ae-slapd"
+    - "restart ae-slapd"
 
 - name: "Create /etc/sasl2/slapd.conf on {{ lsb_id }}"
   template:
@@ -149,7 +149,7 @@
     group: "{{ openldap_slapd_group }}"
     mode: 0640
   notify:
-  - "restart ae-slapd"
+    - "restart ae-slapd"
 
 - name: "Install systemd unit file for ae-slapd"
   template:
@@ -170,7 +170,7 @@
     group: root
     mode: 0644
   notify:
-  - "restart ae-slapd"
+    - "restart ae-slapd"
 
 - name: "Backup slapd databases in CRON job"
   cron:
