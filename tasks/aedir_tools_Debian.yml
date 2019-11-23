@@ -1,5 +1,24 @@
 ---
 
+- name: "Install Python {{ aedir_python_version }} packages on {{ lsb_id }}"
+  apt:
+    name:
+      - "libpython{{ aedir_python_version }}"
+      - python3-setuptools
+      - python3-venv
+      - python3-pip
+      - python3-cffi
+    state: present
+    update_cache: no
+    install_recommends: no
+    dpkg_options: 'force-confold,force-confdef'
+  notify:
+    - restart ae-dir-pwd
+    - restart hotp_validator
+    - restart oathenroll
+    - restart bind_proxy
+    - restart web2ldap
+
 - name: "Install C compiler packages on {{ lsb_id }}"
   apt:
     name:
@@ -15,24 +34,6 @@
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
   when: aedir_pip_needs_compiler==True
-
-- name: "Install base packages on {{ lsb_id }}"
-  apt:
-    name:
-      - python3-setuptools
-      - python3-venv
-      - python3-pip
-      - python3-cffi
-    state: present
-    update_cache: no
-    install_recommends: no
-    dpkg_options: 'force-confold,force-confdef'
-  notify:
-    - restart ae-dir-pwd
-    - restart hotp_validator
-    - restart oathenroll
-    - restart bind_proxy
-    - restart web2ldap
 
 - name: "Generate /etc/python{{ aedir_python_version }}/sitecustomize.py"
   copy:
