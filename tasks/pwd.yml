@@ -60,7 +60,6 @@
     module: "aedir_pproc.pwd.web:application"
     master: "true"
     processes: "{{ aedir_uwsgi_params.pwd.processes }}"
-    threads: 0
     stats_port: 9092
     buffer_size: "{{ aedir_uwsgi_params.pwd.buffer_size }}"
     harakiri: "{{ aedir_uwsgi_params.pwd.harakiri }}"

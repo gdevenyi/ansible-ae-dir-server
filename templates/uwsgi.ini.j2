@@ -11,12 +11,12 @@ module = {{ module }}
 stats = 127.0.0.1:{{ stats_port }}
 manage-script-name = true
 master = {{ master }}
-{% if processes >= 1 %}
-processes = {{ processes }}
-{% endif %}
-{% if threads >= 1 %}
+{% if threads is defined %}
+processes = 1
 threads = {{ threads }}
 enable-threads = true
+{% else %}
+processes = {{ processes }}
 {% endif %}
 buffer-size = {{ buffer_size }}
 harakiri = {{ harakiri }}

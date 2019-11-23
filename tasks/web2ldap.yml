@@ -105,7 +105,6 @@
     user: ae-dir-web2ldap
     module: "web2ldap.wsgi:application"
     master: "false"
-    processes: 1
     threads: "{{ aedir_uwsgi_params.web2ldap.threads }}"
     stats_port: 9091
     buffer_size: "{{ aedir_uwsgi_params.web2ldap.buffer_size }}"
