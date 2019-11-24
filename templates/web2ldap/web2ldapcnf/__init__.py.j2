@@ -191,6 +191,11 @@ access_allowed = {
     u'{{ allowed }}',
 {% endfor %}
   ],
+  u'metrics': [
+{% for allowed in web2ldap_monitor_access_allowed %}
+    u'{{ allowed }}',
+{% endfor %}
+  ],
   # disable web2ldap's DNS SRV lookups completely
   u'locate': [],
 }
