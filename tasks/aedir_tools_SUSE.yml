@@ -1,6 +1,6 @@
 ---
 
-- name: "Install base packages on {{ lsb_id }}"
+- name: "Install Python 3 modules on {{ lsb_id }}"
   zypper:
     name:
       - python3-pyasn1 >= 0.4.5
@@ -9,6 +9,7 @@
       - python3-aedir >= 0.6.0
       - python3-cryptography
       - python3-jwcrypto
+      - python3-prometheus_client
     state: present
     disable_recommends: yes
     type: package
@@ -62,7 +63,7 @@
 - name: "Install web2ldap on {{ openldap_role }} on {{ lsb_id }}"
   zypper:
     name:
-      - web2ldap >= 1.5.8
+      - web2ldap >= 1.5.10
     state: present
     disable_recommends: yes
     type: package
