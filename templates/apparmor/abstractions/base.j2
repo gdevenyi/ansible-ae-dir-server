@@ -80,7 +80,7 @@
 
   # let process see own /proc data
   @{PROC}/@{pid}/ r,
-  @{PROC}/@{pid}/{maps,auxv,status} r,
+  @{PROC}/@{pid}/{maps,auxv,limits,stat,status} r,
 
   # glibc statvfs
   @{PROC}/filesystems            r,
