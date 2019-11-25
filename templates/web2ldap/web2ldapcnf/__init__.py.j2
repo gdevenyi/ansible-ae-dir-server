@@ -74,14 +74,14 @@ command_link_separator = ' &bull; '
 #---------------------------------------------------------------------------
 
 # Maximum number of concurrent web sessions stored
-session_limit = 80
+session_limit = {{ web2ldap_session_limit }}
 
 # Maximum number of concurrent web sessions per remote IP
-session_per_ip_limit = 20
+session_per_ip_limit = {{ web2ldap_session_per_ip_limit }}
 
 # Amount of time in seconds after which inactive sessions will be expired
 # and the session data is removed silently without the possibility to relogin.
-session_remove = 900
+session_remove = {{ web2ldap_session_remove }}
 
 # List of environment variables assumed to be constant throughout
 # web sessions with the same ID if existent.

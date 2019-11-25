@@ -23,6 +23,7 @@ Environment=LOG_LEVEL={{ aedir_uwsgi_params.web2ldap.log_level }}
 ExecStart={{ uwsgi_paths.exec }} --strict --ini {{ aedir_etc }}/uwsgi/web2ldap.ini
 User={{ web2ldap_user }}
 Group={{ web2ldap_group }}
+LimitNOFILE={{ web2ldap_session_limit * 4 }}
 Restart=always
 KillSignal=SIGQUIT
 StandardError=syslog
