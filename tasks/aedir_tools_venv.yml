@@ -21,7 +21,7 @@
       - pyasn1_modules>=0.2.5
       - ldap0>=0.6.0
       - aedir>=0.5.1
-      - prometheus_client
+      - prometheus_client>=0.7.1
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
