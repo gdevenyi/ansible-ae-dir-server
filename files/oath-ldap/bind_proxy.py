@@ -359,7 +359,7 @@ class BindProxyHandler(SlapdSockHandler):
                     result_code,
                 )
             else:
-                # Prepare the sucess result returned
+                # Prepare the success result returned
                 result_code = 'success'
                 info = None
                 self._log(
