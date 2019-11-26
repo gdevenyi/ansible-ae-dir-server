@@ -12,6 +12,7 @@
   with_dict:
     HOME: "{{ aedir_rundir }}"
     MAILTO: ""
+    LD_LIBRARY_PATH: "{{ slapd_check_lib_dirs|join(':') }}"
     LDAPRC: "{{ aedir_etc }}/ldap.conf"
     PYTHONPATH: "{{ aedir_etc }}/ae-dir-pwd"
     PYTHONOPTIMIZE: "2"
