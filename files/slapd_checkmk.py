@@ -69,7 +69,7 @@ from ldap0.ldif import LDIFParser
 # Configuration constants
 #-----------------------------------------------------------------------
 
-__version__ = '3.0.0'
+__version__ = '3.0.1'
 
 STATE_FILENAME = 'slapd_checkmk.state'
 
@@ -152,11 +152,10 @@ def slapd_pid_fromfile(config_attrs):
     """
     pid_filename = config_attrs['olcPidFile'][0]
     try:
-        pid_file = open(pid_filename, 'r', encoding='utf-8')
+        with open(pid_filename, 'r', encoding='utf-8') as pid_file:
+            slapd_pid = pid_file.read().strip()
     except IOError:
         slapd_pid = None
-    else:
-        slapd_pid = pid_file.read().strip()
     return slapd_pid # end of _get_slapd_pid()
 
 #-----------------------------------------------------------------------
@@ -359,9 +358,8 @@ class CheckStateFile:
         """
         try:
             state_tuple_list = []
-            state_file = open(self._state_filename, 'r', encoding='utf-8')
-            state_string_list = state_file.read().split(self.line_sep)
-            state_file.close()
+            with open(self._state_filename, 'r', encoding='utf-8') as state_file:
+                state_string_list = state_file.read().split(self.line_sep)
             state_tuple_list = [
                 line.split('=', 1)
                 for line in state_string_list
@@ -380,9 +378,8 @@ class CheckStateFile:
             for key, val in state.items()
         ]
         state_string_list.append('')
-        state_file = open(self._state_filename, 'w', encoding='utf-8')
-        state_file.write(self.line_sep.join(state_string_list))
-        state_file.close()
+        with open(self._state_filename, 'w', encoding='utf-8') as state_file:
+            state_file.write(self.line_sep.join(state_string_list))
 
 
 class OpenLDAPMonitorCache:
@@ -878,7 +875,8 @@ class SlapdCheck(CheckMkLocalCheck):
                     'Attribute %r not set' % (tls_attr_name)
                 )
             try:
-                tls_pem[tls_attr_name] = open(fname, 'rb').read()
+                with open(fname, 'rb') as tls_pem_file:
+                    tls_pem[tls_attr_name] = tls_pem_file.read()
             except CATCH_ALL_EXC as exc:
                 file_read_errors.append(
                     'Error reading %r: %s' % (fname, exc)
@@ -1029,13 +1027,14 @@ class SlapdCheck(CheckMkLocalCheck):
             """
             Send MONITOR request to Unix domain socket in `sock_path'
             """
-            _sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-            _sock.connect(sock_path)
-            _sock.settimeout(SLAPD_SOCK_TIMEOUT)
-            _sock_f = _sock.makefile('rwb')
-            _sock_f.write(b'MONITOR\n')
-            _sock_f.flush()
-            return _sock_f.read()
+            with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as _sock:
+                _sock.connect(sock_path)
+                _sock.settimeout(SLAPD_SOCK_TIMEOUT)
+                _sock_f = _sock.makefile('rwb')
+                _sock_f.write(b'MONITOR\n')
+                _sock_f.flush()
+                res = _sock_f.read()
+            return res
             # end of _read_sock_monitor
 
         def _parse_sock_response(sock_response):
