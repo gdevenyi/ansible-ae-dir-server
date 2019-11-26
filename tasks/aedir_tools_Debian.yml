@@ -1,5 +1,10 @@
 ---
 
+- name: "Check whether ldap0 module is installed"
+  command: "{{ aedir_python }} -c 'import ldap0 ; print(ldap0.__version__)'"
+  ignore_errors: yes
+  register: ldap0_installed
+
 - name: "Install Python {{ aedir_python_version }} packages on {{ lsb_id }}"
   apt:
     name:
@@ -33,7 +38,7 @@
     update_cache: no
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
-  when: aedir_pip_needs_compiler==True
+  when: aedir_pip_needs_compiler==True and ldap0_installed.rc != 0
 
 - name: "Generate /etc/python{{ aedir_python_version }}/sitecustomize.py"
   copy:
@@ -45,3 +50,18 @@
 
 - name: "AE-DIR tools installation in virtualenv {{ aedir_prefix }}"
   include_tasks: "aedir_tools_venv.yml"
+
+- name: "Uninstall C compiler packages on {{ lsb_id }}"
+  apt:
+    name:
+      - gcc
+      - libssl-dev
+      - libsasl2-dev
+      - libldap-dev
+      - python3-dev
+      - libpython3-dev
+      - libffi-dev
+    state: absent
+    autoremove: yes
+    update_cache: no
+    dpkg_options: 'force-confold,force-confdef'
