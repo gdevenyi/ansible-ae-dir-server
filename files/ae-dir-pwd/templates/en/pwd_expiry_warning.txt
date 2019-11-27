@@ -26,9 +26,6 @@ Description in user entry:
 Distinguished name of user entry:
 {user_dn}
 
-Created/activated by:
-{admin_cn} <{admin_mail}>
-
 -------------------------- Password reset ------------------------------
 
 You can request a temporary password for your account here:
