@@ -1,9 +1,6 @@
 ---
 # vars file for roles/ae-dir-server
 
-# the release version (semantic versioning scheme)
-aedir_version: '0.1.1'
-
 # map real LSB id to another LSB id to be used during plays
 lsb_id_map:
   openSUSE: "SUSE"
