@@ -5,7 +5,7 @@
     name:
       - python3-pyasn1 >= 0.4.5
       - python3-pyasn1-modules >= 0.2.5
-      - python3-ldap0 >= 0.6.0
+      - python3-ldap0 >= 0.6.3
       - python3-aedir >= 0.6.2
       - python3-cryptography
       - python3-jwcrypto
@@ -34,7 +34,7 @@
   zypper:
     name:
       - python3-paramiko
-      - python3-mailutil>=0.3.0
+      - python3-mailutil >= 0.3.0
       - python3-passlib
       - python3-asn1crypto
       - python3-xlwt
@@ -52,7 +52,7 @@
 - name: "Install ae-dir-pproc on {{ openldap_role }} on {{ lsb_id }}"
   zypper:
     name:
-      - ae-dir-pproc >= 0.3.0
+      - ae-dir-pproc >= 0.3.1
     state: present
     disable_recommends: yes
     type: package
@@ -63,7 +63,7 @@
 - name: "Install web2ldap on {{ openldap_role }} on {{ lsb_id }}"
   zypper:
     name:
-      - web2ldap >= 1.5.16
+      - web2ldap >= 1.5.17
     state: present
     disable_recommends: yes
     type: package
