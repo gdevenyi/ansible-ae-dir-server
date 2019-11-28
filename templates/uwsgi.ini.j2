@@ -3,7 +3,7 @@
 # {{ ansible_managed }}
 #---------------------------------------------------------------------------
 [uwsgi]
-plugin = {{ uwsgi_paths.python_plugin|basename }}, syslog
+plugin = {{ uwsgi_paths.python_plugin|basename }}
 socket = {{ aedir_rundir }}/uwsgi/{{ name }}/{{ name }}.sock
 chmod-socket = 666
 chdir = {{ aedir_rundir }}/uwsgi/{{ name }}
@@ -23,5 +23,4 @@ harakiri = {{ harakiri }}
 {% if aedir_python_sitepackages.startswith(aedir_prefix) %}
 virtualenv = {{ aedir_prefix }}
 {% endif  %}
-logger = syslog:uwsgi-{{ name }},daemon
 log-format = %(addr) - %(user) [%(ltime)] "%(method) %(uri) %(proto)" %(status) %(size) "%(referer)" "%(uagent)"
