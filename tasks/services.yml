@@ -25,34 +25,6 @@
     state: started
     enabled: yes
 
-- name: "Ensure {{ cron_service_name }} is running"
-  service:
-    name: "{{ cron_service_name }}"
-    state: started
-    enabled: yes
-  when: openldap_role == "provider"
-
-- name: "Ensure ae-apache is running"
-  service:
-    name: "ae-apache"
-    state: started
-    enabled: yes
-  when: openldap_role == "provider"
-
-- name: "Ensure web2ldap is running"
-  service:
-    name: "web2ldap"
-    state: started
-    enabled: yes
-  when: openldap_role == "provider"
-
-- name: "Ensure ae-dir-pwd is running"
-  service:
-    name: "ae-dir-pwd"
-    state: started
-    enabled: yes
-  when: openldap_role == "provider"
-
 - name: "Enable and start service {{ oath_bind_listener }}"
   service:
     name: "{{ oath_bind_listener }}"
@@ -60,16 +32,44 @@
     enabled: yes
   when: oath_ldap_enabled == True
 
-- name: "ensure oathenroll is running"
-  service:
-    name: "oathenroll"
-    state: started
-    enabled: yes
-  when: openldap_role == "provider" and oath_ldap_enabled == True
+- block:
 
-- name: "Ensure PASSMOD listener service is running"
-  service:
-    name: "passmod"
-    state: started
-    enabled: yes
-  when: openldap_role == "provider" and aedir_pwsync_targeturl
+  - name: "Ensure {{ cron_service_name }} is running"
+    service:
+      name: "{{ cron_service_name }}"
+      state: started
+      enabled: yes
+
+  - name: "Ensure ae-apache is running"
+    service:
+      name: "ae-apache"
+      state: started
+      enabled: yes
+
+  - name: "Ensure web2ldap is running"
+    service:
+      name: "web2ldap"
+      state: started
+      enabled: yes
+
+  - name: "Ensure ae-dir-pwd is running"
+    service:
+      name: "ae-dir-pwd"
+      state: started
+      enabled: yes
+
+  - name: "Ensure PASSMOD listener service is running"
+    service:
+      name: "passmod"
+      state: started
+      enabled: yes
+    when: aedir_pwsync_targeturl != ""
+
+  - name: "ensure oathenroll is running"
+    service:
+      name: "oathenroll"
+      state: started
+      enabled: yes
+    when: oath_ldap_enabled == True
+
+  when: openldap_role == "provider"
