@@ -60,17 +60,6 @@
   notify:
     - restart ae-dir-pwd
 
-- name: "Install web2ldap on {{ openldap_role }} on {{ lsb_id }}"
-  zypper:
-    name:
-      - web2ldap >= 1.5.18
-    state: present
-    disable_recommends: yes
-    type: package
-  when: openldap_role == 'provider'
-  notify:
-    - restart web2ldap
-
 - name: "Install additional packages for simple web apps on {{ openldap_role }} on {{ lsb_id }}"
   zypper:
     name:
