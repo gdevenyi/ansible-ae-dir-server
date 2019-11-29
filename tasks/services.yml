@@ -2,10 +2,16 @@
 
 # enable running services
 
-- name: "restart apparmor"
-  service:
-    name: "apparmor"
-    state: restarted
+- block:
+  - name: "Ensure AppArmor service is running"
+    service:
+      name: "apparmor"
+      state: started
+      enabled: yes
+  - name: "Restart AppArmor service to reload profiles"
+    service:
+      name: "apparmor"
+      state: restarted
   when: apparmor_enabled == True
 
 - name: "Make sure systemd unit files are reloaded"
@@ -67,10 +73,3 @@
     state: started
     enabled: yes
   when: openldap_role == "provider" and aedir_pwsync_targeturl
-
-- name: "ensure AppArmor service is running"
-  service:
-    name: "apparmor"
-    state: started
-    enabled: yes
-  when: apparmor_enabled == True
