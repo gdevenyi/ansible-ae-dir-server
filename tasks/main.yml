@@ -5,6 +5,7 @@
     var: "{{ item }}"
     verbosity: 1
   with_items:
+    - lsb_id
     - inventory_dir
     - playbook_dir
     - role_path
