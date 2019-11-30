@@ -113,7 +113,9 @@ THREADS_ACTIVE_WARN_UPPER = 6
 THREADS_PENDING_WARN = 5
 
 class NoneException(BaseException):
-    pass
+    """
+    A dummy exception class used for disabling exception handling
+    """
 
 CATCH_ALL_EXC = (Exception, ldap0.LDAPError)
 #CATCH_ALL_EXC = NoneException
