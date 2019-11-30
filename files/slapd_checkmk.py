@@ -474,10 +474,9 @@ class OpenLDAPObject:
     ]
 
     def __getattr__(self, name):
-        if name in self.naming_context_attrs:
-            if not name in self.__dict__:
-                self.get_naming_context_attrs()
-            return self.__dict__[name]
+        if name not in self.__dict__ and name in self.naming_context_attrs:
+            self.get_naming_context_attrs()
+        return self.__dict__[name]
 
     def get_monitor_entries(self):
         """
