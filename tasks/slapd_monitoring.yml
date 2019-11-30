@@ -1,13 +1,28 @@
 ---
-# tasks file for roles/slapd_check
+# monitoring stuff
 
-- name: "Install {{ aedir_sbin }}/slapd_checkmk.py"
-  copy:
-    src: "slapd_checkmk.py"
-    dest: "{{ aedir_sbin }}/slapd_checkmk.py"
-    owner: root
-    group: root
-    mode: 0755
+- name: "Remove {{ aedir_sbin }}/slapd_checkmk.py"
+  file:
+    path: "{{ aedir_sbin }}/slapd_checkmk.py"
+    state: absent
+
+- name: "PIP install slapdcheck in virtualenv {{ aedir_prefix }}"
+  pip:
+    name:
+      - slapdcheck>=3.1.0
+    state: present
+    virtualenv: "{{ aedir_prefix }}"
+    extra_args: "{{ aedir_pip_extra_args }}"
+  when: lsb_id != 'SUSE'
+
+- name: "Install slapdcheck package on {{ openldap_role }}"
+  zypper:
+    name:
+      - slapdcheck >= 3.1.0
+    state: present
+    disable_recommends: yes
+    type: package
+  when: lsb_id == 'SUSE'
 
 - name: "Check status of directory {{ slapd_checkmk_local }}"
   stat:
