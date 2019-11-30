@@ -8,6 +8,7 @@
       - python3-ldap0 >= 0.6.3
       - python3-aedir >= 0.6.2
       - python3-cryptography
+      - python3-asn1crypto
       - python3-jwcrypto
       - python3-prometheus_client >= 0.7.1
     state: present
@@ -36,7 +37,6 @@
       - python3-paramiko
       - python3-mailutil >= 0.3.0
       - python3-passlib
-      - python3-asn1crypto
       - python3-xlwt
       - python3-pycryptodome
     state: present
