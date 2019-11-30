@@ -16,9 +16,8 @@
       - tar
       - gzip
       - ca-certificates
-      - python
-      - libxml2-python
-      - libselinux-python
+      - python3
+      - python3-libselinux
       - polkit
     state: present
     update_cache: yes

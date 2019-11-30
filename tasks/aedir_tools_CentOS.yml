@@ -24,7 +24,7 @@
     name:
       - python3-setuptools
       - python3-pip
-      - python36-cffi
+      - python3-cffi
     state: present
     update_cache: no
   notify:
