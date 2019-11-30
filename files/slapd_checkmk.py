@@ -26,8 +26,6 @@ limitations under the License.
 # Import modules
 #-----------------------------------------------------------------------
 
-from __future__ import absolute_import
-
 import os
 import sys
 import socket
@@ -37,22 +35,9 @@ import pprint
 import logging
 import threading
 
-# optional imports from cryptography (aka PyCA) module
-CRYPTOGRAPHY_AVAIL = False
-M2CRYPTO_AVAIL = False
-try:
-    import cryptography.x509
-    from cryptography.hazmat.backends import default_backend as crypto_default_backend
-    import cryptography.hazmat.primitives.asymmetric.rsa
-except ImportError:
-    try:
-        import M2Crypto
-    except ImportError:
-        pass
-    else:
-        M2CRYPTO_AVAIL = True
-else:
-    CRYPTOGRAPHY_AVAIL = True
+import cryptography.x509
+from cryptography.hazmat.backends import default_backend as crypto_default_backend
+import cryptography.hazmat.primitives.asymmetric.rsa
 
 # Switch off processing .ldaprc or ldap.conf
 # before importing ldap0 with loads libldap.so
@@ -69,7 +54,7 @@ from ldap0.ldif import LDIFParser
 # Configuration constants
 #-----------------------------------------------------------------------
 
-__version__ = '3.0.1'
+__version__ = '3.0.2'
 
 STATE_FILENAME = 'slapd_checkmk.state'
 
@@ -156,7 +141,8 @@ def slapd_pid_fromfile(config_attrs):
             slapd_pid = pid_file.read().strip()
     except IOError:
         slapd_pid = None
-    return slapd_pid # end of _get_slapd_pid()
+    return slapd_pid # end of slapd_pid_fromfile()
+
 
 #-----------------------------------------------------------------------
 # Classes
@@ -889,39 +875,18 @@ class SlapdCheck(CheckMkLocalCheck):
                 check_output=' / '.join(file_read_errors)
             )
             return
-        if not CRYPTOGRAPHY_AVAIL and not M2CRYPTO_AVAIL:
-            # no crypto modules present => abort
-            self.result(
-                CHECK_RESULT_UNKNOWN,
-                'SlapdCert',
-                check_output='no crypto modules present => could not check validity of %r' % (
-                    config_attrs['olcTLSCertificateFile'][0],
-                ),
-            )
-            return
-        if CRYPTOGRAPHY_AVAIL:
-            server_cert_obj = cryptography.x509.load_pem_x509_certificate(
-                tls_pem['olcTLSCertificateFile'],
-                crypto_default_backend(),
-            )
-            server_key_obj = cryptography.hazmat.primitives.serialization.load_pem_private_key(
-                tls_pem['olcTLSCertificateKeyFile'],
-                None,
-                crypto_default_backend(),
-            )
-            cert_not_after = server_cert_obj.not_valid_after
-            cert_not_before = server_cert_obj.not_valid_before
-            modulus_match = server_cert_obj.public_key().public_numbers().n == server_key_obj.public_key().public_numbers().n
-            crypto_module = 'cryptography'
-        elif M2CRYPTO_AVAIL:
-            server_cert_obj = M2Crypto.X509.load_cert_string(
-                tls_pem['olcTLSCertificateFile'],
-                M2Crypto.X509.FORMAT_PEM,
-            )
-            cert_not_after = server_cert_obj.get_not_after().get_datetime()
-            cert_not_before = server_cert_obj.get_not_before().get_datetime()
-            modulus_match = None
-            crypto_module = 'M2Crypto'
+        server_cert_obj = cryptography.x509.load_pem_x509_certificate(
+            tls_pem['olcTLSCertificateFile'],
+            crypto_default_backend(),
+        )
+        server_key_obj = cryptography.hazmat.primitives.serialization.load_pem_private_key(
+            tls_pem['olcTLSCertificateKeyFile'],
+            None,
+            crypto_default_backend(),
+        )
+        cert_not_after = server_cert_obj.not_valid_after
+        cert_not_before = server_cert_obj.not_valid_before
+        modulus_match = server_cert_obj.public_key().public_numbers().n == server_key_obj.public_key().public_numbers().n
         utc_now = datetime.datetime.now(cert_not_after.tzinfo)
         cert_validity_rest = cert_not_after - utc_now
         if modulus_match is False or cert_validity_rest.days <= CERT_ERROR_DAYS:
@@ -939,15 +904,13 @@ class SlapdCheck(CheckMkLocalCheck):
             check_output=(
                 'Server cert %r valid until %s UTC '
                 '(%d days left, %0.1f %% elapsed), '
-                'modulus_match==%r, '
-                '(via module %s)'
+                'modulus_match==%r'
             ) % (
                 config_attrs['olcTLSCertificateFile'][0],
                 cert_not_after,
                 cert_validity_rest.days,
                 elapsed_percentage,
                 modulus_match,
-                crypto_module,
             ),
         )
         # end of _check_tls_file()
