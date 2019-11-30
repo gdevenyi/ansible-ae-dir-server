@@ -39,10 +39,6 @@ import cryptography.x509
 from cryptography.hazmat.backends import default_backend as crypto_default_backend
 import cryptography.hazmat.primitives.asymmetric.rsa
 
-# Switch off processing .ldaprc or ldap.conf
-# before importing ldap0 with loads libldap.so
-os.environ['LDAPNOINIT'] = '0'
-
 # from ldap0 package
 import ldap0
 from ldap0.ldapobject import LDAPObject
