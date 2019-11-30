@@ -2,6 +2,8 @@
 # shell wrapper script for slapd_checkmk.py
 # {{ ansible_managed }}
 
+LDAPNOINIT=1
+export LDAPNOINIT
 LD_LIBRARY_PATH="{{ slapd_check_lib_dirs|join(':') }}:${LD_LIBRARY_PATH}"
 export LD_LIBRARY_PATH
 
