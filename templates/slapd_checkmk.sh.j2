@@ -2,10 +2,19 @@
 # shell wrapper script for slapd_checkmk.py
 # {{ ansible_managed }}
 
+# disable use of ldap.conf
 LDAPNOINIT=1
 export LDAPNOINIT
+
+# explicitly use specific libldap
 LD_LIBRARY_PATH="{{ slapd_check_lib_dirs|join(':') }}:${LD_LIBRARY_PATH}"
 export LD_LIBRARY_PATH
+
+# some options for Python interpreter
+PYTHONDONTWRITEBYTECODE=1
+export PYTHONDONTWRITEBYTECODE
+PYTHONWARNINGS=error
+export PYTHONWARNINGS
 
 {{ aedir_python }} -m slapdcheck.checkmk \
   '{{ openldap_ldapi_uri }}' \
