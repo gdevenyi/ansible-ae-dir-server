@@ -726,7 +726,6 @@ oath_ldap_oathenroll_web_group: ae-dir-otpenroll
 # query string of URL may contain two more parameters:
 # STARTTLS: Send STARTTLS (see also config parameter SMTP_TLSARGS)
 # VIA: Use this hostname or IP address for connection
-#smtp_relay_url: "smtp://user:password@mail-relay.example.com/?STARTTLS&VIA=mail-relay-othername.example.com"
 #smtp_relay_url: "smtp://127.0.0.1"
 #smtp_relay_url: "smtp://smtp.example.com:587/?STARTTLS"
 smtp_relay_url: "smtp://smtp.example.com:587/?STARTTLS"
