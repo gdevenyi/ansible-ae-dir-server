@@ -73,19 +73,8 @@ SMTP_DEBUGLEVEL = 0
 # set to None for automatically using the local hostname
 SMTP_LOCALHOSTNAME = '{{ ansible_fqdn }}'
 
-# Dictionary for key-word arguments to be used for function ssl.wrap_socket()
-# See https://docs.python.org/2/library/ssl.html#ssl.wrap_socket
-import ssl
-SMTP_TLSARGS = {
-#  'keyfile':None,
-#  'certfile':None,
-  'cert_reqs':ssl.CERT_REQUIRED,
-  'ssl_version':ssl.PROTOCOL_TLSv1_2,
-  'ca_certs':'{{ smtp_cacert_pathname }}',
-  'expected_fingerprints':None,
-  # ciphers only supported with Python 2.7+
-  'ciphers': "HIGH:!aNULL:!eNULL",
-}
+# Path name of file containing CA certificates used to validate TLS server certs
+SMTP_TLS_CACERTS = '{{ smtp_cacert_pathname }}'
 
 # From address in sent e-mail
 SMTP_FROM = '{{ smtp_from_address }}'

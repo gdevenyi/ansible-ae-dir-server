@@ -20,7 +20,7 @@
       - pyasn1>=0.4.5
       - pyasn1_modules>=0.2.5
       - ldap0>=0.6.3
-      - aedir>=0.6.2
+      - aedir>=0.7.0
       - prometheus_client>=0.7.1
     state: present
     virtualenv: "{{ aedir_prefix }}"
@@ -45,7 +45,7 @@
 - name: "PIP install additional modules in virtualenv {{ aedir_prefix }} on {{ openldap_role }}"
   pip:
     name:
-      - mailutil>=0.3.0
+      - mailutil>=0.4.0
       - paramiko
       - passlib
       - xlwt
@@ -64,7 +64,7 @@
 - name: "PIP install aedir_pproc in virtualenv {{ aedir_prefix }} on {{ openldap_role }} on {{ lsb_id }}"
   pip:
     name:
-      - aedir_pproc>=0.3.1
+      - aedir_pproc>=0.4.0
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
