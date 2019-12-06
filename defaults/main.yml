@@ -728,7 +728,7 @@ oath_ldap_oathenroll_web_group: ae-dir-otpenroll
 # VIA: Use this hostname or IP address for connection
 #smtp_relay_url: "smtp://127.0.0.1"
 #smtp_relay_url: "smtp://smtp.example.com:587/?STARTTLS"
-smtp_relay_url: "smtp://smtp.example.com:587/?STARTTLS"
+smtp_relay_url: "smtp://localhost:25/"
 
 # from address to be used when sending e-mails
 smtp_admin_address: "ae-admins@{{ openldap_service_fqdn }}"
@@ -736,10 +736,10 @@ smtp_admin_address: "ae-admins@{{ openldap_service_fqdn }}"
 # from address to be used when sending e-mails
 smtp_from_address: "{{ smtp_admin_address }}"
 
-# The CA certificate file bundle for sending e-mail via SMTP/STARTTLS
+# Local filename of CA certificate file bundle for sending e-mail via SMTP/STARTTLS
 smtp_cacert_filename:  "{{ openldap_cacert_filename }}"
 
-# The CA certificate file for sending e-mail via SMTP/STARTTLS
+# Path name of remote CA certificate file for sending e-mail via SMTP/STARTTLS
 smtp_cacert_pathname: "{{ aedir_etc }}/{{ smtp_cacert_filename|basename }}"
 
 #---------------------------------------------------------------------------
