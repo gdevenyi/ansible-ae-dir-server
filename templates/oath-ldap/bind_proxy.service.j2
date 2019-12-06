@@ -19,6 +19,7 @@ Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
 Environment=LDAPNOINIT=1
 Environment=PYTHONOPTIMIZE=2
 Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONWARNINGS=error
 Environment=LDAPTLS_CACERT={{ openldap_cacert_pathname }}
 ExecStart={{ aedir_python }} {{ aedir_sbin }}/{{ oath_bind_listener }}.py "{{ oath_ldap_socket_path }}" "{{ openldap_ldapi_uri|replace('%','%%') }}????x-saslmech=EXTERNAL" {% for host in openldap_syncrepl_providers %} ldaps://{{ hostvars[host].get('openldap_service_fqdn',host) }}{% endfor %}
 
