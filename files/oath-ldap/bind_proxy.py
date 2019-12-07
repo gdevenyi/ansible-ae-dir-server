@@ -319,6 +319,9 @@ class BindProxyHandler(SlapdSockHandler):
                             remote_ldap_uri,
                             trace_level=0,
                         )
+                        remote_ldap_conn.set_tls_options(
+                            cacert_filename=os.environ['LDAPTLS_CACERT'],
+                        )
                         remote_ldap_conn.simple_bind_s(
                             request.dn,
                             request.cred,
@@ -401,9 +404,6 @@ def run():
     """
 
     script_name = os.path.abspath(sys.argv[0])
-
-    # explicitly set CA cert file from libldap env var
-    ldap0.set_option(ldap0.OPT_X_TLS_CACERTFILE, os.environ['LDAPTLS_CACERT'].encode('utf-8'))
 
     log_level = LOG_LEVEL
     console_log_format = None
