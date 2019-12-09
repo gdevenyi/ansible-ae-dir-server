@@ -360,7 +360,7 @@ aedir_addressbook_attrs:
   - userCertificate
 
 # Specifies whether a AE-DIR instance should send e-mail notifications to users or not
-aedir_user_mail_enabled: "{{ aedir_hosts.provider[0]==ansible_fqdn }}"
+aedir_user_mail_enabled: "{{ inventory_hostname == aedir_main_provider_hostname }}"
 
 # some stupid LDAP clients insist on searching user or group entries in
 # separate container trees beneath the separately configured search root
