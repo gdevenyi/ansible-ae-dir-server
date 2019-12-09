@@ -20,7 +20,7 @@
       - pyasn1>=0.4.5
       - pyasn1_modules>=0.2.5
       - ldap0>=0.6.4
-      - aedir>=0.7.0
+      - aedir>=0.7.1
       - prometheus_client>=0.7.1
     state: present
     virtualenv: "{{ aedir_prefix }}"
@@ -64,7 +64,7 @@
 - name: "PIP install aedir_pproc in virtualenv {{ aedir_prefix }} on {{ openldap_role }} on {{ lsb_id }}"
   pip:
     name:
-      - aedir_pproc>=0.4.2
+      - aedir_pproc>=0.4.3
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"

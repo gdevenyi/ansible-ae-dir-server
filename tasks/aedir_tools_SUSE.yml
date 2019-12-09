@@ -6,7 +6,7 @@
       - python3-pyasn1 >= 0.4.5
       - python3-pyasn1-modules >= 0.2.5
       - python3-ldap0 >= 0.6.4
-      - python3-aedir >= 0.7.0
+      - python3-aedir >= 0.7.1
       - python3-cryptography
       - python3-asn1crypto
       - python3-jwcrypto
@@ -52,7 +52,7 @@
 - name: "Install ae-dir-pproc on {{ openldap_role }} on {{ lsb_id }}"
   zypper:
     name:
-      - ae-dir-pproc >= 0.4.2
+      - ae-dir-pproc >= 0.4.3
     state: present
     disable_recommends: yes
     type: package
