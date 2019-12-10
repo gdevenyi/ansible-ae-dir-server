@@ -223,12 +223,12 @@ class PWSyncWorker(threading.Thread, LocalLDAPConn):
                 ldapi_conn.read_s(user_dn, attrlist=['userPassword']) or {}
             )
         except ldap0.LDAPError as ldap_error:
-            self.logger.warn('LDAPError checking password of %r: %s', user_dn, ldap_error)
+            self.logger.warning('LDAPError checking password of %r: %s', user_dn, ldap_error)
             return False
         try:
             user_password_hash = user_entry['userPassword'][0][7:]
         except (KeyError, IndexError):
-            self.logger.warn('No userPassword in %r', user_dn)
+            self.logger.warning('No userPassword in %r', user_dn)
             return False
         if __debug__:
             self.logger.debug('user_password_hash = %r', user_password_hash)
@@ -244,7 +244,7 @@ class PWSyncWorker(threading.Thread, LocalLDAPConn):
         rdn_attr_type, uid, _ = str2dn(source_dn)[0][0]
         if rdn_attr_type.lower() != self.source_id_attr:
             # check accepted attribute in RDN
-            self.logger.warn(
+            self.logger.warning(
                 'RDN attribute %r is not %r => ignore password change of %r',
                 rdn_attr_type,
                 self.source_id_attr,
@@ -324,12 +324,12 @@ class PWSyncWorker(threading.Thread, LocalLDAPConn):
                 time.sleep(sleep_time)
                 if not self._check_password(user_dn, new_passwd):
                     # simply ignore wrong passwords
-                    self.logger.warn('Ignoring wrong password for %r', user_dn)
+                    self.logger.warning('Ignoring wrong password for %r', user_dn)
                     continue
                 target_id = self.get_target_id(user_dn)
                 if target_id is None:
                     # simply ignore non-existent targets
-                    self.logger.warn(
+                    self.logger.warning(
                         'No target ID found for %r => ignore password change',
                         user_dn,
                     )
@@ -551,7 +551,7 @@ def run():
         try:
             slapd_sock_listener.serve_forever()
         except KeyboardInterrupt:
-            my_logger.warn('Received interrupt signal => shutdown')
+            my_logger.warning('Received interrupt signal => shutdown')
     finally:
         my_logger.debug('Remove socket path %s', repr(socket_path))
         try:
