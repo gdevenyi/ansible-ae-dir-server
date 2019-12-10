@@ -20,7 +20,7 @@
       - pyasn1>=0.4.5
       - pyasn1_modules>=0.2.5
       - ldap0>=0.6.4
-      - aedir>=0.7.1
+      - aedir>=0.7.2
       - prometheus_client>=0.7.1
     state: present
     virtualenv: "{{ aedir_prefix }}"
@@ -34,7 +34,7 @@
 
 - name: "PIP package slapdsock in virtualenv {{ aedir_prefix }}"
   pip:
-    name: slapdsock>=0.11.3
+    name: slapdsock>=0.11.4
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
@@ -64,7 +64,7 @@
 - name: "PIP install aedir_pproc in virtualenv {{ aedir_prefix }} on {{ openldap_role }} on {{ lsb_id }}"
   pip:
     name:
-      - aedir_pproc>=0.4.3
+      - aedir_pproc>=0.4.4
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
