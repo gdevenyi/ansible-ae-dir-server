@@ -1146,7 +1146,7 @@ def run():
         try:
             slapd_sock_listener.serve_forever()
         except KeyboardInterrupt:
-            my_logger.warn('Received interrupt signal => shutdown')
+            my_logger.warning('Received interrupt signal => shutdown')
     finally:
         my_logger.debug('Remove socket path %s', repr(socket_path))
         try:
