@@ -42,7 +42,7 @@ from slapdsock.service import SlapdSockServer
 # Configuration constants
 #-----------------------------------------------------------------------
 
-__version__ = '0.5.1'
+__version__ = '0.5.2'
 __author__ = u'Michael Ströder <michael@stroeder.com>'
 
 # If
@@ -108,13 +108,6 @@ LOG_LEVEL = logging.INFO
 CACHE_TTL = -1.0
 
 DEBUG_VARS = [
-    'request_dn_utf8',
-    'pwd_changed_time',
-    'pwd_failure_times',
-    'pwd_policy_subentry_dn',
-    'pwd_policy_subentry',
-    'pwd_max_age',
-    'pwd_expired',
     'remote_ldap_uris',
     'user_filterstr',
 ]
@@ -191,11 +184,12 @@ class BindProxyHandler(SlapdSockHandler):
                 return True
         return False # end of _check_peername()
 
-    def _shuffle_remote_ldap_uris(self, user_dn):
+    def _shuffle_remote_ldap_uris(self, request):
         # Generate list of upstream LDAP URIs shifted based on bind-DN hash
         ldap_uris = collections.deque(self.server.remote_ldap_uris)
-        ldap_uris.rotate(hash(user_dn) % len(self.server.remote_ldap_uris))
-        return ldap_uris # end of _shuffle_remote_ldap_uris()
+        ldap_uris.rotate(hash(request.dn.encode('utf-8')) % len(self.server.remote_ldap_uris))
+        return ldap_uris
+        # end of _shuffle_remote_ldap_uris()
 
     def _check_user_filter(self, request):
         """
@@ -254,13 +248,10 @@ class BindProxyHandler(SlapdSockHandler):
             )
             return 'CONTINUE\n'
 
-        # We need UTF-8 encoded DN several times later
-        request_dn_utf8 = request.dn.encode('utf-8')
-
         self._check_user_filter(request)
 
         # Generate list of upstream LDAP URIs shifted based on bind-DN hash
-        remote_ldap_uris = self._shuffle_remote_ldap_uris(request_dn_utf8)
+        remote_ldap_uris = self._shuffle_remote_ldap_uris(request)
         self._log(logging.DEBUG, 'remote_ldap_uris = %r', remote_ldap_uris)
 
         try:
