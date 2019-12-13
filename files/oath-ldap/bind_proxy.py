@@ -15,8 +15,6 @@ from __future__ import absolute_import
 import os
 import logging
 import sys
-import datetime
-import re
 import socket
 import collections
 
@@ -32,7 +30,6 @@ from ldap0.controls.sessiontrack import \
 
 # local modules
 from slapdsock.ldaphelper import RESULT_CODE
-from slapdsock.ldaphelper import ldap_datetime_str
 from slapdsock.loghelper import combined_logger
 from slapdsock.handler import SlapdSockHandler, SlapdSockHandlerError
 from slapdsock.message import RESULTResponse, InvalidCredentialsResponse
@@ -45,14 +42,14 @@ from slapdsock.service import SlapdSockServer
 # Configuration constants
 #-----------------------------------------------------------------------
 
-__version__ = '0.5.0'
+__version__ = '0.5.1'
 __author__ = u'Michael Ströder <michael@stroeder.com>'
 
 # If
 # 1. 'peername' matches any item in
 #    LDAP_PROXY_PEER_ADDRS or LDAP_PROXY_PEER_NETS *and*
 # 2. BIND request's 'dn' matches LDAP_PROXY_BINDDN_PATTERN
-# then bind request must be validated by upstream provider replica
+#    then bind request must be validated by upstream provider replica
 LDAP_PROXY_PEER_ADDRS = (
     '/opt/ae-dir/run/slapd/ldapi',
     '127.0.0.1',
@@ -60,9 +57,6 @@ LDAP_PROXY_PEER_ADDRS = (
 LDAP_PROXY_PEER_NETS = (
     u'0.0.0.0/0',
 )
-# Regex pattern for HOTP user DNs
-# If bind-DN does not match this pattern, request will be continued by slapd
-LDAP_PROXY_BINDDN_PATTERN = u'^uid=[a-z]+,cn=[a-z0-9]+,(cn|ou|o|dc)=.*ae-dir.*$'
 
 # UIDs and peer GIDS of peers which are granted access
 # (list of int/strings)
@@ -87,19 +81,15 @@ LDAP_SASL_AUTHZID = None
 
 # Time in seconds for which normal LDAP searches will be valid in cache
 LDAP_CACHE_TTL = 5.0
-# Time in seconds for which pwdPolicy and oathHOTPParams entries will be
-# valid in cache
-LDAP_LONG_CACHE_TTL = 100 * LDAP_CACHE_TTL
 
 # Timeout in seconds when connecting to local and remote LDAP servers
 # used for ldap0.OPT_NETWORK_TIMEOUT and ldap0.OPT_TIMEOUT
 LDAP_TIMEOUT = 3.0
 
-# Template filter string for reading the bind-DN's entry to determine
-# whether to proxy the simple bind (None for disabling this search request)
-LDAP_PROXY_FILTER_TMPL = '(&(objectClass=aeUser)(objectClass=oathHOTPUser)(oathHOTPToken=*))'
-
-LDAP_USERNAME_ATTR = 'uid'
+# Filter string for checking the bind-DN's entry to determine
+# whether to proxy the simple bind
+# (set to None for disabling this check)
+LDAP_PROXY_USER_FILTER = '(oathToken=*)'
 
 # Timeout in seconds for the server (Unix domain) socket
 SOCKET_TIMEOUT = 2 * LDAP_TIMEOUT
@@ -193,7 +183,6 @@ class BindProxyHandler(SlapdSockHandler):
         ipaddress.ip_network(p)
         for p in LDAP_PROXY_PEER_NETS
     ]
-    ldap_proxy_filter_tmpl = LDAP_PROXY_FILTER_TMPL
 
     def _check_peername(self, peer):
         peer_type, peer_addr = peer.lower().rsplit(':')[0].split('=')
@@ -213,24 +202,46 @@ class BindProxyHandler(SlapdSockHandler):
         ldap_uris.rotate(hash(user_dn) % len(self.server.remote_ldap_uris))
         return ldap_uris # end of _shuffle_remote_ldap_uris()
 
-    def _gen_session_tracking_ctrl(self, request, request_dn_utf8):
-        # Prepare Session Track control for bind request to upstream
-        return SessionTrackingControl(
-            request.peername,
-            socket.getfqdn(),
-            SESSION_TRACKING_FORMAT_OID_USERNAME,
-            request_dn_utf8
-        )
-
-    def _check_regex(self, request):
+    def _check_user_filter(self, request):
         """
-        Returns True if request.dn matches LDAP_PROXY_BINDDN_PATTERN
+        Additional check whether bind request has to be sent to remote LDAP
+        server by searching the bind-DN's entry with a filter
         """
-        # Preliminary request DN pattern check
-        proxy_binddn_regex = re.compile(LDAP_PROXY_BINDDN_PATTERN.format(
-            suffix=request.suffix,
-        ))
-        return proxy_binddn_regex.match(request.dn)
+        if LDAP_PROXY_USER_FILTER is None:
+            return
+        # Try to read the user entry for the given request dn
+        try:
+            try:
+                # Get LDAPObject instance for local LDAPI access
+                local_ldap_conn = self.server.get_ldapi_conn()
+                ldap_result = local_ldap_conn.search_s(
+                    request.dn,
+                    ldap0.SCOPE_BASE,
+                    LDAP_PROXY_USER_FILTER,
+                    attrlist=['1.1'],
+                )
+            except ldap0.SERVER_DOWN as ldap_error:
+                self.server.disable_ldapi_conn()
+                raise ldap_error
+        except LDAPError as ldap_error:
+            raise SlapdSockHandlerError(
+                ldap_error,
+                log_level=logging.WARN,
+                response=InvalidCredentialsResponse(request.msgid),
+                log_vars=self.server._log_vars,
+            )
+        # Check whether we want handle this
+        if not ldap_result:
+            raise SlapdSockHandlerError(
+                Exception('No result reading %r with filter %r' % (
+                    request.dn,
+                    LDAP_PROXY_USER_FILTER,
+                )),
+                log_level=logging.INFO,
+                response='CONTINUE\n',
+                log_vars=self.server._log_vars,
+            )
+        # end of _check_user_filter()
 
     def do_bind(self, request):
         """
@@ -248,62 +259,10 @@ class BindProxyHandler(SlapdSockHandler):
             )
             return 'CONTINUE\n'
 
-        if not self._check_regex(request):
-            self._log(
-                logging.DEBUG,
-                'Bind-DN %r (from %r) does not match %r => let slapd continue',
-                request.dn,
-                request.peername,
-                LDAP_PROXY_BINDDN_PATTERN,
-            )
-            return 'CONTINUE\n'
-
-        # We need current time in GeneralizedTime syntax later
-        now_dt = datetime.datetime.utcnow()
-        now_str = ldap_datetime_str(now_dt)
-
         # We need UTF-8 encoded DN several times later
         request_dn_utf8 = request.dn.encode('utf-8')
 
-        if self.ldap_proxy_filter_tmpl:
-
-            # Get LDAPObject instance for local LDAPI access
-            user_filterstr = self.ldap_proxy_filter_tmpl.format(now=now_str)
-
-            # Try to read the user entry for the given request dn
-            try:
-                try:
-                    local_ldap_conn = self.server.get_ldapi_conn()
-                    ldap_result = local_ldap_conn.search_s(
-                        request.dn,
-                        ldap0.SCOPE_BASE,
-                        '(&{0}({1}=*))'.format(
-                            user_filterstr,
-                            LDAP_USERNAME_ATTR,
-                        ),
-                        attrlist=['1.1'],
-                    )
-                except ldap0.SERVER_DOWN as ldap_error:
-                    self.server.disable_ldapi_conn()
-                    raise ldap_error
-            except LDAPError as ldap_error:
-                raise SlapdSockHandlerError(
-                    ldap_error,
-                    log_level=logging.WARN,
-                    response=InvalidCredentialsResponse(request.msgid),
-                    log_vars=self.server._log_vars,
-                )
-
-            # Check whether we want handle this
-            if not ldap_result:
-                raise SlapdSockHandlerError(
-                    Exception('No result reading %r with filter %r' % (
-                        request.dn, user_filterstr,
-                    )),
-                    log_level=logging.WARN,
-                    response='CONTINUE\n',
-                    log_vars=self.server._log_vars,
-                )
+        self._check_user_filter(request)
 
         # Generate list of upstream LDAP URIs shifted based on bind-DN hash
         remote_ldap_uris = self._shuffle_remote_ldap_uris(request_dn_utf8)
@@ -326,7 +285,12 @@ class BindProxyHandler(SlapdSockHandler):
                             request.dn,
                             request.cred,
                             req_ctrls=[
-                                self._gen_session_tracking_ctrl(request, request.dn)
+                                SessionTrackingControl(
+                                    request.peername,
+                                    socket.getfqdn(),
+                                    SESSION_TRACKING_FORMAT_OID_USERNAME,
+                                    request.dn,
+                                ),
                             ]
                         )
                     except ldap0.SERVER_DOWN as ldap_error:
