@@ -80,7 +80,7 @@ LDAP_RETRYDELAY = 0.1
 LDAP_SASL_AUTHZID = None
 
 # Time in seconds for which normal LDAP searches will be valid in cache
-LDAP_CACHE_TTL = 5.0
+LDAP_CACHE_TTL = 180.0
 
 # Timeout in seconds when connecting to local and remote LDAP servers
 # used for ldap0.OPT_NETWORK_TIMEOUT and ldap0.OPT_TIMEOUT
@@ -118,11 +118,6 @@ DEBUG_VARS = [
     'remote_ldap_uris',
     'user_filterstr',
 ]
-
-# Error messages
-if __debug__:
-    DEBUG_VARS.extend([
-    ])
 
 #-----------------------------------------------------------------------
 # Classes and functions
