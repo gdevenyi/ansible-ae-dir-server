@@ -214,16 +214,16 @@ access to
 
 access to
   dn.subtree="{{ aedir_suffix }}"
-  attrs=authTimestamp,pwdFailureTime,pwdHistory,oathSecret,oathTokenPIN,msPwdResetAdminPw
+  attrs=authTimestamp,pwdFailureTime,pwdHistory,msPwdResetAdminPw
 {% for restriction in aedir_providers_restrictions or [''] %}
     by group/aeGroup/member="cn=ae-providers,cn=ae,{{ aedir_suffix }}" {{ restriction }} read
 {% endfor %}
     by group/aeGroup/member="cn=ae-replicas,cn=ae,{{ aedir_suffix }}" none
     by * none break
 
-# department, location and person entries only required on providers
+# OATH token, department, location and person entries only required on providers
 access to
-  filter="(|(objectClass=aeDept)(objectClass=aeLocation)(objectClass=aePerson))"
+  filter="(|(objectClass=aeDept)(objectClass=aeLocation)(objectClass=aePerson)(objectClass=oathToken))"
 {% for restriction in aedir_providers_restrictions or [''] %}
     by group/aeGroup/member="cn=ae-providers,cn=ae,{{ aedir_suffix }}" {{ restriction }} read
 {% endfor %}
