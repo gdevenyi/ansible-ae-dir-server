@@ -13,7 +13,7 @@
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
-  when: lsb_id != 'SUSE'
+  when: aedir_pip_install
 
 - name: "Install slapdcheck package on {{ openldap_role }}"
   zypper:

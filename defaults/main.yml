@@ -25,6 +25,10 @@ aedir_files_dirs:
 # pip install arguments
 #---------------------------------------------------------------------------
 
+# whether to use PIP to install Python software in a virtual env
+# instead of using native OS packages
+aedir_pip_install: "{{ lsb_id != 'SUSE' }}"
+
 aedir_pip_index_url: "https://pypi.python.org/simple"
 
 aedir_pip_needs_compiler: "{{ aedir_pip_index_url == 'https://pypi.python.org/simple' }}"
@@ -790,6 +794,9 @@ web_document_root: "{{ aedir_htdocsdir }}"
 #---------------------------------------------------------------------------
 # web2ldap parameters
 #---------------------------------------------------------------------------
+
+# minimum web2ldap version to be installed
+web2ldap_min_version: "1.5.25"
 
 # directory where the configuration files are located
 web2ldapcnf_prefix: "{{ web2ldap_paths.configdir }}"

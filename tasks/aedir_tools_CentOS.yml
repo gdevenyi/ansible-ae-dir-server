@@ -3,6 +3,7 @@
 - name: "Check whether ldap0 module is installed"
   command: "{{ aedir_python }} -c 'import ldap0 ; print(ldap0.__version__)'"
   ignore_errors: yes
+  when: aedir_pip_install
   register: ldap0_installed
 
 - name: "Install C compiler packages on {{ lsb_id }}"

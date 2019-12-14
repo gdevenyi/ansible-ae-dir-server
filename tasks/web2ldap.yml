@@ -4,22 +4,22 @@
 - name: "PIP install web2ldap in virtualenv {{ aedir_prefix }} on {{ openldap_role }}"
   pip:
     name:
-      - web2ldap>=1.5.24
+      - "web2ldap>={{ web2ldap_min_version }}"
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
-  when: lsb_id != 'SUSE'
+  when: aedir_pip_install
   notify:
     - restart web2ldap
 
 - name: "Install web2ldap package on {{ openldap_role }}"
   zypper:
     name:
-      - web2ldap >= 1.5.24
+      - "web2ldap >= {{ web2ldap_min_version }}"
     state: present
     disable_recommends: yes
     type: package
-  when: lsb_id == 'SUSE'
+  when: not aedir_pip_install
   notify:
     - restart web2ldap
 
