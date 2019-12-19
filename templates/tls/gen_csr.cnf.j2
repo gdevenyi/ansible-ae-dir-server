@@ -1,3 +1,11 @@
+# OpenSSL config for generating PKCS#10 CSRs
+# You have to adjust the parameters herein to match your own CA/PKI needs
+#
+# File format:
+# https://www.openssl.org/docs/man1.1.1/man1/req.html#CONFIGURATION-FILE-FORMAT
+#
+# {{ ansible_managed }}
+
 [ req ]
 
 default_bits = 2048
