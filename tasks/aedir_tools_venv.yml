@@ -19,7 +19,7 @@
       - jwcrypto
       - pyasn1>=0.4.5
       - pyasn1_modules>=0.2.5
-      - ldap0>=0.6.4
+      - ldap0>=0.6.5
       - aedir>=0.7.2
       - prometheus_client>=0.7.1
     state: present
