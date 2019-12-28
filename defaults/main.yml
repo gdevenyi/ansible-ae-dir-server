@@ -796,7 +796,7 @@ web_document_root: "{{ aedir_htdocsdir }}"
 #---------------------------------------------------------------------------
 
 # minimum web2ldap version to be installed
-web2ldap_min_version: "1.5.38"
+web2ldap_min_version: "1.5.39"
 
 # directory where the configuration files are located
 web2ldapcnf_prefix: "{{ web2ldap_paths.configdir }}"
