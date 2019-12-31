@@ -180,9 +180,9 @@ cookie_domain = None
 session_paranoid = 0
 
 # unsuspicious target URLs accept by redirector even without a session
-good_redirect_targets=set((
+good_redirect_targets = {
   '/web2ldap.html',
-))
+}
 
 # Dictionary specifying accepted address/net mask strings of
 # accepted client addresses for certain URL commands.
