@@ -23,7 +23,6 @@
       - openldap-ltb
       - openldap-ltb-contrib-overlays
       - openldap-ltb-mdb-utils
-      - openldap-ltb-ppm
       - openldap-ltb-check-password
       - cracklib
     state: latest

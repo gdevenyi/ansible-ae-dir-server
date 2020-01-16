@@ -10,7 +10,6 @@
       - openldap2-back-sock
       - openldap2-client
       - openldap2-contrib
-      - openldap2-ppolicy-check-password
     state: latest
     disable_recommends: yes
     type: package
