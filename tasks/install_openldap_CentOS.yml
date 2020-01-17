@@ -23,7 +23,6 @@
       - openldap-ltb
       - openldap-ltb-contrib-overlays
       - openldap-ltb-mdb-utils
-      - openldap-ltb-check-password
       - cracklib
     state: latest
     update_cache: yes
