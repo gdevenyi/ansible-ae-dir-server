@@ -9,7 +9,7 @@
 - name: "PIP install slapdcheck in virtualenv {{ aedir_prefix }}"
   pip:
     name:
-      - slapdcheck>=3.4.2
+      - slapdcheck>=3.5.0
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
@@ -18,7 +18,7 @@
 - name: "Install slapdcheck package on {{ openldap_role }}"
   zypper:
     name:
-      - slapdcheck >= 3.4.2
+      - slapdcheck >= 3.5.0
     state: present
     disable_recommends: yes
     type: package
@@ -29,11 +29,18 @@
     path: "{{ slapd_checkmk_local }}"
   register: slapd_checkmk_local_stat
 
-- name: "Install local check {{ slapd_checkmk_local }}/slapd_checkmk.sh"
+- name: "Install check_mk local check {{ slapd_checkmk_local }}/slapd_checkmk.sh"
   template:
     src: "slapd_checkmk.sh.j2"
     dest: "{{ slapd_checkmk_local }}/slapd_checkmk.sh"
     owner: root
     group: root
     mode: 0755
-  when: slapd_checkmk_local_stat.stat.isdir is defined and slapd_checkmk_local_stat.stat.isdir
+
+- name: "Install metrics wrapper script {{ slapd_metrics_local }}/slapd_metrics.sh"
+  template:
+    src: "slapd_metrics.sh.j2"
+    dest: "{{ aedir_sbin }}/slapd_metrics.sh"
+    owner: root
+    group: root
+    mode: 0755
