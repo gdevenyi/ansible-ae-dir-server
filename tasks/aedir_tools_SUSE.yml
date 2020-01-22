@@ -10,6 +10,7 @@
       - python3-cryptography
       - python3-asn1crypto
       - python3-jwcrypto
+      - python3-psutil >= 5.6.7
       - python3-prometheus_client >= 0.7.1
     state: present
     disable_recommends: yes
