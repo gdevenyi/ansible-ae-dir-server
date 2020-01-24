@@ -13,7 +13,7 @@
 
 - name: "Create logging config file {{ aedir_etc }}/ae-logging.conf from template"
   template:
-    src: "ae-logging.conf.j2"
+    src: "{{ aedir_logging_conf }}"
     dest: "{{ aedir_etc }}/ae-logging.conf"
     owner: root
     group: root

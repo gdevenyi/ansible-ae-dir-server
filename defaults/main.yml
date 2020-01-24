@@ -105,6 +105,12 @@ aedir_python: "{{ aedir_python_paths.python_exec }} -ROOBs"
 # where to install systemd files
 aedir_systemd_dir: "/etc/systemd/system"
 
+# Jinja template used to generate Logging configuration for all AE-DIR
+# demons and scripts written in Python.
+# See format in Python 3.x library docs:
+# https://docs.python.org/3/library/logging.config.html#configuration-file-format
+aedir_logging_conf: "ae-logging.conf.j2"
+
 # various systemd.exec options for hardening the service units
 aedir_systemd_hardening:
   - "PrivateUsers=no"
