@@ -17,6 +17,8 @@
     PYTHONPATH: "{{ aedir_etc }}/ae-dir-pwd"
     PYTHONOPTIMIZE: "2"
     PYTHONDONTWRITEBYTECODE: "1"
+    PYTHONWARNINGS: "error"
+    AE_LOGGER_QUALNAME: "aedir.syslog"
 
 - name: "Install CRON jobs running as root"
   cron:
