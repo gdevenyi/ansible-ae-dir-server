@@ -23,13 +23,13 @@ qualname=aedir
 
 [logger_syslog]
 handlers=syslog
+level=INFO
 propagate=0
 facility=local7
 qualname=aedir.syslog
 
 [handler_syslog]
 class=logging.handlers.SysLogHandler
-level=INFO
 formatter=syslog
 facility=CRON
 args=('/dev/log',)
@@ -41,12 +41,12 @@ datefmt=
 
 [logger_console]
 handlers=console
+level=INFO
 propagate=0
 qualname=aedir.console
 
 [handler_console]
 class=logging.StreamHandler
-level=DEBUG
 formatter=console
 args=(sys.stdout,)
 
