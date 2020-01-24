@@ -53,7 +53,7 @@
 - name: "Install ae-dir-pproc on {{ openldap_role }} on {{ lsb_id }}"
   zypper:
     name:
-      - ae-dir-pproc >= 0.4.6
+      - ae-dir-pproc >= 0.4.9
     state: present
     disable_recommends: yes
     type: package
