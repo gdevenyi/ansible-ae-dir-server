@@ -9,7 +9,7 @@
 #
 # {{ ansible_managed }}
 #---------------------------------------------------------------------------
-{% set gid_number = aedir_min_gid-1 -%}
+{% set gid_number = [] -%}
 version: 1
 
 #---------------------------------------------------------------------------
@@ -629,8 +629,9 @@ mail: {{ person_attrs.mail }}
 dn: uid={{ ae_user.uid }},cn=ae,{{ aedir_suffix }}
 changetype: add
 uid: {{ ae_user.uid }}
-uidNumber: {{ gid_number + loop.index }}
-gidNumber: {{ gid_number + loop.index }}
+uidNumber: {{ aedir_min_uid + gid_number|length }}
+gidNumber: {{ aedir_min_uid + gid_number|length }}
+{% if gid_number.append(1) -%}{% endif %}
 objectClass: account
 objectClass: person
 objectClass: organizationalPerson
@@ -651,13 +652,12 @@ pwdPolicySubentry: cn=ppolicy-ae-admins,cn=ae,{{ aedir_suffix }}
 cn: {{ aedir_init_aepersons[ae_user.unique_identifier].given_name }} {{ aedir_init_aepersons[ae_user.unique_identifier].sur_name }}
 displayName: {{ aedir_init_aepersons[ae_user.unique_identifier].given_name }}
   {{ aedir_init_aepersons[ae_user.unique_identifier].sur_name }}
-  ({{ ae_user.uid }}/{{ gid_number + loop.index }})
+  ({{ ae_user.uid }}/{{ aedir_min_uid + gid_number|length }})
 sn: {{ aedir_init_aepersons[ae_user.unique_identifier].sur_name }}
 givenName: {{ aedir_init_aepersons[ae_user.unique_identifier].given_name }}
 mail: {{ aedir_init_aepersons[ae_user.unique_identifier].mail }}
 
 {% endfor %}
-{% set gid_number = gid_number + aedir_init_aeadmins|length + 1 -%}
 
 #---------------------------------------------------------------------------
 # AE groups
@@ -670,8 +670,7 @@ aeTicketId: {{ aedir_init_ticket_id }}
 aeTag: ae-tag-init
 cn: ae-admins
 description:: R3JvdXAgbWVtYmVycyBjYW4gbWFuYWdlIGFsbCDDhi1ESVIgZW50cmllcw==
-gidNumber: {{ gid_number }}
-{% set gid_number = gid_number+1 -%}
+gidNumber: {{ aedir_min_uid + gid_number|length }}
 objectClass: top
 objectClass: groupOfEntries
 objectClass: posixGroup
@@ -682,6 +681,7 @@ aeMemberZone: cn=ae,{{ aedir_suffix }}
 member: uid={{ ae_user.uid }},cn=ae,{{ aedir_suffix }}
 memberUid: {{ ae_user.uid }}
 {% endfor %}
+{% if gid_number.append(1) -%}{% endif %}
 
 dn: cn=ae-auditors,cn=ae,{{ aedir_suffix }}
 changetype: add
@@ -690,21 +690,20 @@ aeTicketId: {{ aedir_init_ticket_id }}
 aeTag: ae-tag-init
 cn: ae-auditors
 description:: R3JvdXAgbWVtYmVycyBjYW4gcmVhZCBhbGwgw4YtRElSIGVudHJpZXM=
-gidNumber: {{ gid_number }}
-{% set gid_number = gid_number+1 -%}
+gidNumber: {{ aedir_min_uid + gid_number|length }}
 objectClass: top
 objectClass: groupOfEntries
 objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
 aeMemberZone: cn=ae,{{ aedir_suffix }}
+{% if gid_number.append(1) -%}{% endif %}
 
 dn: cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}
 changetype: add
 cn: ae-all-zone-admins
 description: This group is updated to contain all zone admins
-gidNumber: {{ gid_number }}
-{% set gid_number = gid_number+1 -%}
+gidNumber: {{ aedir_min_uid + gid_number|length }}
 memberURL: ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-admins)(!(cn=ae-all-zone-*)))
 objectClass: top
 objectClass: groupOfEntries
@@ -715,13 +714,13 @@ objectClass: aeGroup
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
 aeTag: ae-tag-init
+{% if gid_number.append(1) -%}{% endif %}
 
 dn: cn=ae-all-zone-auditors,cn=ae,{{ aedir_suffix }}
 changetype: add
 cn: ae-all-zone-auditors
 description: This group is updated to contain all zone auditors
-gidNumber: {{ gid_number }}
-{% set gid_number = gid_number+1 -%}
+gidNumber: {{ aedir_min_uid + gid_number|length }}
 memberURL: ldap:///{{ aedir_suffix }}?member?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=*-zone-auditors)(!(cn=ae-all-zone-*)))
 objectClass: top
 objectClass: groupOfEntries
@@ -732,6 +731,7 @@ objectClass: aeGroup
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
 aeTag: ae-tag-init
+{% if gid_number.append(1) -%}{% endif %}
 
 dn: cn=ae-sys-admins,cn=ae,{{ aedir_suffix }}
 changetype: add
@@ -740,14 +740,14 @@ aeTicketId: {{ aedir_init_ticket_id }}
 aeTag: ae-tag-init
 cn: ae-sys-admins
 description: Members are system admins for AE-DIR servers
-gidNumber: {{ gid_number }}
-{% set gid_number = gid_number+1 -%}
+gidNumber: {{ aedir_min_uid + gid_number|length }}
 objectClass: top
 objectClass: groupOfEntries
 objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
 aeMemberZone: cn=ae,{{ aedir_suffix }}
+{% if gid_number.append(1) -%}{% endif %}
 
 {% for uid, s in aedir_ldapi_services.items() %}
 dn: uid={{ uid }},cn=ae,{{ aedir_suffix }}
@@ -777,8 +777,7 @@ aeTicketId: {{ aedir_init_ticket_id }}
 aeTag: ae-tag-init
 cn: ae-login-proxies
 description: Members are central login components which are allowed to see all users/groups and must determine login user/target relation themselves
-gidNumber: {{ gid_number }}
-{% set gid_number = gid_number+1 -%}
+gidNumber: {{ aedir_min_uid + gid_number|length }}
 objectClass: top
 objectClass: groupOfEntries
 objectClass: posixGroup
@@ -792,6 +791,7 @@ memberUid: ae-dir-otpverify
 memberUid: ae-dir-bind-proxy
 memberUid: {{ oath_ldap_oathenroll_web_user }}
 {% endif %}
+{% if gid_number.append(1) -%}{% endif %}
 
 dn: cn=ae-sudo-sys-admins,cn=ae,{{ aedir_suffix }}
 changetype: add
@@ -890,15 +890,14 @@ aeTag: ae-tag-init
 description: AE-DIR slapd provider {{ service_fqdn }} running on {{ host }}
 homeDirectory: /home/ae-dir-slapd_{{ service_hostname }}
 cn: ae-dir-slapd_{{ service_hostname }}
-uidNumber: {{ gid_number + loop.index }}
-gidNumber: {{ gid_number + loop.index }}
+uidNumber: {{ aedir_min_uid + gid_number|length }}
+gidNumber: {{ aedir_min_uid + gid_number|length }}
 seeAlso: cn={{ service_fqdn }},{{ openldap_tls_cert_suffixes[0] }}
 aeHost: host={{ host }},cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir_suffix }}
+{% if gid_number.append(1) -%}{% endif %}
 
 {% endfor %}
-{% set gid_number = gid_number + aedir_hosts[role]|length -%}
 {% endfor %}
-{% set gid_number = gid_number + aedir_hosts['provider']|length + aedir_hosts['consumer']|length + 1 -%}
 dn: cn=ae-dir-consumer-hosts,cn=ae,{{ aedir_suffix }}
 changetype: modify
 add: aeRequires
@@ -917,8 +916,7 @@ aeTicketId: {{ aedir_init_ticket_id }}
 aeTag: ae-tag-init
 cn: ae-replicas
 description: Members of this group are AE-DIR replicas (providers and consumers)
-gidNumber: {{ gid_number }}
-{% set gid_number = gid_number+1 -%}
+gidNumber: {{ aedir_min_uid + gid_number|length }}
 objectClass: top
 objectClass: groupOfEntries
 objectClass: posixGroup
@@ -935,6 +933,7 @@ memberUid: ae-dir-slapd_{{ replica.split('.')[0] }}
 member: uid=ae-dir-slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
 memberUid: ae-dir-slapd_{{ replica.split('.')[0] }}
 {% endfor %}
+{% if gid_number.append(1) -%}{% endif %}
 
 dn: cn=ae-providers,cn=ae,{{ aedir_suffix }}
 changetype: add
@@ -943,8 +942,7 @@ aeTicketId: {{ aedir_init_ticket_id }}
 aeTag: ae-tag-init
 cn: ae-providers
 description: Members of this group are AE-DIR provider replicas
-gidNumber: {{ gid_number }}
-{% set gid_number = gid_number+1 -%}
+gidNumber: {{ aedir_min_uid + gid_number|length }}
 objectClass: top
 objectClass: groupOfEntries
 objectClass: posixGroup
@@ -956,6 +954,7 @@ aeMemberZone: cn=ae,{{ aedir_suffix }}
 member: uid=ae-dir-slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
 memberUid: ae-dir-slapd_{{ replica.split('.')[0] }}
 {% endfor %}
+{% if gid_number.append(1) -%}{% endif %}
 
 #---------------------------------------------------------------------------
 # Zone admins/auditors groups
@@ -968,13 +967,13 @@ aeTag: ae-tag-init
 cn: {{ zone_cn }}-zone-admins
 description: Group members are zone admins who can manage zone '{{ zone_cn }}'
 aeTicketId: {{ zone_attrs['ticket_id'] }}
-gidNumber: {{ gid_number }}
-{% set gid_number = gid_number+1 -%}
+gidNumber: {{ aedir_min_uid + gid_number|length }}
 objectClass: top
 objectClass: groupOfEntries
 objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
+{% if gid_number.append(1) -%}{% endif %}
 
 dn: cn={{ zone_cn }}-zone-auditors,cn={{ zone_cn }},{{ aedir_suffix }}
 changetype: add
@@ -983,13 +982,13 @@ aeTag: ae-tag-init
 cn: {{ zone_cn }}-zone-auditors
 description: Group members are zone auditors who can read zone '{{ zone_cn }}'
 aeTicketId: {{ zone_attrs['ticket_id'] }}
-gidNumber: {{ gid_number }}
-{% set gid_number = gid_number+1 -%}
+gidNumber: {{ aedir_min_uid + gid_number|length }}
 objectClass: top
 objectClass: groupOfEntries
 objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
+{% if gid_number.append(1) -%}{% endif %}
 
 dn: cn={{ zone_cn }},{{ aedir_suffix }}
 changetype: modify
@@ -1001,14 +1000,12 @@ aeZoneAuditors: cn={{ zone_cn }}-zone-auditors,cn={{ zone_cn }},{{ aedir_suffix 
 -
 
 {% endfor %}
-{% set gid_number = gid_number + 2 * aedir_init_aezones|length -%}
-#
 #---------------------------------------------------------------------------
 # update next UID/GID values in root suffix entry
 #---------------------------------------------------------------------------
 dn: {{ aedir_suffix }}
 changetype: modify
 add: gidNumber
-gidNumber: {{ gid_number }}
+gidNumber: {{ aedir_min_uid + gid_number|length}}
 -
 
