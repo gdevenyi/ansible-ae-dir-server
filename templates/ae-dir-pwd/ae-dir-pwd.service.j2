@@ -21,7 +21,6 @@ Environment=PYTHONPATH={{ aedir_etc }}/ae-dir-pwd
 Environment=PYTHONOPTIMIZE=2
 Environment=PYTHONDONTWRITEBYTECODE=1
 Environment=PYTHONWARNINGS=error
-Environment=LOG_LEVEL={{ aedir_uwsgi_params.pwd.log_level }}
 Environment=AE_LOGGER_QUALNAME=aedir.syslog
 ExecStart={{ uwsgi_paths.exec }} --strict --ini {{ aedir_etc }}/uwsgi/ae-dir-pwd.ini
 User=ae-dir-pwd

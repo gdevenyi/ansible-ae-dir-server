@@ -431,7 +431,6 @@ aedir_uwsgi_params:
     harakiri: 10
     processes: 5
   pwd:
-    log_level: INFO
     buffer_size: 8192
     harakiri: 10
     processes: 5
