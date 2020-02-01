@@ -118,7 +118,7 @@ class RequestLogAdaptor(logging.LoggerAdapter):
 
 # Safety check for URL chars
 if PWD_TMP_CHARS != url_quote_plus(PWD_TMP_CHARS):
-    raise ValueError('URL special chars in PWD_TMP_CHARS: %s' % repr(PWD_TMP_CHARS))
+    raise ValueError('URL special chars in PWD_TMP_CHARS: %r' % (PWD_TMP_CHARS,))
 
 # Set some webpy configuration vars
 if WEB_CONFIG_DEBUG is False:
@@ -588,13 +588,13 @@ class ResetToken(BaseApp):
             enroll_pw = enroll_pw1 + enroll_pw2
             self.update_token(token_dn, token_entry, enroll_pw)
         except ldap0.err.NoUniqueEntry as ldap_err:
-            self.logger.error('LDAPError: %s', repr(ldap_err), exc_info=__debug__)
+            self.logger.warning('LDAPError: %s', ldap_err)
             res = self.GET(message='Serial no. not found!')
         except LDAPError as ldap_err:
-            self.logger.error('LDAPError: %s', repr(ldap_err), exc_info=__debug__)
+            self.logger.error('LDAPError: %s', ldap_err, exc_info=__debug__)
             res = self.GET(message='Internal LDAP error!')
         except Exception as err:
-            self.logger.error('Unhandled exception: %s', repr(err), exc_info=__debug__)
+            self.logger.error('Unhandled exception: %s', err, exc_info=__debug__)
             res = self.GET(message='Internal error!')
         else:
             # try to send 2nd enrollment password part to token owner
@@ -604,6 +604,7 @@ class ResetToken(BaseApp):
                 self.logger.error('Error sending e-mail: %s', mail_error, exc_info=__debug__)
                 res = self.GET(message='Error sending e-mail via SMTP!')
             else:
+                self.logger.info('Finished resetting token %r.', token_dn)
                 res = RENDER.reset_action(
                     'Token was reset',
                     serial=token_serial,
