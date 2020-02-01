@@ -18,7 +18,7 @@
     PYTHONOPTIMIZE: "2"
     PYTHONDONTWRITEBYTECODE: "1"
     PYTHONWARNINGS: "error"
-    AE_LOGGER_QUALNAME: "aedir.syslog"
+    AE_LOGGER_QUALNAME: "{{ aedir_logging_qualname }}"
 
 - name: "Install CRON jobs running as root"
   cron:

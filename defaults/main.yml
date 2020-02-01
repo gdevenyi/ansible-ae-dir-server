@@ -111,6 +111,9 @@ aedir_systemd_dir: "/etc/systemd/system"
 # https://docs.python.org/3/library/logging.config.html#configuration-file-format
 aedir_logging_conf: "ae-logging.conf.j2"
 
+# qualifier name set to choose a specific logger from the logging config
+aedir_logging_qualname: "aedir.syslog"
+
 # various systemd.exec options for hardening the service units
 aedir_systemd_hardening:
   - "PrivateUsers=no"
