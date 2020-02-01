@@ -165,7 +165,7 @@ class Default:
     """
     ldap_url = ExtLDAPUrl(LDAP_URL)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
         # Set additional headers in response
         self.remote_ip = web.ctx.env.get(
             'FORWARDED_FOR',
@@ -190,7 +190,8 @@ class Default:
         self.user_ldap_conn = None
         self.token_ldap_conn = None
 
-    def _add_headers(self):
+    @staticmethod
+    def _add_headers():
         """
         Add more HTTP headers to response
         """
