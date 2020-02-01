@@ -46,7 +46,7 @@ from oathenroll_cnf import \
     LDAPI_AUTHZ_ID, LDAP_URL, \
     PWD_ADMIN_LEN, PWD_LENGTH, PWD_TMP_CHARS, \
     LDAP0_TRACE_LEVEL, \
-    SMTP_DEBUGLEVEL, SMTP_FROM, SMTP_LOCALHOSTNAME, SMTP_TLSARGS, SMTP_URL, \
+    SMTP_DEBUGLEVEL, SMTP_FROM, SMTP_LOCALHOSTNAME, SMTP_TLS_CACERTS, SMTP_URL, \
     LAYOUT, TEMPLATES_DIRNAME,  \
     WEB_CONFIG_DEBUG, WEB_ERROR
 
@@ -357,7 +357,7 @@ class ResetToken(BaseApp):
         smtp_conn = mailutil.smtp_connection(
             SMTP_URL,
             local_hostname=SMTP_LOCALHOSTNAME,
-            tls_args=SMTP_TLSARGS,
+            ca_certs=SMTP_TLS_CACERTS,
             debug_level=SMTP_DEBUGLEVEL
         )
 
