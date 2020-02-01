@@ -36,7 +36,7 @@ args=('/dev/log',)
 
 [formatter_syslog]
 class=logging.Formatter
-format=%(name)s[%(process)d] %(levelname)s %(processName)s - %(pathname)s:%(lineno)d - %(message)s
+format=%(name)s[%(process)d] %(levelname)s - %(pathname)s:%(lineno)d - %(message)s
 datefmt=
 
 [logger_console]
@@ -52,5 +52,5 @@ args=(sys.stderr,)
 
 [formatter_console]
 class=logging.Formatter
-format=%(asctime)s - %(name)s[%(process)d] %(levelname)s %(processName)s - %(pathname)s:%(lineno)d - %(message)s
+format=%(asctime)s - %(name)s[%(process)d] %(levelname)s - %(pathname)s:%(lineno)d - %(message)s
 datefmt=
