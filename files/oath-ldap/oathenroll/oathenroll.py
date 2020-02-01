@@ -443,6 +443,7 @@ class ResetToken(BaseApp):
             smtp_message,
         )
         smtp_conn.quit()
+        self.logger.info('Sent reset password to %r.', to_addr)
         # end of _send_pw()
 
     def search_accounts(self, dn):
