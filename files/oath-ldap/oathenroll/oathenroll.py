@@ -8,16 +8,14 @@ Author: Michael Ströder <michael@stroeder.com>
 
 from __future__ import absolute_import
 
-__version__ = '0.3.0'
+__version__ = '0.4.0'
 
 # from Python's standard lib
-import sys
 import os
 import time
 import socket
 import smtplib
 import hashlib
-import random
 import logging
 from urllib.parse import quote_plus as url_quote_plus
 import email.utils
@@ -65,6 +63,26 @@ URL2CLASS_MAPPING = (
 # basic functions and classes
 #---------------------------------------------------------------------------
 
+def init_logger():
+    """
+    Create logger instance
+    """
+    if 'LOG_CONFIG' in os.environ:
+        from logging.config import fileConfig
+        fileConfig(os.environ['LOG_CONFIG'])
+    else:
+        logging.basicConfig(
+            level=os.environ.get('LOG_LEVEL', '').upper() or logging.INFO,
+            format='%(asctime)s %(name)s %(levelname)s: %(message)s',
+            datefmt='%Y-%m-%d %H:%M:%S',
+        )
+    _logger = logging.getLogger(os.environ.get('LOG_QUALNAME', None))
+    _logger.name = 'oathenroll'
+    return _logger
+
+APP_LOGGER = init_logger()
+
+
 class ExtLDAPUrl(LDAPUrl):
     """
     Special class for handling additional LDAP URL extensions
@@ -75,6 +93,23 @@ class ExtLDAPUrl(LDAPUrl):
         'start_tls': 'startTLS',
         'trace_level': 'trace',
     }
+
+
+class RequestLogAdaptor(logging.LoggerAdapter):
+    """
+    wrapper for adding more request-specific information to log messages
+    """
+
+    def process(self, msg, kwargs):
+        return (
+            'IP=%s CLASS=%s REQID=%d - %s' % (
+                self.extra['remote_ip'],
+                self.extra['req_class'],
+                self.extra['req_id'],
+                msg,
+            ),
+            kwargs,
+        )
 
 
 #---------------------------------------------------------------------------
@@ -96,35 +131,35 @@ RENDER = web.template.render(TEMPLATES_DIRNAME, base=LAYOUT)
 ADMIN_FIELD = web.form.Textbox(
     'admin',
     web.form.notnull,
-    web.form.regexp('^[a-zA-Z]+$', u'Invalid 2FA admin user name.'),
-    description=u'2FA admin user name'
+    web.form.regexp('^[a-zA-Z]+$', 'Invalid 2FA admin user name.'),
+    description='2FA admin user name'
 )
 
 # Declaration for text input field for old password
 PASSWORD_FIELD = web.form.Password(
     'password',
     web.form.notnull,
-    web.form.regexp(r'^.+$', u'Invalid password'),
-    description=u'2FA admin password'
+    web.form.regexp('^.+$', 'Invalid password'),
+    description='2FA admin password'
 )
 
 # Declaration for text input field for 'email'
 SERIAL_FIELD = web.form.Textbox(
     'serial',
     web.form.notnull,
-    web.form.regexp(r'^[0-9]+$', u'Invalid token serial number'),
-    description=u'E-mail address'
+    web.form.regexp('^[0-9]+$', 'Invalid token serial number'),
+    description='E-mail address'
 )
 
 # Declaration for text input field for 'confirm' (hex-encoded hash)
 CONFIRM_FIELD = web.form.Textbox(
     'confirm',
-    web.form.regexp(r'^[0-9a-fA-F]*$', u'Invalid confirmation hash'),
-    description=u'Confirmation hash'
+    web.form.regexp('^[0-9a-fA-F]*$', 'Invalid confirmation hash'),
+    description='Confirmation hash'
 )
 
 
-class Default(object):
+class Default:
     """
     Handle requests to base URL
     """
@@ -135,6 +170,20 @@ class Default(object):
         self.remote_ip = web.ctx.env.get(
             'FORWARDED_FOR',
             web.ctx.env.get('HTTP_X_FORWARDED_FOR', web.ctx.ip)
+        )
+        self.logger = RequestLogAdaptor(
+            APP_LOGGER,
+            {
+                'remote_ip': self.remote_ip,
+                'req_class': '.'.join((self.__class__.__module__, self.__class__.__name__)),
+                'req_id': id(self),
+            }
+        )
+        self.logger.debug(
+            '%s request from %s (via %s)',
+            web.ctx.env['REQUEST_METHOD'],
+            self.remote_ip,
+            web.ctx.ip,
         )
         self._add_headers()
         self.ldap_conn = None
@@ -173,9 +222,9 @@ class Default(object):
                 ('Referrer-Policy', 'same-origin'),
             ):
             web.header(header, value)
-        return # end of Default._add_headers()
+        # end of Default._add_headers()
 
-    def GET(self, message=u''):
+    def GET(self, message=''):
         """
         Simply display the entry landing page
         """
@@ -187,7 +236,7 @@ class BaseApp(Default):
     Request handler base class which is not used directly
     """
 
-    def ldap_connect(self, ldap_url, authz_id=None):
+    def ldap_connect(self, authz_id=None):
         """
         Connect and bind to the LDAP directory as local system account
         """
@@ -197,7 +246,7 @@ class BaseApp(Default):
         )
         # Send SASL bind request with mechanism EXTERNAL
         self.ldap_conn.sasl_non_interactive_bind_s('EXTERNAL', authz_id=authz_id)
-        return # end of ldap_connect()
+        # end of ldap_connect()
 
     def check_login(self, username, password):
         """
@@ -222,7 +271,7 @@ class BaseApp(Default):
                 )
                 self.user_ldap_conn.simple_bind_s(user.dn_s, password.encode('utf-8'))
             except LDAPError:
-                self.user_uid = u''
+                self.user_uid = ''
                 result = False
             else:
                 self.user_uid = username
@@ -273,7 +322,7 @@ class BaseApp(Default):
                     self.ldap_conn.unbind_s()
                 except (AttributeError, LDAPError):
                     pass
-        return # end of BaseApp.clean_up()
+        # end of BaseApp.clean_up()
 
     def POST(self):
         """
@@ -286,20 +335,20 @@ class BaseApp(Default):
         # Parse and validate the form input
         self.form = self.post_form()
         if not self.form.validates():
-            return self.GET(message=u'Incomplete or invalid input!')
+            return self.GET(message='Incomplete or invalid input!')
         # Make connection to LDAP server
         try:
-            self.ldap_connect(LDAP_URL, authz_id=LDAPI_AUTHZ_ID)
+            self.ldap_connect(authz_id=LDAPI_AUTHZ_ID)
         except ldap0.SERVER_DOWN:
-            return self.GET(message=u'LDAP server not reachable!')
+            return self.GET(message='LDAP server not reachable!')
         except LDAPError:
-            return self.GET(message=u'Internal LDAP error!')
+            return self.GET(message='Internal LDAP error!')
         # Do the real work
         try:
             res = self.do_the_work()
         except Exception as err:
-            logging.error('Unhandled exception: %s', repr(err), exc_info=True)
-            res = self.GET(message=u'Internal error!')
+            self.logger.error('Unhandled exception: %s', err, exc_info=__debug__)
+            res = self.GET(message='Internal error!')
         self.clean_up()
         return res # end of BaseApp.POST()
 
@@ -320,27 +369,27 @@ class ResetToken(BaseApp):
         web.form.Button(
             'submit',
             type='submit',
-            description=u'Reset token'
+            description='Reset token'
         ),
     )
 
-    def GET(self, message=u''):
+    def GET(self, message=''):
         """
         Process the GET request mainly for displaying input form
         """
         try:
             get_input = web.input(
-                serial=u'',
-                admin=u'',
-                password=u'',
+                serial='',
+                admin='',
+                password='',
             )
         except UnicodeError:
-            return RENDER.reset_form(u'Invalid Unicode input')
+            return RENDER.reset_form('Invalid Unicode input')
         else:
             if not get_input.serial:
-                message = u'Enter a serial number of token to be (re-)initialized.'
+                message = 'Enter a serial number of token to be (re-)initialized.'
             elif not get_input.admin:
-                message = u'Login with your 2FA admin account.'
+                message = 'Login with your 2FA admin account.'
             return RENDER.reset_form(
                 message,
                 admin=get_input.admin,
@@ -394,7 +443,7 @@ class ResetToken(BaseApp):
             smtp_message,
         )
         smtp_conn.quit()
-        return # _send_pw()
+        # end of _send_pw()
 
     def search_accounts(self, dn):
         """
@@ -498,7 +547,7 @@ class ResetToken(BaseApp):
             None, token_password,
             req_ctrls=[session_tracking_ctrl],
         )
-        return # end of ResetToken.update_token()
+        # end of ResetToken.update_token()
 
     def do_the_work(self):
         """
@@ -506,7 +555,7 @@ class ResetToken(BaseApp):
         """
         # Check the login
         if not self.check_login(self.form.d.admin, self.form.d.password):
-            return self.GET(message=u'Admin login failed!')
+            return self.GET(message='Admin login failed!')
         token_serial = self.form.d.serial
         try:
             token_displayname, token_dn, token_entry = self.search_token(
@@ -538,20 +587,21 @@ class ResetToken(BaseApp):
             enroll_pw = enroll_pw1 + enroll_pw2
             self.update_token(token_dn, token_entry, enroll_pw)
         except ldap0.err.NoUniqueEntry as ldap_err:
-            logging.error('LDAPError: %s', repr(ldap_err), exc_info=True)
-            res = self.GET(message=u'Serial no. not found!')
+            self.logger.error('LDAPError: %s', repr(ldap_err), exc_info=__debug__)
+            res = self.GET(message='Serial no. not found!')
         except LDAPError as ldap_err:
-            logging.error('LDAPError: %s', repr(ldap_err), exc_info=True)
-            res = self.GET(message=u'Internal LDAP error!')
+            self.logger.error('LDAPError: %s', repr(ldap_err), exc_info=__debug__)
+            res = self.GET(message='Internal LDAP error!')
         except Exception as err:
-            logging.error('Unhandled exception: %s', repr(err), exc_info=True)
-            res = self.GET(message=u'Internal error!')
+            self.logger.error('Unhandled exception: %s', repr(err), exc_info=__debug__)
+            res = self.GET(message='Internal error!')
         else:
             # try to send 2nd enrollment password part to token owner
             try:
                 self._send_pw(self.form.d.serial, owner_entry, enroll_pw1)
             except (socket.error, socket.gaierror, smtplib.SMTPException) as mail_error:
-                res = self.GET(message=u'Error sending e-mail via SMTP!')
+                self.logger.error('Error sending e-mail: %s', mail_error, exc_info=__debug__)
+                res = self.GET(message='Error sending e-mail via SMTP!')
             else:
                 res = RENDER.reset_action(
                     'Token was reset',
@@ -577,45 +627,45 @@ class InitToken(BaseApp):
         web.form.Password(
             'epw1',
             web.form.notnull,
-            web.form.regexp(r'^.+$', u'Invalid password'),
-            description=u'Enrollment password #1'
+            web.form.regexp(r'^.+$', 'Invalid password'),
+            description='Enrollment password #1'
         ),
         web.form.Password(
             'epw2',
             web.form.notnull,
-            web.form.regexp(r'^.+$', u'Invalid password'),
-            description=u'Enrollment password #2'
+            web.form.regexp(r'^.+$', 'Invalid password'),
+            description='Enrollment password #2'
         ),
         web.form.Textbox(
             'secret',
             web.form.notnull,
-            web.form.regexp(r'^.+$', u'Invalid shared secret'),
-            description=u'(Encrypted) Shared Secret'
+            web.form.regexp(r'^.+$', 'Invalid shared secret'),
+            description='(Encrypted) Shared Secret'
         ),
         web.form.Button(
             'submit',
             type='submit',
-            description=u'Initialize token'
+            description='Initialize token'
         ),
     )
 
-    def GET(self, message=u''):
+    def GET(self, message=''):
         """
         Process the GET request mainly for displaying input form
         """
         try:
             get_input = web.input(
-                serial=u'',
-                admin=u'',
-                password=u'',
+                serial='',
+                admin='',
+                password='',
             )
         except UnicodeError:
-            return RENDER.init_form(u'Invalid Unicode input')
+            return RENDER.init_form('Invalid Unicode input')
         else:
             if not get_input.serial:
                 message = (
-                    u'Enter a serial number of token to be (re-)initialized'
-                    u' and enrollment passwords.'
+                    'Enter a serial number of token to be (re-)initialized'
+                    ' and enrollment passwords.'
                 )
             return RENDER.init_form(
                 message,
@@ -639,8 +689,8 @@ class InitToken(BaseApp):
             token_ldap_conn.modify_s(
                 token_dn,
                 [
-                    (ldap0.MOD_ADD, 'oathHOTPCounter', ['0']),
-                    (ldap0.MOD_ADD, 'oathSecret', [oath_secret]),
+                    (ldap0.MOD_ADD, b'oathHOTPCounter', [b'0']),
+                    (ldap0.MOD_ADD, b'oathSecret', [oath_secret]),
                     #(ldap0.MOD_DELETE, 'userPassword', None),
                 ],
                 req_ctrls=[
@@ -653,8 +703,8 @@ class InitToken(BaseApp):
                 ],
             )
         except Exception as err:
-            logging.error('Unhandled exception: %s', repr(err), exc_info=True)
-            res = self.GET(message=u'Internal error!')
+            self.logger.error('Unhandled exception: %s', err, exc_info=__debug__)
+            res = self.GET(message='Internal error!')
         else:
             res = RENDER.init_action(
                 'Token was initialized',
@@ -662,22 +712,5 @@ class InitToken(BaseApp):
             )
         return res # end of InitToken.do_the_work()
 
+
 application = web.application(URL2CLASS_MAPPING, globals(), autoreload=bool(WEB_ERROR)).wsgifunc()
-
-def run():
-    """
-    Start the web application service
-    """
-    # Change to directory where the script is located
-    os.chdir(os.path.dirname(sys.argv[0]))
-    # Initialize web application
-    app = web.application(URL2CLASS_MAPPING, globals())
-    # Set error handling
-    if WEB_ERROR is False:
-        app.internalerror = False
-    # Start the internal web server
-    app.run()
-
-
-if __name__ == '__main__':
-    run()

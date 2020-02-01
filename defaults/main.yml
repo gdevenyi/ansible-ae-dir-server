@@ -429,7 +429,6 @@ aedir_uwsgi_params:
     harakiri: 45
     threads: 10
   oathenroll:
-    log_level: INFO
     buffer_size: 8192
     harakiri: 10
     processes: 5
@@ -734,7 +733,7 @@ oath_ldap_oathenroll_web_group: ae-dir-otpenroll
 
 # SMTP server used as smart host (SMTP relay)
 # query string of URL may contain two more parameters:
-# STARTTLS: Send STARTTLS (see also config parameter SMTP_TLSARGS)
+# STARTTLS: Send STARTTLS
 # VIA: Use this hostname or IP address for connection
 #smtp_relay_url: "smtp://127.0.0.1"
 #smtp_relay_url: "smtp://smtp.example.com:587/?STARTTLS"
