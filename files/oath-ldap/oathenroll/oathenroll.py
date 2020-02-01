@@ -237,6 +237,17 @@ class BaseApp(Default):
     Request handler base class which is not used directly
     """
 
+    def _sess_track_ctrl(self):
+        """
+        return LDAPv3 session tracking control representing current user
+        """
+        return SessionTrackingControl(
+            self.remote_ip,
+            web.ctx.homedomain,
+            SESSION_TRACKING_FORMAT_OID_USERNAME,
+            str(id(self)),
+        )
+
     def ldap_connect(self, authz_id=None):
         """
         Connect and bind to the LDAP directory as local system account
@@ -309,6 +320,7 @@ class BaseApp(Default):
                 'oathTokenSerialNumber',
                 ATTR_OWNER_DN,
             ],
+            req_ctrls=[self._sess_track_ctrl()],
         )
         return token.entry_s['displayName'][0], token.dn_s, token.entry_s
         # endof BaseApp.search_token()
@@ -500,12 +512,7 @@ class ResetToken(BaseApp):
         - setting temporary enrollment password in 'userPassword'
         - resetting 'oathSecretTime' to current time
         """
-        session_tracking_ctrl = SessionTrackingControl(
-            self.remote_ip,
-            web.ctx.homedomain,
-            SESSION_TRACKING_FORMAT_OID_USERNAME,
-            self.user_uid.encode('utf-8'),
-        )
+        session_tracking_ctrl = self._sess_track_ctrl()
         token_mods = [
             # We don't fully trust enrollment client
             # => set shared secret time to current time here
