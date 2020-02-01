@@ -22,7 +22,6 @@ Environment=PYTHONOPTIMIZE=2
 Environment=PYTHONDONTWRITEBYTECODE=1
 Environment=PYTHONWARNINGS=error
 Environment=LOG_LEVEL={{ aedir_uwsgi_params.oathenroll.log_level }}
-Environment=AE_LOGGER_QUALNAME=aedir.syslog
 ExecStart={{ uwsgi_paths.exec }} --strict --ini {{ aedir_etc }}/uwsgi/oathenroll.ini
 User={{ oath_ldap_oathenroll_web_user }}
 Group={{ oath_ldap_oathenroll_web_group }}
