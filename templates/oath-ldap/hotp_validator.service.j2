@@ -33,6 +33,7 @@ AppArmorProfile={{ oath_bind_listener }}
 {{ systemd_option }}
 {% endfor %}
 {% endif %}
+SystemCallFilter={{ systemd_systemcallfilter.default }}
 
 [Install]
 WantedBy=multi-user.target

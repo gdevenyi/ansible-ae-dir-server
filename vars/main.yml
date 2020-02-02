@@ -10,3 +10,8 @@ lsb_id_map:
 openldap_sockbuf_max_incoming_auth_default:
   provider: 4194304
   consumer: 262143
+
+# values for SystemCallFilter= (see systemd.exec(5) for details)
+systemd_systemcallfilter:
+  default: "~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete @chown @timer @privileged"
+  apache: "~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete"

@@ -37,6 +37,7 @@ AppArmorProfile=ae-apache
 {{ systemd_option }}
 {% endfor %}
 {% endif %}
+SystemCallFilter={{ systemd_systemcallfilter.apache }}
 
 [Install]
 WantedBy=multi-user.target

@@ -131,7 +131,6 @@ aedir_systemd_hardening:
   - "KeyringMode=private"
   - "RestrictRealtime=yes"
   - "RestrictNamespaces=yes"
-  - "SystemCallFilter=~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete" # madvise @privileged"
 #  - "InaccessiblePaths=/run/systemd"
 
 # regex patterns for enforcing naming conventions (substring match!)
