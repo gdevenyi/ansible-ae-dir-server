@@ -8,7 +8,7 @@ Author: Michael Ströder <michael@stroeder.com>
 
 from __future__ import absolute_import
 
-__version__ = '0.4.0'
+__version__ = '0.5.0'
 
 # from Python's standard lib
 import os
@@ -188,7 +188,6 @@ class Default:
         self._add_headers()
         self.ldap_conn = None
         self.user_ldap_conn = None
-        self.token_ldap_conn = None
 
     @staticmethod
     def _add_headers():
@@ -236,6 +235,7 @@ class BaseApp(Default):
     """
     Request handler base class which is not used directly
     """
+    post_form = None
 
     def _sess_track_ctrl(self):
         """
@@ -260,41 +260,24 @@ class BaseApp(Default):
         self.ldap_conn.sasl_non_interactive_bind_s('EXTERNAL', authz_id=authz_id)
         # end of ldap_connect()
 
-    def check_login(self, username, password):
+    def open_user_conn(self, username, password):
         """
         Search a user entry specified by :username: and check
         :password: with LDAP simple bind.
         """
-        if not password:
-            # empty password is always wrong!
-            return False
-        try: # finally-block
-            self.user_ldap_conn = None
-            try:
-                user = self.ldap_conn.find_unique_entry(
-                    self.ldap_url.dn,
-                    scope=self.ldap_url.scope,
-                    filterstr=FILTERSTR_ADMIN_LOGIN.format(uid=username),
-                    attrlist=['1.1'],
-                )
-                self.user_ldap_conn = ReconnectLDAPObject(
-                    self.ldap_url.connect_uri(),
-                    trace_level=LDAP0_TRACE_LEVEL,
-                )
-                self.user_ldap_conn.simple_bind_s(user.dn_s, password.encode('utf-8'))
-            except LDAPError:
-                self.user_uid = ''
-                result = False
-            else:
-                self.user_uid = username
-                result = True
-        finally:
-            # Anyway we should try to close the LDAP connection
-            try:
-                self.user_ldap_conn.unbind_s()
-            except (AttributeError, LDAPError):
-                pass
-        return result # end of BaseApp.login()
+        self.user_ldap_conn = None
+        user = self.ldap_conn.find_unique_entry(
+            self.ldap_url.dn,
+            scope=self.ldap_url.scope,
+            filterstr=FILTERSTR_ADMIN_LOGIN.format(uid=username),
+            attrlist=['1.1'],
+        )
+        self.user_ldap_conn = ReconnectLDAPObject(
+            self.ldap_url.connect_uri(),
+            trace_level=LDAP0_TRACE_LEVEL,
+        )
+        self.user_ldap_conn.simple_bind_s(user.dn_s, password.encode('utf-8'))
+        # end of BaseApp.open_user_conn()
 
     def search_token(self, token_serial):
         """
@@ -325,6 +308,13 @@ class BaseApp(Default):
         return token.entry_s['displayName'][0], token.dn_s, token.entry_s
         # endof BaseApp.search_token()
 
+    def do_the_work(self):
+        """
+        this method contains the real work and is implemented by derived classes
+        """
+        return
+
+
     def clean_up(self):
         """
         Clean up initialized stuff
@@ -352,9 +342,11 @@ class BaseApp(Default):
         # Make connection to LDAP server
         try:
             self.ldap_connect(authz_id=LDAPI_AUTHZ_ID)
-        except ldap0.SERVER_DOWN:
+        except ldap0.SERVER_DOWN as ldap_err:
+            self.logger.error('Error connectiong to %r: %s', self.ldap_url.connect_uri(), ldap_err)
             return self.GET(message='LDAP server not reachable!')
-        except LDAPError:
+        except LDAPError as ldap_err:
+            self.logger.error('Other LDAPError connecting to %r: %s', self.ldap_url.connect_uri(), ldap_err)
             return self.GET(message='Internal LDAP error!')
         # Do the real work
         try:
@@ -433,7 +425,7 @@ class ResetToken(BaseApp):
         )
         owner_data = {
             'serial': token_serial,
-            'admin': self.user_uid,
+            'admin': self.form.d.admin,
             'enrollpw1': enroll_pw1,
             'remote_ip': self.remote_ip,
             'fromaddr': SMTP_FROM,
@@ -459,7 +451,7 @@ class ResetToken(BaseApp):
         self.logger.info('Sent reset password to %r.', to_addr)
         # end of _send_pw()
 
-    def search_accounts(self, dn):
+    def search_accounts(self, token_dn):
         """
         Search all accounts using the token
         """
@@ -467,7 +459,7 @@ class ResetToken(BaseApp):
             self.ldap_url.dn,
             ldap0.SCOPE_SUBTREE,
             filterstr='(&(objectClass=oathUser)(oathToken={dn}))'.format(
-                dn=ldap0.filter.escape_str(dn),
+                dn=ldap0.filter.escape_str(token_dn),
             ),
             attrlist=['uid', 'description']
         )
@@ -481,12 +473,12 @@ class ResetToken(BaseApp):
             for res in ldap_result
         ]
 
-    def read_owner(self, dn):
+    def read_owner(self, owner_dn):
         """
         Read a token owner entry
         """
         ldap_result = self.user_ldap_conn.read_s(
-            dn,
+            owner_dn,
             filterstr=FILTERSTR_OWNER_READ,
             attrlist=[
                 'displayName',
@@ -499,8 +491,9 @@ class ResetToken(BaseApp):
         if ldap_result:
             result = ldap_result.entry_s
         else:
-            raise ldap0.NO_SUCH_OBJECT('No result with %s' % repr(FILTERSTR_OWNER_READ))
-        return result # end of read_owner()
+            raise ldap0.NO_SUCH_OBJECT('No result with %r' % (FILTERSTR_OWNER_READ,))
+        return result
+        # end of read_owner()
 
     def update_token(self, token_dn, token_entry, token_password):
         """
@@ -562,8 +555,15 @@ class ResetToken(BaseApp):
         """
         Actually do the work herein
         """
-        # Check the login
-        if not self.check_login(self.form.d.admin, self.form.d.password):
+        # Check the user login and open user connection
+        try:
+            self.open_user_conn(self.form.d.admin, self.form.d.password)
+        except LDAPError as ldap_err:
+            self.logger.error(
+                'Error opening user connection to %r as user %r: %s',
+                self.ldap_url.connect_uri(),
+                self.form.d.admin,
+            )
             return self.GET(message='Admin login failed!')
         token_serial = self.form.d.serial
         try:
@@ -622,105 +622,6 @@ class ResetToken(BaseApp):
                     enrollpw2=enroll_pw2,
                 )
         return res # end of ResetToken.do_the_work()
-
-
-class InitToken(BaseApp):
-    """
-    Initializes token with (encrypted) shared secret.
-
-    LDAP operations are authenticated with temporary token enrollment password.
-    """
-
-    # Declaration for the change password input form
-    post_form = web.form.Form(
-        SERIAL_FIELD,
-        web.form.Password(
-            'epw1',
-            web.form.notnull,
-            web.form.regexp(r'^.+$', 'Invalid password'),
-            description='Enrollment password #1'
-        ),
-        web.form.Password(
-            'epw2',
-            web.form.notnull,
-            web.form.regexp(r'^.+$', 'Invalid password'),
-            description='Enrollment password #2'
-        ),
-        web.form.Textbox(
-            'secret',
-            web.form.notnull,
-            web.form.regexp(r'^.+$', 'Invalid shared secret'),
-            description='(Encrypted) Shared Secret'
-        ),
-        web.form.Button(
-            'submit',
-            type='submit',
-            description='Initialize token'
-        ),
-    )
-
-    def GET(self, message=''):
-        """
-        Process the GET request mainly for displaying input form
-        """
-        try:
-            get_input = web.input(
-                serial='',
-                admin='',
-                password='',
-            )
-        except UnicodeError:
-            return RENDER.init_form('Invalid Unicode input')
-        else:
-            if not get_input.serial:
-                message = (
-                    'Enter a serial number of token to be (re-)initialized'
-                    ' and enrollment passwords.'
-                )
-            return RENDER.init_form(
-                message,
-                PWD_LENGTH-PWD_ADMIN_LEN,
-                PWD_ADMIN_LEN,
-                serial=get_input.serial,
-            )
-
-    def do_the_work(self):
-        token_serial = self.form.d.serial.encode('utf-8')
-        token_password = (self.form.d.epw1 + self.form.d.epw2).encode('utf-8')
-        token_binddn = 'serialNumber={0},{1}'.format(token_serial, self.ldap_url.dn)
-        oath_secret = self.form.d.secret.encode('utf-8')
-        try:
-            token_ldap_conn = ReconnectLDAPObject(
-                self.ldap_url.connect_uri(),
-                trace_level=LDAP0_TRACE_LEVEL,
-            )
-            token_ldap_conn.simple_bind_s(token_binddn, token_password)
-            token_dn = token_ldap_conn.whoami_s()[3:]
-            token_ldap_conn.modify_s(
-                token_dn,
-                [
-                    (ldap0.MOD_ADD, b'oathHOTPCounter', [b'0']),
-                    (ldap0.MOD_ADD, b'oathSecret', [oath_secret]),
-                    #(ldap0.MOD_DELETE, 'userPassword', None),
-                ],
-                req_ctrls=[
-                    SessionTrackingControl(
-                        self.remote_ip,
-                        web.ctx.homedomain,
-                        SESSION_TRACKING_FORMAT_OID_USERNAME,
-                        id(self),
-                    ),
-                ],
-            )
-        except Exception as err:
-            self.logger.error('Unhandled exception: %s', err, exc_info=__debug__)
-            res = self.GET(message='Internal error!')
-        else:
-            res = RENDER.init_action(
-                'Token was initialized',
-                serial=self.form.d.serial,
-            )
-        return res # end of InitToken.do_the_work()
 
 
 application = web.application(URL2CLASS_MAPPING, globals(), autoreload=bool(WEB_ERROR)).wsgifunc()
