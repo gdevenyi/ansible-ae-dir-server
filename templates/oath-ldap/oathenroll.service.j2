@@ -21,7 +21,6 @@ Environment=PYTHONPATH={{ aedir_etc }}/oathenroll
 Environment=PYTHONOPTIMIZE=2
 Environment=PYTHONDONTWRITEBYTECODE=1
 Environment=PYTHONWARNINGS=error
-Environment=LOG_LEVEL={{ aedir_uwsgi_params.oathenroll.log_level }}
 Environment=LOG_CONFIG={{ aedir_etc }}/ae-logging.conf
 Environment=LOG_QUALNAME={{ aedir_logging_qualname }}
 ExecStart={{ uwsgi_paths.exec }} --strict --ini {{ aedir_etc }}/uwsgi/oathenroll.ini
