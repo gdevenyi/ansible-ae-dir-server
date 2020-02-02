@@ -39,7 +39,7 @@ AppArmorProfile=web2ldap
 {{ systemd_option }}
 {% endfor %}
 {% endif %}
-SystemCallFilter={{ systemd_systemcallfilter.default }}
+SystemCallFilter={{ systemd_systemcallfilter.web2ldap }}
 
 [Install]
 WantedBy=multi-user.target
