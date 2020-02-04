@@ -11,11 +11,8 @@
   /etc/nsswitch.conf      r,
   /etc/gai.conf           r,
   /etc/passwd             r,
-  /etc/protocols          r,
-  /etc/services           r,
-  # for NSS module usrfiles
-  /usr/etc/protocols      r,
-  /usr/etc/services       r,
+  /{usr/,}etc/protocols   r,
+  /{usr/,}etc/services    r,
 
   # libtirpc (used for NIS/YP login) needs this
   /etc/netconfig r,
