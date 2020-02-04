@@ -1,11 +1,6 @@
 ---
 # monitoring stuff
 
-- name: "Remove {{ aedir_sbin }}/slapd_checkmk.py"
-  file:
-    path: "{{ aedir_sbin }}/slapd_checkmk.py"
-    state: absent
-
 - name: "PIP install slapdcheck in virtualenv {{ aedir_prefix }}"
   pip:
     name:
