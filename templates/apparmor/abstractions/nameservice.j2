@@ -12,6 +12,10 @@
   /etc/gai.conf           r,
   /etc/passwd             r,
   /etc/protocols          r,
+  /etc/services           r,
+  # for NSS module usrfiles
+  /usr/etc/protocols      r,
+  /usr/etc/services       r,
 
   # libtirpc (used for NIS/YP login) needs this
   /etc/netconfig r,
@@ -35,7 +39,6 @@
   /etc/resolvconf/run/resolv.conf r,
   /{,var/}run/systemd/resolve/stub-resolv.conf r,
 
-  /etc/services           r,
   # The Name Service Cache Daemon can cache lookups, sometimes leading
   # to vast speed increases when working with network-based lookups.
   /{,var/}run/.nscd_socket   rw,
