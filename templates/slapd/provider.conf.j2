@@ -958,14 +958,16 @@ access to
     by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}" read
     by * none break
 
-# restricted addressbook usage to person entries for members of groups
-# referenced as address book user groups for the zone
+{% if aedir_addressbook_attrs %}
+# restricted addressbook read access to person entries for
+# members of groups referenced as address book user groups in the zone
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(|(objectClass=aeContact)(objectClass=aePerson)(objectClass=aeMailGroup))"
   attrs=entry,{{ aedir_addressbook_attrs|join(',') }}
     by set="user & this/-1/aeABAccessGroups/member" read
     by * none
+{% endif %}
 
 # active zone admins are granted to access the accesslog DB
 # (for web2ldap [Audit] links)
