@@ -363,13 +363,15 @@ aedir_confidential_person_attrs:
   - aeNotAfter
 
 # Attributes in aeContact, aePerson, aeMailGroup entries
-# readable by address book users of the zone
-aedir_addressbook_attrs:
-  - cn
-  - sn
-  - givenName
-  - mail
-  - userCertificate
+# readable by address book users of the zone.
+# If empty the ACL is removed.
+#aedir_addressbook_attrs:
+#  - cn
+#  - sn
+#  - givenName
+#  - mail
+#  - userCertificate
+aedir_addressbook_attrs: []
 
 # Specifies whether a AE-DIR instance should send e-mail notifications to users or not
 aedir_user_mail_enabled: "{{ inventory_hostname == aedir_main_provider_hostname }}"
