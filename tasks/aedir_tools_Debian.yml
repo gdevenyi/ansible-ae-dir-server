@@ -1,7 +1,7 @@
 ---
 
 - name: "Check whether all C wrapper modules are installed"
-  command: "{{ aedir_python }} -c 'import ldap0, lmdb, psutil'"
+  command: "{{ aedir_python }} -c 'import ldap0, psutil'"
   ignore_errors: yes
   when: aedir_pip_install
   register: ldap0_installed

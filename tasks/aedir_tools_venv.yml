@@ -14,7 +14,6 @@
 - name: "Additional PIP packages in virtualenv {{ aedir_prefix }}"
   pip:
     name:
-      - lmdb>=0.98
       - cryptography
       - asn1crypto
       - jwcrypto
