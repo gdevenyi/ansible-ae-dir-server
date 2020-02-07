@@ -1,7 +1,8 @@
 # Log rotation config for AE-DIR's service ae-apache
 # {{ ansible_managed }}
-# 
+#
 {{ apache_access_log }} {
+    su {{ apache_user }} {{ apache_group }}
     compress
     dateext
     maxage 365
@@ -10,9 +11,10 @@
     notifempty
     missingok
     create 640 root root
-    sharedscripts    
+    sharedscripts
+    nocreate
     postrotate
       systemctl reload ae-apache.service
-      sleep 60
+      sleep 2
     endscript
 }

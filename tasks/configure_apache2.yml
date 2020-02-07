@@ -11,9 +11,19 @@
   file:
     path: "{{ apache_access_log|dirname }}"
     state: directory
-    owner: root
-    group: "{{ apache_group }}"
+    owner: "{{ apache_user }}"
+    group: root
     mode: 0750
+  notify:
+    - "restart ae-apache"
+
+- name: "Fix ownership/permissions of Apache log file {{ apache_access_log }}"
+  file:
+    path: "{{ apache_access_log }}"
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
+    mode: 0640
+  ignore_errors: yes
   notify:
     - "restart ae-apache"
 
@@ -72,8 +82,8 @@
     src: "{{ apache_key_filename }}"
     dest: "{{ apache_key_pathname }}"
     owner: root
-    group: root
-    mode: 0644
+    group: "{{ apache_group }}"
+    mode: 0640
   when: apache_key_filename and (apache_key_filename != openldap_key_filename and apache_key_pathname != openldap_key_pathname)
   no_log: True
   notify:
@@ -83,9 +93,20 @@
   file:
     path: "{{ apache_key_pathname }}"
     owner: root
-    group: root
+    group: "{{ apache_group }}"
     mode: 0640
   when: apache_key_pathname != openldap_key_pathname
+  notify:
+    - "restart ae-apache"
+
+- name: "Grant {{ apache_user }} read access to {{ openldap_key_filename }}"
+  acl:
+    state: present
+    path: "{{ openldap_key_pathname }}"
+    entity: "{{ apache_user }}"
+    etype: user
+    permissions: r
+  when: apache_key_pathname == openldap_key_pathname
   notify:
     - "restart ae-apache"
 
