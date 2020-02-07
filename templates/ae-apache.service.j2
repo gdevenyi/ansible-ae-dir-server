@@ -24,8 +24,8 @@ ExecStart={{ apache2_config.httpd_exec }} -DSYSTEMD -DFOREGROUND -f {{ apache_co
 ExecReload={{ apache2_config.httpd_exec }} -DSYSTEMD -DFOREGROUND -f {{ apache_conf }} -k graceful
 ExecStop={{ apache2_config.httpd_exec }} -DSYSTEMD -DFOREGROUND -f {{ apache_conf }} -k graceful-stop
 KillMode=mixed
-CapabilityBoundingSet=CAP_NET_BIND_SERVICE CAP_KILL
-AmbientCapabilities=CAP_NET_BIND_SERVICE CAP_KILL
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+AmbientCapabilities=CAP_NET_BIND_SERVICE
 MemoryDenyWriteExecute=yes
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 {% if apparmor_enabled %}
