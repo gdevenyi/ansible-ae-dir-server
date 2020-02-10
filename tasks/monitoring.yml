@@ -39,3 +39,20 @@
     owner: root
     group: root
     mode: 0755
+
+- name: "Create directory for mtail programs at {{ aedir_etc }}/mtail/"
+  file:
+    path: "{{ aedir_etc }}/mtail/"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: "Copy mtail programs from {{ role_path }}/files/mtail/ to {{ aedir_etc }}/mtail/"
+  copy:
+    src: "{{ role_path }}/files/mtail/"
+    dest: "{{ aedir_etc }}/mtail/"
+    follow: no
+    owner: root
+    group: root
+    mode: 0644
