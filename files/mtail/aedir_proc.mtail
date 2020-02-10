@@ -1,5 +1,10 @@
-counter aedir_proc by name, loglevel
+counter aedir_logmsg by name, loglevel
+counter aedir_error by name, class
 
 /^.* (?P<name>\S+)\[\d+\] (?P<loglevel>[A-Z]+) .*$/ {
-    aedir_proc[$name, $loglevel]++
+    aedir_logmsg[$name, $loglevel]++
+}
+
+/^.* (?P<name>\S+)\[\d+\] ERROR .*Unhandled exception (?P<class>[A-Za-z0-9_.]+):.*$/ {
+    aedir_error[$name, $class]++
 }
