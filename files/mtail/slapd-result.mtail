@@ -1,8 +1,0 @@
-counter slapd_result_count by tag, err
-
-const SLAPD_PREFIX /^.*slapd\[\d+\]: conn=(?P<conn>\d+) op=(?P<op>\d+) /
-const SLAPD_RESULT // + SLAPD_PREFIX + /.*RESULT tag=(?P<tag>\d+) (oid=(?P<oid>\d+) )*err=(?P<err>\d+) (nentries=(?P<nentries>\d+) )*text=.*$/
-
-// + SLAPD_RESULT {
-    slapd_result_count[$tag, $err]++
-}

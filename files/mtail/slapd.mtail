@@ -1,0 +1,23 @@
+# define constants for general some regex prefixes
+const SLAPD_CONN /^.*slapd\[\d+\]: conn=(?P<conn>\d+) /
+const SLAPD_OP // + SLAPD_CONN + /op=(?P<op>\d+) /
+const SLAPD_FD // + SLAPD_CONN + /fd=(?P<fd>\d+) /
+
+# count RESULT lines with type (tag=) and LDAP result code (err=)
+counter slapd_result_count by tag, err
+
+const SLAPD_RESULT // + SLAPD_OP + /.*RESULT tag=(?P<tag>\d+) (oid=(?P<oid>\d+) )*err=(?P<err>\d+) (nentries=(?P<nentries>\d+) )*text=.*$/
+
+// + SLAPD_RESULT {
+    slapd_result_count[$tag, $err]++
+}
+
+counter slapd_conn_count by src, dst
+
+const SLAPD_ACCEPT_FROM // + SLAPD_FD + /ACCEPT from /
+
+const SLAPD_ACCEPT_IPV4 // + SLAPD_ACCEPT_FROM + /IP=(?P<src>.+):\d+ \(IP=(?P<dst>.+)\)$/
+
+// + SLAPD_ACCEPT_IPV4 {
+    slapd_conn_count[$src, $dst]++
+}
