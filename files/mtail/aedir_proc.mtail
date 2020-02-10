@@ -1,0 +1,5 @@
+counter aedir_proc by name, loglevel
+
+/^.* (?P<name>\S+)\[\d+\] (?P<loglevel>[A-Z]+) .*$/ {
+    aedir_proc[$name, $loglevel]++
+}

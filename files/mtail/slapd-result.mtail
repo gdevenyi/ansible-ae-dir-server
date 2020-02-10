@@ -1,0 +1,5 @@
+counter slapd_result_count by tag, err
+
+/^.*slapd\[\d+\]: conn=(?P<conn>\d+) op=(?P<op>\d+) .*RESULT tag=(?P<tag>\d+) err=(?P<err>\d+) (nentries=(?P<nentries>\d+) )*text=.*$/ {
+    slapd_result_count[$tag, $err]++
+}
