@@ -6,7 +6,7 @@
       - python3-pyasn1 >= 0.4.5
       - python3-pyasn1-modules >= 0.2.5
       - python3-ldap0 >= 0.6.6
-      - python3-aedir >= 0.8.0
+      - python3-aedir >= 0.8.4
       - python3-cryptography
       - python3-asn1crypto
       - python3-jwcrypto

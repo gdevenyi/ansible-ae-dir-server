@@ -20,7 +20,7 @@
       - pyasn1>=0.4.5
       - pyasn1_modules>=0.2.5
       - ldap0>=0.6.6
-      - aedir>=0.8.0
+      - aedir>=0.8.4
       - psutil>=5.6.7
       - prometheus_client>=0.7.1
     state: present
