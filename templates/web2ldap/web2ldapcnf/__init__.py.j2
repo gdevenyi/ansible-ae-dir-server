@@ -181,7 +181,7 @@ session_paranoid = 0
 
 # unsuspicious target URLs accept by redirector even without a session
 good_redirect_targets = {
-  '/web2ldap.html',
+   '/web2ldap.html',
 }
 
 # Dictionary specifying accepted address/net mask strings of
@@ -189,22 +189,22 @@ good_redirect_targets = {
 # Use ['0.0.0.0/0.0.0.0', '::0/0'] to allow access to every client but think twice!
 # IPv6 network addresses without brackets!
 access_allowed = {
-  '_': [
-    '0.0.0.0/0.0.0.0',
-    '::0',
-  ],
-  'monitor': [
+    '_': [
+        '0.0.0.0/0.0.0.0',
+        '::0',
+    ],
+    'monitor': [
 {% for allowed in web2ldap_monitor_access_allowed %}
-    '{{ allowed }}',
+        '{{ allowed }}',
 {% endfor %}
-  ],
-  'metrics': [
+    ],
+    'metrics': [
 {% for allowed in web2ldap_monitor_access_allowed %}
-    '{{ allowed }}',
+        '{{ allowed }}',
 {% endfor %}
-  ],
-  # disable web2ldap's DNS SRV lookups completely
-  'locate': [],
+    ],
+    # disable web2ldap's DNS SRV lookups completely
+    'locate': [],
 }
 
 #---------------------------------------------------------------------------

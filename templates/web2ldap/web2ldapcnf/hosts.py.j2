@@ -1038,16 +1038,16 @@ ldap_def = {
 
     '_': GLOBAL_DEFAULTS,
 
-  # For dynamic configuration via cn=config
-  'ldap:///cn=config': CN_CONFIG,
+    # For dynamic configuration via cn=config
+    'ldap:///cn=config': CN_CONFIG,
 
-  # Example for cn=Monitor covering various server implementations
-  'ldap:///cn=Monitor': OPENLDAP_MONITOR_CONFIG,
+    # Example for cn=Monitor covering various server implementations
+    'ldap:///cn=Monitor': OPENLDAP_MONITOR_CONFIG,
 
-  # Æ-DIR's main DB
-  'ldap:///{{ aedir_suffix }}': AE_DIR_CONFIG,
+    # Æ-DIR's main DB
+    'ldap:///{{ aedir_suffix }}': AE_DIR_CONFIG,
 
-  # Æ-DIR's accesslog
-  'ldap:///{{ aedir_accesslog_suffix }}': OPENLDAP_ACCESSLOG_CONFIG,
+    # Æ-DIR's accesslog
+    'ldap:///{{ aedir_accesslog_suffix }}': OPENLDAP_ACCESSLOG_CONFIG,
 
 }
