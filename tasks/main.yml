@@ -166,7 +166,7 @@
 
 - block:
     - name: "Monitoring scripts on {{ openldap_role }}"
-      include_tasks: "slapd_monitoring.yml"
+      include_tasks: "monitoring.yml"
   tags:
     - monitoring
 
