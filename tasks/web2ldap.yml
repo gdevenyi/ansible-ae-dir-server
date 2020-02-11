@@ -85,14 +85,6 @@
     group: root
     mode: 0644
 
-- name: "Calculate hash of file {{ web2ldapcnf_prefix }}/css/ae-dir.css"
-  command:
-    argv:
-      - "python3"
-      - "-c"
-      - "import base64, hashlib ; print(base64.b64encode(hashlib.sha512(open('{{ web2ldapcnf_prefix }}/css/ae-dir.css', 'rb').read()).digest()).decode('ascii'))"
-  register: web2ldap_default_screen_css_hash
-
 - name: "web2ldap HTML and LDIF templates for AE-DIR (copy)"
   copy:
     src: "{{ item }}"
