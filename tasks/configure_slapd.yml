@@ -17,10 +17,13 @@
     path: "{{ os_openldap_paths.openldap_conf_prefix }}/slapd.d"
     state: absent
 
-- name: "Delete the package static config file {{ os_openldap_paths.openldap_conf_prefix }}/slapd.conf"
-  file:
-    path: "{{ os_openldap_paths.openldap_conf_prefix }}/slapd.conf"
-    state: absent
+- name: "Replace static config file {{ os_openldap_paths.openldap_conf_prefix }}/slapd.conf"
+  copy:
+    content: "# This slapd.conf was deliberately made non-functional"
+    dest: "{{ os_openldap_paths.openldap_conf_prefix }}/slapd.conf"
+    owner: root
+    group: root
+    mode: 0600
 
 - name: "Create OpenLDAP config directories"
   file:
