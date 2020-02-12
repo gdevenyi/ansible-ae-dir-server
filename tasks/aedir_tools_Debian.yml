@@ -10,6 +10,7 @@
   apt:
     name:
       - "libpython{{ aedir_python_version }}"
+      - "python{{ aedir_python_version }}-venv"
       - python3-setuptools
       - python3-pip
     state: present
