@@ -35,11 +35,6 @@
   notify:
     - "restart ae-slapd"
 
-- name: "Remove Debian package ldap-utils"
-  apt:
-    name: ldap-utils
-    state: absent
-
 - name: "Fix ownership of LTB directory"
   file:
     path: /usr/local/openldap
