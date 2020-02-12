@@ -11,6 +11,21 @@
     state: stopped
     enabled: no
   ignore_errors: yes
+  when: aedir_service_manager != "systemd"
+
+- block:
+  - name: "Disable and stop slapd.service"
+    systemd:
+      name: slapd
+      state: stopped
+      enabled: no
+    ignore_errors: yes
+  - name: "Mask systemd unit for slapd.service"
+    systemd:
+      name: slapd
+      masked: yes
+    ignore_errors: yes
+  when: aedir_service_manager == "systemd"
 
 - name: "Delete the package dynamic configuration directory {{ os_openldap_paths.openldap_conf_prefix }}/slapd.d"
   file:
