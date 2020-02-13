@@ -14,6 +14,9 @@ aedir_python_paths:
   python_exec: "{{ aedir_prefix }}/bin/python{{ aedir_python_version }}"
   site_packages: "{{ aedir_prefix }}/lib/python{{ aedir_python_version }}/site-packages"
 
+# use Python3 venv module
+virtualenv_command: "/usr/bin/python{{ aedir_python_version }} -m venv"
+
 # OS-specific maps
 os_openldap_paths:
   # LTB-based installation
