@@ -16,9 +16,13 @@
       - tar
       - gzip
       - ca-certificates
-      - python3
-      - python3-libselinux
       - polkit
+    state: present
+    update_cache: yes
+
+- name: "Install base Python packages"
+  yum:
+    name: "{{ python_base_packages[ansible_lsb.major_release] }}"
     state: present
     update_cache: yes
 
