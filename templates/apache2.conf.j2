@@ -14,7 +14,7 @@ LoadModule {{ mod }}_module {{ apache2_config.mod_dir }}/mod_{{ mod }}.so
 ServerTokens ProductOnly
 ServerAdmin {{ apache_server_admin }}
 ServerSignature EMail
-ServerName {{ web_service_fqdn }}
+ServerName {{ apache_service_fqdn }}
 
 # MIME-Types initialisieren
 TypesConfig /etc/mime.types
@@ -87,7 +87,7 @@ ProxyPreserveHost On
 
 <VirtualHost _default_:80>
 
-  RedirectPermanent / https://{{ web_service_fqdn }}/
+  RedirectPermanent / https://{{ apache_service_fqdn }}/
 
 </VirtualHost>
 
@@ -118,8 +118,8 @@ ProxyPreserveHost On
   # htdocs/
   #---------------------------------------------------------------------
 
-  DocumentRoot "{{ web_document_root }}"
-  <Directory {{ web_document_root }}>
+  DocumentRoot "{{ aedir_htdocsdir }}"
+  <Directory {{ aedir_htdocsdir }}>
     # do not use .htaccess files
     AllowOverride None
 

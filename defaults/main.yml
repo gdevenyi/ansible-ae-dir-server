@@ -772,23 +772,7 @@ slapd_check_authz_id: "dn:uid=slapd_{{ slapd_check_service_fqdn.split('.')[0] }}
 slapd_check_lib_dirs:
   - "{{ openldap_path.libdir }}"
 
-#---------------------------------------------------------------------------
-# web server in general
-#---------------------------------------------------------------------------
-
-# Which web server to install
-web_server: "{{ apache2_config.service_name }}"
-
-# FQDN of service interface
-web_service_fqdn: "{{ openldap_service_fqdn }}"
-
-# e-mail address of web server admin(s)
-web_server_admin_email: "ae-admins@{{ web_service_fqdn }}"
-
-# document root used for https://hostname/
-web_document_root: "{{ aedir_htdocsdir }}"
-
-#---------------------------------------------------------------------------
+# e-mail address of web server admin(s)#---------------------------------------------------------------------------
 # web2ldap parameters
 #---------------------------------------------------------------------------
 
@@ -823,8 +807,11 @@ web2ldap_user: "ae-dir-web2ldap"
 web2ldap_group: "ae-dir-web2ldap"
 
 #---------------------------------------------------------------------------
-# apache2 parameters
+# Apache httpd parameters
 #---------------------------------------------------------------------------
+
+# FQDN of service interface
+apache_service_fqdn: "{{ openldap_service_fqdn }}"
 
 # where to place static config file for slapd (slapd.conf)
 #apache_conf: "{{ apache2_config.conf_pathname }}"
@@ -854,7 +841,7 @@ apache_log_level: "info"
 apache_log_format: !unsafe '{ \"time\":\"%{%Y-%m-%dT%H:%M:%S%z}t\", \"ip\":\"%h\", \"url\":\"%U\", \"query\":\"%q\", \"method\":\"%m\", \"status\":\"%>s\", \"ua\":\"%{User-agent}i\", \"ref\":\"%{Referer}i\", \"reqid\":\"%L\", \"in\":%I, \"out\":%O, \"rbody\":%B, \"etime\":%D, \"tls_proto\":\"%{SSL_PROTOCOL}x\", \"tls_cipher\":\"%{SSL_CIPHER}x\" }'
 
 # Apache ServerAdmin value
-apache_server_admin: "{{ web_server_admin_email }}"
+apache_server_admin: "ae-admins@{{ apache_service_fqdn }}"
 
 # which IP nets are allowed to access normal htdocs/
 apache_htdocs_requires:

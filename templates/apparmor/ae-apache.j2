@@ -39,7 +39,7 @@ profile ae-apache {
   {{ apache_key_pathname }} r,
 
   # access to static htdocs/ files
-  {{ web_document_root }}/** r,
+  {{ aedir_htdocsdir }}/** r,
 
   # access to web2ldap's static CSS files
   {{ web2ldapcnf_prefix }}/css/*.css r,
