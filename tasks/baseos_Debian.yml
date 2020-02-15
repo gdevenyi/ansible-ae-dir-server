@@ -26,3 +26,10 @@
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
   when: aedir_malloc_package!=""
+
+- name: "Remove unwanted Debian packages"
+  apt:
+    name:
+      - ldap-utils
+    state: absent
+    purge: yes

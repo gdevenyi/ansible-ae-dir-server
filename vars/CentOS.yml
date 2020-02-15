@@ -14,16 +14,21 @@ aedir_python_paths:
   python_exec: "{{ aedir_prefix }}/bin/python{{ aedir_python_version[0] }}"
   site_packages: "{{ aedir_prefix }}/lib/python{{ aedir_python_version }}/site-packages"
 
+# use Python3 venv module
+virtualenv_command: "/usr/bin/python{{ aedir_python_version }} -m venv"
+
 # OS-specific maps
-os_openldap_paths:
+openldap_path:
   # LTB-based installation
-  openldap_prefix: /usr/local/openldap
-  openldap_conf_prefix: /usr/local/openldap/etc/openldap
-  openldap_data: /usr/local/openldap/var/openldap-data
-  openldap_rundir: /usr/local/openldap/var/run
-  openldap_slapd_exec: /usr/local/openldap/libexec/slapd
-  openldap_libdir: /usr/local/openldap/lib64
-  openldap_modules: /usr/local/openldap/libexec/openldap
+  prefix: /usr/local/openldap
+  bin: /usr/local/openldap/bin
+  sbin: /usr/local/openldap/sbin
+  conf_prefix: /usr/local/openldap/etc/openldap
+  data: /usr/local/openldap/var/openldap-data
+  rundir: /usr/local/openldap/var/run
+  slapd_exec: /usr/local/openldap/libexec/slapd
+  libdir: /usr/local/openldap/lib64
+  modules: /usr/local/openldap/libexec/openldap
 
 cron_config:
   service_name: "crond"

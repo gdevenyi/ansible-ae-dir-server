@@ -15,7 +15,8 @@
     - always
 
 - name: "Include OS-specific variables"
-  include_vars: "{{ lsb_id }}.yml"
+  include_vars:
+    file: "{{ lsb_id }}.yml"
   tags:
     - always
 

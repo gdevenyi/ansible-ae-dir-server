@@ -12,7 +12,7 @@ DATETIME="$(date +%Y%m%d%H%M%S)"
 umask 077
 
 # slapcat all real database backends found
-{{ openldap_bin }}/ldapsearch \
+{{ openldap_path.bin }}/ldapsearch \
   -Q \
   -LLL \
   -b 'cn=config' \
@@ -22,7 +22,7 @@ umask 077
   grep olcSuffix| \
   cut -d' ' -f2 | \
   xargs -n1 -isuffix \
-    {{ openldap_sbin }}/slapcat \
+    {{ openldap_path.sbin }}/slapcat \
       -f "{{ openldap_slapd_conf }}" \
       -b 'suffix' \
       -l "{{ openldap_backup_path }}/suffix-${DATETIME}.ldif"

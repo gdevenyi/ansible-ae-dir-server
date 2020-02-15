@@ -472,22 +472,12 @@ openldap_role: "consumer"
 openldap_service_fqdn: "{{ inventory_hostname }}"
 
 # Some paths
-openldap_prefix: "{{ os_openldap_paths.openldap_prefix }}"
-openldap_bin: "{{ openldap_prefix }}/bin"
-openldap_conf_prefix: "{{ os_openldap_paths.openldap_conf_prefix }}"
-openldap_schema_prefix: "{{ openldap_conf_prefix }}/schema"
-openldap_sbin: "{{ openldap_prefix }}/sbin"
-openldap_defaults: "/etc/default/slapd"
 openldap_rundir: "{{ aedir_rundir }}/slapd"
 openldap_data: "{{ aedir_prefix }}/slapd-db"
 openldap_ldapi_socket: "{{ openldap_rundir }}/ldapi"
 openldap_ldapi_uri: "ldapi://{{ openldap_ldapi_socket|urlencode|replace('/','%2F') }}"
 # where to place static config file for slapd (slapd.conf)
 openldap_slapd_conf: "{{ aedir_etc_openldap }}/slapd.conf"
-# where to find slapd executable
-openldap_slapd_exec: "{{ os_openldap_paths.openldap_slapd_exec }}"
-# URIs specifying on which interface slapd shall listen
-openldap_listen_urls: "{{ openldap_ldapi_uri|replace('%','%%') }} ldap://*:389 ldaps://*:636"
 # system user/group to run slapd with
 openldap_slapd_user: "ae-dir-slapd"
 openldap_slapd_group: "ae-dir-slapd"
@@ -780,7 +770,7 @@ slapd_check_authz_id: "dn:uid=slapd_{{ slapd_check_service_fqdn.split('.')[0] }}
 
 # pathnames to add to LD_LIBRARY_PATH
 slapd_check_lib_dirs:
-  - "{{ os_openldap_paths.openldap_libdir }}"
+  - "{{ openldap_path.libdir }}"
 
 #---------------------------------------------------------------------------
 # web server in general

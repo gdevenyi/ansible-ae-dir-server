@@ -7,14 +7,14 @@
 #---------------------------------------------------------------------------
 
 # Schema files shipped with OpenLDAP distribution
-include {{ openldap_schema_prefix }}/core.schema
-include {{ openldap_schema_prefix }}/cosine.schema
-include {{ openldap_schema_prefix }}/inetorgperson.schema
-include {{ openldap_schema_prefix }}/dyngroup.schema
-include {{ openldap_schema_prefix }}/openldap.schema
-include {{ openldap_schema_prefix }}/ppolicy.schema
-include {{ openldap_schema_prefix }}/nis.schema
-include {{ openldap_schema_prefix }}/duaconf.schema
+include {{ openldap_path.conf_prefix }}/schema/core.schema
+include {{ openldap_path.conf_prefix }}/schema/cosine.schema
+include {{ openldap_path.conf_prefix }}/schema/inetorgperson.schema
+include {{ openldap_path.conf_prefix }}/schema/dyngroup.schema
+include {{ openldap_path.conf_prefix }}/schema/openldap.schema
+include {{ openldap_path.conf_prefix }}/schema/ppolicy.schema
+include {{ openldap_path.conf_prefix }}/schema/nis.schema
+include {{ openldap_path.conf_prefix }}/schema/duaconf.schema
 
 # mail stuff
 include {{ aedir_schema_prefix }}/mail.schema

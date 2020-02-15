@@ -13,14 +13,6 @@
     state: present
     update_cache: yes
 
-- name: "Overwrite LTB package init script"
-  template:
-    src: "init_slapd_exit0.j2"
-    dest: "/etc/init.d/slapd"
-    owner: root
-    group: root
-    mode: 0755
-
 - name: "Install LTB OpenLDAP packages and dependencies"
   apt:
     name:
@@ -34,11 +26,6 @@
     dpkg_options: 'force-confold,force-confdef'
   notify:
     - "restart ae-slapd"
-
-- name: "Remove Debian package ldap-utils"
-  apt:
-    name: ldap-utils
-    state: absent
 
 - name: "Fix ownership of LTB directory"
   file:

@@ -8,7 +8,7 @@
     state: latest
     virtualenv: "{{ aedir_prefix }}"
     virtualenv_site_packages: no
-    virtualenv_command: "/usr/bin/python{{ aedir_python_version }} -m venv"
+    virtualenv_command: "{{ virtualenv_command }}"
     extra_args: "{{ aedir_pip_extra_args }}"
 
 - name: "Additional PIP packages in virtualenv {{ aedir_prefix }}"

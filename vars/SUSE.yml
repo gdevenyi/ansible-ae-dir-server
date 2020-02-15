@@ -21,15 +21,17 @@ aedir_python_paths:
   site_packages: "/usr/lib/python{{ aedir_python_version }}/site-packages"
 
 # OS-specific maps
-os_openldap_paths:
+openldap_path:
   # openSUSE packages
-  openldap_prefix: /usr
-  openldap_conf_prefix: /etc/openldap
-  openldap_data: /var/lib/ldap
-  openldap_rundir: /var/run/slapd
-  openldap_slapd_exec: /usr/lib64/slapd
-  openldap_libdir: /usr/lib64
-  openldap_modules: /usr/lib64/openldap
+  prefix: /usr
+  bin: /usr/bin
+  sbin: /usr/sbin
+  conf_prefix: /etc/openldap
+  data: /var/lib/ldap
+  rundir: /var/run/slapd
+  slapd_exec: /usr/lib64/slapd
+  libdir: /usr/lib64
+  modules: /usr/lib64/openldap
 
 cron_config:
   service_name: "cron"
