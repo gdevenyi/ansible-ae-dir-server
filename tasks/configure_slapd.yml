@@ -27,15 +27,15 @@
     ignore_errors: yes
   when: aedir_service_manager == "systemd"
 
-- name: "Delete the package dynamic configuration directory {{ os_openldap_paths.openldap_conf_prefix }}/slapd.d"
+- name: "Delete the package dynamic configuration directory {{ openldap_path.conf_prefix }}/slapd.d"
   file:
-    path: "{{ os_openldap_paths.openldap_conf_prefix }}/slapd.d"
+    path: "{{ openldap_path.conf_prefix }}/slapd.d"
     state: absent
 
-- name: "Replace static config file {{ os_openldap_paths.openldap_conf_prefix }}/slapd.conf"
+- name: "Replace static config file {{ openldap_path.conf_prefix }}/slapd.conf"
   copy:
     content: "# This slapd.conf was deliberately made non-functional"
-    dest: "{{ os_openldap_paths.openldap_conf_prefix }}/slapd.conf"
+    dest: "{{ openldap_path.conf_prefix }}/slapd.conf"
     owner: root
     group: root
     mode: 0600
@@ -180,10 +180,10 @@
     - "restart ae-slapd"
   when: aedir_service_manager == "systemd"
 
-- name: "Create client config file {{ openldap_conf_prefix }}/ldap.conf from template"
+- name: "Create client config file {{ openldap_path.conf_prefix }}/ldap.conf from template"
   template:
     src: "ldap.conf.j2"
-    dest: "{{ openldap_conf_prefix }}/ldap.conf"
+    dest: "{{ openldap_path.conf_prefix }}/ldap.conf"
     owner: root
     group: root
     mode: 0644
@@ -201,7 +201,7 @@
     job: "{{ openldap_backup_script }}"
   when: openldap_role == 'provider'
 
-- name: "Create AppArmor profile for slapd {{ openldap_slapd_exec }}"
+- name: "Create AppArmor profile ae-slapd"
   template:
     src: "apparmor/ae-slapd.j2"
     dest: "{{ apparmor_profiles_dir }}/ae-slapd"

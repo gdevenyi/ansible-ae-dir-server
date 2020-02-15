@@ -13,12 +13,12 @@ profile ae-slapd {
   capability net_bind_service,
 
   # access to dynamically loadable modules
-  {{ os_openldap_paths.openldap_modules }}/* rm,
+  {{ openldap_path.modules }}/* rm,
 
   # access to config
   {{ openldap_slapd_conf }} r,
   {{ openldap_slapd_conf|dirname }}/rootDSE.ldif r,
-  {{ openldap_schema_prefix }}/*.schema r,
+  {{ openldap_path.conf_prefix }}/schema/*.schema r,
   {{ aedir_schema_prefix }}/*.schema r,
 
   # allow r/w access to PID and args files
@@ -52,9 +52,9 @@ profile ae-slapd {
 {% endif %}
 
   # access to OpenLDAP's client libs
-  {{ os_openldap_paths.openldap_libdir }}/lib{lber,ldap}* rm,
+  {{ openldap_path.libdir }}/lib{lber,ldap}* rm,
   # access to OpenLDAP's client config
-  {{ os_openldap_paths.openldap_conf_prefix }}/ldap.conf rm,
+  {{ openldap_path.conf_prefix }}/ldap.conf rm,
 
 {% if lsb_id=="Debian" %}
   /etc/hosts.{allow,deny} r,
