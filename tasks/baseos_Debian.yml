@@ -4,6 +4,7 @@
 - name: "Install base OS packages"
   apt:
     name:
+      - acl
       - apt-transport-https
       - ca-certificates
       - "{{ cron_pkg_name }}"
