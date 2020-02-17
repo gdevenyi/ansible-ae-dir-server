@@ -4,6 +4,7 @@
 - name: "Install base OS packages"
   zypper:
     name:
+      - acl
       - openssl
       - "{{ cron_pkg_name }}"
       - tar
