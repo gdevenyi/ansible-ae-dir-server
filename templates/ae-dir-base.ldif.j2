@@ -924,8 +924,8 @@ objectClass: aeGroup
 aeMemberZone: cn=ae,{{ aedir_suffix }}
 {% for host in aedir_hosts['provider'] %}
 {% set replica = hostvars[host].get('openldap_service_fqdn',host) -%}
-member: uid=ae-dir-slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
-memberUid: ae-dir-slapd_{{ replica.split('.')[0] }}
+member: uid=ae-dir-slapd_{{ replica }},cn=ae,{{ aedir_suffix }}
+memberUid: ae-dir-slapd_{{ replica }}
 {% endfor %}
 {% for host in aedir_hosts['consumer'] %}
 {% set replica = hostvars[host].get('openldap_service_fqdn',host) -%}
@@ -950,8 +950,8 @@ objectClass: aeGroup
 aeMemberZone: cn=ae,{{ aedir_suffix }}
 {% for host in aedir_hosts['provider'] %}
 {% set replica = hostvars[host].get('openldap_service_fqdn',host) -%}
-member: uid=ae-dir-slapd_{{ replica.split('.')[0] }},cn=ae,{{ aedir_suffix }}
-memberUid: ae-dir-slapd_{{ replica.split('.')[0] }}
+member: uid=ae-dir-slapd_{{ replica }},cn=ae,{{ aedir_suffix }}
+memberUid: ae-dir-slapd_{{ replica }}
 {% endfor %}
 {% if gid_number.append(1) -%}{% endif %}
 
