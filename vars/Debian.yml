@@ -15,7 +15,7 @@ aedir_python_paths:
   site_packages: "{{ aedir_prefix }}/lib/python{{ aedir_python_version }}/site-packages"
 
 # use virtualenv tool
-virtualenv_command: "virtualenv -p /usr/bin/python{{ aedir_python_version }}"
+virtualenv_command: "/usr/bin/python{{ aedir_python_version }} -m venv"
 
 # OS-specific maps
 openldap_path:

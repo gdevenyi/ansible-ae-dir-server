@@ -13,7 +13,6 @@
       - "python{{ aedir_python_version }}-venv"
       - python3-setuptools
       - python3-pip
-      - virtualenv
     state: present
     update_cache: no
     install_recommends: no
