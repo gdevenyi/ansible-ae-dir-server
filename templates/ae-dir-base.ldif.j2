@@ -845,7 +845,7 @@ objectClass: aeObject
 objectClass: aeHost
 objectClass: ldapPublicKey
 pwdPolicySubentry: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
-cn: {{ host.split('.')[0] }}
+cn: {{ host }}
 description: AE-DIR {{ role }} host {{ service_fqdn }}
 
 {% for interface in hostvars[host]['ansible_interfaces'] if interface not in ( "lo", "tunl0") %}
