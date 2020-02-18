@@ -94,7 +94,7 @@
     name: "oathldap-tool>=0.3.1"
     state: present
     virtualenv: "{{ aedir_prefix }}"
-    virtualenv_command: "/usr/bin/python{{ aedir_python_version }} -m venv"
+    virtualenv_command: "{{ virtualenv_command }}"
     extra_args: "{{ aedir_pip_extra_args }}"
   when: openldap_role == 'provider' and aedir_pip_install
 
