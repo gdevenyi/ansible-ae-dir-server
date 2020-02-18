@@ -631,7 +631,6 @@ changetype: add
 uid: {{ ae_user.uid }}
 uidNumber: {{ aedir_min_gid + gid_number|length }}
 gidNumber: {{ aedir_min_gid + gid_number|length }}
-{% if gid_number.append(1) -%}{% endif %}
 objectClass: account
 objectClass: person
 objectClass: organizationalPerson
@@ -656,6 +655,7 @@ displayName: {{ aedir_init_aepersons[ae_user.unique_identifier].given_name }}
 sn: {{ aedir_init_aepersons[ae_user.unique_identifier].sur_name }}
 givenName: {{ aedir_init_aepersons[ae_user.unique_identifier].given_name }}
 mail: {{ aedir_init_aepersons[ae_user.unique_identifier].mail }}
+{% if gid_number.append(1) -%}{% endif %}
 
 {% endfor %}
 
