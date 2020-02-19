@@ -36,3 +36,11 @@
     owner: root
     group: root
     mode: 0750
+
+- name: "Create /etc/profile.d/ae-dir.sh"
+  template:
+    src: "templates/profile-ae-dir.sh.j2"
+    dest: "/etc/profile.d/ae-dir.sh"
+    owner: root
+    group: root
+    mode: 0644
