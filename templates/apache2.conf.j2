@@ -85,6 +85,21 @@ Header always set Referrer-Policy "same-origin"
 ProxyRequests Off
 ProxyPreserveHost On
 
+<VirtualHost 127.0.0.1:80>
+
+  ServerName localhost
+  SSLEngine off
+
+  # turn off access log for requests coming from loopback interface
+  CustomLog /dev/null "-" "expr=-R '127.0.0.1/32'"
+
+  <Location /server-status>
+    SetHandler server-status
+    Require ip 127.0.0.1
+  </Location>
+
+</VirtualHost>
+
 <VirtualHost _default_:80>
 
   RedirectPermanent / https://{{ apache_service_fqdn }}/
