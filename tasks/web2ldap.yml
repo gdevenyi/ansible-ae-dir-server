@@ -136,7 +136,7 @@
 
 - name: "Install systemd unit file for web2ldap"
   template:
-    src: "web2ldap/web2ldap.service.j2"
+    src: "systemd/web2ldap.service.j2"
     dest: "{{ aedir_systemd_dir }}/web2ldap.service"
     owner: root
     group: root

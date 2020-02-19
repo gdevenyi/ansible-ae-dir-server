@@ -79,7 +79,7 @@
 
 - name: "Install systemd unit {{ aedir_systemd_dir }}/oathenroll.service"
   template:
-    src: "oath-ldap/oathenroll.service.j2"
+    src: "systemd/oathenroll.service.j2"
     dest: "{{ aedir_systemd_dir }}/oathenroll.service"
     owner: root
     group: root

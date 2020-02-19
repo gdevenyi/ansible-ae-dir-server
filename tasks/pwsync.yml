@@ -79,7 +79,7 @@
 
 - name: "Install systemd unit file for PASSMOD listener"
   template:
-    src: "passmod.service.j2"
+    src: "systemd/passmod.service.j2"
     dest: "{{ aedir_systemd_dir }}/passmod.service"
     owner: root
     group: root

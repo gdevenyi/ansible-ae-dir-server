@@ -68,7 +68,7 @@
 
 - name: "Install systemd unit {{ aedir_systemd_dir }}/ae-dir-pwd.service"
   template:
-    src: "ae-dir-pwd/ae-dir-pwd.service.j2"
+    src: "systemd/ae-dir-pwd.service.j2"
     dest: "{{ aedir_systemd_dir }}/ae-dir-pwd.service"
     owner: root
     group: root

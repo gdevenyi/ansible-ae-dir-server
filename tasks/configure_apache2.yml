@@ -112,7 +112,7 @@
 
 - name: "Install systemd unit file for ae-apache"
   template:
-    src: "ae-apache.service.j2"
+    src: "systemd/ae-apache.service.j2"
     dest: "{{ aedir_systemd_dir }}/ae-apache.service"
     owner: root
     group: root

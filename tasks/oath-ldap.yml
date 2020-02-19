@@ -72,7 +72,7 @@
 
 - name: "Install systemd unit file for {{ oath_bind_listener }}"
   template:
-    src: "oath-ldap/{{ oath_bind_listener }}.service.j2"
+    src: "systemd/{{ oath_bind_listener }}.service.j2"
     dest: "{{ aedir_systemd_dir }}/{{ oath_bind_listener }}.service"
     owner: root
     group: root

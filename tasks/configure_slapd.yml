@@ -171,7 +171,7 @@
 
 - name: "Install systemd unit file for ae-slapd"
   template:
-    src: "ae-slapd.service.j2"
+    src: "systemd/ae-slapd.service.j2"
     dest: "{{ aedir_systemd_dir }}/ae-slapd.service"
     owner: root
     group: root
