@@ -22,7 +22,7 @@ umask 077
   grep olcSuffix| \
   cut -d' ' -f2 | \
   xargs -n1 -isuffix \
-    {{ openldap_path.sbin }}/slapcat \
+    {{ openldap_path.slapd_exec }} -T cat \
       -f "{{ openldap_slapd_conf }}" \
       -b 'suffix' \
       -l "{{ openldap_backup_path }}/suffix-${DATETIME}.ldif"
