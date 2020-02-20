@@ -1,5 +1,5 @@
 ---
-# Install CRON jobs on provider
+# Install CRON jobs
 
 - name: "Set env vars in {{ aedir_cron_file }}"
   cron:
@@ -20,43 +20,20 @@
     PYTHONWARNINGS: "error"
     AE_LOGGER_QUALNAME: "{{ aedir_logging_qualname }}"
 
-- name: "Install CRON jobs running as root"
+- name: "Remove metrics text export CRON job"
   cron:
-    name: "{{ item.key }}"
+    name: "slapd_metrics"
+    state: absent
+    cron_file: "{{ aedir_cron_file }}"
+  when: aedir_metricsdir == ""
+
+- name: "Install metrics text export CRON job"
+  cron:
+    name: "slapd_metrics"
     state: present
     user: root
     cron_file: "{{ aedir_cron_file }}"
-    hour: "{{ item.value['hour']|default('*') }}"
-    minute: "{{ item.value.minute }}"
-    job: "{{ aedir_python }} -m {{ item.value.pyjob }}"
-  with_dict:
-    aedir_pproc_groups:
-      minute: "*/3"
-      pyjob: aedir_pproc.groups
-    aedir_pproc_status:
-      minute: "*/13"
-      pyjob: "aedir_pproc.status"
-    aedir_pproc_persattrs:
-      minute: "*/2"
-      pyjob: "aedir_pproc.persattrs {{ aedir_rundir }}/aedir_pproc_persattrs.state"
-
-- name: "Install CRON jobs running as ae-dir-pwd"
-  cron:
-    name: "{{ item.key }}"
-    state: present
-    user: ae-dir-pwd
-    cron_file: "{{ aedir_cron_file }}"
-    hour: "{{ item.value['hour']|default('*') }}"
-    minute: "{{ item.value.minute }}"
-    job: "{{ aedir_python }} -m {{ item.value.pyjob }}"
-  with_dict:
-    aedir_pproc_welcome:
-      minute: "*/2"
-      pyjob: "aedir_pproc.welcome"
-    aedir_pwd_expreset:
-      minute: "*/2"
-      pyjob: "aedir_pproc.pwd.expreset"
-    aedir_pwd_expwarn:
-      hour: "0"
-      minute: "0"
-      pyjob: "aedir_pproc.pwd.expwarn"
+    hour: "*"
+    minute: "*/2"
+    job: "{{ aedir_sbin }}/slapd_metrics.sh > {{ aedir_metricsdir }}/ae-slapd.tmp && mv {{ aedir_metricsdir }}/ae-slapd.tmp {{ aedir_metricsdir }}/ae-slapd"
+  when: aedir_metricsdir != ""

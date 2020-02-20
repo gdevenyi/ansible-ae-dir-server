@@ -56,3 +56,12 @@
     owner: root
     group: root
     mode: 0644
+
+- name: "Create directory for metrics text exports {{ aedir_metricsdir }}"
+  file:
+    path: "{{ aedir_metricsdir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  when: aedir_metricsdir != ""
