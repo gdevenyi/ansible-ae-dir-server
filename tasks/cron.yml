@@ -35,5 +35,5 @@
     cron_file: "{{ aedir_cron_file }}"
     hour: "*"
     minute: "*/2"
-    job: "{{ aedir_sbin }}/slapd_metrics.sh > {{ aedir_metricsdir }}/ae-slapd.tmp && mv {{ aedir_metricsdir }}/ae-slapd.tmp {{ aedir_metricsdir }}/ae-slapd"
+    job: "{{ aedir_sbin }}/slapd_metrics.sh > {{ aedir_metricsdir }}/ae-slapd.prom.tmp && mv {{ aedir_metricsdir }}/ae-slapd.prom.tmp {{ aedir_metricsdir }}/ae-slapd.prom"
   when: aedir_metricsdir != ""
