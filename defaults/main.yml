@@ -101,7 +101,7 @@ aedir_htdocsdir: "{{ aedir_prefix }}/htdocs"
 
 # where text exporter metrics are written to
 # if empty, no text exporter CRON jobs are installed
-#aedir_metricsdir: "{{ aedir_rundir }}/metrics"
+#aedir_metricsdir: "/run/metrics"
 aedir_metricsdir: ""
 
 # which Python interpreter to use

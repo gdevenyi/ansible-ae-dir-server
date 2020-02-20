@@ -57,11 +57,25 @@
     group: root
     mode: 0644
 
-- name: "Create directory for metrics text exports {{ aedir_metricsdir }}"
-  file:
-    path: "{{ aedir_metricsdir }}"
-    state: directory
-    owner: root
-    group: root
-    mode: 0755
+- block:
+  - name: "Create directory for metrics text exports {{ aedir_metricsdir }}"
+    file:
+      path: "{{ aedir_metricsdir }}"
+      state: directory
+      owner: root
+      group: root
+      mode: 0755
+  - name: "Install tmpfiles config for {{ aedir_metricsdir }}"
+    copy:
+      content: "d {{ aedir_metricsdir }} 0755 root root"
+      dest: "/usr/lib/tmpfiles.d/aedir_metricsdir.conf"
+      owner: root
+      group: root
+      mode: 0644
   when: aedir_metricsdir != ""
+
+- name: "Remove tmpfiles config for {{ aedir_metricsdir }}"
+  file:
+    state: absent
+    path: "/usr/lib/tmpfiles.d/aedir_metricsdir.conf"
+  when: aedir_metricsdir == ""
