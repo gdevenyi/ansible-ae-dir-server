@@ -29,7 +29,7 @@
     dest: "{{ web2ldapcnf_prefix }}/web2ldapcnf/__init__.py"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
   with_first_found:
     - files:
         - "web2ldap/web2ldapcnf/__init__.py.j2"
@@ -43,7 +43,7 @@
     dest: "{{ web2ldapcnf_prefix }}/web2ldapcnf/hosts.py"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
   with_first_found:
     - files:
         - "web2ldap/web2ldapcnf/hosts.py.j2"
@@ -57,7 +57,7 @@
     dest: "{{ web2ldapcnf_prefix }}/web2ldapcnf/plugins.py"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
   with_first_found:
     - files:
         - "web2ldap/web2ldapcnf/plugins.py.j2"
@@ -71,7 +71,7 @@
     dest: "{{ web2ldapcnf_prefix }}/templates/connect.html"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
   with_first_found:
     - files:
         - "web2ldap/templates/connect.html.j2"
@@ -83,7 +83,7 @@
     dest: "{{ aedir_htdocsdir }}/opensearch-ae-dir.xml"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
 
 - name: "web2ldap HTML and LDIF templates for AE-DIR (copy)"
   copy:
@@ -91,7 +91,7 @@
     dest: "{{ web2ldapcnf_prefix }}/templates/ae-dir/{{ item | basename }}"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
   with_fileglob:
     "web2ldap/templates/ae-dir/*.*"
 
@@ -101,7 +101,7 @@
     dest: "{{ web2ldapcnf_prefix }}/templates/ae-dir/{{ item | basename | regex_replace('\\.j2','') }}"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
   with_fileglob:
     "../templates/web2ldap/templates/ae-dir/*.*.j2"
 
@@ -121,7 +121,7 @@
     dest: "{{ aedir_etc }}/uwsgi/{{ name }}.ini"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
   vars:
     name: web2ldap
     user: ae-dir-web2ldap
@@ -140,7 +140,7 @@
     dest: "{{ aedir_systemd_dir }}/web2ldap.service"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
   notify:
     - "restart web2ldap"
   when: aedir_service_manager == "systemd"
@@ -151,7 +151,7 @@
     dest: "{{ apparmor_profiles_dir }}/web2ldap"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
   vars:
     name: web2ldap
     cfgdir: "{{ web2ldapcnf_prefix }}"

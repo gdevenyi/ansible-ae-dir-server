@@ -7,7 +7,7 @@
     state: directory
     owner: root
     group: root
-    mode: 0755
+    mode: 0o0755
   notify:
     - "restart ae-slapd"
     - "restart ae-apache"
@@ -18,7 +18,7 @@
     dest: "{{ aedir_etc }}/tls/gen_csr.cnf"
     owner: root
     group: root
-    mode: 0600
+    mode: 0o0600
   with_first_found:
     - files:
         - "tls/gen_csr.cnf.j2"
@@ -30,7 +30,7 @@
     dest: "{{ aedir_sbin }}/ae-dir-csrgen.sh"
     owner: root
     group: root
-    mode: 0700
+    mode: 0o0700
 
 - name: CA certificate file
   copy:
@@ -38,7 +38,7 @@
     dest: "{{ openldap_cacert_pathname }}"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
   notify:
     - "restart ae-slapd"
     - "restart ae-apache"
@@ -95,7 +95,7 @@
     dest: "{{ openldap_cert_pathname }}"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
   when: openssl_verify_result.rc == 0 and
         openldap_cert_modulus.rc == 0 and
         openldap_key_modulus.rc == 0 and
@@ -109,7 +109,7 @@
     path: "{{ openldap_key_pathname }}"
     owner: root
     group: "{{ openldap_slapd_group }}"
-    mode: 0640
+    mode: 0o0640
   notify:
     - "restart ae-slapd"
     - "restart ae-apache"
@@ -132,6 +132,6 @@
     path: "{{ openldap_dhparam_pathname }}"
     owner: root
     group: "{{ openldap_slapd_group }}"
-    mode: 0640
+    mode: 0o0640
   notify:
     - "restart ae-slapd"

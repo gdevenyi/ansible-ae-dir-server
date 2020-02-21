@@ -30,7 +30,7 @@
     dest: "{{ aedir_etc }}/oathenroll/oathenroll_cnf.py"
     owner: root
     group: "{{ oath_ldap_oathenroll_web_group }}"
-    mode: 0640
+    mode: 0o0640
   with_first_found:
     - files:
         - "oath-ldap/oathenroll_cnf.py.j2"
@@ -44,7 +44,7 @@
     dest: "{{ aedir_python_sitepackages }}/oathenroll.py"
     owner: root
     group: "{{ oath_ldap_oathenroll_web_group }}"
-    mode: 0750
+    mode: 0o0750
   notify:
     - "restart oathenroll"
 
@@ -64,7 +64,7 @@
     dest: "{{ aedir_etc }}/uwsgi/{{ name }}.ini"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
   vars:
     name: oathenroll
     user: ae-dir-pwd
@@ -83,7 +83,7 @@
     dest: "{{ aedir_systemd_dir }}/oathenroll.service"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
   notify:
     - "restart oathenroll"
   when: aedir_service_manager == "systemd"
@@ -94,7 +94,7 @@
     dest: "{{ apparmor_profiles_dir }}/oathenroll"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
   vars:
     name: oathenroll
     cfgdir: "{{ aedir_etc }}/oathenroll"

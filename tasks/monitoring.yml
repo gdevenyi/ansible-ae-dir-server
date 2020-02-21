@@ -30,7 +30,7 @@
     dest: "{{ slapd_checkmk_local }}/slapd_checkmk.sh"
     owner: root
     group: root
-    mode: 0755
+    mode: 0o0755
 
 - name: "Install metrics wrapper script {{ slapd_metrics_local }}/slapd_metrics.sh"
   template:
@@ -38,7 +38,7 @@
     dest: "{{ aedir_sbin }}/slapd_metrics.sh"
     owner: root
     group: root
-    mode: 0755
+    mode: 0o0755
 
 - name: "Create directory for mtail programs at {{ aedir_etc }}/mtail/"
   file:
@@ -46,7 +46,7 @@
     state: directory
     owner: root
     group: root
-    mode: 0755
+    mode: 0o0755
 
 - name: "Copy mtail programs from {{ role_path }}/files/mtail/ to {{ aedir_etc }}/mtail/"
   copy:
@@ -55,7 +55,7 @@
     follow: no
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
 
 - block:
   - name: "Create directory for metrics text exports {{ aedir_metricsdir }}"
@@ -64,12 +64,12 @@
       state: directory
       owner: root
       group: root
-      mode: 0755
+      mode: 0o0755
   - name: "Generate static metrics file {{ aedir_metricsdir }}/ae-dir-conf.prom"
     template:
       src: "ae-dir-conf.prom.j2"
       dest: "{{ aedir_metricsdir }}/ae-dir-conf.prom"
       owner: root
       group: root
-      mode: 0644
+      mode: 0o0644
   when: aedir_metricsdir != ""

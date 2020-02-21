@@ -29,7 +29,7 @@
     dest: "{{ aedir_etc }}/ae-dir-pwd/aedirpwd_cnf.py"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
   with_first_found:
     - files:
         - "ae-dir-pwd/aedirpwd_cnf.py.j2"
@@ -53,7 +53,7 @@
     dest: "{{ aedir_etc }}/uwsgi/{{ name }}.ini"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
   vars:
     name: ae-dir-pwd
     user: ae-dir-pwd
@@ -72,7 +72,7 @@
     dest: "{{ aedir_systemd_dir }}/ae-dir-pwd.service"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
   notify:
     - "restart ae-dir-pwd"
   when: aedir_service_manager == "systemd"
@@ -83,7 +83,7 @@
     dest: "{{ apparmor_profiles_dir }}/ae-dir-pwd"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
   vars:
     name: ae-dir-pwd
     cfgdir: "{{ aedir_etc }}/ae-dir-pwd"

@@ -13,7 +13,7 @@
     state: directory
     owner: "{{ apache_user }}"
     group: root
-    mode: 0750
+    mode: 0o0750
   notify:
     - "restart ae-apache"
 
@@ -22,7 +22,7 @@
     path: "{{ apache_access_log }}"
     owner: "{{ apache_user }}"
     group: "{{ apache_group }}"
-    mode: 0640
+    mode: 0o0640
   ignore_errors: yes
   notify:
     - "restart ae-apache"
@@ -33,7 +33,7 @@
     dest: "{{ apache_conf }}"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
   notify:
     - "restart ae-apache"
 
@@ -43,7 +43,7 @@
     dest: "/etc/logrotate.d/ae-apache"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
 
 - name: "Create Apache run directory {{ apache_rundir }}"
   file:
@@ -51,7 +51,7 @@
     state: directory
     owner: root
     group: "{{ apache_group }}"
-    mode: 0775
+    mode: 0o0775
   notify:
     - "restart ae-apache"
 
@@ -61,7 +61,7 @@
     dest: "{{ apache_cacert_pathname }}"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
   when: apache_cacert_filename != openldap_cacert_filename and apache_cacert_pathname != openldap_cacert_pathname
   notify:
     - "restart ae-apache"
@@ -72,7 +72,7 @@
     dest: "{{ apache_cert_pathname }}"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
   when: apache_cert_filename != openldap_cert_filename and apache_cert_pathname != openldap_cert_pathname
   notify:
     - "restart ae-apache"
@@ -83,7 +83,7 @@
     dest: "{{ apache_key_pathname }}"
     owner: root
     group: "{{ apache_group }}"
-    mode: 0640
+    mode: 0o0640
   when: apache_key_filename and (apache_key_filename != openldap_key_filename and apache_key_pathname != openldap_key_pathname)
   no_log: True
   notify:
@@ -94,7 +94,7 @@
     path: "{{ apache_key_pathname }}"
     owner: root
     group: "{{ apache_group }}"
-    mode: 0640
+    mode: 0o0640
   when: apache_key_pathname != openldap_key_pathname
   notify:
     - "restart ae-apache"
@@ -116,7 +116,7 @@
     dest: "{{ aedir_systemd_dir }}/ae-apache.service"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
   notify:
     - "restart ae-apache"
   when: aedir_service_manager == "systemd"
@@ -127,7 +127,7 @@
     dest: "{{ apparmor_profiles_dir }}/ae-apache"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
   notify:
     - "restart apparmor"
     - "restart ae-apache"

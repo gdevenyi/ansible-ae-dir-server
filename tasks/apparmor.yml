@@ -12,7 +12,7 @@
     state: directory
     owner: root
     group: root
-    mode: 0755
+    mode: 0o0755
   with_items:
     - "{{ apparmor_profiles_dir }}/ae-dir"
     - "{{ apparmor_profiles_dir }}/ae-dir/abstractions"
@@ -25,7 +25,7 @@
     dest: "{{ apparmor_profiles_dir }}/ae-dir/abstractions/{{ item }}"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
   with_items:
     - base
     - ldapclient

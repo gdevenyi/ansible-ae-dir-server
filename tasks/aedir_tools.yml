@@ -7,7 +7,7 @@
     dest: "{{ aedir_etc }}/ldap.conf"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
   notify:
     - "restart ae-slapd"
 
@@ -17,7 +17,7 @@
     dest: "{{ aedir_etc }}/ae-logging.conf"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
 
 - name: "install CA cert for SMTP/STARTTLS to {{ smtp_cacert_pathname }}"
   copy:
@@ -35,7 +35,7 @@
     dest: "{{ aedir_sbin }}/ae-dir-replica-reset.sh"
     owner: root
     group: root
-    mode: 0750
+    mode: 0o0750
 
 - name: "Create /etc/profile.d/ae-dir.sh"
   template:
@@ -43,4 +43,4 @@
     dest: "/etc/profile.d/ae-dir.sh"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644

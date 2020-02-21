@@ -42,7 +42,7 @@
     path: "{{ item }}"
     owner: root
     group: "{{ oath_listener_user }}"
-    mode: 0640
+    mode: 0o0640
   when: openldap_role=="provider"
   notify:
     - "restart {{ oath_bind_listener }}"
@@ -62,7 +62,7 @@
     dest: "{{ aedir_sbin }}/{{ oath_bind_listener }}.py"
     owner: root
     group: "{{ oath_listener_user }}"
-    mode: 0750
+    mode: 0o0750
   with_first_found:
     - files:
         - "oath-ldap/{{ oath_bind_listener }}.py"
@@ -76,7 +76,7 @@
     dest: "{{ aedir_systemd_dir }}/{{ oath_bind_listener }}.service"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
   notify:
     - "restart {{ oath_bind_listener }}"
   when: aedir_service_manager == "systemd"
@@ -104,7 +104,7 @@
     dest: "{{ apparmor_profiles_dir }}/ae-dir/abstractions/{{ item }}"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
   with_items:
     - "oath_bind_listener"
   when: apparmor_enabled == True
@@ -118,7 +118,7 @@
     dest: "{{ apparmor_profiles_dir }}/{{ oath_bind_listener }}"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
   notify:
     - "restart apparmor"
     - "restart ae-apache"

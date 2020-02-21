@@ -73,7 +73,7 @@
     dest: "{{ aedir_sbin }}/passmod.py"
     owner: root
     group: "{{ aedir_pwsync_listener_user }}"
-    mode: 0750
+    mode: 0o0750
   notify:
     - "restart passmod"
 
@@ -83,7 +83,7 @@
     dest: "{{ aedir_systemd_dir }}/passmod.service"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
   notify:
     - "restart passmod"
   when: aedir_service_manager == "systemd"

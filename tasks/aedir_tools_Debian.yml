@@ -46,7 +46,7 @@
     dest: "/etc/python{{ aedir_python_version }}/sitecustomize.py"
     owner: root
     group: root
-    mode: 0644
+    mode: 0o0644
 
 - name: "AE-DIR tools installation in virtualenv {{ aedir_prefix }}"
   include_tasks: "aedir_tools_venv.yml"
