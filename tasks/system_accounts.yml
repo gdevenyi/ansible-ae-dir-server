@@ -24,7 +24,7 @@
     system: yes
     createhome: no
     non_unique: no
-    home: "{{ aedir_rundir }}"
+    home: "{{ aedir_rundir+'/'+item.key }}"
   with_dict:
     "{{ aedir_ldapi_services }}"
   when: openldap_role in item.value.roles
@@ -36,6 +36,7 @@
   user:
     name: "{{ item.key }}"
     state: absent
+    force: yes
   with_dict:
     "{{ aedir_ldapi_services }}"
   when: openldap_role not in item.value.roles
