@@ -67,7 +67,7 @@
 
 - name: "Key generation tasks"
   include_tasks: tls_keygen.yml
-  when: openldap_keygen and ( openldap_cert_modulus.rc != 0 or openldap_key_modulus.rc != 0 or openldap_cert_modulus.stdout != openldap_key_modulus.stdout )
+  when: ( aedir_keygen is defined ) and ( openldap_cert_modulus.rc != 0 or openldap_key_modulus.rc != 0 or openldap_cert_modulus.stdout != openldap_key_modulus.stdout )
 
 - name: "Modulus of cert"
   fail:
