@@ -222,7 +222,6 @@ aedir_ldapi_services:
     uid_number: "{{ aedir_min_gid-1 }}"
     gid_number: "{{ aedir_min_gid-1 }}"
     description: The system user allowed to set attributes during user password reset (msPwdResetObject) over LDAPI
-    home_directory: "{{ aedir_rundir }}/ae-dir-pwd"
     roles:
       - provider
   # system user for sync processes
@@ -231,7 +230,6 @@ aedir_ldapi_services:
     uid_number: "{{ aedir_min_gid-2 }}"
     gid_number: "{{ aedir_min_gid-2 }}"
     description: The system user allowed to maintain aePerson entries over LDAPI
-    home_directory: "{{ aedir_rundir }}/ae-dir-peoplesync"
     roles:
       - provider
   # system user for OTP registration/enrollment web application
