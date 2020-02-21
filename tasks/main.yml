@@ -14,6 +14,20 @@
   tags:
     - always
 
+- name: "Forced stop of all services"
+  service:
+    name: "{{ item }}"
+    state: stopped
+  ignore_errors: yes
+  when: aedir_stop is defined
+  with_items:
+    - ae-dir-pwd
+    - ae-slapd
+    - ae-apache
+    - "{{ oath_bind_listener }}"
+    - oathenroll
+    - web2ldap
+
 - name: "Include OS-specific variables"
   include_vars:
     file: "{{ lsb_id }}.yml"
