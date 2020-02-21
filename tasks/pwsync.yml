@@ -33,7 +33,7 @@
   notify:
     - "restart passmod"
 
-- name: Install CA cert for target connection to {{ aedir_pwsync_cacert_pathname }}"
+- name: "Install CA cert for target connection to {{ aedir_pwsync_cacert_pathname }}"
   copy:
     src: "{{ aedir_pwsync_cacert_filename }}"
     dest: "{{ aedir_pwsync_cacert_pathname }}"

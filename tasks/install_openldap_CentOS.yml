@@ -1,7 +1,7 @@
 ---
 # install OpenLDAP packages
 
-- name: copy GPG key file
+- name: "Copy GPG key file for LTB OpenLDAP repository"
   copy:
     src: "{{ aedir_pkg_repos['ltb_project_org'].key }}"
     dest: "/etc/pki/rpm-gpg/{{ aedir_pkg_repos['ltb_project_org'].key }}"
@@ -17,7 +17,7 @@
     gpgkey: "file:///etc/pki/rpm-gpg/{{ aedir_pkg_repos['ltb_project_org'].key }}"
     gpgcheck: yes
 
-- name: Install OpenLDAP packages and dependencies
+- name: "Install OpenLDAP packages and dependencies"
   yum:
     name:
       - openldap-ltb

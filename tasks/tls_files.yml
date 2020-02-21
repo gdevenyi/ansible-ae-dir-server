@@ -1,7 +1,7 @@
 ---
 # Install TLS related files
 
-- name: Create TLS directory
+- name: "Create directory for TLS files"
   file:
     path: "{{ aedir_etc }}/tls"
     state: directory
@@ -12,7 +12,7 @@
     - "restart ae-slapd"
     - "restart ae-apache"
 
-- name: Create gen_csr.cnf
+- name: "Create gen_csr.cnf"
   template:
     src: "{{ item }}"
     dest: "{{ aedir_etc }}/tls/gen_csr.cnf"
@@ -24,7 +24,7 @@
         - "tls/gen_csr.cnf.j2"
       paths: "{{ aedir_templates_dirs }}"
 
-- name: Create gen_csr.sh
+- name: "Create gen_csr.sh"
   template:
     src: "ae-dir-csrgen.sh.j2"
     dest: "{{ aedir_sbin }}/ae-dir-csrgen.sh"
@@ -32,7 +32,7 @@
     group: root
     mode: 0o0700
 
-- name: CA certificate file
+- name: "CA certificate file"
   copy:
     src: "{{ openldap_cacert_filename }}"
     dest: "{{ openldap_cacert_pathname }}"

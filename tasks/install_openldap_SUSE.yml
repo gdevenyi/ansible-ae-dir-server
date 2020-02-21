@@ -1,7 +1,7 @@
 ---
 # install OpenLDAP packages
 
-- name: Install OpenLDAP packages and dependencies
+- name: "Install OpenLDAP packages and dependencies"
   zypper:
     name:
       - cyrus-sasl
