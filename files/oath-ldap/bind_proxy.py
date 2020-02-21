@@ -9,8 +9,6 @@ information matches
 # Imports
 #-----------------------------------------------------------------------
 
-from __future__ import absolute_import
-
 # from Python's standard lib
 import os
 import logging
@@ -25,8 +23,10 @@ import ldap0
 from ldap0 import LDAPError
 from ldap0.ldapurl import LDAPUrl
 from ldap0.ldapobject import LDAPObject
-from ldap0.controls.sessiontrack import \
-    SessionTrackingControl, SESSION_TRACKING_FORMAT_OID_USERNAME
+from ldap0.controls.sessiontrack import (
+    SessionTrackingControl,
+    SESSION_TRACKING_FORMAT_OID_USERNAME
+)
 
 # local modules
 from slapdsock.ldaphelper import RESULT_CODE
@@ -42,20 +42,20 @@ from slapdsock.service import SlapdSockServer
 # Configuration constants
 #-----------------------------------------------------------------------
 
-__version__ = '0.5.2'
-__author__ = u'Michael Ströder <michael@stroeder.com>'
+__version__ = '0.6.0'
+__author__ = 'Michael Ströder <michael@stroeder.com>'
 
-# If
-# 1. 'peername' matches any item in
-#    LDAP_PROXY_PEER_ADDRS or LDAP_PROXY_PEER_NETS *and*
-# 2. BIND request's 'dn' matches LDAP_PROXY_BINDDN_PATTERN
-#    then bind request must be validated by upstream provider replica
-LDAP_PROXY_PEER_ADDRS = (
+# 1. peer addresses always excluded from proxying to OTP validator
+LDAP_NOPROXY_PEER_ADDRS = {
     '/opt/ae-dir/run/slapd/ldapi',
     '127.0.0.1',
-)
+}
+# 2. peer addresses proxied to OTP validator (after checking LDAP_NOPROXY_PEER_ADDRS)
+LDAP_PROXY_PEER_ADDRS = {
+}
+# 3. peer address nets proxied to OTP validator (final check)
 LDAP_PROXY_PEER_NETS = (
-    u'0.0.0.0/0',
+    '0.0.0.0/0',
 )
 
 # UIDs and peer GIDS of peers which are granted access
@@ -165,7 +165,8 @@ class BindProxyHandler(SlapdSockHandler):
     cache_ttl = {
         'BIND': CACHE_TTL,
     }
-    ldap_proxy_peer_addrs = set(LDAP_PROXY_PEER_ADDRS)
+    ldap_proxy_peer_addrs = LDAP_PROXY_PEER_ADDRS
+    ldap_noproxy_peer_addrs = LDAP_NOPROXY_PEER_ADDRS
     ldap_proxy_peer_nets = [
         ipaddress.ip_network(p)
         for p in LDAP_PROXY_PEER_NETS
@@ -173,14 +174,26 @@ class BindProxyHandler(SlapdSockHandler):
 
     def _check_peername(self, peer):
         peer_type, peer_addr = peer.lower().rsplit(':')[0].split('=')
+        if peer_addr in LDAP_NOPROXY_PEER_ADDRS:
+            self._log(logging.DEBUG, 'Peer %r explicitly excluded => no OTP check', peer_addr)
+            return False
         if peer_addr in self.ldap_proxy_peer_addrs:
+            self._log(logging.DEBUG, 'Peer %r explicitly included => proxy OTP check', peer_addr)
             return True
         if not peer_type == 'ip':
+            self._log(logging.DEBUG, 'Peer %r not an IP address => no OTP check', peer_addr)
             return False
         peer_ip_address = ipaddress.ip_address(peer_addr)
         for peer_net in self.ldap_proxy_peer_nets:
             if peer_ip_address in peer_net:
+                self._log(
+                    logging.DEBUG,
+                    'Peer %r in included net %r => proxy OTP check',
+                    peer_ip_address,
+                    peer_net,
+                )
                 return True
+        self._log(logging.DEBUG, 'Peer %r not included => no OTP check', peer_addr)
         return False # end of _check_peername()
 
     def _shuffle_remote_ldap_uris(self, request):
