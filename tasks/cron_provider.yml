@@ -38,6 +38,6 @@
       minute: "*/2"
       pyjob: "aedir_pproc.pwd.expreset"
     aedir_pwd_expwarn:
-      hour: "0"
-      minute: "0"
+      hour: "1"
+      minute: "23"
       pyjob: "aedir_pproc.pwd.expwarn"
