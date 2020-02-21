@@ -8,7 +8,7 @@
     owner: root
     group: root
     mode: 0o0600
-  when: aedir_init == True
+  when: aedir_init is defined
 
 - name: "Install backup script from template"
   template:
