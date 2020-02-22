@@ -10,6 +10,8 @@
   @{PROC}/filesystems r,
   # read access to own file descriptors
   @{PROC}/@{pid}/fd/ r,
+  # read access to number of max. possible connections
+  @{PROC}/sys/net/core/somaxconn r,
 
   # UWSGI plugin module for syslog
   {{ uwsgi_paths.syslog_plugin }} rm,
@@ -17,5 +19,3 @@
   {{ uwsgi_paths.python_plugin }} rm,
 
   deny /bin/bash r,
-
-  @{PROC}/sys/net/core/somaxconn r,
