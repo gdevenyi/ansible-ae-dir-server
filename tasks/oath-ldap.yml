@@ -56,19 +56,29 @@
     group: root
     mode: u=rwx,g=rx,o=rx
 
-- name: "Install {{ oath_bind_listener }}.py"
-  copy:
-    src: "{{ item }}"
-    dest: "{{ aedir_sbin }}/{{ oath_bind_listener }}.py"
-    owner: root
-    group: "{{ oath_listener_user }}"
-    mode: 0o0750
-  with_first_found:
-    - files:
-        - "oath-ldap/{{ oath_bind_listener }}.py"
-      paths: "{{ aedir_files_dirs }}"
+- name: "PIP install OATH-LDAP services in virtualenv {{ aedir_prefix }}"
+  pip:
+    name:
+      - oath-ldap-srv>=0.4.0
+    state: latest
+    virtualenv: "{{ aedir_prefix }}"
+    extra_args: "{{ aedir_pip_extra_args }}"
+  when: aedir_pip_install
   notify:
     - "restart {{ oath_bind_listener }}"
+    - "restart oathenroll"
+
+- name: "Install OATH-LDAP services package on {{ openldap_role }}"
+  zypper:
+    name:
+      - oath-ldap-srv >= 0.4.0
+    state: latest
+    disable_recommends: yes
+    type: package
+  when: lsb_id == 'SUSE'
+  notify:
+    - "restart {{ oath_bind_listener }}"
+    - "restart oathenroll"
 
 - name: "Install systemd unit file for {{ oath_bind_listener }}"
   template:
