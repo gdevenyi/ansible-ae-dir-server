@@ -5,6 +5,9 @@
   #include <ae-dir/abstractions/nameservice>
   #include <ae-dir/abstractions/ldapclient>
 
+  # grant read access to check whether FIPS-compliant crypto is available
+  @{PROC}/sys/crypto/fips_enabled r,
+
   # grant read access to system-wide Python modules
   /usr/lib{,32,64}/python{{ aedir_python_version }}/ r,
   /usr/lib{,32,64}/python{{ aedir_python_version }}/**.{pyc,so} mr,
