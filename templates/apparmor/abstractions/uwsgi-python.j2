@@ -11,10 +11,6 @@
   # read access to own file descriptors
   @{PROC}/@{pid}/fd/ r,
 
-  # write temporary files
-  /tmp/ rw,
-  owner /tmp/** rwkl,
-
   # UWSGI plugin module for syslog
   {{ uwsgi_paths.syslog_plugin }} rm,
   # UWSGI plugin module for Python {{ aedir_python_version }}
