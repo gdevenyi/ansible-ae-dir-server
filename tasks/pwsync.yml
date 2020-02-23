@@ -67,16 +67,6 @@
   notify:
     - "restart passmod"
 
-- name: "Install passmod.py"
-  copy:
-    src: "passmod.py"
-    dest: "{{ aedir_sbin }}/passmod.py"
-    owner: root
-    group: "{{ aedir_pwsync_listener_user }}"
-    mode: 0o0750
-  notify:
-    - "restart passmod"
-
 - name: "Install systemd unit file for PASSMOD listener"
   template:
     src: "systemd/passmod.service.j2"
