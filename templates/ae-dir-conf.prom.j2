@@ -3,7 +3,12 @@
 aedir_cfg_openldap_role{role="{{ openldap_role }}"} 1
 # HELP aedir_cfg_min_gid AE-DIR minimum POSIX-GID
 # TYPE aedir_cfg_min_gid gauge
-aedir_cfg_min_gid{role="{{ aedir_min_gid }}"} 1
+aedir_cfg_min_gid {{ aedir_min_gid }}
 # HELP aedir_cfg_max_gid AE-DIR minimum POSIX-UID
 # TYPE aedir_cfg_max_gid gauge
-aedir_cfg_max_gid{role="{{ aedir_max_gid }}"} 1
+aedir_cfg_max_gid {{ aedir_max_gid }}
+{% if openldap_server_id is defined %}
+# HELP aedir_cfg_serverid AE-DIR OpenLDAP server ID for multi-master replication
+# TYPE aedir_cfg_serverid gauge
+aedir_cfg_openldap_server_id {{ openldap_server_id }}
+{% endif %}
