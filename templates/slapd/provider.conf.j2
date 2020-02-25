@@ -249,7 +249,7 @@ access to
 {% else %}
   dn.subtree="{{ aedir_suffix }}"
 {% endif %}
-  attrs=userPassword
+  attrs=entry,objectClass,userPassword
   filter="(&(|(objectClass=aeUser)(objectClass=aeService))(aeStatus=0)(!(objectClass=oathUser)))"
     by dn.base="uid={{ aedir_pwsync_listener_user }},cn=ae,{{ aedir_suffix }}" read
     by * none break
