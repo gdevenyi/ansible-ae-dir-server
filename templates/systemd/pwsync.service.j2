@@ -1,13 +1,13 @@
 #-----------------------------------------------------------------------
-# initiate:   systemctl enable passmod.service
-# start:      systemctl start passmod.service
-# get status: systemctl status passmod.service
+# initiate:   systemctl enable pwsync.service
+# start:      systemctl start pwsync.service
+# get status: systemctl status pwsync.service
 #
 # {{ ansible_managed }}
 #-----------------------------------------------------------------------
 
 [Unit]
-Description=passmod.py - Password change interceptor listener
+Description=pwsync - Password change interceptor listener
 Requires=network.target
 After=network.target
 
@@ -17,7 +17,7 @@ Environment="LDAPTLS_CACERT={{ aedir_pwsync_cacert_pathname }}"
 {% if aedir_malloc_ld_preload %}
 Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
 {% endif %}
-ExecStart={{ aedir_python }} -m aedir_pproc.passmod "{{ aedir_pwsync_socket_path }}" "{{ openldap_ldapi_uri|replace('%','%%') }}????x-saslmech=EXTERNAL" "{{ aedir_pwsync_targeturl }}" "{{ aedir_pwsync_targetpwfile }}"
+ExecStart={{ aedir_python }} -m aedir_pproc.pwsync "{{ aedir_pwsync_socket_path }}" "{{ openldap_ldapi_uri|replace('%','%%') }}????x-saslmech=EXTERNAL" "{{ aedir_pwsync_targeturl }}" "{{ aedir_pwsync_targetpwfile }}"
 User={{ aedir_pwsync_listener_user }}
 Group={{ aedir_pwsync_listener_user }}
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX

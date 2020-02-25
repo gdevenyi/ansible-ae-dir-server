@@ -64,10 +64,10 @@
     state: restarted
   when: openldap_role == 'provider'
 
-- name: "restart passmod"
+- name: "restart pwsync"
   listen:
-    - "restart passmod"
+    - "restart pwsync"
   service:
-    name: "passmod"
+    name: "pwsync"
     state: restarted
   when: openldap_role == 'provider' and aedir_pwsync_targeturl
