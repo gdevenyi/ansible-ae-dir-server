@@ -25,7 +25,7 @@
 
 - name: "Install python3-slapdsock packages on {{ lsb_id }}"
   zypper:
-    name: python3-slapdsock >= 0.11.4
+    name: python3-slapdsock >= 0.11.5
     state: present
     disable_recommends: yes
     type: package
