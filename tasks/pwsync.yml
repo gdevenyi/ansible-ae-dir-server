@@ -62,8 +62,8 @@
     path: "{{ aedir_pwsync_socket_dir }}"
     state: directory
     owner: "{{ aedir_pwsync_listener_user }}"
-    group: root
-    mode: u=rwx,g=rx,o=rx
+    group: "{{ openldap_slapd_group }}"
+    mode: 0750
   notify:
     - "restart pwsync"
 

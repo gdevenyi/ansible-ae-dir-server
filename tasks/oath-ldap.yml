@@ -53,8 +53,10 @@
     path: "{{ oath_ldap_socket_dir }}"
     state: directory
     owner: "{{ oath_listener_user }}"
-    group: root
-    mode: u=rwx,g=rx,o=rx
+    group: "{{ openldap_slapd_group }}"
+    mode: 0750
+  notify:
+    - "restart {{ oath_bind_listener }}"
 
 - name: "PIP install OATH-LDAP services in virtualenv {{ aedir_prefix }}"
   pip:
