@@ -656,16 +656,16 @@ aedir_pwsync_targetpassword: ""
 aedir_pwsync_cacert_filename:  "{{ openldap_cacert_filename }}"
 
 # The CA certificate file bundle for connecting to sync target
-aedir_pwsync_cacert_pathname: "{{ aedir_etc }}/passmod/{{ aedir_pwsync_cacert_filename|basename }}"
+aedir_pwsync_cacert_pathname: "{{ aedir_etc }}/pwsync/{{ aedir_pwsync_cacert_filename|basename }}"
 
 # pathname of file containing target's password
-aedir_pwsync_targetpwfile: "{{ aedir_etc }}/passmod/target_pw"
+aedir_pwsync_targetpwfile: "{{ aedir_etc }}/pwsync/target_pw"
 
 # user account for running external PASSMOD listener
 aedir_pwsync_listener_user: ae-dir-pwsync
 
 # Directory path where Unix domain socket is created
-aedir_pwsync_socket_dir: "{{ aedir_rundir }}/passmod"
+aedir_pwsync_socket_dir: "{{ aedir_rundir }}/pwsync"
 # Full pathname of Unix domain socket of bind listener
 # (set this to empty string for disabling the external bind listeners completely)
 aedir_pwsync_socket_path: "{{ aedir_pwsync_socket_dir }}/socket"

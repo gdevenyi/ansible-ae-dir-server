@@ -8,7 +8,7 @@
     state: present
     system: yes
   notify:
-    - "restart passmod"
+    - "restart pwsync"
 
 - name: "Add local system account {{ aedir_pwsync_listener_user }} for external PASSMOD listener"
   user:
@@ -21,7 +21,7 @@
     system: yes
     createhome: no
   notify:
-    - "restart passmod"
+    - "restart pwsync"
 
 - name: "Create config directory {{ aedir_pwsync_targetpwfile|dirname }}"
   file:
@@ -31,7 +31,7 @@
     group: "{{ aedir_pwsync_listener_user }}"
     mode: u=rwx,g=rx,o=
   notify:
-    - "restart passmod"
+    - "restart pwsync"
 
 - name: "Install CA cert for target connection to {{ aedir_pwsync_cacert_pathname }}"
   copy:
@@ -43,7 +43,7 @@
     mode: u=rw,g=r,o=r
     directory_mode: u=rwx,g=rx,o=rx
   notify:
-    - "restart passmod"
+    - "restart pwsync"
 
 - name: "Create password file {{ aedir_pwsync_targetpwfile }}"
   copy:
@@ -53,7 +53,7 @@
     group: "{{ aedir_pwsync_listener_user }}"
     mode: u=rwx,g=rx,o=
   notify:
-    - "restart passmod"
+    - "restart pwsync"
   when: aedir_pwsync_targetpassword != ""
   no_log: True
 
@@ -65,15 +65,15 @@
     group: root
     mode: u=rwx,g=rx,o=rx
   notify:
-    - "restart passmod"
+    - "restart pwsync"
 
 - name: "Install systemd unit file for PASSMOD listener"
   template:
-    src: "systemd/passmod.service.j2"
-    dest: "{{ aedir_systemd_dir }}/passmod.service"
+    src: "systemd/pwsync.service.j2"
+    dest: "{{ aedir_systemd_dir }}/pwsync.service"
     owner: root
     group: root
     mode: 0o0644
   notify:
-    - "restart passmod"
+    - "restart pwsync"
   when: aedir_service_manager == "systemd"

@@ -58,9 +58,9 @@
       state: started
       enabled: yes
 
-  - name: "Ensure PASSMOD listener service is running"
+  - name: "Ensure pwsync is running"
     service:
-      name: "passmod"
+      name: "pwsync"
       state: started
       enabled: yes
     when: aedir_pwsync_targeturl != ""
