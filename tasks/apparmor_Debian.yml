@@ -18,5 +18,5 @@
     - restart oathenroll
     - restart bind_proxy
     - restart web2ldap
-    - "restart ae-slapd"
+    - "restart {{ openldap_service_name }}"
     - "restart ae-apache"

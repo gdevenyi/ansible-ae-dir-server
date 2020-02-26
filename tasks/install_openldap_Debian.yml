@@ -25,7 +25,7 @@
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
   notify:
-    - "restart ae-slapd"
+    - "restart {{ openldap_service_name }}"
 
 - name: "Fix ownership of LTB directory"
   file:

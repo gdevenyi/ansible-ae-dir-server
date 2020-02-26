@@ -9,7 +9,7 @@
     group: root
     mode: 0o0644
   notify:
-    - "restart ae-slapd"
+    - "restart {{ openldap_service_name }}"
 
 - name: "Create logging config file {{ aedir_etc }}/ae-logging.conf from template"
   template:

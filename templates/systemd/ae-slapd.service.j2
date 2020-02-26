@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------
-# initiate:   systemctl enable ae-slapd.service
-# start:      systemctl start ae-slapd.service
-# get status: systemctl status ae-slapd.service
+# initiate:   systemctl enable {{ openldap_service_name }}.service
+# start:      systemctl start {{ openldap_service_name }}.service
+# get status: systemctl status {{ openldap_service_name }}.service
 #
 # {{ ansible_managed }}
 #-----------------------------------------------------------------------
@@ -27,7 +27,7 @@ MemoryDenyWriteExecute=yes
 LimitNOFILE={{ openldap_limit_nofile }}
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 {% if apparmor_enabled %}
-AppArmorProfile=ae-slapd
+AppArmorProfile={{ openldap_service_name }}
 {% endif %}
 {% if aedir_systemd_hardening %}
 # various hardening options from ansible var aedir_systemd_hardening

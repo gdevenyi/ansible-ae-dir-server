@@ -19,9 +19,9 @@
     daemon_reload: yes
   when: aedir_service_manager == "systemd"
 
-- name: "Enable and start ae-slapd is running"
+- name: "Enable and start service {{ openldap_service_name }}"
   service:
-    name: ae-slapd
+    name: "{{ openldap_service_name }}"
     state: started
     enabled: yes
 

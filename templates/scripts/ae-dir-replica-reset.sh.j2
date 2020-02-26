@@ -5,6 +5,6 @@ set -o nounset
 # After here exit on any error
 set -e
 
-systemctl stop ae-slapd
+systemctl stop {{ openldap_service_name }}
 rm -f {{ openldap_data }}/*/*.mdb
-systemctl start ae-slapd
+systemctl start {{ openldap_service_name }}

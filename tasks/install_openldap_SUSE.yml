@@ -14,4 +14,4 @@
     disable_recommends: yes
     type: package
   notify:
-    - "restart ae-slapd"
+    - "restart {{ openldap_service_name }}"

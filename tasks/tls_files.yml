@@ -9,7 +9,7 @@
     group: root
     mode: 0o0755
   notify:
-    - "restart ae-slapd"
+    - "restart {{ openldap_service_name }}"
     - "restart ae-apache"
 
 - name: "Create gen_csr.cnf"
@@ -40,7 +40,7 @@
     group: root
     mode: 0o0644
   notify:
-    - "restart ae-slapd"
+    - "restart {{ openldap_service_name }}"
     - "restart ae-apache"
 
 - name: "Validate cert {{ openldap_cert_filename }} against CA certs {{ openldap_cacert_filename }}"
@@ -101,7 +101,7 @@
         openldap_key_modulus.rc == 0 and
         openldap_cert_modulus.stdout == openldap_key_modulus.stdout
   notify:
-    - "restart ae-slapd"
+    - "restart {{ openldap_service_name }}"
     - "restart ae-apache"
 
 - name: "TLS server key file ownership/permissions"
@@ -111,7 +111,7 @@
     group: "{{ openldap_slapd_group }}"
     mode: 0o0640
   notify:
-    - "restart ae-slapd"
+    - "restart {{ openldap_service_name }}"
     - "restart ae-apache"
 
 - name: "Check TLS DH parameter file {{ openldap_dhparam_pathname }}"
@@ -124,7 +124,7 @@
   command: "/usr/bin/openssl dhparam -out {{ openldap_dhparam_pathname }} {{ openldap_dhparam_numbits }}"
   when: openldap_dhparam_check.rc != 0
   notify:
-    - "restart ae-slapd"
+    - "restart {{ openldap_service_name }}"
     - "restart ae-apache"
 
 - name: "TLS DH parameter file ownership/permissions"
@@ -134,4 +134,4 @@
     group: "{{ openldap_slapd_group }}"
     mode: 0o0640
   notify:
-    - "restart ae-slapd"
+    - "restart {{ openldap_service_name }}"

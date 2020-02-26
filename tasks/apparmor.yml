@@ -36,7 +36,7 @@
   notify:
     - restart apparmor
     - restart ae-apache
-    - restart ae-slapd
+    - "restart {{ openldap_service_name }}"
     - restart ae-dir-pwd
     - restart oathenroll
     - "restart {{ oath_bind_listener }}"

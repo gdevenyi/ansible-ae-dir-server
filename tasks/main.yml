@@ -22,7 +22,7 @@
   when: aedir_stop is defined
   with_items:
     - ae-dir-pwd
-    - ae-slapd
+    - "{{ openldap_service_name }}"
     - ae-apache
     - "{{ oath_bind_listener }}"
     - oathenroll

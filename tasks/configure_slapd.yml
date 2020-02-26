@@ -52,7 +52,7 @@
     - "{{ aedir_schema_prefix }}"
     - "{{ aedir_rundir }}"
   notify:
-    - "restart ae-slapd"
+    - "restart {{ openldap_service_name }}"
 
 # database directory structure
 #-----------------------------------------------------------------------
@@ -65,7 +65,7 @@
     group: "{{ openldap_slapd_group }}"
     mode: 0o0775
   notify:
-    - "restart ae-slapd"
+    - "restart {{ openldap_service_name }}"
 
 - name: "Create OpenLDAP database root directory"
   file:
@@ -75,7 +75,7 @@
     group: "{{ openldap_slapd_group }}"
     mode: 0o0750
   notify:
-    - "restart ae-slapd"
+    - "restart {{ openldap_service_name }}"
 
 - name: "Create database directories"
   file:
@@ -88,7 +88,7 @@
     - accesslog
     - um
   notify:
-    - "restart ae-slapd"
+    - "restart {{ openldap_service_name }}"
 
 - name: "Create session database directory on {{ openldap_role }}"
   file:
@@ -98,7 +98,7 @@
     group: "{{ openldap_slapd_group }}"
     mode: 0o0750
   notify:
-    - "restart ae-slapd"
+    - "restart {{ openldap_service_name }}"
   when: openldap_role == 'provider'
 
 - name: "Fix ownership database directories"
@@ -111,7 +111,7 @@
     - accesslog
     - um
   notify:
-    - "restart ae-slapd"
+    - "restart {{ openldap_service_name }}"
 
 - name: "Fix ownership session database directory on {{ openldap_role }}"
   file:
@@ -121,7 +121,7 @@
     group: "{{ openldap_slapd_group }}"
     recurse: yes
   notify:
-    - "restart ae-slapd"
+    - "restart {{ openldap_service_name }}"
   when: openldap_role == 'provider'
 
 # slapd.conf and schema files
@@ -136,7 +136,7 @@
     mode: 0o0644
   with_items: "{{ openldap_schema_files }}"
   notify:
-    - "restart ae-slapd"
+    - "restart {{ openldap_service_name }}"
 
 - name: "Create rootDSE.ldif"
   template:
@@ -146,7 +146,7 @@
     group: "{{ openldap_slapd_group }}"
     mode: 0o0640
   notify:
-    - "restart ae-slapd"
+    - "restart {{ openldap_service_name }}"
 
 - name: "Create /etc/sasl2/slapd.conf on {{ lsb_id }}"
   template:
@@ -156,7 +156,7 @@
     group: "{{ openldap_slapd_group }}"
     mode: 0o0640
   notify:
-    - "restart ae-slapd"
+    - "restart {{ openldap_service_name }}"
   when: lsb_id != "Debian"
 
 - name: "Create role-specific slapd.conf for {{ openldap_role }}"
@@ -167,17 +167,17 @@
     group: "{{ openldap_slapd_group }}"
     mode: 0o0640
   notify:
-    - "restart ae-slapd"
+    - "restart {{ openldap_service_name }}"
 
-- name: "Install systemd unit file for ae-slapd"
+- name: "Install systemd unit file for {{ openldap_service_name }}"
   template:
-    src: "systemd/ae-slapd.service.j2"
-    dest: "{{ aedir_systemd_dir }}/ae-slapd.service"
+    src: "systemd/{{ openldap_service_name }}.service.j2"
+    dest: "{{ aedir_systemd_dir }}/{{ openldap_service_name }}.service"
     owner: root
     group: root
     mode: 0o0644
   notify:
-    - "restart ae-slapd"
+    - "restart {{ openldap_service_name }}"
   when: aedir_service_manager == "systemd"
 
 - name: "Create client config file {{ openldap_path.conf_prefix }}/ldap.conf from template"
@@ -188,7 +188,7 @@
     group: root
     mode: 0o0644
   notify:
-    - "restart ae-slapd"
+    - "restart {{ openldap_service_name }}"
 
 - name: "Backup slapd databases in CRON job"
   cron:
@@ -201,14 +201,14 @@
     job: "{{ openldap_backup_script }}"
   when: openldap_role == 'provider'
 
-- name: "Create AppArmor profile ae-slapd"
+- name: "Create AppArmor profile {{ openldap_service_name }}"
   template:
-    src: "apparmor/ae-slapd.j2"
-    dest: "{{ apparmor_profiles_dir }}/ae-slapd"
+    src: "apparmor/{{ openldap_service_name }}.j2"
+    dest: "{{ apparmor_profiles_dir }}/{{ openldap_service_name }}"
     owner: root
     group: root
     mode: 0o0644
   notify:
     - "restart apparmor"
-    - "restart ae-slapd"
+    - "restart {{ openldap_service_name }}"
   when: apparmor_enabled == True

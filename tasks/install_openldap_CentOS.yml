@@ -27,7 +27,7 @@
     state: latest
     update_cache: yes
   notify:
-    - "restart ae-slapd"
+    - "restart {{ openldap_service_name }}"
 
 - name: "Fix ownership of LTB directory"
   file:
