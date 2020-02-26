@@ -49,13 +49,16 @@
     mode: 0o0755
 
 - name: "Copy mtail programs from {{ role_path }}/files/mtail/ to {{ aedir_etc }}/mtail/"
-  copy:
-    src: "{{ role_path }}/files/mtail/"
-    dest: "{{ aedir_etc }}/mtail/"
+  template:
+    src: "mtail/{{ item }}.mtail.j2"
+    dest: "{{ aedir_etc }}/mtail/{{ item }}.mtail"
     follow: no
     owner: root
     group: root
     mode: 0o0644
+  with_items:
+    - "{{ openldap_service_name }}"
+    - aedir_proc
 
 - block:
   - name: "Create directory for metrics text exports {{ aedir_metricsdir }}"

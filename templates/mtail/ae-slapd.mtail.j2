@@ -1,5 +1,5 @@
 # define constants for general some regex prefixes
-const SLAPD_CONN /^.*slapd\[\d+\]: conn=(?P<conn>\d+) /
+const SLAPD_CONN /^.* {{ openldap_service_name }}\[\d+\]: conn=(?P<conn>\d+) /
 const SLAPD_OP // + SLAPD_CONN + /op=(?P<op>\d+) /
 const SLAPD_FD // + SLAPD_CONN + /fd=(?P<fd>\d+) /
 
@@ -20,4 +20,12 @@ const SLAPD_ACCEPT_IPV4 // + SLAPD_ACCEPT_FROM + /IP=(?P<src>.+):\d+ \(IP=(?P<ds
 
 // + SLAPD_ACCEPT_IPV4 {
     slapd_conn_count[$src, $dst]++
+}
+
+counter slapd_deferring_operation by defer_type
+
+const SLAPD_DEFERRING /^.* {{ openldap_service_name }}\[\d+\]: connection_input: conn=(?P<conn>\d+) deferring operation: (?P<defer_type>.+)$/
+
+// + SLAPD_DEFERRING {
+    slapd_deferring_operation[$defer_type]++
 }
