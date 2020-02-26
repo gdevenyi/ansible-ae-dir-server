@@ -6,6 +6,9 @@ lsb_id_map:
   openSUSE: "SUSE"
   RedHatEnterpriseServer: "CentOS"
 
+# Service name for OpenLDAP slapd process
+openldap_service_name: "ae-slapd"
+
 # Maximum incoming LDAP PDU size for authenticated sessions
 openldap_sockbuf_max_incoming_auth_default:
   provider: 4194304
