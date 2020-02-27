@@ -10,7 +10,7 @@
     size=+100k
     notifempty
     missingok
-    create 640 root root
+    create 640 {{ apache_user }} {{ apache_group }}
     sharedscripts
     nocreate
     postrotate
