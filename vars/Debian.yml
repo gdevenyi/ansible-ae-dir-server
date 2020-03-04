@@ -5,9 +5,9 @@
 aedir_python_version: "3.7"
 
 aedir_package_repos:
-  "ltb_project_org":
-    repo: "deb https://ltb-project.org/debian/{{ ansible_lsb.codename }} {{ ansible_lsb.codename }} main"
-    key: "RPM-GPG-KEY-LTB-project"
+  "AE-DIR":
+    repo: "deb https://ae-dir.com/repo/debian/ {{ ansible_lsb.codename }} main"
+    key: "AE-DIR-project.gpg.key"
 
 # OS-specific Python paths
 aedir_python_paths:
@@ -20,15 +20,15 @@ virtualenv_command: "/usr/bin/python{{ aedir_python_version }} -m venv"
 # OS-specific maps
 openldap_path:
   # LTB-based installation
-  prefix: /usr/local/openldap
-  bin: /usr/local/openldap/bin
-  sbin: /usr/local/openldap/sbin
-  conf_prefix: /usr/local/openldap/etc/openldap
-  data: /usr/local/openldap/var/openldap-data
-  rundir: /usr/local/openldap/var/run
-  slapd_exec: /usr/local/openldap/libexec/slapd
-  libdir: /usr/local/openldap/lib64
-  modules: /usr/local/openldap/libexec/openldap
+  prefix: /opt/openldap-ms
+  bin: /opt/openldap-ms/bin
+  sbin: /opt/openldap-ms/sbin
+  conf_prefix: /opt/openldap-ms/etc/openldap
+  data: /opt/openldap-ms/var/openldap-data
+  rundir: /opt/openldap-ms/var/run
+  slapd_exec: /opt/openldap-ms/libexec/slapd
+  libdir: /opt/openldap-ms/lib64
+  modules: /opt/openldap-ms/libexec/openldap
 
 cron_config:
   service_name: "cron"

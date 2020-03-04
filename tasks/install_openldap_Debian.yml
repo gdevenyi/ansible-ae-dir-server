@@ -1,49 +1,29 @@
 ---
 # install OpenLDAP packages
 
-- name: "Add LTB OpenLDAP repository key"
+- name: "Add AE-DIR repository key"
   apt_key:
-    data: "{{ lookup('file', aedir_pkg_repos['ltb_project_org'].key) }}"
+    data: "{{ lookup('file', item.value.key) }}"
     state: present
+  with_dict: "{{ aedir_pkg_repos }}"
 
-- name: "Add LTB Debian repository"
+- name: "Add AE-DIR Debian repository"
   apt_repository:
-    filename: "ltb_project_org"
-    repo: "{{ aedir_pkg_repos['ltb_project_org'].repo }}"
+    filename: "{{ item.key }}"
+    repo: "{{ item.value.repo }}"
     state: present
     update_cache: yes
+  with_dict: "{{ aedir_pkg_repos }}"
 
-- name: "Install LTB OpenLDAP packages and dependencies"
+- name: "Install AE-DIR OpenLDAP packages and dependencies"
   apt:
     name:
-      - openldap-ltb
-      - openldap-ltb-contrib-overlays
-      - openldap-ltb-mdb-utils
-      - cracklib-runtime
+      - openldap-ms
+      - openldap-ms-contrib-overlays
+      - openldap-ms-mdb-utils
     state: latest
     update_cache: no
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
   notify:
     - "restart {{ openldap_service_name }}"
-
-- name: "Fix ownership of LTB directory"
-  file:
-    path: /usr/local/openldap
-    owner: root
-    group: root
-
-- name: "Fix ownership in LTB sub-directories"
-  file:
-    path: "{{ item }}"
-    owner: root
-    group: root
-    recurse: yes
-  with_items:
-    - /usr/local/openldap/bin
-    - /usr/local/openldap/etc
-    - /usr/local/openldap/include
-    - /usr/local/openldap/lib64
-    - /usr/local/openldap/libexec
-    - /usr/local/openldap/sbin
-    - /usr/local/openldap/share
