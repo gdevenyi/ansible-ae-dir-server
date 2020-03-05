@@ -13,7 +13,7 @@
     state: directory
     owner: "{{ apache_user }}"
     group: root
-    mode: 0o0750
+    mode: 0o0370
   notify:
     - "restart ae-apache"
 

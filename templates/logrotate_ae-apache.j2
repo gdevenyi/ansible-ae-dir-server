@@ -2,7 +2,6 @@
 # {{ ansible_managed }}
 #
 {{ apache_access_log }} {
-    su {{ apache_user }} {{ apache_group }}
     compress
     dateext
     maxage 365
@@ -10,7 +9,6 @@
     size=+100k
     notifempty
     missingok
-    create 640 {{ apache_user }} {{ apache_group }}
     sharedscripts
     nocreate
     postrotate
