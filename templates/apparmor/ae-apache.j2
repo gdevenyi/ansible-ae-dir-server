@@ -16,7 +16,9 @@ profile ae-apache {
   signal peer=@{profile_name},
 
   # access to dynamically loadable modules
-  {{ apache2_config.mod_dir }}/mod_*.so rm,
+{% for mod in apache2_config.modules %}
+  {{ apache2_config.mod_dir }}/mod_{{ mod }}.so rm,
+{% endfor %}
 
   # access to config files
   {{ apache_conf }} r,
