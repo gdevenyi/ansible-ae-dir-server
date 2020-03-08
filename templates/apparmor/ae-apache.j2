@@ -19,6 +19,9 @@ profile ae-apache {
 {% for mod in apache2_config.modules %}
   {{ apache2_config.mod_dir }}/mod_{{ mod }}.so rm,
 {% endfor %}
+{% if apache_status_urlpath %}
+  {{ apache2_config.mod_dir }}/mod_status.so rm,
+{% endif %}
 
   # access to config files
   {{ apache_conf }} r,

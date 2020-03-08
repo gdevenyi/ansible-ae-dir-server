@@ -65,7 +65,6 @@ apache2_config:
     - logio
     - proxy
     - proxy_uwsgi
-    - status
 
 web2ldap_paths:
   configdir: "/etc/web2ldap"

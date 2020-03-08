@@ -833,6 +833,10 @@ apache_access_log: "/var/log/ae-apache/access.log"
 # Apache LogLevel value
 apache_log_level: "info"
 
+# URL path to server-status info provided by mod_status
+# (set to empty string to disable)
+apache_status_urlpath: "/server-status"
+
 # see https://httpd.apache.org/docs/2.4/mod/mod_log_config.html#formats
 apache_log_format: !unsafe '{ \"time\":\"%{%Y-%m-%dT%H:%M:%S%z}t\", \"ip\":\"%h\", \"url\":\"%U\", \"query\":\"%q\", \"method\":\"%m\", \"status\":\"%>s\", \"ua\":\"%{User-agent}i\", \"ref\":\"%{Referer}i\", \"reqid\":\"%L\", \"in\":%I, \"out\":%O, \"rbody\":%B, \"etime\":%D, \"tls_proto\":\"%{SSL_PROTOCOL}x\", \"tls_cipher\":\"%{SSL_CIPHER}x\" }'
 

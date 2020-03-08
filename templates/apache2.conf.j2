@@ -10,6 +10,9 @@
 {% for mod in apache2_config.modules %}
 LoadModule {{ mod }}_module {{ apache2_config.mod_dir }}/mod_{{ mod }}.so
 {% endfor %}
+{% if apache_status_urlpath %}
+LoadModule status_module {{ apache2_config.mod_dir }}/mod_status.so
+{% endif %}
 
 ServerTokens ProductOnly
 ServerAdmin {{ apache_server_admin }}
@@ -85,6 +88,8 @@ Header always set Referrer-Policy "same-origin"
 ProxyRequests Off
 ProxyPreserveHost On
 
+{% if apache_status_urlpath %}
+# Strictly local virtual host for exposing metrics via mod_status
 <VirtualHost 127.0.0.1:80>
 
   ServerName localhost
@@ -93,12 +98,13 @@ ProxyPreserveHost On
   # turn off access log for requests coming from loopback interface
   CustomLog /dev/null "-" "expr=-R '127.0.0.1/32'"
 
-  <Location /server-status>
+  <Location {{ apache_status_urlpath }}>
     SetHandler server-status
     Require ip 127.0.0.1
   </Location>
 
 </VirtualHost>
+{% endif %}
 
 <VirtualHost _default_:80>
 

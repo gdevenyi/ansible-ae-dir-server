@@ -61,7 +61,6 @@ apache2_config:
     - filter
     - proxy
     - proxy_uwsgi
-    - status
 
 web2ldap_paths:
   configdir: "{{ aedir_prefix }}/etc/web2ldap"
