@@ -40,18 +40,10 @@
     group: root
     mode: 0o0755
 
-- name: "Create directory for mtail programs at {{ aedir_etc }}/mtail/"
-  file:
-    path: "{{ aedir_etc }}/mtail/"
-    state: directory
-    owner: root
-    group: root
-    mode: 0o0755
-
-- name: "Copy mtail programs from {{ role_path }}/files/mtail/ to {{ aedir_etc }}/mtail/"
+- name: "Copy mtail programs from {{ role_path }}/files/mtail/ to {{ mtail_progs }}/"
   template:
     src: "mtail/{{ item }}.mtail.j2"
-    dest: "{{ aedir_etc }}/mtail/{{ item }}.mtail"
+    dest: "{{ mtail_progs }}/{{ item }}.mtail"
     follow: no
     owner: root
     group: root
@@ -59,6 +51,7 @@
   with_items:
     - "{{ openldap_service_name }}"
     - aedir_proc
+  when: mtail_progs is defined
 
 - block:
   - name: "Create directory for metrics text exports {{ aedir_metricsdir }}"
