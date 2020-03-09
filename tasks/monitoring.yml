@@ -40,7 +40,7 @@
     group: root
     mode: 0o0755
 
-- name: "Copy mtail programs from {{ role_path }}/files/mtail/ to {{ mtail_progs }}/"
+- name: "Copy mtail programs to {{ mtail_progs }}/"
   template:
     src: "mtail/{{ item }}.mtail.j2"
     dest: "{{ mtail_progs }}/{{ item }}.mtail"
