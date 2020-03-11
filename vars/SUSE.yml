@@ -2,7 +2,7 @@
 # vars file for roles/ae-dir-server
 
 # explicit use of a specific Python version
-aedir_python_version: "{{ '3.7' if ansible_lsb.description == 'openSUSE Tumbleweed' else '3.6' }}"
+aedir_python_version: "{{ '3.8' if ansible_lsb.description == 'openSUSE Tumbleweed' else '3.6' }}"
 
 # which repos on https://download.opensuse.org to use for openSUSE or SLES versions
 aedir_suse_repo:
