@@ -66,9 +66,9 @@ AllowEncodedSlashes Off
 AddDefaultCharset Off
 
 # for non-SSL vhost
-Listen 0.0.0.0:80
+Listen 80
 # for SSL vhost
-Listen 0.0.0.0:443
+Listen 443
 
 # SSL Session Resumption
 SSLSessionCache        shmcb:{{ apache2_config.run_dir }}/ssl_scache(512000)
@@ -90,7 +90,7 @@ ProxyPreserveHost On
 
 {% if apache_status_urlpath %}
 # Strictly local virtual host for exposing metrics via mod_status
-<VirtualHost 127.0.0.1:80>
+<VirtualHost 127.0.0.1:80 [::1]:80>
 
   ServerName localhost
   SSLEngine off
@@ -101,6 +101,7 @@ ProxyPreserveHost On
   <Location {{ apache_status_urlpath }}>
     SetHandler server-status
     Require ip 127.0.0.1
+    Require ip ::1
   </Location>
 
 </VirtualHost>
