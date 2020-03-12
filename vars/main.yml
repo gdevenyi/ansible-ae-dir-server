@@ -19,10 +19,3 @@ systemd_systemcallfilter:
   default: "~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete @chown @timer @privileged"
   apache: "~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete"
   web2ldap: "~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete @chown @privileged"
-
-python_env:
-  - "PYTHONBREAKPOINT=0"
-  - "PYTHONOPTIMIZE=2"
-  - "PYTHONDONTWRITEBYTECODE=1"
-  - "PYTHONWARNINGS=error"
-  - "PYTHONNOUSERSITE=1"

@@ -10,11 +10,11 @@ export LDAPNOINIT
 LD_LIBRARY_PATH="{{ slapd_check_lib_dirs|join(':') }}:${LD_LIBRARY_PATH}"
 export LD_LIBRARY_PATH
 
-# some options for Python interpreter
-PYTHONDONTWRITEBYTECODE=1
-export PYTHONDONTWRITEBYTECODE
-PYTHONWARNINGS=error
-export PYTHONWARNINGS
+# some env vars set for Python interpreter
+{% for evar in aedir_python_env %}
+{{ evar.name }}={{ evar.value }}
+export {{ evar.name }}
+{% endfor %}
 
 {{ aedir_python }} -m slapdcheck.metrics \
   '{{ openldap_ldapi_uri }}' \

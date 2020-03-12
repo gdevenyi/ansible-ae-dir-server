@@ -1,7 +1,7 @@
 ---
 # Install CRON jobs
 
-- name: "Set env vars in {{ aedir_cron_file }}"
+- name: "Set general env vars in {{ aedir_cron_file }}"
   cron:
     env: yes
     name: "{{ item.key }}"
@@ -15,10 +15,17 @@
     LD_LIBRARY_PATH: "{{ openldap_path.libdir }}"
     LDAPRC: "{{ aedir_etc }}/ldap.conf"
     PYTHONPATH: "{{ aedir_etc }}/ae-dir-pwd"
-    PYTHONOPTIMIZE: "2"
-    PYTHONDONTWRITEBYTECODE: "1"
-    PYTHONWARNINGS: "error"
     AE_LOGGER_QUALNAME: "{{ aedir_logging_qualname }}"
+
+- name: "Set Python env vars in {{ aedir_cron_file }}"
+  cron:
+    env: yes
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    state: present
+    user: root
+    cron_file: "{{ aedir_cron_file }}"
+  with_items: "{{ aedir_python_env }}"
 
 - name: "Remove metrics text export CRON job"
   cron:
