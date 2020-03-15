@@ -16,10 +16,18 @@ counter slapd_conn_count by src, dst
 
 const SLAPD_ACCEPT_FROM // + SLAPD_FD + /ACCEPT from /
 
-const SLAPD_ACCEPT_IPV4 // + SLAPD_ACCEPT_FROM + /IP=(?P<src>.+):\d+ \(IP=(?P<dst>.+)\)$/
+# this extracts TCP/IP connections
+const SLAPD_ACCEPT_IP // + SLAPD_ACCEPT_FROM + /IP=(?P<src>.+):\d+ \(IP=(?P<dst>.+)\)$/
 
-// + SLAPD_ACCEPT_IPV4 {
+// + SLAPD_ACCEPT_IP {
     slapd_conn_count[$src, $dst]++
+}
+
+# this extracts LDAPI connections
+const SLAPD_ACCEPT_PATH // + SLAPD_ACCEPT_FROM + /PATH=(?P<src>[^ ]+) \(PATH=(?P<dst>.+)\)$/
+
+// + SLAPD_ACCEPT_PATH {
+    slapd_conn_count["ldapi", $dst]++
 }
 
 counter slapd_deferring_operation by defer_type
