@@ -104,7 +104,7 @@ aedir_metricsdir: ""
 aedir_python: "{{ aedir_python_paths.python_exec }} -ROOBs"
 
 # which value to set for PYTHONWARNINGS
-aedir_python_warnings: "{{ 'default' if aedir_python_version == '3.8' else 'error' }}"
+aedir_python_warnings: "default"
 
 # environment variables set when running Python code
 aedir_python_env:
