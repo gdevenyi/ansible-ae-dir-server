@@ -3,6 +3,38 @@
 #######################################################################
 
 #---------------------------------------------------------------------------
+# Load dynamic backend modules:
+#---------------------------------------------------------------------------
+
+moduleload back_mdb
+moduleload back_monitor
+moduleload back_sock
+
+#---------------------------------------------------------------------------
+# Load dynamic overlay modules:
+#---------------------------------------------------------------------------
+
+moduleload accesslog
+moduleload ppolicy
+moduleload memberof
+moduleload rwm
+# on provider *and* consumer as a work-around for ITS#8396
+moduleload syncprov
+
+# contrib modules
+moduleload lastbind
+moduleload deref
+moduleload noopsrch
+
+{% if openldap_role=="provider" %}
+# only on provider replicas
+moduleload sssvlv
+moduleload constraint
+moduleload refint
+moduleload unique
+{% endif %}
+
+#---------------------------------------------------------------------------
 # Include schema files
 #---------------------------------------------------------------------------
 
@@ -55,42 +87,6 @@ include {{ aedir_schema_prefix }}/ae-dir-session.schema
 # Where PID and arg files are stored
 pidfile {{ openldap_rundir }}/slapd.pid
 argsfile {{ openldap_rundir }}/slapd.args
-
-#---------------------------------------------------------------------------
-# Load dynamic backend modules:
-#---------------------------------------------------------------------------
-
-moduleload back_mdb
-moduleload back_monitor
-moduleload back_sock
-
-#---------------------------------------------------------------------------
-# Load dynamic overlay modules:
-#---------------------------------------------------------------------------
-
-moduleload accesslog
-moduleload ppolicy
-moduleload memberof
-moduleload rwm
-# on provider *and* consumer as a work-around for ITS#8396
-moduleload syncprov
-
-# contrib modules
-moduleload lastbind
-moduleload deref
-moduleload noopsrch
-
-{% if openldap_role=="provider" %}
-# only on provider replicas
-moduleload sssvlv
-moduleload constraint
-moduleload refint
-moduleload unique
-{% endif %}
-
-#---------------------------------------------------------------------------
-# slapd process parameters
-#---------------------------------------------------------------------------
 
 {% if openldap_role=="provider" %}
 # serverID must be unique across all provider replicas
