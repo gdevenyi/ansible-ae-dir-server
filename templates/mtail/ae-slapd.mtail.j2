@@ -1,9 +1,11 @@
 # define constants for general some regex prefixes
 const SLAPD_CONN /^.* {{ openldap_service_name }}\[\d+\]: conn=(?P<conn>\d+) /
-const SLAPD_OP // + SLAPD_CONN + /op=(?P<op>\d+) /
+const SLAPD_OP // + SLAPD_CONN + /op=(?P<op>\d+)( | \[(|IP=[^ ]+)[ ]*(|NAME=[^ ]+)[ ]*(|USERNAME=[^ ]+)\])/
 const SLAPD_FD // + SLAPD_CONN + /fd=(?P<fd>\d+) /
 
 # count RESULT lines with type (tag=) and LDAP result code (err=)
+#---------------------------------------------------------------------------
+
 counter slapd_result_count by tag, err
 
 const SLAPD_RESULT // + SLAPD_OP + /.*RESULT tag=(?P<tag>\d+) (oid=(?P<oid>\d+) )*err=(?P<err>\d+) (nentries=(?P<nentries>\d+) )*text=.*$/
@@ -11,6 +13,9 @@ const SLAPD_RESULT // + SLAPD_OP + /.*RESULT tag=(?P<tag>\d+) (oid=(?P<oid>\d+) 
 // + SLAPD_RESULT {
     slapd_result_count[$tag, $err]++
 }
+
+# count ACCEPT lines with source and destination address
+#---------------------------------------------------------------------------
 
 counter slapd_conn_count by src, dst
 
@@ -29,6 +34,9 @@ const SLAPD_ACCEPT_PATH // + SLAPD_ACCEPT_FROM + /PATH=(?P<src>[^ ]+) \(PATH=(?P
 // + SLAPD_ACCEPT_PATH {
     slapd_conn_count["ldapi", $dst]++
 }
+
+# count "deferring" messages
+#---------------------------------------------------------------------------
 
 counter slapd_deferring_operation by defer_type
 
