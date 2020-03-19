@@ -9,8 +9,8 @@
     - inventory_dir
     - playbook_dir
     - role_path
-    - aedir_templates_dirs
     - aedir_files_dirs
+    - aedir_templates_dirs
   tags:
     - always
 
@@ -31,6 +31,15 @@
 - name: "Include OS-specific variables"
   include_vars:
     file: "{{ lsb_id }}.yml"
+  tags:
+    - always
+
+- debug:
+    var: "{{ item }}"
+    verbosity: 1
+  with_items:
+    - aedir_python
+    - aedir_cron_file
   tags:
     - always
 
