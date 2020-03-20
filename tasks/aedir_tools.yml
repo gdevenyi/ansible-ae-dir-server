@@ -37,6 +37,14 @@
     group: root
     mode: 0o0750
 
+- name: "Install database ownership/permissions fixup script"
+  template:
+    src: "scripts/ae-dir-fix-db-permissions.sh.j2"
+    dest: "{{ aedir_sbin }}/ae-dir-fix-db-permissions.sh"
+    owner: root
+    group: root
+    mode: 0o0750
+
 - name: "Create /etc/profile.d/ae-dir.sh"
   template:
     src: "templates/profile-ae-dir.sh.j2"

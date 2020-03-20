@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Don't use uninitialized vars
+set -o nounset
+# After here exit on any error
+set -e
+
+# set ownership
+chown -c {{ openldap_slapd_user }}:{{ openldap_slapd_group }} {{ openldap_data }}/*/*.mdb
+
+# set permissions
+chmod -c 0600 {{ openldap_data }}/*/*.mdb
