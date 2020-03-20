@@ -29,7 +29,7 @@
     mode: u=rw,g=r,o=r
     directory_mode: u=rwx,g=rx,o=rx
 
-- name: "Install replica reset script from template"
+- name: "Install replica reset script"
   template:
     src: "scripts/ae-dir-replica-reset.sh.j2"
     dest: "{{ aedir_sbin }}/ae-dir-replica-reset.sh"

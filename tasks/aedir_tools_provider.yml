@@ -10,7 +10,7 @@
     mode: 0o0600
   when: aedir_init is defined
 
-- name: "Install backup script from template"
+- name: "Install backup script"
   template:
     src: "scripts/ae-dir-slapcat.sh.j2"
     dest: "{{ aedir_sbin }}/ae-dir-slapcat.sh"
