@@ -25,8 +25,11 @@ ExecStart={{ aedir_python }} -m oathldap_srv.{{ oath_bind_listener }} "{{ oath_l
 User={{ oath_listener_user }}
 Group={{ oath_listener_user }}
 RestrictAddressFamilies=AF_UNIX
-{% if apparmor_enabled %}
-AppArmorProfile={{ oath_bind_listener }}
+{% if aedir_systemd_logging %}
+# various logging options from ansible var aedir_systemd_logging
+{% for systemd_option in aedir_systemd_logging %}
+{{ systemd_option }}
+{% endfor %}
 {% endif %}
 {% if aedir_systemd_hardening %}
 # various hardening options from ansible var aedir_systemd_hardening
@@ -35,6 +38,9 @@ AppArmorProfile={{ oath_bind_listener }}
 {% endfor %}
 {% endif %}
 SystemCallFilter={{ systemd_systemcallfilter.default }}
+{% if apparmor_enabled %}
+AppArmorProfile={{ oath_bind_listener }}
+{% endif %}
 
 [Install]
 WantedBy=multi-user.target

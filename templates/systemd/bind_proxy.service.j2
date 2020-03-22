@@ -23,12 +23,14 @@ Environment={{ evar.name }}={{ evar.value }}
 {% endfor %}
 Environment=LDAPTLS_CACERT={{ openldap_cacert_pathname }}
 ExecStart={{ aedir_python }} -m oathldap_srv.{{ oath_bind_listener }} "{{ oath_ldap_socket_path }}" "{{ openldap_ldapi_uri|replace('%','%%') }}????x-saslmech=EXTERNAL" {% for host in openldap_syncrepl_providers %} ldaps://{{ hostvars[host].get('openldap_service_fqdn',host) }}{% endfor %}
-
 User={{ oath_listener_user }}
 Group={{ oath_listener_user }}
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
-{% if apparmor_enabled %}
-AppArmorProfile={{ oath_bind_listener }}
+{% if aedir_systemd_logging %}
+# various logging options from ansible var aedir_systemd_logging
+{% for systemd_option in aedir_systemd_logging %}
+{{ systemd_option }}
+{% endfor %}
 {% endif %}
 {% if aedir_systemd_hardening %}
 # various hardening options from ansible var aedir_systemd_hardening
@@ -37,6 +39,9 @@ AppArmorProfile={{ oath_bind_listener }}
 {% endfor %}
 {% endif %}
 SystemCallFilter={{ systemd_systemcallfilter.default }}
+{% if apparmor_enabled %}
+AppArmorProfile={{ oath_bind_listener }}
+{% endif %}
 
 [Install]
 WantedBy=multi-user.target

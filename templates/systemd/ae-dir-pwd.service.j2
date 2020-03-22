@@ -28,10 +28,12 @@ User=ae-dir-pwd
 Group=ae-dir-pwd
 Restart=always
 KillSignal=SIGQUIT
-StandardError=syslog
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
-{% if apparmor_enabled %}
-AppArmorProfile=ae-dir-pwd
+{% if aedir_systemd_logging %}
+# various logging options from ansible var aedir_systemd_logging
+{% for systemd_option in aedir_systemd_logging %}
+{{ systemd_option }}
+{% endfor %}
 {% endif %}
 {% if aedir_systemd_hardening %}
 # various hardening options from ansible var aedir_systemd_hardening
@@ -40,6 +42,9 @@ AppArmorProfile=ae-dir-pwd
 {% endfor %}
 {% endif %}
 SystemCallFilter={{ systemd_systemcallfilter.default }}
+{% if apparmor_enabled %}
+AppArmorProfile=ae-dir-pwd
+{% endif %}
 
 [Install]
 WantedBy=multi-user.target

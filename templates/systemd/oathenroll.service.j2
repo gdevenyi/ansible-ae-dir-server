@@ -29,10 +29,12 @@ User={{ oath_ldap_oathenroll_web_user }}
 Group={{ oath_ldap_oathenroll_web_group }}
 Restart=always
 KillSignal=SIGQUIT
-StandardError=syslog
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
-{% if apparmor_enabled %}
-AppArmorProfile=oathenroll
+{% if aedir_systemd_logging %}
+# various logging options from ansible var aedir_systemd_logging
+{% for systemd_option in aedir_systemd_logging %}
+{{ systemd_option }}
+{% endfor %}
 {% endif %}
 {% if aedir_systemd_hardening %}
 # various hardening options from ansible var aedir_systemd_hardening
@@ -41,6 +43,9 @@ AppArmorProfile=oathenroll
 {% endfor %}
 {% endif %}
 SystemCallFilter={{ systemd_systemcallfilter.default }}
+{% if apparmor_enabled %}
+AppArmorProfile=oathenroll
+{% endif %}
 
 [Install]
 WantedBy=multi-user.target

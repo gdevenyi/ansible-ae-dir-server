@@ -28,11 +28,12 @@ User={{ web2ldap_user }}
 Group={{ web2ldap_group }}
 LimitNOFILE={{ web2ldap_session_limit * 4 }}
 Restart=always
-KillSignal=SIGQUIT
-StandardError=syslog
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
-{% if apparmor_enabled %}
-AppArmorProfile=web2ldap
+{% if aedir_systemd_logging %}
+# various logging options from ansible var aedir_systemd_logging
+{% for systemd_option in aedir_systemd_logging %}
+{{ systemd_option }}
+{% endfor %}
 {% endif %}
 {% if aedir_systemd_hardening %}
 # various hardening options from ansible var aedir_systemd_hardening
@@ -41,6 +42,9 @@ AppArmorProfile=web2ldap
 {% endfor %}
 {% endif %}
 SystemCallFilter={{ systemd_systemcallfilter.web2ldap }}
+{% if apparmor_enabled %}
+AppArmorProfile=web2ldap
+{% endif %}
 
 [Install]
 WantedBy=multi-user.target

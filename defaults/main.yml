@@ -131,6 +131,11 @@ aedir_logging_conf: "ae-logging.conf.j2"
 # qualifier name set to choose a specific logger from the logging config
 aedir_logging_qualname: "aedir.syslog"
 
+# logging related systemd options
+aedir_systemd_logging:
+  - "StandardOutput=null"
+  - "StandardError=syslog"
+
 # various systemd.exec options for hardening the service units
 aedir_systemd_hardening:
   - "PrivateUsers=no"
