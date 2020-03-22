@@ -28,7 +28,6 @@ ExecStart={{ uwsgi_paths.exec }} --strict --ini {{ aedir_etc }}/uwsgi/oathenroll
 User={{ oath_ldap_oathenroll_web_user }}
 Group={{ oath_ldap_oathenroll_web_group }}
 Restart=always
-KillSignal=SIGQUIT
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 {% if aedir_systemd_logging %}
 # various logging options from ansible var aedir_systemd_logging

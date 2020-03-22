@@ -27,7 +27,6 @@ ExecStart={{ uwsgi_paths.exec }} --strict --ini {{ aedir_etc }}/uwsgi/ae-dir-pwd
 User=ae-dir-pwd
 Group=ae-dir-pwd
 Restart=always
-KillSignal=SIGQUIT
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 {% if aedir_systemd_logging %}
 # various logging options from ansible var aedir_systemd_logging
