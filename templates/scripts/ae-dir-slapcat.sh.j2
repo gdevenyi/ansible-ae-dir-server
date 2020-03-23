@@ -11,7 +11,7 @@ DATETIME="$(date +%Y%m%d%H%M%S)"
 # strict permissions
 umask 077
 
-# slapcat all real database backends found
+# export all real database backends found to LDIF time-stamped files
 {{ openldap_path.bin }}/ldapsearch \
   -Q \
   -LLL \
