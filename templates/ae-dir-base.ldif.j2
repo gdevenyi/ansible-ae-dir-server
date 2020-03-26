@@ -787,9 +787,17 @@ objectClass: aeGroup
 member: uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}
 member: uid=ae-dir-bind-proxy,cn=ae,{{ aedir_suffix }}
 member: uid={{ oath_ldap_oathenroll_web_user }},cn=ae,{{ aedir_suffix }}
+{% endif %}
+{% if aedir_pwsync_targeturl %}
+member: uid=ae-dir-pwsync,cn=ae,{{ aedir_suffix }}
+{% endif %}
+{% if oath_ldap_enabled==True %}
 memberUid: ae-dir-otpverify
 memberUid: ae-dir-bind-proxy
 memberUid: {{ oath_ldap_oathenroll_web_user }}
+{% endif %}
+{% if aedir_pwsync_targeturl %}
+memberUid: ae-dir-pwsync
 {% endif %}
 {% if gid_number.append(1) -%}{% endif %}
 
