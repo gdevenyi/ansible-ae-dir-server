@@ -734,6 +734,7 @@ oath_ldap_keys_dir: "{{ aedir_etc }}/oath-master-keys"
 
 # If variable oath_ldap_key_files is defined all files *.pub and *.key
 # found therein are installed to directory defined with oath_ldap_keys_dir
+# *.key files should be protected with ansible vault or similar
 #oath_ldap_key_files: "{{ inventory_dir }}/files/oath-master-keys/"
 
 # Directory path where Unix domain socket is created
