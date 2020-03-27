@@ -181,6 +181,11 @@ aedir_aedept_deptnumber_regex: "[a-zA-Z0-9_.:/-]+"
 aedir_aeservice_sshpubkey_regex: "(ssh-rsa|ecdsa-sha2-nistp256|ecdsa-sha2-nistp384|ecdsa-sha2-nistp521|ssh-ed25519) [A-Za-z0-9+=/]+ .+"
 aedir_aeuser_sshpubkey_regex: "(ssh-rsa|ecdsa-sha2-nistp256|ecdsa-sha2-nistp384|ecdsa-sha2-nistp521|ssh-ed25519) [A-Za-z0-9+=/]+ .+"
 
+# filter for self-service ACL for attribute sshPublicKey
+# set to empty string for disabling the self-service ACL
+#aedir_sshpublickey_self_filter: "(&(objectClass=aeUser)(oathToken=*))"
+aedir_sshpublickey_self_filter: ""
+
 # List of possible SSH key permissions/option values in
 # attribute 'aeSSHPermissions'
 # Note:

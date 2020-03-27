@@ -859,6 +859,16 @@ access to
     by self write
     by * none break
 
+{% if aedir_sshpublickey_self_filter %}
+# users can maintain own sshPublicKey attribute
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="{{ aedir_sshpublickey_self_filter }}"
+  attrs=sshPublicKey
+    by self write
+    by * none break
+{% endif %}
+
 {% include 'service_access.conf.j2' %}
 
 # Last catch ACLs
