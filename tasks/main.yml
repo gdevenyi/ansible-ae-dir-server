@@ -205,3 +205,10 @@
       include_tasks: "services.yml"
   tags:
     - services
+
+- block:
+    - name: "Tasks for loading initial data"
+      include_tasks: "aedir_init.yml"
+  when: aedir_init is defined and openldap_role == "provider"
+  tags:
+    - init

@@ -1,0 +1,11 @@
+---
+
+# initial load of main provider
+
+- name: "Create ae-dir-base.ldif"
+  template:
+    src: "ae-dir-base.ldif.j2"
+    dest: "{{ aedir_etc }}/ae-dir-base.ldif"
+    owner: root
+    group: root
+    mode: 0o0600

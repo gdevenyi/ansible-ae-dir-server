@@ -104,6 +104,17 @@
     - "restart {{ openldap_service_name }}"
     - "restart ae-apache"
 
+- name: "Extract subject DN of server cert"
+  command: "openssl x509 -in {{ openldap_cert_filename }} -noout -nameopt rfc2253 -subject"
+  delegate_to: 127.0.0.1
+  become: no
+  register: openldap_cert_subject
+
+- name: "Store subject DN of server cert as host fact"
+  set_fact:
+    cacheable: yes
+    openldap_cert_subject: "{{ openldap_cert_subject.stdout[8:] }}"
+
 - name: "TLS server key file ownership/permissions"
   file:
     path: "{{ openldap_key_pathname }}"

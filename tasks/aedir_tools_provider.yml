@@ -1,15 +1,6 @@
 ---
 # Tasks on providers after AE-DIR tools installation
 
-- name: "Create ae-dir-base.ldif"
-  template:
-    src: "ae-dir-base.ldif.j2"
-    dest: "{{ aedir_etc }}/ae-dir-base.ldif"
-    owner: root
-    group: root
-    mode: 0o0600
-  when: aedir_init is defined
-
 - name: "Install backup script"
   template:
     src: "scripts/ae-dir-slapcat.sh.j2"
