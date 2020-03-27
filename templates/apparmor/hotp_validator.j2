@@ -7,7 +7,7 @@ profile {{ oath_bind_listener }} {
 
   #include <ae-dir/abstractions/oath_bind_listener>
 
-  {{ aedir_etc }}/oath-master-keys/ r,
-  {{ aedir_etc }}/oath-master-keys/* r,
+  {{ oath_ldap_keys_dir }}/ r,
+  {{ oath_ldap_keys_dir }}/* r,
 
 }

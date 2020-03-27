@@ -19,9 +19,9 @@
     system: yes
     createhome: no
 
-- name: "Create OATH master key directory {{ aedir_etc }}/oath-master-keys"
+- name: "Create OATH master key directory {{ oath_ldap_keys_dir }}"
   file:
-    path: "{{ aedir_etc }}/oath-master-keys"
+    path: "{{ oath_ldap_keys_dir }}"
     state: directory
     owner: root
     group: "{{ oath_listener_user }}"
@@ -30,9 +30,22 @@
   notify:
     - "restart {{ oath_bind_listener }}"
 
-- name: "List OATH master key file(s)"
+- name: "List OATH master key file(s) to {{ oath_ldap_keys_dir }}"
+  copy:
+    src: "{{ item }}"
+    dest: "{{ oath_ldap_keys_dir }}/{{ item|basename }}"
+    owner: root
+    group: "{{ oath_listener_user }}"
+    mode: 0o0640
+  notify: "restart hotp_validator"
+  with_fileglob:
+    - "{{ oath_ldap_key_files }}/*.priv"
+    - "{{ oath_ldap_key_files }}/*.pub"
+  when: oath_ldap_key_files is defined
+
+- name: "List OATH master key file(s) in {{ oath_ldap_keys_dir }}"
   find:
-    paths: "{{ aedir_etc }}/oath-master-keys"
+    paths: "{{ oath_ldap_keys_dir }}"
   when: openldap_role=="provider"
   register: master_keys
   changed_when: False

@@ -729,6 +729,13 @@ oath_bind_listener: "{{ oath_dict[openldap_role].bind_listener }}"
 # System user used to start bind listener
 oath_listener_user: "{{ oath_dict[openldap_role].user }}"
 
+# Directory path where OATH-LDAP master keys are stored
+oath_ldap_keys_dir: "{{ aedir_etc }}/oath-master-keys"
+
+# If variable oath_ldap_key_files is defined all files *.pub and *.key
+# found therein are installed to directory defined with oath_ldap_keys_dir
+#oath_ldap_key_files: "{{ inventory_dir }}/files/oath-master-keys/"
+
 # Directory path where Unix domain socket is created
 oath_ldap_socket_dir: "{{ aedir_rundir }}/{{ oath_bind_listener }}"
 # Full pathname of Unix domain socket of bind listener
