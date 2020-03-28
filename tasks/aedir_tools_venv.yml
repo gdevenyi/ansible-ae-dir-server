@@ -20,7 +20,7 @@
       - jwcrypto
       - pyasn1>=0.4.5
       - pyasn1_modules>=0.2.5
-      - ldap0>=0.6.10
+      - ldap0>=1.0.0
       - aedir>=0.8.5
       - psutil>=5.6.7
       - prometheus_client>=0.7.1
