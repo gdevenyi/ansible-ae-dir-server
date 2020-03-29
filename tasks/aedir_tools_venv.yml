@@ -63,7 +63,16 @@
     - restart hotp_validator
     - restart web2ldap
 
-- name: "PIP install aedir_pproc in virtualenv {{ aedir_prefix }} on {{ openldap_role }} on {{ lsb_id }}"
+- name: "PIP install aedir_cli in virtualenv on provider"
+  pip:
+    name:
+      - aedir_cli>=1.0.0
+    state: present
+    virtualenv: "{{ aedir_prefix }}"
+    extra_args: "{{ aedir_pip_extra_args }}"
+  when: openldap_role == 'provider'
+
+- name: "PIP install aedir_pproc in virtualenv on provider"
   pip:
     name:
       - aedir_pproc>=0.6.0

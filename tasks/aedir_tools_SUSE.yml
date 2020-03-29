@@ -51,7 +51,16 @@
     - restart hotp_validator
     - restart web2ldap
 
-- name: "Install ae-dir-pproc on {{ openldap_role }} on {{ lsb_id }}"
+- name: "Install ae-dir-cli on provider"
+  zypper:
+    name:
+      - ae-dir-cli >= 1.0.0
+    state: present
+    disable_recommends: yes
+    type: package
+  when: openldap_role == 'provider'
+
+- name: "Install ae-dir-pproc on provider"
   zypper:
     name:
       - ae-dir-pproc >= 0.6.0
