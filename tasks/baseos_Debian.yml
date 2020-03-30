@@ -10,6 +10,7 @@
       - "{{ cron_pkg_name }}"
       - gzip
       - gpg
+      - gpg-agent
       - openssl
       - python3
       - tar
