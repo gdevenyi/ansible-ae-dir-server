@@ -168,7 +168,7 @@
 
 - block:
     - name: "OATH-LDAP tasks on {{ openldap_role }}"
-      include_tasks: "oath-ldap.yml"
+      include_tasks: "oath_ldap.yml"
       when: oath_ldap_enabled == True
   tags:
     - oath
