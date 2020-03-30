@@ -789,7 +789,7 @@ cron_pkg_name: "{{ cron_config.pkg_name }}"
 slapd_checkmk_local: "{{ aedir_sbin }}"
 
 # fully-qualified domain name of local LDAPS service
-slapd_check_service_fqdn: "{{ ansible_fqdn }}"
+slapd_check_service_fqdn: "{{ inventory_hostname }}"
 
 # local LDAPS URI
 slapd_check_ldaps_uri: "ldaps://{{ slapd_check_service_fqdn }}"

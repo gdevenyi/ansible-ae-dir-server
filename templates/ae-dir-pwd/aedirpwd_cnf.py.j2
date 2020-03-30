@@ -76,7 +76,7 @@ SMTP_DEBUGLEVEL = 0
 
 # Hostname to be sent in EHLO request,
 # set to None for automatically using the local hostname
-SMTP_LOCALHOSTNAME = '{{ ansible_fqdn }}'
+SMTP_LOCALHOSTNAME = '{{ inventory_hostname }}'
 
 # Path name of file containing CA certificates used to validate TLS server certs
 SMTP_TLS_CACERTS = '{{ smtp_cacert_pathname }}'
