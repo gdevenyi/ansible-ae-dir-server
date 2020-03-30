@@ -75,7 +75,7 @@
 - name: "PIP install aedir_pproc in virtualenv on provider"
   pip:
     name:
-      - aedir_pproc>=0.6.0
+      - aedir_pproc>=1.0.0
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
