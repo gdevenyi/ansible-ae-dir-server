@@ -9,6 +9,7 @@
       - "{{ cron_pkg_name }}"
       - tar
       - gzip
+      - gpg2
       - ca-certificates
       - python3-base
       - zypper

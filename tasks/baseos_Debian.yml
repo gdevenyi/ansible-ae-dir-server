@@ -9,6 +9,7 @@
       - ca-certificates
       - "{{ cron_pkg_name }}"
       - gzip
+      - gpg
       - openssl
       - python3
       - tar
