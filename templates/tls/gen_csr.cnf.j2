@@ -9,7 +9,6 @@
 [ req ]
 
 default_bits = 2048
-distinguished_name = csr_dn
 encrypt_rsa_key = no
 encrypt_key = no
 attributes = csr_attributes
@@ -17,15 +16,6 @@ req_extensions = csr_extensions
 default_md = sha256
 string_mask = utf8only
 prompt = no
-
-[ csr_dn ]
-
-countryName = "CO"
-stateOrProvinceName = "Edit ST"
-localityName = "Edit L"
-organizationName = "Edit O"
-organizationalUnitName = "Edit OU"
-commonName = "{{ openldap_service_fqdn }}"
 
 [ csr_attributes ]
 

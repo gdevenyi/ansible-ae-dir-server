@@ -593,7 +593,10 @@ openldap_password_hash: "{CRYPT}"
 # SHA-512, 128 bits of salt, 20000 iterations (see also crypt(3) man page)
 openldap_password_crypt_salt_format: "$6$rounds=20000$%.16s"
 
-# subject alternative names for gen_csr.sh in OpenSSL syntax
+# subject alternative names in CSRs
+openldap_csr_subjectdn: "/{{ openldap_tls_cert_suffixes[0].split(',')|reverse|join('/') }}/CN={{ openldap_service_fqdn }}"
+
+# subject alternative names in CSRs (OpenSSL syntax)
 openldap_csr_subjectaltnames:
   - "DNS:{{ openldap_service_fqdn }}"
 

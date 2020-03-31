@@ -16,6 +16,7 @@ NEW_KEY_FILE="{{ aedir_etc }}/tls/{{ openldap_service_fqdn }}.key-${TIMESTAMP}"
   -batch \
   -new \
   -nodes \
+  -subj "{{ openldap_csr_subjectdn }}" \
   -out "${NEW_CSR_FILE}" \
   -keyout "${NEW_KEY_FILE}"
 
