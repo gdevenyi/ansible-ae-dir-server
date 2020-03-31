@@ -8,6 +8,7 @@
 
 [ req ]
 
+distinguished_name = csr_dn
 default_bits = 2048
 encrypt_rsa_key = no
 encrypt_key = no
@@ -16,6 +17,10 @@ req_extensions = csr_extensions
 default_md = sha256
 string_mask = utf8only
 prompt = no
+
+[ csr_dn ]
+
+
 
 [ csr_attributes ]
 
