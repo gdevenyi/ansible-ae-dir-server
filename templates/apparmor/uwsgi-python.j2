@@ -9,7 +9,7 @@ profile {{ name }} {
   #include <ae-dir/abstractions/uwsgi-python>
 
   # access to uwsgi executable
-  {{ uwsgi_paths.exec }} r,
+  {{ uwsgi_paths.exec }} rix,
 
   # access to {{ name }} application config
   {{ cfgdir }}/ r,
