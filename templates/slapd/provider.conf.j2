@@ -216,7 +216,7 @@ access to
   dn.subtree="{{ aedir_suffix }}"
   attrs=authTimestamp,pwdFailureTime,pwdHistory,msPwdResetAdminPw
 {% for restriction in aedir_providers_restrictions or [''] %}
-    by group/aeGroup/member="cn=ae-providers,cn=ae,{{ aedir_suffix }}" {{ restriction }} read
+    by {{ restriction }} group/aeGroup/member="cn=ae-providers,cn=ae,{{ aedir_suffix }}" read
 {% endfor %}
     by group/aeGroup/member="cn=ae-replicas,cn=ae,{{ aedir_suffix }}" none
     by * none break
@@ -225,7 +225,7 @@ access to
 access to
   filter="(|(objectClass=aeDept)(objectClass=aeLocation)(objectClass=aePerson)(objectClass=oathToken))"
 {% for restriction in aedir_providers_restrictions or [''] %}
-    by group/aeGroup/member="cn=ae-providers,cn=ae,{{ aedir_suffix }}" {{ restriction }} read
+    by {{ restriction }} group/aeGroup/member="cn=ae-providers,cn=ae,{{ aedir_suffix }}" read
 {% endfor %}
     by group/aeGroup/member="cn=ae-replicas,cn=ae,{{ aedir_suffix }}" none
     by * none break
@@ -234,7 +234,7 @@ access to
 access to
   dn.subtree="{{ aedir_suffix }}"
 {% for restriction in aedir_replicas_restrictions or [''] %}
-    by group/aeGroup/member="cn=ae-replicas,cn=ae,{{ aedir_suffix }}" {{ restriction }} read
+    by {{ restriction }} group/aeGroup/member="cn=ae-replicas,cn=ae,{{ aedir_suffix }}" read
 {% endfor %}
     by * none break
 
