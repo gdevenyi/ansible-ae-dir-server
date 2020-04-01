@@ -11,6 +11,8 @@
     - role_path
     - aedir_files_dirs
     - aedir_templates_dirs
+    - aedir_providers_restrictions
+    - aedir_replicas_restrictions
   tags:
     - always
 
