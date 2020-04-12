@@ -155,6 +155,29 @@ http_headers = {
         "style-src 'self';",
         #"report-uri https://logger.example.com/csp-error-handler",
     )),
+    'Feature-Policy': (
+        "ambient-light-sensor 'none'; "
+        "autoplay 'none'; "
+        "accelerometer 'none'; "
+        "camera 'none'; "
+        "display-capture 'none'; "
+        "document-domain 'none'; "
+        "encrypted-media 'none'; "
+        "fullscreen 'none'; "
+        "geolocation 'none'; "
+        "gyroscope 'none'; "
+        "magnetometer 'none'; "
+        "microphone 'none'; "
+        "midi 'none'; "
+        "payment 'none'; "
+        "picture-in-picture 'none'; "
+        "speaker 'none'; "
+        "sync-xhr 'none'; "
+        "usb 'none'; "
+        "wake-lock 'none'; "
+        "vr 'none'; "
+        "xr 'none'"
+    ),
 }
 http_headers['X-Webkit-CSP'] = http_headers['Content-Security-Policy']
 http_headers['X-Content-Security-Policy'] = http_headers['Content-Security-Policy']
