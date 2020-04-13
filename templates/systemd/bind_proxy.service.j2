@@ -21,9 +21,7 @@ Environment=LDAPNOINIT=1
 {% for evar in aedir_python_env %}
 Environment={{ evar.name }}={{ evar.value }}
 {% endfor %}
-Environment=LDAPTLS_CACERT={{ openldap_cacert_pathname }}
-ExecStart={{ aedir_python }} -m oathldap_srv.{{ oath_bind_listener }} "{{ oath_ldap_socket_path }}" "{{ openldap_ldapi_uri|replace('%','%%') }}????x-saslmech=EXTERNAL" {% for host in openldap_syncrepl_providers %} ldaps://{{ hostvars[host].get('openldap_service_fqdn',host) }}{% endfor %}
-
+ExecStart={{ aedir_python }} -m oathldap_srv.{{ oath_bind_listener }} {{ oath_ldap_cfg_dir }}/{{ oath_bind_listener }}/{{ oath_bind_listener }}.cfg
 User={{ oath_listener_user }}
 Group={{ oath_listener_user }}
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX

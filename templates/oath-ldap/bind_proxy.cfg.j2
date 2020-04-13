@@ -1,0 +1,34 @@
+[bind_proxy]
+
+# Pathname of Unix domain socket where slapd-sock sends requests to
+socket_path = {{ oath_ldap_socket_path }}
+
+# LDAPI URI for connecting to local slapd
+ldapi_uri = {{ openldap_ldapi_uri }}
+
+# CA certificate file to use for connecting to OATH-LDAP providers
+cacert_file = {{ openldap_cacert_pathname }}
+
+# Space- or line separated list of LDAP URIs of OATH-LDAP providers
+providers =
+{% for host in openldap_syncrepl_providers %}
+  ldaps://{{ hostvars[host].get('openldap_service_fqdn',host) }}
+{% endfor %}
+
+# logging level (key-word known in logging module)
+log_level = INFO
+
+# logging configuration file
+logging_conf = {{ aedir_etc }}/ae-logging.conf
+
+# logging qualifier name
+logger_name = {{ aedir_logging_qualname }}
+
+# time in seconds for which to cache bind requests
+# (set to negative number to disable caching)
+cache_ttl = -1.0
+
+# Space- or line separated list network addresses of clients for which bind
+# requests might be proxied to an OATH-LDAP provider
+#proxy_peer_nets = 0.0.0.0/0
+proxy_peer_nets = 10.0.0.0/8

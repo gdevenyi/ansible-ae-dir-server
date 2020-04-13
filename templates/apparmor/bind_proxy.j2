@@ -7,4 +7,8 @@ profile {{ oath_bind_listener }} {
 
   #include <ae-dir/abstractions/oath_bind_listener>
 
+  # grant read access to service config
+  {{ oath_ldap_cfg_dir }}/{{ oath_bind_listener }}/ r,
+  {{ oath_ldap_cfg_dir }}/{{ oath_bind_listener }}/{{ oath_bind_listener }}.cfg r,
+
 }

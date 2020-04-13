@@ -1,0 +1,25 @@
+[hotp_validator]
+
+# Pathname of Unix domain socket where slapd-sock sends requests to
+socket_path = {{ oath_ldap_socket_path }}
+
+# LDAPI URI for connecting to local slapd
+ldapi_uri = {{ openldap_ldapi_uri }}
+
+# logging level (key-word known in logging module)
+log_level = INFO
+
+# logging configuration file
+logging_conf = {{ aedir_etc }}/ae-logging.conf
+
+# logging qualifier name
+logger_name = {{ aedir_logging_qualname }}
+
+# time in seconds for which to cache bind requests
+# (set to negative number to disable caching)
+cache_ttl = -1.0
+
+# Globbing pattern for searching JSON web key files (private keys)
+# used for decrypting the shared secrets
+master_key_files = {{ oath_ldap_keys_dir }}/*.priv
+

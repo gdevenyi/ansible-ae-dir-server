@@ -19,6 +19,36 @@
     system: yes
     createhome: no
 
+- name: "Create OATH base config directory {{ oath_ldap_cfg_dir }}"
+  file:
+    path: "{{ oath_ldap_cfg_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: u=rwx,g=rx,o=rx
+
+- name: "Create OATH bind listener config directory"
+  file:
+    path: "{{ oath_ldap_cfg_dir }}/{{ oath_bind_listener }}"
+    state: directory
+    owner: root
+    group: "{{ oath_listener_user }}"
+    mode: 0o0750
+  notify:
+    - "restart {{ oath_bind_listener }}"
+
+- name: "Create OATH bind listener config"
+  template:
+    src: "oath-ldap/{{ oath_bind_listener }}.cfg.j2"
+    dest: "{{ oath_ldap_cfg_dir }}/{{ oath_bind_listener }}/{{ oath_bind_listener }}.cfg"
+    owner: root
+    group: "{{ oath_listener_user }}"
+    mode: 0o0640
+  with_items:
+    - "{{ oath_bind_listener }}"
+  notify:
+    - "restart {{ oath_bind_listener }}"
+
 - name: "Create OATH master key directory {{ oath_ldap_keys_dir }}"
   file:
     path: "{{ oath_ldap_keys_dir }}"
@@ -75,7 +105,7 @@
 - name: "PIP install OATH-LDAP services in virtualenv {{ aedir_prefix }}"
   pip:
     name:
-      - oath-ldap-srv>=0.5.1
+      - oath-ldap-srv>=1.0.0
     state: latest
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
@@ -87,7 +117,7 @@
 - name: "Install OATH-LDAP services package on {{ openldap_role }}"
   zypper:
     name:
-      - oath-ldap-srv >= 0.5.1
+      - oath-ldap-srv >= 1.0.0
     state: latest
     disable_recommends: yes
     type: package
@@ -126,13 +156,11 @@
 
 - name: "Create AppArmor abstractions"
   template:
-    src: "apparmor/abstractions/{{ item }}.j2"
-    dest: "{{ apparmor_profiles_dir }}/ae-dir/abstractions/{{ item }}"
+    src: "apparmor/abstractions/oath_bind_listener.j2"
+    dest: "{{ apparmor_profiles_dir }}/ae-dir/abstractions/oath_bind_listener"
     owner: root
     group: root
     mode: 0o0644
-  with_items:
-    - "oath_bind_listener"
   when: apparmor_enabled == True
   notify:
     - "restart apparmor"

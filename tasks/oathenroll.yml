@@ -9,13 +9,13 @@
     group: root
     mode: u=rwx,g=rx,o=rx
   with_items:
-    - "{{ aedir_etc }}/oathenroll"
-    - "{{ aedir_etc }}/oathenroll/templates"
+    - "{{ oath_ldap_cfg_dir }}/oathenroll"
+    - "{{ oath_ldap_cfg_dir }}/oathenroll/templates"
 
 - name: "copy oathenroll HTML templates to {{ aedir_etc }}/oathenroll/templates"
   copy:
     src: "oath-ldap/oathenroll/templates/"
-    dest: "{{ aedir_etc }}/oathenroll/templates"
+    dest: "{{ oath_ldap_cfg_dir }}/oathenroll/templates"
     follow: no
     owner: root
     group: root
@@ -27,7 +27,7 @@
 - name: "Create oathenroll_cnf.py"
   template:
     src: "{{ item }}"
-    dest: "{{ aedir_etc }}/oathenroll/oathenroll_cnf.py"
+    dest: "{{ oath_ldap_cfg_dir }}/oathenroll/oathenroll_cnf.py"
     owner: root
     group: "{{ oath_ldap_oathenroll_web_group }}"
     mode: 0o0640
