@@ -23,7 +23,6 @@ Group={{ apache_group }}
 ExecStart={{ apache2_config.httpd_exec }} -DSYSTEMD -DFOREGROUND -f {{ apache_conf }} -k start
 ExecReload={{ apache2_config.httpd_exec }} -DSYSTEMD -DFOREGROUND -f {{ apache_conf }} -k graceful
 ExecStop={{ apache2_config.httpd_exec }} -DSYSTEMD -DFOREGROUND -f {{ apache_conf }} -k graceful-stop
-KillMode=mixed
 CapabilityBoundingSet=CAP_NET_BIND_SERVICE
 AmbientCapabilities=CAP_NET_BIND_SERVICE
 MemoryDenyWriteExecute=yes
