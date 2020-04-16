@@ -27,6 +27,7 @@ Environment=LOG_QUALNAME={{ aedir_logging_qualname }}
 ExecStart={{ uwsgi_paths.exec }} --strict --ini {{ aedir_etc }}/uwsgi/oathenroll.ini
 User={{ oath_ldap_oathenroll_web_user }}
 Group={{ oath_ldap_oathenroll_web_group }}
+KillSignal=SIGQUIT
 Restart=always
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 {% if aedir_systemd_logging %}
