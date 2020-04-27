@@ -353,12 +353,12 @@ web2ldap.app.plugins.aedir.AEHomeDirectory.homeDirectoryPrefixes = ('{{ aedir_ho
 web2ldap.app.plugins.aedir.AEHomeDirectory.homeDirectoryHidden = '{{ aedir_homedirectory_hidden }}'
 web2ldap.app.plugins.aedir.AELoginShell.attr_value_dict = {
 {% for login_shell in aedir_login_shells %}
-  u'{{ login_shell }}':u'{{ login_shell }}',
+    '{{ login_shell }}': '{{ login_shell }}',
 {% endfor %}
 }
 web2ldap.app.plugins.aedir.AESSHPermissions.attr_value_dict = {
 {% for ssh_perm in aedir_sshkey_perms %}
-  u'{{ ssh_perm }}':u'{{ ssh_perm }}',
+    '{{ ssh_perm }}': '{{ ssh_perm }}',
 {% endfor %}
 }
 

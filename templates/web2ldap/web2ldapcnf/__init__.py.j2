@@ -50,10 +50,6 @@ input_maxfieldlen = 600000
 # maximum count of search parameters in a search form
 max_searchparams = 20
 
-# Path name to dumpasn1.cfg. Grab it from
-# https://www.cs.auckland.ac.nz/~pgut001/dumpasn1.cfg
-dumpasn1cfg = os.path.join(etc_dir, 'dumpasn1.cfg')
-
 #---------------------------------------------------------------------------
 # Global HTML options (templates etc.)
 #---------------------------------------------------------------------------
@@ -116,10 +112,6 @@ session_checkvars = (
     'SSL_CLIENT_M_SERIAL', 'SSL_CLIENT_CERT_SERIAL',
     # HTTP_ACCEPT_ENCODING disabled because of Google Chrome
     #'HTTP_ACCEPT_ENCODING',
-    # SSL session ID if running on SSL server capable
-    # of reusing SSL sessions (needs server configuration)
-    # not usable with newer TLS implementations though
-    #'SSL_SESSION_ID',
 )
 
 # Static dict of HTTP headers to be always sent to the browser
@@ -200,7 +192,7 @@ cookie_domain = None
 # a new session ID was generated.
 session_paranoid = 0
 
-# unsuspicious target URLs accept by redirector even without a session
+# unsuspicious target URLs accepted by redirector even without a session
 good_redirect_targets = {
    '/web2ldap.html',
 }
@@ -210,6 +202,7 @@ good_redirect_targets = {
 # Use ['0.0.0.0/0.0.0.0', '::0/0'] to allow access to every client but think twice!
 # IPv6 network addresses without brackets!
 access_allowed = {
+    # default for all sub URLs
     '_': [
         '0.0.0.0/0.0.0.0',
         '::0',
