@@ -812,7 +812,7 @@ slapd_check_lib_dirs:
 #---------------------------------------------------------------------------
 
 # minimum web2ldap version to be installed
-web2ldap_min_version: "1.5.66"
+web2ldap_min_version: "1.5.68"
 
 # directory where the configuration files are located
 web2ldapcnf_prefix: "{{ web2ldap_paths.configdir }}"
