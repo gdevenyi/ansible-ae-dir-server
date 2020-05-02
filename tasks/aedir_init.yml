@@ -9,3 +9,16 @@
     owner: root
     group: root
     mode: 0o0600
+
+- block:
+
+  - name: "Check whether DB has content"
+    command: "{{ openldap_path.bin }}/ldapsearch -LLL -b '{{ aedir_suffix }}' -s base '(objectClass=*)' 1.1"
+    ignore_errors: yes
+    register: check_db_cmd
+
+  - name: "Load initial DB content"
+    command: "{{ openldap_path.bin }}/ldapmodify -f {{ aedir_etc }}/ae-dir-base.ldif"
+    when: check_db_cmd.rc == 32
+
+  when: inventory_hostname == aedir_main_provider_hostname
