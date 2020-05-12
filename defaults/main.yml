@@ -156,6 +156,7 @@ aedir_systemd_hardening:
   - "KeyringMode=private"
   - "RestrictRealtime=yes"
   - "RestrictNamespaces=yes"
+  - "RestrictSUIDSGID=yes"
 #  - "InaccessiblePaths=/run/systemd"
 
 # regex patterns for enforcing naming conventions (substring match!)
