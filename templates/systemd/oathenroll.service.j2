@@ -29,6 +29,8 @@ User={{ oath_ldap_oathenroll_web_user }}
 Group={{ oath_ldap_oathenroll_web_group }}
 KillSignal=SIGQUIT
 Restart=always
+CapabilityBoundingSet=
+AmbientCapabilities=
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 {% if aedir_systemd_logging %}
 # various logging options from ansible var aedir_systemd_logging

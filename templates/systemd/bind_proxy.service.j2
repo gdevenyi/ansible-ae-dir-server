@@ -24,6 +24,8 @@ Environment={{ evar.name }}={{ evar.value }}
 ExecStart={{ aedir_python }} -m oathldap_srv.{{ oath_bind_listener }} {{ oath_ldap_cfg_dir }}/{{ oath_bind_listener }}/{{ oath_bind_listener }}.cfg
 User={{ oath_listener_user }}
 Group={{ oath_listener_user }}
+CapabilityBoundingSet=
+AmbientCapabilities=
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 {% if aedir_systemd_logging %}
 # various logging options from ansible var aedir_systemd_logging
