@@ -157,6 +157,8 @@ aedir_systemd_hardening:
   - "RestrictRealtime=yes"
   - "RestrictNamespaces=yes"
   - "RestrictSUIDSGID=yes"
+  - "DevicePolicy=closed"
+  - "DeviceAllow=/dev/log w"
 #  - "InaccessiblePaths=/run/systemd"
 
 # regex patterns for enforcing naming conventions (substring match!)
