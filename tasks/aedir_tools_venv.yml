@@ -53,6 +53,7 @@
       - xlwt
       - dnspython
       - web.py>=0.40
+      - pynacl>=1.2
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"

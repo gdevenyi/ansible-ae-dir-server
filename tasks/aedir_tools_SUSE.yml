@@ -41,6 +41,7 @@
       - python3-passlib
       - python3-xlwt
       - python3-pycryptodome
+      - python3-PyNaCl >= 1.2
     state: present
     disable_recommends: yes
     type: package
