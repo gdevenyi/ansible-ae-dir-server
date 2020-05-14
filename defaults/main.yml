@@ -598,7 +598,7 @@ openldap_dhparam_numbits: 2048
 openldap_password_hash: "{CRYPT}"
 # SHA-512, 128 bits of salt, 20000 iterations (see also crypt(3) man page)
 openldap_password_crypt_salt_format: "$6$rounds=20000$%.16s"
-# new password scheme available in OpenLDAP 2.4.51
+# new password scheme available in OpenLDAP 2.4.50
 #openldap_password_hash: "{ARGON2}"
 
 # subject alternative names in CSRs
