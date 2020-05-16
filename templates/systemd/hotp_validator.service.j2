@@ -40,7 +40,7 @@ PrivateNetwork=yes
 {{ systemd_option }}
 {% endfor %}
 {% endif %}
-SystemCallFilter={{ systemd_systemcallfilter.default }}
+SystemCallFilter={{ systemd_systemcallfilter.slapdsock }}
 {% if apparmor_enabled %}
 AppArmorProfile={{ oath_bind_listener }}
 {% endif %}

@@ -18,4 +18,5 @@ openldap_sockbuf_max_incoming_auth_default:
 systemd_systemcallfilter:
   default: "~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete @chown @timer @privileged"
   apache: "~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete"
-  web2ldap: "~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete @chown @privileged"
+  web2ldap: "~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete @chown @privileged fork"
+  slapdsock: "~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete @chown @timer @privileged clone clone2 clone3 fork"
