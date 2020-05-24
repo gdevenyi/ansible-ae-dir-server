@@ -60,12 +60,12 @@
       state: directory
       owner: root
       group: root
-      mode: 0o0755
+      mode: 0o0750
   - name: "Generate static metrics file {{ aedir_metricsdir }}/ae-dir-conf.prom"
     template:
       src: "ae-dir-conf.prom.j2"
       dest: "{{ aedir_metricsdir }}/ae-dir-conf.prom"
       owner: root
       group: root
-      mode: 0o0644
+      mode: 0o0640
   when: aedir_metricsdir != ""
