@@ -20,6 +20,7 @@ Environment=APACHE_PID_FILE={{ apache_pid_file }}
 PIDFile={{ apache_pid_file }}
 User={{ apache_user }}
 Group={{ apache_group }}
+UMask=0027
 ExecStart={{ apache2_config.httpd_exec }} -DSYSTEMD -DFOREGROUND -f {{ apache_conf }} -k start
 ExecReload={{ apache2_config.httpd_exec }} -DSYSTEMD -DFOREGROUND -f {{ apache_conf }} -k graceful
 ExecStop={{ apache2_config.httpd_exec }} -DSYSTEMD -DFOREGROUND -f {{ apache_conf }} -k graceful-stop
