@@ -100,6 +100,9 @@ aedir_htdocsdir: "{{ aedir_prefix }}/htdocs"
 #aedir_metricsdir: "/var/spool/metrics"
 aedir_metricsdir: ""
 
+# Group ID or name for setting group ownership of metrics directory and files
+aedir_metrics_owner_group: "root"
+
 # which Python interpreter to use
 aedir_python: "{{ aedir_python_paths.python_exec }} -ROOBs"
 
