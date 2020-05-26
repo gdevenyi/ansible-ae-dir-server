@@ -95,8 +95,9 @@ aedir_rundir: "{{ aedir_prefix }}/run"
 aedir_python_sitepackages: "{{ aedir_python_paths.site_packages }}"
 aedir_htdocsdir: "{{ aedir_prefix }}/htdocs"
 
-# where text exporter metrics are written to
-# if empty, no text exporter CRON jobs are installed
+# Directory for metrics text exports picked up by Prometheus node-exporter.
+# If empty, no text exporter CRON jobs are installed.
+# Setting this to empty string disables dumping metrics to files.
 #aedir_metricsdir: "/var/spool/metrics"
 aedir_metricsdir: ""
 
