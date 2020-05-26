@@ -148,6 +148,14 @@ objectclass ( ae-dir-oc:21
   MUST ( aeStatus )
   MAY ( description $ aeNotBefore $ aeNotAfter $ aeTicketId $ aeTag $ aeExpiryStatus ) )
 
+objectclass ( ae-dir-oc:36
+  NAME 'aeSSHAccount'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Account with extra attributes for SSH access'
+  AUXILIARY
+  SUP ldapPublicKey
+  MAY ( aeSSHPermissions ) )
+
 # UID and GID number pools
 #-----------------------------------------------------------------------
 
@@ -348,7 +356,7 @@ objectclass ( ae-dir-oc:2
   STRUCTURAL
   SUP ( inetOrgPerson $ account $ aeObject )
   MUST ( uid $ aePerson $ givenName $ displayName )
-  MAY ( aeRemoteHost $ aeSSHPermissions ) )
+  MAY ( aeRemoteHost ) )
 
 # Server groups
 #-----------------------------------------------------------------------
@@ -555,7 +563,7 @@ objectclass ( ae-dir-oc:4
   STRUCTURAL
   SUP ( account $ aeObject )
   MUST ( uid $ description )
-  MAY ( aeRemoteHost $ aeSSHPermissions $ aeHost $ aeSrvGroup $ userPassword ) )
+  MAY ( aeRemoteHost $ aeHost $ aeSrvGroup $ userPassword ) )
 
 # Authentication tokens (yubikey etc.)
 #-----------------------------------------------------------------------

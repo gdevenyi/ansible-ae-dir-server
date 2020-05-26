@@ -639,6 +639,7 @@ objectClass: aeObject
 objectClass: aeUser
 objectClass: posixAccount
 objectClass: ldapPublicKey
+objectClass: aeSSHAccount
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
 aeTag: ae-tag-init
@@ -766,7 +767,6 @@ objectClass: account
 objectClass: aeObject
 objectClass: aeService
 objectClass: posixAccount
-objectClass: ldapPublicKey
 pwdPolicySubentry: cn=ppolicy-sasl-external,cn=ae,{{ aedir_suffix }}
 
 {% endfor %}
