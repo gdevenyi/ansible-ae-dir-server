@@ -563,7 +563,7 @@ objectclass ( ae-dir-oc:4
   STRUCTURAL
   SUP ( account $ aeObject )
   MUST ( uid $ description )
-  MAY ( aeRemoteHost $ aeHost $ aeSrvGroup $ userPassword ) )
+  MAY ( cn $ aeRemoteHost $ aeHost $ aeSrvGroup $ userPassword ) )
 
 # Authentication tokens (yubikey etc.)
 #-----------------------------------------------------------------------
