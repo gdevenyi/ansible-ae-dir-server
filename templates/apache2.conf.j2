@@ -93,7 +93,7 @@ ProxyPreserveHost On
 # Strictly local virtual host for exposing metrics via mod_status
 <VirtualHost 127.0.0.1:80 [::1]:80>
 
-  ServerName localhost
+  ServerName http://localhost
   SSLEngine off
 
   # turn off access log for requests coming from loopback interface
@@ -110,11 +110,21 @@ ProxyPreserveHost On
 
 <VirtualHost _default_:80>
 
+  ServerName http://{{ apache_service_fqdn }}
+{%if aedir_provider_lb_hostname and aedir_provider_lb_hostname != apache_service_fqdn and aedir_provider_lb_hostname not in groups.aedir_providers %}
+  ServerAlias {{ aedir_provider_lb_hostname }}
+{%endif %}
+
   RedirectPermanent / https://{{ apache_service_fqdn }}/
 
 </VirtualHost>
 
 <VirtualHost _default_:443>
+
+  ServerName https://{{ apache_service_fqdn }}
+{%if aedir_provider_lb_hostname and aedir_provider_lb_hostname != apache_service_fqdn and aedir_provider_lb_hostname not in groups.aedir_providers %}
+  ServerAlias {{ aedir_provider_lb_hostname }}
+{%endif %}
 
   DirectoryIndex index.html index.xhtml index.htm
 
