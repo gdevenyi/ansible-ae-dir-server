@@ -111,7 +111,7 @@ ProxyPreserveHost On
 <VirtualHost _default_:80>
 
   ServerName http://{{ apache_service_fqdn }}
-{%if aedir_provider_lb_hostname and aedir_provider_lb_hostname != apache_service_fqdn and aedir_provider_lb_hostname not in groups.aedir_providers %}
+{%if aedir_provider_lb_hostname and aedir_provider_lb_hostname != apache_service_fqdn and aedir_provider_lb_hostname not in aedir_hosts.provider %}
   ServerAlias {{ aedir_provider_lb_hostname }}
 {%endif %}
 
@@ -122,7 +122,7 @@ ProxyPreserveHost On
 <VirtualHost _default_:443>
 
   ServerName https://{{ apache_service_fqdn }}
-{%if aedir_provider_lb_hostname and aedir_provider_lb_hostname != apache_service_fqdn and aedir_provider_lb_hostname not in groups.aedir_providers %}
+{%if aedir_provider_lb_hostname and aedir_provider_lb_hostname != apache_service_fqdn and aedir_provider_lb_hostname not in aedir_hosts.provider %}
   ServerAlias {{ aedir_provider_lb_hostname }}
 {%endif %}
 
