@@ -172,9 +172,8 @@ ProxyPreserveHost On
   Header always set Strict-Transport-Security "max-age=15552000; includeSubDomains; preload"
 
   #---------------------------------------------------------------------
-  # web2ldap
+  # web2ldap (via mod_proxy_uwsgi)
   #---------------------------------------------------------------------
-
 
   <Location /web2ldap>
     ProxyPass unix:{{ aedir_rundir }}/uwsgi/web2ldap/web2ldap.sock|uwsgi://web2ldap/
@@ -198,7 +197,7 @@ ProxyPreserveHost On
   </Location>
 
   #----------------------------------------------------------------------
-  # Æ-DIR password self-service web application (reverse proxy)
+  # Æ-DIR password self-service web application (via mod_proxy_uwsgi)
   #----------------------------------------------------------------------
 
   RedirectPermanent /pwd /pwd/
@@ -213,7 +212,7 @@ ProxyPreserveHost On
 
 {% if oath_ldap_enabled==True %}
   #----------------------------------------------------------------------
-  # OATH-LDAP enrollment web application (reverse proxy)
+  # OATH-LDAP enrollment web application (via mod_proxy_uwsgi)
   #----------------------------------------------------------------------
 
   RedirectPermanent /oath /oath/
