@@ -77,7 +77,7 @@
         - "web2ldap/templates/connect.html.j2"
       paths: "{{ aedir_templates_dirs }}"
 
-- name: "Create search provider file pointing to {{ aedir_main_provider_hostname }}"
+- name: "Create search provider file pointing to {{ aedir_provider_lb_hostname }}"
   template:
     src: "web2ldap/opensearch-ae-dir.xml.j2"
     dest: "{{ aedir_htdocsdir }}/opensearch-ae-dir.xml"

@@ -388,8 +388,11 @@ aedir_hosts:
   # inventory host names of *all* consumer hosts
   consumer: "{{ groups.aedir_consumers }}"
 
-# main provider hostname (e.g. for HA setups)
+# main provider hostname used for initially loading data and CRON scripts
 aedir_main_provider_hostname: "{{ aedir_hosts.provider[0] }}"
+
+# load-balancer hostname for accessing provider(s) especially used in web URLs
+aedir_provider_lb_hostname: "{{ aedir_main_provider_hostname }}"
 
 # aePerson attributes only readable by zone admins/auditors of people zone
 aedir_confidential_person_attrs:

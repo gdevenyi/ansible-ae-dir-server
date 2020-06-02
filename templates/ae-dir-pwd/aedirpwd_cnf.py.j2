@@ -93,7 +93,7 @@ APP_PATH_PREFIX = '/pwd'
 SERVER_ID = '{0:03x}'.format(int('{{ openldap_server_id }}'))
 
 # hostname to use in URLs generated in notification e-mails
-WEB_CTX_HOST = '{{ aedir_main_provider_hostname }}'
+WEB_CTX_HOST = '{{ aedir_provider_lb_hostname }}'
 
 # Filter string templates
 FILTERSTR_EXPIRE = (
