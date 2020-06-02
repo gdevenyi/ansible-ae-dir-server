@@ -747,6 +747,10 @@ objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
 aeMemberZone: cn=ae,{{ aedir_suffix }}
+{% for ae_user in aedir_init_aeadmins %}
+member: uid={{ ae_user.uid }},cn=ae,{{ aedir_suffix }}
+memberUid: {{ ae_user.uid }}
+{% endfor %}
 {% if gid_number.append(1) -%}{% endif %}
 
 {% for uid, s in aedir_ldapi_services.items() %}
