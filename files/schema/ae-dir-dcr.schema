@@ -54,7 +54,7 @@ ditcontentrule ( ae-dir-oc:7
 
 ditcontentrule ( ae-dir-oc:2
   NAME 'aeUser-dcr'
-  AUX ( posixAccount $ inetLocalMailRecipient $ pkiUser $ aeSSHAccount $
+  AUX ( posixAccount $ inetLocalMailRecipient $ pkiUser $ aeSSHAccount $ ldapPublicKey $
         msPwdResetObject $ oathHOTPUser $ oathTOTPUser )
   NOT ( gecos $ audio $ businessCategory $ carLicense $
         destinationIndicator $ facsimileTelephoneNumber $
@@ -95,7 +95,7 @@ ditcontentrule ( ae-dir-oc:8
 
 ditcontentrule ( ae-dir-oc:4
   NAME 'aeService-dcr'
-  AUX ( posixAccount $ pkiUser $ aeSSHAccount $
+  AUX ( posixAccount $ pkiUser $ aeSSHAccount $ ldapPublicKey $
         mailboxRelatedObject $ inetLocalMailRecipient $
         oathHOTPUser $ oathTOTPUser )
   NOT ( gecos $ host $ l $ o $ ou ) )
