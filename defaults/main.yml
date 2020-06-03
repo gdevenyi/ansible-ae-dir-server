@@ -388,7 +388,7 @@ aedir_hosts:
   # inventory host names of *all* consumer hosts
   consumer: "{{ groups.aedir_consumers }}"
 
-# main provider hostname used for initially loading data and CRON scripts
+# main provider hostname used for initially loading data
 aedir_main_provider_hostname: "{{ aedir_hosts.provider[0] }}"
 
 # load-balancer hostname for accessing provider(s) especially used in web URLs
