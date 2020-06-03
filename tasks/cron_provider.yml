@@ -35,10 +35,12 @@
     job: "{{ aedir_python }} -m {{ item.value.pyjob }}"
   with_dict:
     aedir_pproc_welcome:
-      minute: "*/2"
+      # run each minute on one of the providers
+      minute: "{{ range(openldap_server_id-1, 60, aedir_hosts.provider|length) | select('lessthan', 60) | map('string') | join(',') }}"
       pyjob: "aedir_pproc.welcome"
     aedir_pwd_expreset:
-      minute: "*/2"
+      # run every two minutes on one of the providers
+      minute: "{{ range(2*(openldap_server_id-1), 30, aedir_hosts.provider|length) | select('lessthan', 60) | map('string') | join(',') }}"
       pyjob: "aedir_pproc.pwd.expreset"
     aedir_pwd_expwarn:
       hour: "1"
