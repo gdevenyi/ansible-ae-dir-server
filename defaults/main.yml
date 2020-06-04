@@ -504,13 +504,13 @@ aedir_cron_minutes:
   # run each minute on one of the providers
   aedir_pproc_groups: "{{ range(openldap_server_id-1, 60, aedir_hosts.provider|length) | select('lessthan', 60) | map('string') | join(',') }}"
   # run every two minutes on one of the providers
-  aedir_pproc_status: "{{ range(2*(openldap_server_id-1), 30, aedir_hosts.provider|length) | select('lessthan', 60) | map('string') | join(',') }}"
+  aedir_pproc_status: "{{ range(2*(openldap_server_id-1), 60, 2*aedir_hosts.provider|length) | select('lessthan', 60) | map('string') | join(',') }}"
   # run each minute on one of the providers
   aedir_pproc_persattrs: "{{ range(openldap_server_id-1, 60, aedir_hosts.provider|length) | select('lessthan', 60) | map('string') | join(',') }}"
   # run each minute on one of the providers
   aedir_pproc_welcome: "{{ range(openldap_server_id-1, 60, aedir_hosts.provider|length) | select('lessthan', 60) | map('string') | join(',') }}"
   # run every two minutes on one of the providers
-  aedir_pwd_expreset: "{{ range(2*(openldap_server_id-1), 30, aedir_hosts.provider|length) | select('lessthan', 60) | map('string') | join(',') }}"
+  aedir_pwd_expreset: "{{ range(2*(openldap_server_id-1), 60, 2*aedir_hosts.provider|length) | select('lessthan', 60) | map('string') | join(',') }}"
 
 #---------------------------------------------------------------------------
 # OpenLDAP parameters
