@@ -37,6 +37,14 @@
   notify:
     - "restart {{ oath_bind_listener }}"
 
+- name: "Create token PIN decryption script"
+  template:
+    src: "oath-ldap/oath-ldap-decpin.sh.j2"
+    dest: "{{ aedir_sbin }}/oath-ldap-decpin.sh"
+    owner: root
+    group: root
+    mode: 0o0700
+
 - name: "Create OATH bind listener config"
   template:
     src: "oath-ldap/{{ oath_bind_listener }}.cfg.j2"

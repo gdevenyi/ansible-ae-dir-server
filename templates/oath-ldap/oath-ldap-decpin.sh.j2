@@ -1,0 +1,23 @@
+#!/bin/sh
+# shell wrapper script for extracting/decrypting oathToken PIN
+# {{ ansible_managed }}
+
+# disable use of ldap.conf
+LDAPNOINIT=1
+export LDAPNOINIT
+
+# explicitly use specific libldap
+LD_LIBRARY_PATH="{{ slapd_check_lib_dirs|join(':') }}:${LD_LIBRARY_PATH}"
+export LD_LIBRARY_PATH
+
+# some env vars set for Python interpreter
+{% for evar in aedir_python_env %}
+{{ evar.name }}={{ evar.value }}
+export {{ evar.name }}
+{% endfor %}
+
+{{ aedir_python }} -m oathldap_tool.cli decpin \
+  --ldap-url '{{ openldap_ldapi_uri }}/{{ aedir_suffix }}' \
+  --admin-dn "uid=$1,{{ aedir_suffix }}" \
+  --key-path '{{ oath_ldap_keys_dir }}' \
+  --token-id "$2"
