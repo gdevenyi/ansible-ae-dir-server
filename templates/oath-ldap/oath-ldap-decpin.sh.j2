@@ -18,6 +18,5 @@ export {{ evar.name }}
 
 {{ aedir_python }} -m oathldap_tool.cli decpin \
   --ldap-url '{{ openldap_ldapi_uri }}/{{ aedir_suffix }}' \
-  --admin-dn "uid=$1,{{ aedir_suffix }}" \
   --key-path '{{ oath_ldap_keys_dir }}' \
-  --token-id "$2"
+  --token-id "$1"

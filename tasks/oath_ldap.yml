@@ -147,7 +147,7 @@
 
 - name: "Install OATH-LDAP tool package on {{ lsb_id }}"
   zypper:
-    name: "oath-ldap-tool>=1.0.1"
+    name: "oath-ldap-tool>=1.0.3"
     state: latest
     disable_recommends: yes
     type: package
@@ -155,7 +155,7 @@
 
 - name: "PIP-install OATH-LDAP tool on {{ lsb_id }}"
   pip:
-    name: "oath-ldap-tool>=1.0.1"
+    name: "oath-ldap-tool>=1.0.3"
     state: present
     virtualenv: "{{ aedir_prefix }}"
     virtualenv_command: "{{ virtualenv_command }}"
