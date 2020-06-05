@@ -137,7 +137,7 @@
 - block:
     - name: "AE-DIR web pages {{ openldap_role }}"
       include_role:
-        name: ae-dir-htdocs
+        name: aedir_htdocs
       vars:
         document_root: "{{ aedir_htdocsdir }}"
         htdocs_templates: "{{ aedir_htdocs_templates }}"
