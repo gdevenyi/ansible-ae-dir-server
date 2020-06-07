@@ -30,7 +30,7 @@ openldap_path:
   conf_prefix: /etc/openldap
   data: /var/lib/ldap
   rundir: /var/run/slapd
-  slapd_exec: /usr/lib64/slapd
+  slapd_exec: /usr/sbin/slapd
   libdir: /usr/lib64
   modules: /usr/lib64/openldap
 
