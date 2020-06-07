@@ -127,26 +127,27 @@ objectClass: namedObject
 objectClass: aeTag
 
 #---------------------------------------------------------------------------
-# black-list entries
+# entries for lists of reserved/blocked uid values
 #---------------------------------------------------------------------------
 #
-dn: cn=ae-uid-blacklist,cn=ae,{{ aedir_suffix }}
+dn: cn=ae-uid-reserved,cn=ae,{{ aedir_suffix }}
 changetype: add
-description: This entry contains a blacklist for 'uid' values
-cn: ae-uid-blacklist
+description: This entry contains a list of reserved/blocked 'uid' values
+cn: ae-uid-reserved
 objectClass: namedObject
 objectClass: uidObject
 objectClass: labeledURIObject
 uid: acpi
 uid: admin
 uid: administrator
-uid: aeadmin
 uid: ae-admin
-uid: aedir
+uid: aeadmin
 uid: ae-dir
+uid: aedir
 uid: aehost-init
-uid: aezoneadmin
+uid: aehostinit
 uid: ae-zone-admin
+uid: aezoneadmin
 uid: arch
 uid: at
 uid: avahi
@@ -173,6 +174,7 @@ uid: dmcs
 uid: echo
 uid: edit
 uid: ejbca
+uid: ekca
 uid: expr
 uid: file
 uid: find
@@ -221,6 +223,7 @@ uid: look
 uid: lp
 uid: lpq
 uid: lprm
+uid: ls
 uid: lscp
 uid: lsns
 uid: lsof
@@ -272,6 +275,8 @@ uid: pseudo
 uid: psql
 uid: ptar
 uid: publickey
+uid: pwd
+uid: pypi
 uid: pypy
 uid: qa
 uid: qgit
