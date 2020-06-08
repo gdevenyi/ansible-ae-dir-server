@@ -499,18 +499,21 @@ aedir_replicas_restrictions: "{{ aedir_providers_restrictions }}"
 # name of CRON file in /etc/cron.d
 aedir_cron_file: "ae-dir-{{ openldap_role }}"
 
+# server-specific offset for rotating CRON execution
+aedir_cron_offset: "{{ openldap_server_id - 1 }}"
+
 # minutes values for CRON jobs
 aedir_cron_minutes:
   # run each minute on one of the providers
-  aedir_pproc_groups: "{{ range(openldap_server_id-1, 60, aedir_hosts.provider|length) | select('lessthan', 60) | map('string') | join(',') }}"
+  aedir_pproc_groups: "{{ range(aedir_cron_offset|int, 60, aedir_hosts.provider|length) | select('lessthan', 60) | map('string') | join(',') }}"
   # run every two minutes on one of the providers
-  aedir_pproc_status: "{{ range(2*(openldap_server_id-1), 60, 2*aedir_hosts.provider|length) | select('lessthan', 60) | map('string') | join(',') }}"
+  aedir_pproc_status: "{{ range(2*(aedir_cron_offset|int), 60, 2*aedir_hosts.provider|length) | select('lessthan', 60) | map('string') | join(',') }}"
   # run each minute on one of the providers
-  aedir_pproc_persattrs: "{{ range(openldap_server_id-1, 60, aedir_hosts.provider|length) | select('lessthan', 60) | map('string') | join(',') }}"
+  aedir_pproc_persattrs: "{{ range(aedir_cron_offset|int, 60, aedir_hosts.provider|length) | select('lessthan', 60) | map('string') | join(',') }}"
   # run each minute on one of the providers
-  aedir_pproc_welcome: "{{ range(openldap_server_id-1, 60, aedir_hosts.provider|length) | select('lessthan', 60) | map('string') | join(',') }}"
+  aedir_pproc_welcome: "{{ range(aedir_cron_offset|int, 60, aedir_hosts.provider|length) | select('lessthan', 60) | map('string') | join(',') }}"
   # run every two minutes on one of the providers
-  aedir_pwd_expreset: "{{ range(2*(openldap_server_id-1), 60, 2*aedir_hosts.provider|length) | select('lessthan', 60) | map('string') | join(',') }}"
+  aedir_pwd_expreset: "{{ range(2*(aedir_cron_offset|int), 60, 2*aedir_hosts.provider|length) | select('lessthan', 60) | map('string') | join(',') }}"
 
 #---------------------------------------------------------------------------
 # OpenLDAP parameters
