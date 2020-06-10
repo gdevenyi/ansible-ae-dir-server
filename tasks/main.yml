@@ -256,5 +256,20 @@
 
     when: aehost_result.changed and aehost_result.password
 
+  - name: "Init aeService entry on {{ aedir_main_provider_hostname }}"
+    aeservice:
+      name: "ae-dir-slapd_{{ openldap_service_fqdn }}"
+      state: "present"
+      host: "{{ inventory_hostname }}"
+      zone: "ae"
+      description: "AE-DIR slapd {{ openldap_role }} {{ openldap_service_fqdn }} running on {{ inventory_hostname }}"
+      ticket_id: "{{ aedir_init_ticket_id }}"
+      ppolicy: "cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}"
+      see_also: "{{ hostvars[inventory_hostname].openldap_cert_subject }}"
+    vars:
+      ansible_python_interpreter: "{{ hostvars[aedir_main_provider_hostname].aedir_python_paths.python_exec }}"
+      ansible_python_interpreter: "{{ aedir_bin }}/python3"
+    delegate_to: "{{ aedir_main_provider_hostname }}"
+
   tags:
     - init
