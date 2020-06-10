@@ -38,14 +38,6 @@ objectClass: namedObject
 objectClass: aeObject
 objectClass: aeZone
 
-dn: cn=ae-tag-init,cn=ae,{{ aedir_suffix }}
-changetype: add
-aeStatus: 0
-cn: ae-tag-init
-description: tag for all entries created during initial load
-objectClass: namedObject
-objectClass: aeTag
-
 #---------------------------------------------------------------------------
 # aeZone entries (zone admins/auditors groups are added below)
 #---------------------------------------------------------------------------
@@ -54,7 +46,6 @@ objectClass: aeTag
 dn: cn={{ zone_cn }},{{ aedir_suffix }}
 changetype: add
 aeStatus: 0
-aeTag: ae-tag-init
 cn: {{ zone_cn }}
 description: {{ zone_attrs['description'] }}
 aeTicketId: {{ zone_attrs['ticket_id'] }}
@@ -72,7 +63,6 @@ dn: cn=pub,{{ aedir_suffix }}
 changetype: add
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
-aeTag: ae-tag-init
 cn: pub
 description: Public default entries
 objectClass: namedObject
@@ -622,7 +612,6 @@ aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
 aeDept: departmentNumber=0,cn={{ aedir_org_zone }},{{ aedir_suffix }}
 aeLocation: cn=no-location,cn={{ aedir_org_zone }},{{ aedir_suffix }}
-aeTag: ae-tag-init
 cn: {{ person_attrs.given_name }} {{ person_attrs.sur_name }}
 displayName: {{ person_attrs.given_name }} {{ person_attrs.sur_name }} ({{ unique_identifier }})
 sn: {{ person_attrs.sur_name }}
@@ -646,7 +635,6 @@ objectClass: posixAccount
 objectClass: aeSSHAccount
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
-aeTag: ae-tag-init
 aeTag: pub-tag-no-welcome-yet
 aePerson: uniqueIdentifier={{ ae_user.unique_identifier }},cn={{ aedir_org_zone }},{{ aedir_suffix }}
 description: {{ ae_user.description }}
@@ -672,7 +660,6 @@ dn: cn=ae-admins,cn=ae,{{ aedir_suffix }}
 changetype: add
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
-aeTag: ae-tag-init
 cn: ae-admins
 description:: R3JvdXAgbWVtYmVycyBjYW4gbWFuYWdlIGFsbCDDhi1ESVIgZW50cmllcw==
 gidNumber: {{ aedir_min_gid + gid_number|length }}
@@ -692,7 +679,6 @@ dn: cn=ae-auditors,cn=ae,{{ aedir_suffix }}
 changetype: add
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
-aeTag: ae-tag-init
 cn: ae-auditors
 description:: R3JvdXAgbWVtYmVycyBjYW4gcmVhZCBhbGwgw4YtRElSIGVudHJpZXM=
 gidNumber: {{ aedir_min_gid + gid_number|length }}
@@ -718,7 +704,6 @@ objectClass: aeObject
 objectClass: aeGroup
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
-aeTag: ae-tag-init
 {% if gid_number.append(1) -%}{% endif %}
 
 dn: cn=ae-all-zone-auditors,cn=ae,{{ aedir_suffix }}
@@ -735,14 +720,12 @@ objectClass: aeObject
 objectClass: aeGroup
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
-aeTag: ae-tag-init
 {% if gid_number.append(1) -%}{% endif %}
 
 dn: cn=ae-sys-admins,cn=ae,{{ aedir_suffix }}
 changetype: add
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
-aeTag: ae-tag-init
 cn: ae-sys-admins
 description: Members are system admins for AE-DIR servers
 gidNumber: {{ aedir_min_gid + gid_number|length }}
@@ -763,7 +746,6 @@ dn: uid={{ uid }},cn=ae,{{ aedir_suffix }}
 changetype: add
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
-aeTag: ae-tag-init
 uid: {{ uid }}
 cn: {{ s.cn }}
 description: {{ s.cn }}
@@ -782,7 +764,6 @@ dn: cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}
 changetype: add
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
-aeTag: ae-tag-init
 cn: ae-login-proxies
 description: Members are central login components which are allowed to see all users/groups and must determine login user/target relation themselves
 gidNumber: {{ aedir_min_gid + gid_number|length }}
@@ -820,7 +801,6 @@ description: su - root for AE-DIR system admins
 sudoRunAsUser: ALL
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
-aeTag: ae-tag-init
 sudoCommand: ALL
 sudoHost: ALL
 sudoUser: %ae-sys-admins
@@ -835,7 +815,6 @@ dn: cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir_suffix }}
 changetype: add
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
-aeTag: ae-tag-init
 description: AE-DIR {{ role }} hosts
 objectClass: aeObject
 objectClass: aeSrvGroup
@@ -853,7 +832,6 @@ changetype: add
 host: {{ host }}
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
-aeTag: ae-tag-init
 objectClass: device
 objectClass: aeDevice
 objectClass: aeObject
@@ -870,7 +848,6 @@ dn: cn={{ interface }},host={{ host }},cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir
 changetype: add
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
-aeTag: ae-tag-init
 cn: {{ interface }}
 {% if "ipv4" in hostvars[host][interface_fact] %}
 {% set interface_ipv4 = hostvars[host][interface_fact]["ipv4"]["address"] -%}
@@ -901,7 +878,6 @@ objectClass: pkiUser
 objectClass: posixAccount
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
-aeTag: ae-tag-init
 description: AE-DIR slapd provider {{ service_fqdn }} running on {{ host }}
 homeDirectory: /home/ae-dir-slapd_{{ service_fqdn }}
 cn: ae-dir-slapd_{{ service_fqdn }}
@@ -928,7 +904,6 @@ dn: cn=ae-replicas,cn=ae,{{ aedir_suffix }}
 changetype: add
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
-aeTag: ae-tag-init
 cn: ae-replicas
 description: Members of this group are AE-DIR replicas (providers and consumers)
 gidNumber: {{ aedir_min_gid + gid_number|length }}
@@ -954,7 +929,6 @@ dn: cn=ae-providers,cn=ae,{{ aedir_suffix }}
 changetype: add
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
-aeTag: ae-tag-init
 cn: ae-providers
 description: Members of this group are AE-DIR provider replicas
 gidNumber: {{ aedir_min_gid + gid_number|length }}
@@ -978,7 +952,6 @@ memberUid: ae-dir-slapd_{{ replica }}
 dn: cn={{ zone_cn }}-zone-admins,cn={{ zone_cn }},{{ aedir_suffix }}
 changetype: add
 aeStatus: 0
-aeTag: ae-tag-init
 cn: {{ zone_cn }}-zone-admins
 description: Group members are zone admins who can manage zone '{{ zone_cn }}'
 aeTicketId: {{ zone_attrs['ticket_id'] }}
@@ -993,7 +966,6 @@ objectClass: aeGroup
 dn: cn={{ zone_cn }}-zone-auditors,cn={{ zone_cn }},{{ aedir_suffix }}
 changetype: add
 aeStatus: 0
-aeTag: ae-tag-init
 cn: {{ zone_cn }}-zone-auditors
 description: Group members are zone auditors who can read zone '{{ zone_cn }}'
 aeTicketId: {{ zone_attrs['ticket_id'] }}
