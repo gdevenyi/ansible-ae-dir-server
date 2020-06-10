@@ -733,6 +733,10 @@ aedir_pwsync_socket_path: "{{ aedir_pwsync_socket_dir }}/socket"
 # list of HTML snippets to be put as news on the entry web page
 aedir_news: []
 
+# Task state when creating aeHost entry
+# Temporarily set to "reset" for forced update of host password
+aedir_aehost_state: "present"
+
 #---------------------------------------------------------------------------
 # OATH-LDAP parameters
 #---------------------------------------------------------------------------

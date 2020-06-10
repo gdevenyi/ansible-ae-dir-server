@@ -41,6 +41,10 @@ options:
         description:
             - LDAP URI of Æ-DIR server (default ldapi://)
         required: false
+    ticket_id:
+        description:
+            - Value for attribute aeTicketId
+        required: false
 
 author:
     - Michael Stroeder <michael@stroeder.com>
@@ -94,6 +98,7 @@ def get_module_args():
         host=dict(type='str', required=False),
         srvgroup=dict(type='str', required=True),
         description=dict(type='str', required=False),
+        ticket_id=dict(type='str', required=False),
         ldapurl=dict(
             required=False,
             default='ldapi://%2Fopt%2Fae-dir%2Frun%2Fslapd%2Fldapi',
@@ -150,8 +155,9 @@ def main():
     ae_host = AEHost(
         parent_dn=ae_srvgroup.dn_o,
         cn=module.params['name'],
-        aeStatus=AEStatus.active,
         host=module.params['host'],
+        aeTicketId=module.params['ticket_id'],
+        aeStatus=AEStatus.active,
         description=module.params['description'],
         pwdPolicySubentry=DNObj.from_str('cn=ppolicy-systems,cn=ae,'+ldap_conn.search_base),
     )
@@ -173,7 +179,7 @@ def main():
     ldap_ops = ldap_conn.ensure_entry(
         ae_host.dn_s,
         ae_host.ldap_entry(),
-        old_attrs=list(AEHost.__must__|AEHost.__may__)
+        old_attrs=list((AEHost.__must__|AEHost.__may__)-frozenset(('userPassword',))),
     )
     if ldap_ops:
         message = '%d LDAP operations on %r' % (len(ldap_ops), ae_host.dn_s,)
@@ -183,7 +189,7 @@ def main():
 
     if (
             state == 'reset'
-            or ldap_ops and ldap_ops[0].rtype == ldap0.RES_ADD
+            or (ldap_ops and ldap_ops[0].rtype == ldap0.RES_ADD)
         ):
         _, new_password = ldap_conn.set_password(module.params['host'], None)
         message='Set new password for %r' % (ae_host.dn_s,)

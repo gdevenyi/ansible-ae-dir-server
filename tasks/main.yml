@@ -214,12 +214,16 @@
     include_tasks: "aedir_init.yml"
     when: aedir_init is defined and openldap_role == "provider"
 
-  - name: "Init aeHost entry"
+  - name: "Init aeHost entry on {{ aedir_main_provider_hostname }}"
     aehost:
       name: "{{ inventory_hostname }}"
-      state: "present"
+      state: "{{ aedir_aehost_state }}"
       srvgroup: "ae-dir-{{ openldap_role }}-hosts"
       description: "AE-DIR {{ openldap_role }} host {{ openldap_service_fqdn }}"
+      ticket_id: "{{ aedir_init_ticket_id }}"
+    vars:
+      ansible_python_interpreter: "{{ hostvars[aedir_main_provider_hostname].aedir_python_paths.python_exec }}"
+      ansible_python_interpreter: "{{ aedir_bin }}/python3"
     delegate_to: "{{ aedir_main_provider_hostname }}"
     register: aehost_result
 
@@ -231,13 +235,23 @@
 
     - name: "Init aehostd with a SSH ping"
       connection: "ssh"
+      remote_user: "aehost-init"
       vars:
-        ansible_user: "aehost-init"
         ansible_password: "{{ aehost_result.password }}"
         ansible_ssh_args: "-o PasswordAuthentication=yes -o RequestTTY=no -o PreferredAuthentications=password"
       ping:
         data: "pong"
-      ignore_errors: yes
+      become: no
+      ignore_unreachable: yes
+
+    - name: "Wait aehostd refresh"
+      pause:
+        seconds: 4
+
+    - name: "Normal SSH ping"
+      ping:
+        data: "pong"
+      become: no
 
     when: aehost_result.changed and aehost_result.password
 
