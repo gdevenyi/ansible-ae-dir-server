@@ -25,6 +25,12 @@ options:
         description:
             - Hostname to put in attribute 'cn'
         required: true
+    state:
+        description:
+            - The target state of the entry.
+        required: false
+        choices: [present, absent, reset]
+        default: present
     host:
         description:
             - Fully-qualified domain name to put in attribute 'host'
@@ -187,11 +193,20 @@ def main():
             dn=ae_host.dn_s,
         )
 
-    ldap_ops = ldap_conn.ensure_entry(
-        ae_host.dn_s,
-        ae_host.ldap_entry(),
-        old_attrs=list((AEHost.__must__|AEHost.__may__)-frozenset(('userPassword',))),
-    )
+    try:
+        ldap_ops = ldap_conn.ensure_entry(
+            ae_host.dn_s,
+            ae_host.ldap_entry(),
+            old_attrs=list((AEHost.__must__|AEHost.__may__)-frozenset(('userPassword',))),
+        )
+    except LDAPError as ldap_err:
+        module.fail_json(
+            msg='LDAP operations on entry {0} failed: {1}'.format(
+                ae_host.dn_s,
+                ldap_err,
+            )
+        )
+
     if ldap_ops:
         message = '%d LDAP operations on %r' % (len(ldap_ops), ae_host.dn_s,)
         changed = True
