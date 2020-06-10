@@ -833,14 +833,14 @@ cron_pkg_name: "{{ cron_config.pkg_name }}"
 slapd_checkmk_local: "{{ aedir_sbin }}"
 
 # fully-qualified domain name of local LDAPS service
-slapd_check_service_fqdn: "{{ inventory_hostname }}"
+slapd_check_service_fqdn: "{{ openldap_service_fqdn }}"
 
 # local LDAPS URI
 slapd_check_ldaps_uri: "ldaps://{{ slapd_check_service_fqdn }}"
 
 # expected authz-ID for local LDAPS connection
 # very likely you have to adjust this one
-slapd_check_authz_id: "dn:uid=slapd_{{ slapd_check_service_fqdn.split('.')[0] }},dc=example,dc=com"
+slapd_check_authz_id: "dn:uid=ae-dir-slapd_{{ slapd_check_service_fqdn }},cn=ae,{{ aedir_suffix }}"
 
 # pathnames to add to LD_LIBRARY_PATH
 slapd_check_lib_dirs:
