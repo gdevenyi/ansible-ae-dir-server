@@ -221,6 +221,7 @@
       srvgroup: "ae-dir-{{ openldap_role }}-hosts"
       description: "AE-DIR {{ openldap_role }} host {{ openldap_service_fqdn }}"
       ticket_id: "{{ aedir_init_ticket_id }}"
+      ppolicy: "cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}"
     vars:
       ansible_python_interpreter: "{{ hostvars[aedir_main_provider_hostname].aedir_python_paths.python_exec }}"
       ansible_python_interpreter: "{{ aedir_bin }}/python3"

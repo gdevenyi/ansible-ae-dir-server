@@ -45,6 +45,10 @@ options:
         description:
             - Value for attribute aeTicketId
         required: false
+    ppolicy:
+        description:
+            - DN of the pwdPolicySubentry entry (default cn=ppolicy-systems,cn=ae,<aedir_suffix>)
+        required: false
 
 author:
     - Michael Stroeder <michael@stroeder.com>
@@ -104,6 +108,10 @@ def get_module_args():
             default='ldapi://%2Fopt%2Fae-dir%2Frun%2Fslapd%2Fldapi',
             type='str'
         ),
+        ppolicy=dict(
+            required=False,
+            type='str'
+        ),
     )
 
 
@@ -150,6 +158,9 @@ def main():
     if module.params['host'] is None:
         module.params['host'] = module.params['name']
 
+    if module.params['ppolicy'] is None:
+        module.params['ppolicy'] = 'cn=ppolicy-systems,cn=ae,'+ldap_conn.search_base
+
     ae_srvgroup = ldap_conn.find_aesrvgroup(module.params['srvgroup'])
 
     ae_host = AEHost(
@@ -159,7 +170,7 @@ def main():
         aeTicketId=module.params['ticket_id'],
         aeStatus=AEStatus.active,
         description=module.params['description'],
-        pwdPolicySubentry=DNObj.from_str('cn=ppolicy-systems,cn=ae,'+ldap_conn.search_base),
+        pwdPolicySubentry=DNObj.from_str(module.params['ppolicy']),
     )
 
     message = ''
@@ -204,6 +215,7 @@ def main():
         password=new_password,
         dn=ae_host.dn_s,
         cn=ae_host.cn,
+        ppolicy=str(ae_host.pwdPolicySubentry),
     )
 
 
