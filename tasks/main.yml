@@ -209,8 +209,37 @@
     - services
 
 - block:
-    - name: "Tasks for loading initial data"
-      include_tasks: "aedir_init.yml"
-  when: aedir_init is defined and openldap_role == "provider"
+
+  - name: "Tasks for loading initial data"
+    include_tasks: "aedir_init.yml"
+    when: aedir_init is defined and openldap_role == "provider"
+
+  - name: "Init aeHost entry"
+    aehost:
+      name: "{{ inventory_hostname }}"
+      state: "present"
+      srvgroup: "ae-dir-{{ openldap_role }}-hosts"
+      description: "AE-DIR {{ openldap_role }} host {{ openldap_service_fqdn }}"
+    delegate_to: "{{ aedir_main_provider_hostname }}"
+    register: aehost_result
+
+  - block:
+
+    - name: "Wait for replication of aeHost entry change"
+      pause:
+        seconds: 4
+
+    - name: "Init aehostd with a SSH ping"
+      connection: "ssh"
+      vars:
+        ansible_user: "aehost-init"
+        ansible_password: "{{ aehost_result.password }}"
+        ansible_ssh_args: "-o PasswordAuthentication=yes -o RequestTTY=no -o PreferredAuthentications=password"
+      ping:
+        data: "pong"
+      ignore_errors: yes
+
+    when: aehost_result.changed and aehost_result.password
+
   tags:
     - init
