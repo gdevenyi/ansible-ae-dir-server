@@ -134,7 +134,7 @@
     - "restart {{ oath_bind_listener }}"
     - "restart oathenroll"
 
-- name: "Install systemd unit file for {{ oath_bind_listener }}"
+- name: "Install systemd unit file for OATH-LDAP bind listener"
   template:
     src: "systemd/{{ oath_bind_listener }}.service.j2"
     dest: "{{ aedir_systemd_dir }}/{{ oath_bind_listener }}.service"
