@@ -314,6 +314,7 @@ def main():
         message=message,
         dn=ae_service.dn_s,
         cn=ae_service.cn,
+        ops_count=len(ldap_ops),
         ppolicy=str(ae_service.pwdPolicySubentry),
     )
 
