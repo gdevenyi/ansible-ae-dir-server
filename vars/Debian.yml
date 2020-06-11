@@ -11,7 +11,7 @@ aedir_package_repos:
 
 # OS-specific Python paths
 aedir_python_paths:
-  python_exec: "{{ aedir_prefix }}/bin/python{{ aedir_python_version }}"
+  python_exec: "{{ aedir_prefix }}/bin/python{{ aedir_python_version.split('.')[0] }}"
   site_packages: "{{ aedir_prefix }}/lib/python{{ aedir_python_version }}/site-packages"
 
 # use virtualenv tool
