@@ -117,6 +117,7 @@ try:
     from aedir.models import AEService, AEStatus
     import ldap0
     from ldap0 import LDAPError
+    from ldap0.filter import escape_str as escape_filter_str
     from ldap0.dn import DNObj
 except ImportError:
     HAS_AEDIR = False
@@ -257,6 +258,11 @@ def main():
         ldap_ops = ldap_conn.ensure_entry(
             ae_service.dn_s,
             ae_service.ldap_entry(),
+            old_base=ldap_conn.search_base,
+            old_filter='(|(uid={0})(uidNumber={1}))'.format(
+                escape_filter_str(ae_service.uid),
+                escape_filter_str(str(ae_service.uidNumber)),
+            ),
             old_attrs=list((AEService.__must__|AEService.__may__)-frozenset(('userPassword',))),
         )
     except LDAPError as ldap_err:
