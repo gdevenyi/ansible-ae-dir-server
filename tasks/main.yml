@@ -214,6 +214,11 @@
     include_tasks: "aedir_init.yml"
     when: aedir_init is defined and openldap_role == "provider"
 
+  - name: "Store subject DN of server cert as host fact"
+    set_fact:
+      cacheable: no
+      aedir_python3: "{{ aedir_python }}"
+
   - name: "Init aeHost entry on {{ aedir_main_provider_hostname }}"
     aehost:
       name: "{{ inventory_hostname }}"
@@ -223,8 +228,7 @@
       ticket_id: "{{ aedir_init_ticket_id }}"
       ppolicy: "cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}"
     vars:
-      ansible_python_interpreter: "{{ hostvars[aedir_main_provider_hostname].aedir_python_paths.python_exec }}"
-      ansible_python_interpreter: "{{ aedir_bin }}/python3"
+      ansible_python_interpreter: "{{ hostvars[aedir_main_provider_hostname].aedir_python3 }}"
     delegate_to: "{{ aedir_main_provider_hostname }}"
     register: aehost_result
 
@@ -242,8 +246,7 @@
         - "ae-replicas"
         - "{{ 'ae-providers' if openldap_role == 'provider' else None }}"
     vars:
-      ansible_python_interpreter: "{{ hostvars[aedir_main_provider_hostname].aedir_python_paths.python_exec }}"
-      ansible_python_interpreter: "{{ aedir_bin }}/python3"
+      ansible_python_interpreter: "{{ hostvars[aedir_main_provider_hostname].aedir_python3 }}"
     delegate_to: "{{ aedir_main_provider_hostname }}"
     register: aeservice_result
 
