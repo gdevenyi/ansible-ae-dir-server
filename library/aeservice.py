@@ -231,7 +231,7 @@ def main():
 
     if module.params['see_also']:
         ae_service.objectClass.add('pkiUser')
-        ae_service.seeAlso = [DNObj.from_str(module.params['see_also'])]
+        ae_service.seeAlso = [DNObj.from_str(module.params['see_also'], at_sanitizer=str.lower)]
 
     message = ''
 
