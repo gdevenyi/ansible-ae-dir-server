@@ -5,6 +5,21 @@ ansible module for adding aeService entries to Æ-DIR
 Copyright: (c) 2020, Michael Stroeder <michael@stroeder.com>
 """
 
+from ansible.module_utils.basic import AnsibleModule
+
+try:
+    from aedir import AEDirObject
+    from aedir.models import AEService, AEStatus
+    import ldap0
+    from ldap0 import LDAPError
+    from ldap0.filter import escape_str as escape_filter_str, map_filter_parts
+    from ldap0.dn import DNObj
+except ImportError:
+    HAS_AEDIR = False
+else:
+    HAS_AEDIR = True
+
+
 ANSIBLE_METADATA = {
     'metadata_version': '1.1',
     'status': ['preview'],
@@ -53,7 +68,7 @@ options:
         required: false
     groups:
         description:
-            - names of user groups to add the service to
+            - names of user groups to add the service to (empty names and non-existent group names are silently ignored)
         required: false
     description:
         description:
@@ -105,27 +120,11 @@ message:
     description: The output message that the sample module generates
 '''
 
-import logging
-import os
-import uuid
-
-from ansible.module_utils.basic import AnsibleModule
-
-try:
-    import aedir
-    from aedir import AEDirObject
-    from aedir.models import AEService, AEStatus
-    import ldap0
-    from ldap0 import LDAPError
-    from ldap0.filter import escape_str as escape_filter_str
-    from ldap0.dn import DNObj
-except ImportError:
-    HAS_AEDIR = False
-else:
-    HAS_AEDIR = True
-
 
 def get_module_args():
+    """
+    returns dict with ansible module argument declaration
+    """
     return dict(
         name=dict(type='str', required=True),
         uid_number=dict(type='int', required=False),
@@ -155,10 +154,9 @@ def get_module_args():
 
 
 def main():
-
-    # set log level
-    logger = logging.getLogger()
-    logger.setLevel(os.environ.get('LOG_LEVEL', logging.ERROR))
+    """
+    actually do the stuff
+    """
 
     module = AnsibleModule(
         argument_spec=get_module_args(),
@@ -173,8 +171,6 @@ def main():
             message='Nothing done in check mode',
         )
 
-    changed = False
-
     if not HAS_AEDIR:
         module.fail_json(msg="Missing required 'aedir' module (pip install aedir).")
 
@@ -188,12 +184,6 @@ def main():
     except LDAPError as ldap_err:
         module.fail_json(msg='Error connecting to %r: %s' % (ldap_url, ldap_err))
 
-    logging.debug(
-        'Successfully bound to %s as %r',
-        ldap_conn.uri,
-        ldap_conn.whoami_s(),
-    )
-
     if module.params['ppolicy'] is None:
         module.params['ppolicy'] = 'cn=ppolicy-systems,cn=ae,'+ldap_conn.search_base
 
@@ -203,7 +193,10 @@ def main():
     if module.params['srvgroup']:
         parent_dn = ldap_conn.find_aesrvgroup(module.params['srvgroup']).dn_o
     elif module.params['zone']:
-        parent_dn = DNObj(((('cn', module.params['zone']),),)) + DNObj.from_str(ldap_conn.search_base)
+        parent_dn = (
+            DNObj(((('cn', module.params['zone']),),))
+            + DNObj.from_str(ldap_conn.search_base)
+        )
     else:
         module.fail_json(msg="Either 'zone' or 'srvgroup' must be set.")
 
@@ -241,7 +234,6 @@ def main():
         ae_service.seeAlso = [DNObj.from_str(module.params['see_also'])]
 
     message = ''
-    changed = False
 
     if state == 'absent':
 
@@ -267,19 +259,57 @@ def main():
         )
     except LDAPError as ldap_err:
         module.fail_json(
-            msg='LDAP operations on entry {0} failed: {1}'.format(
+            msg='{0}.ensure_entry() failed for entry {1!r}: {2}'.format(
+                ldap_conn.__class__.__name__,
                 ae_service.dn_s,
                 ldap_err,
             )
         )
 
+    if module.params['groups']:
+        group_filter = '(&(objectClass=aeGroup)(|{0})(!(member={1})))'.format(
+            ''.join(map_filter_parts(
+                'cn',
+                [
+                    grp_name
+                    for grp_name in module.params['groups']
+                    if grp_name
+                ],
+            )),
+            escape_filter_str(ae_service.dn_s),
+        )
+        try:
+            missing_groups = ldap_conn.search_s(
+                ldap_conn.search_base,
+                ldap0.SCOPE_SUBTREE,
+                filterstr=group_filter,
+                attrlist=['1.1'],
+            )
+        except LDAPError as ldap_err:
+            module.fail_json(
+                msg='Search groups with filter {0!r} failed: {1}'.format(
+                    group_filter,
+                    ldap_err,
+                )
+            )
+
+        for res in missing_groups:
+            ldap_ops.append(
+                ldap_conn.modify_s(
+                    res.dn_s,
+                    [
+                        (ldap0.MOD_ADD, b'member', [ae_service.dn_s.encode('utf-8')]),
+                        (ldap0.MOD_ADD, b'memberUid', [ae_service.uid.encode('utf-8')]),
+                    ],
+                )
+            )
+
     if ldap_ops:
         message = '%d LDAP operations on %r' % (len(ldap_ops), ae_service.dn_s,)
-        changed = True
 
     # finally return a result message to ansible
     module.exit_json(
-        changed=changed,
+        changed=bool(message),
         original_message=module.params['name'],
         message=message,
         dn=ae_service.dn_s,
