@@ -5,6 +5,20 @@ ansible module for adding aeHost entries to Æ-DIR
 Copyright: (c) 2020, Michael Stroeder <michael@stroeder.com>
 """
 
+from ansible.module_utils.basic import AnsibleModule
+
+try:
+    from aedir import AEDirObject
+    from aedir.models import AEHost, AEStatus
+    import ldap0
+    from ldap0 import LDAPError
+    from ldap0.dn import DNObj
+except ImportError:
+    HAS_AEDIR = False
+else:
+    HAS_AEDIR = True
+
+
 ANSIBLE_METADATA = {
     'metadata_version': '1.1',
     'status': ['preview'],
@@ -77,26 +91,10 @@ message:
     description: The output message that the sample module generates
 '''
 
-import logging
-import os
-import uuid
-
-from ansible.module_utils.basic import AnsibleModule
-
-try:
-    import aedir
-    from aedir import AEDirObject
-    from aedir.models import AEHost, AEStatus
-    import ldap0
-    from ldap0 import LDAPError
-    from ldap0.dn import DNObj
-except ImportError:
-    HAS_AEDIR = False
-else:
-    HAS_AEDIR = True
-
-
 def get_module_args():
+    """
+    returns dict with ansible module argument declaration
+    """
     return dict(
         name=dict(type='str', required=True),
         state=dict(
@@ -122,10 +120,9 @@ def get_module_args():
 
 
 def main():
-
-    # set log level
-    logger = logging.getLogger()
-    logger.setLevel(os.environ.get('LOG_LEVEL', logging.ERROR))
+    """
+    actually do the stuff
+    """
 
     module = AnsibleModule(
         argument_spec=get_module_args(),
@@ -154,12 +151,6 @@ def main():
         ldap_conn = AEDirObject(ldap_url)
     except LDAPError as ldap_err:
         module.fail_json(msg='Error connecting to %r: %s' % (ldap_url, ldap_err))
-
-    logging.debug(
-        'Successfully bound to %s as %r',
-        ldap_conn.uri,
-        ldap_conn.whoami_s(),
-    )
 
     if module.params['host'] is None:
         module.params['host'] = module.params['name']
@@ -218,7 +209,7 @@ def main():
             or (ldap_ops and ldap_ops[0].rtype == ldap0.RES_ADD)
         ):
         _, new_password = ldap_conn.set_password(module.params['host'], None)
-        message='Set new password for %r' % (ae_host.dn_s,)
+        message = 'Set new password for {0!r}'.format(ae_host.dn_s)
         changed = True
 
 
