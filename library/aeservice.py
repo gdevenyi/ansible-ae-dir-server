@@ -267,42 +267,46 @@ def main():
         )
 
     if module.params['groups']:
-        group_filter = '(&(objectClass=aeGroup)(|{0})(!(member={1})))'.format(
-            ''.join(map_filter_parts(
-                'cn',
-                [
-                    grp_name
-                    for grp_name in module.params['groups']
-                    if grp_name
-                ],
-            )),
-            escape_filter_str(ae_service.dn_s),
-        )
-        try:
-            missing_groups = ldap_conn.search_s(
-                ldap_conn.search_base,
-                ldap0.SCOPE_SUBTREE,
-                filterstr=group_filter,
-                attrlist=['1.1'],
-            )
-        except LDAPError as ldap_err:
-            module.fail_json(
-                msg='Search groups with filter {0!r} failed: {1}'.format(
-                    group_filter,
-                    ldap_err,
-                )
-            )
-
-        for res in missing_groups:
-            ldap_ops.append(
-                ldap_conn.modify_s(
-                    res.dn_s,
+        for group_filter_tmpl, mod_op in (
+            ('(&(objectClass=aeGroup)(|{0})(!(member={1})))', ldap0.MOD_ADD),
+            ('(&(objectClass=aeGroup)(!(|{0}))(member={1}))', ldap0.MOD_DELETE),
+        ):
+            group_filter = group_filter_tmpl.format(
+                ''.join(map_filter_parts(
+                    'cn',
                     [
-                        (ldap0.MOD_ADD, b'member', [ae_service.dn_s.encode('utf-8')]),
-                        (ldap0.MOD_ADD, b'memberUid', [ae_service.uid.encode('utf-8')]),
+                        grp_name
+                        for grp_name in module.params['groups']
+                        if grp_name
                     ],
-                )
+                )),
+                escape_filter_str(ae_service.dn_s),
             )
+            try:
+                ldap_res = ldap_conn.search_s(
+                    ldap_conn.search_base,
+                    ldap0.SCOPE_SUBTREE,
+                    filterstr=group_filter,
+                    attrlist=['1.1'],
+                )
+            except LDAPError as ldap_err:
+                module.fail_json(
+                    msg='Search groups with filter {0!r} failed: {1}'.format(
+                        group_filter,
+                        ldap_err,
+                    )
+                )
+
+            for grp in ldap_res:
+                ldap_ops.append(
+                    ldap_conn.modify_s(
+                        grp.dn_s,
+                        [
+                            (mod_op, b'member', [ae_service.dn_s.encode('utf-8')]),
+                            (mod_op, b'memberUid', [ae_service.uid.encode('utf-8')]),
+                        ],
+                    )
+                )
 
     if ldap_ops:
         message = '%d LDAP operations on %r' % (len(ldap_ops), ae_service.dn_s,)
