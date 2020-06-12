@@ -870,7 +870,7 @@ objectClass: ipHost
 dn: uid=ae-dir-slapd_{{ service_fqdn }},cn=ae,{{ aedir_suffix }}
 changetype: add
 uid: ae-dir-slapd_{{ service_fqdn }}
-pwdPolicySubentry: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
+pwdPolicySubentry: cn=ppolicy-sasl-external,cn=ae,{{ aedir_suffix }}
 objectClass: account
 objectClass: aeObject
 objectClass: aeService
