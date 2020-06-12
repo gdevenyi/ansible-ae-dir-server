@@ -74,6 +74,10 @@ options:
         description:
             - names of user groups to add the service to (empty names and non-existent group names are silently ignored)
         required: false
+    object_classes:
+        description:
+            - names of objectClass values to set
+        required: false
     description:
         description:
             - Purpose description of aeService object
@@ -155,6 +159,7 @@ def get_module_args():
         ),
         ppolicy=dict(type='str', required=False),
         see_also=dict(type='str', required=False),
+        object_classes=dict(type='list', required=False),
     )
 
 
@@ -216,6 +221,7 @@ def main():
         parent_dn=parent_dn,
         cn=module.params['name'],
         uid=module.params['uid'],
+        objectClass=set(module.params['object_classes'] or AEService.__object_classes__  ),
         uidNumber=-1,
         gidNumber=-1,
         homeDirectory=module.params['home_directory'],
