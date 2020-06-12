@@ -3,7 +3,7 @@
 # Add system accounts/groups
 #---------------------------------------------------------------------------
 
-- name: "Add local system groups needed on {{ openldap_role }}"
+- name: "Add local system groups needed for server role"
   group:
     name: "{{ item.key }}"
     gid: "{{ item.value.gid_number }}"
@@ -13,7 +13,7 @@
     "{{ aedir_ldapi_services }}"
   when: openldap_role in item.value.roles
 
-- name: "Add local system accounts needed on {{ openldap_role }}"
+- name: "Add local system accounts needed for server role"
   user:
     name: "{{ item.key }}"
     comment: "{{ item.value.description }}"
@@ -32,7 +32,7 @@
 # Remove system accounts/groups
 #---------------------------------------------------------------------------
 
-- name: "Remove local system accounts not needed on {{ openldap_role }}"
+- name: "Remove local system accounts not needed for server role"
   user:
     name: "{{ item.key }}"
     state: absent
@@ -41,7 +41,7 @@
     "{{ aedir_ldapi_services }}"
   when: openldap_role not in item.value.roles
 
-- name: "Remove local system groups not needed on {{ openldap_role }}"
+- name: "Remove local system groups not needed for server role"
   group:
     name: "{{ item.key }}"
     state: absent
