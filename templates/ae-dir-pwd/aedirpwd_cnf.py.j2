@@ -88,7 +88,7 @@ SMTP_FROM = '{{ smtp_from_address }}'
 # handy for reverse proxy setups
 APP_PATH_PREFIX = '/pwd'
 
-# MMR server ID of this particular provider replica
+# Server ID of provider replica
 # (must be 3 hex-digits with padded zeros)
 SERVER_ID = '{0:03x}'.format(int('{{ openldap_server_id }}'))
 
