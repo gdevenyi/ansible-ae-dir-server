@@ -249,6 +249,8 @@
       ansible_python_interpreter: "{{ hostvars[aedir_main_provider_hostname].aedir_python3 }}"
     delegate_to: "{{ aedir_main_provider_hostname }}"
     register: aeservice_result
+    notify:
+      - "restart {{ openldap_service_name }}"
 
   - name: "Wait for replication of changes"
     pause:
