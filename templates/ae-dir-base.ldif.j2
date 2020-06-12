@@ -884,6 +884,7 @@ cn: ae-dir-slapd_{{ service_fqdn }}
 uidNumber: {{ aedir_min_gid + gid_number|length }}
 gidNumber: {{ aedir_min_gid + gid_number|length }}
 seeAlso: {{ hostvars[host]['openldap_cert_subject'] }}
+loginShell: {{ aedir_nologin_shell }}
 aeHost: host={{ host }},cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir_suffix }}
 {% if gid_number.append(1) -%}{% endif %}
 

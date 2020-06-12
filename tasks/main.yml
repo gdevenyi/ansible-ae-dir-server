@@ -242,6 +242,7 @@
       ticket_id: "{{ aedir_init_ticket_id }}"
       ppolicy: "cn=ppolicy-sasl-external,cn=ae,{{ aedir_suffix }}"
       see_also: "{{ hostvars[inventory_hostname].openldap_cert_subject }}"
+      login_shell: "{{ aedir_nologin_shell }}"
       groups:
         - "ae-replicas"
         - "{{ 'ae-providers' if openldap_role == 'provider' else None }}"
