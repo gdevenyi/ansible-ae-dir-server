@@ -232,10 +232,40 @@
     delegate_to: "{{ aedir_main_provider_hostname }}"
     register: aehost_result
 
+  - name: "Add aeService entries for system accounts"
+    aeservice:
+      name: "{{ item.value.cn }}"
+      state: "present"
+      object_classes:
+        - account
+        - aeObject
+        - aeService
+        - posixAccount
+      uid: "{{ item.key }}"
+      description: "{{ item.value.description }}"
+      zone: "ae"
+      uid_number: "{{ item.value.uid_number|int }}"
+      gid_number: "{{ item.value.gid_number|int }}"
+      ppolicy: "cn=ppolicy-sasl-external,cn=ae,{{ aedir_suffix }}"
+      login_shell: "{{ aedir_nologin_shell }}"
+      home_directory: "{{ aedir_rundir+'/'+item.key }}"
+      ticket_id: "{{ aedir_init_ticket_id }}"
+    with_dict:
+      "{{ aedir_ldapi_services }}"
+    vars:
+      ansible_python_interpreter: "{{ hostvars[aedir_main_provider_hostname].aedir_python3 }}"
+    run_once: yes
+    delegate_to: "{{ aedir_main_provider_hostname }}"
+
   - name: "Init aeService entry on {{ aedir_main_provider_hostname }}"
     aeservice:
       name: "ae-dir-slapd_{{ openldap_service_fqdn }}"
       state: "present"
+      object_classes:
+        - account
+        - aeObject
+        - aeService
+        - posixAccount
       host: "{{ inventory_hostname }}"
       zone: "ae"
       description: "AE-DIR slapd {{ openldap_role }} {{ openldap_service_fqdn }} running on {{ inventory_hostname }}"
