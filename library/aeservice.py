@@ -40,6 +40,10 @@ options:
         description:
             - Value to put in attribute 'cn'
         required: true
+    uid:
+        description:
+            - Value to put in attribute 'uid' (default is name:)
+        required: false
     state:
         description:
             - The target state of the entry.
@@ -127,6 +131,7 @@ def get_module_args():
     """
     return dict(
         name=dict(type='str', required=True),
+        uid=dict(type='str', required=False),
         uid_number=dict(type='int', required=False),
         gid_number=dict(type='int', required=False),
         state=dict(
@@ -187,6 +192,9 @@ def main():
     if module.params['ppolicy'] is None:
         module.params['ppolicy'] = 'cn=ppolicy-systems,cn=ae,'+ldap_conn.search_base
 
+    if module.params['uid'] is None:
+        module.params['uid'] = module.params['name']
+
     if module.params['home_directory'] is None:
         module.params['home_directory'] = '/home/{}'.format(module.params['name'])
 
@@ -207,7 +215,7 @@ def main():
     ae_service = AEService(
         parent_dn=parent_dn,
         cn=module.params['name'],
-        uid=module.params['name'],
+        uid=module.params['uid'],
         uidNumber=-1,
         gidNumber=-1,
         homeDirectory=module.params['home_directory'],
@@ -228,6 +236,9 @@ def main():
         else:
             ae_service.uidNumber = int(old.entry_s['uidNumber'][0])
             ae_service.gidNumber = int(old.entry_s['gidNumber'][0])
+    else:
+        ae_service.uidNumber = module.params['uid_number']
+        ae_service.gidNumber = module.params['gid_number']
 
     if module.params['see_also']:
         ae_service.objectClass.add('pkiUser')
