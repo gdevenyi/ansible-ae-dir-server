@@ -214,7 +214,7 @@
     include_tasks: "aedir_init.yml"
     when: aedir_init is defined and openldap_role == "provider"
 
-  - name: "Store subject DN of server cert as host fact"
+  - name: "Store Python interpreter used for ansible modules as host fact"
     set_fact:
       cacheable: no
       aedir_python3: "{{ aedir_python }}"
@@ -222,7 +222,7 @@
   - name: "Init aeHost entry on {{ aedir_main_provider_hostname }}"
     aehost:
       name: "{{ inventory_hostname }}"
-      state: "{{ aedir_aehost_state }}"
+      state: "{{ 'reset' if aedir_init is defined else aedir_aehost_state }}"
       srvgroup: "ae-dir-{{ openldap_role }}-hosts"
       description: "AE-DIR {{ openldap_role }} host {{ openldap_service_fqdn }}"
       ticket_id: "{{ aedir_init_ticket_id }}"
