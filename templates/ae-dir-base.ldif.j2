@@ -748,10 +748,10 @@ aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
 uid: {{ uid }}
 cn: {{ s.cn }}
-description: {{ s.cn }}
+description: {{ s.description }}
 uidNumber: {{ s.uid_number }}
 gidNumber: {{ s.gid_number }}
-homeDirectory: {{ s.get('home_directory', '/home/'+uid) }}
+homeDirectory: {{ s.get('home_directory', aedir_rundir+'/'+uid) }}
 loginShell: {{ aedir_nologin_shell }}
 objectClass: account
 objectClass: aeObject
@@ -772,22 +772,14 @@ objectClass: groupOfEntries
 objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
-{% if oath_ldap_enabled==True %}
 member: uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}
 member: uid=ae-dir-bind-proxy,cn=ae,{{ aedir_suffix }}
 member: uid={{ oath_ldap_oathenroll_web_user }},cn=ae,{{ aedir_suffix }}
-{% endif %}
-{% if aedir_pwsync_targeturl %}
 member: uid=ae-dir-pwsync,cn=ae,{{ aedir_suffix }}
-{% endif %}
-{% if oath_ldap_enabled==True %}
 memberUid: ae-dir-otpverify
 memberUid: ae-dir-bind-proxy
 memberUid: {{ oath_ldap_oathenroll_web_user }}
-{% endif %}
-{% if aedir_pwsync_targeturl %}
 memberUid: ae-dir-pwsync
-{% endif %}
 {% if gid_number.append(1) -%}{% endif %}
 
 dn: cn=ae-sudo-sys-admins,cn=ae,{{ aedir_suffix }}
@@ -878,7 +870,7 @@ objectClass: pkiUser
 objectClass: posixAccount
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
-description: AE-DIR slapd provider {{ service_fqdn }} running on {{ host }}
+description: AE-DIR slapd {{ role }} {{ service_fqdn }} running on {{ host }}
 homeDirectory: /home/ae-dir-slapd_{{ service_fqdn }}
 cn: ae-dir-slapd_{{ service_fqdn }}
 uidNumber: {{ aedir_min_gid + gid_number|length }}

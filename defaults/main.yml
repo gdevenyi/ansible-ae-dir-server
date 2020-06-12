@@ -273,6 +273,8 @@ aedir_ldapi_services:
     description: The system user allowed to init OATH token entries over LDAPI
     roles:
       - provider
+    groups:
+      - ae-login-proxies
   # system user for OTP verification listener
   # uid is referenced in OpenLDAP ACLs!
   ae-dir-otpverify:
@@ -282,6 +284,8 @@ aedir_ldapi_services:
     description: The system user allowed to read shared secrets (OATH-LDAP)
     roles:
       - provider
+    groups:
+      - ae-login-proxies
   # system user for bind proxy listener
   ae-dir-bind-proxy:
     cn: OATH-LDAP bind proxy
@@ -290,6 +294,8 @@ aedir_ldapi_services:
     description: The system user used for simple bind proxy
     roles:
       - consumer
+    groups:
+      - ae-login-proxies
   # system user for WebSSO component
   ae-dir-web-sso:
     cn: WebSSO component
@@ -306,6 +312,8 @@ aedir_ldapi_services:
     description: The system user allowed to intercept password changes and set password
     roles:
       - provider
+    groups:
+      - ae-login-proxies
   # system user which must match UID/GID OpenLDAP's slapd service is running as
   ae-dir-slapd:
     cn: OpenLDAP slapd demon user

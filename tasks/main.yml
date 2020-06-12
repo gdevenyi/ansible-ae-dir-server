@@ -250,6 +250,7 @@
       login_shell: "{{ aedir_nologin_shell }}"
       home_directory: "{{ aedir_rundir+'/'+item.key }}"
       ticket_id: "{{ aedir_init_ticket_id }}"
+      groups: "{{ item.value.get('groups', []) }}"
     with_dict:
       "{{ aedir_ldapi_services }}"
     vars:
