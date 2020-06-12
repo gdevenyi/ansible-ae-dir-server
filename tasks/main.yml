@@ -232,7 +232,7 @@
     delegate_to: "{{ aedir_main_provider_hostname }}"
     register: aehost_result
 
-  - name: "Add aeService entries for system accounts"
+  - name: "Update aeService entries for local system accounts via {{ aedir_main_provider_hostname }}"
     aeservice:
       name: "{{ item.value.cn }}"
       state: "present"
@@ -257,7 +257,7 @@
     run_once: yes
     delegate_to: "{{ aedir_main_provider_hostname }}"
 
-  - name: "Init aeService entry on {{ aedir_main_provider_hostname }}"
+  - name: "Init aeService entry via {{ aedir_main_provider_hostname }}"
     aeservice:
       name: "ae-dir-slapd_{{ openldap_service_fqdn }}"
       state: "present"
