@@ -1,6 +1,11 @@
 ---
 # tasks file for roles/ae-dir-server
 
+- name: "Store Python interpreter used for ansible modules as host fact"
+  set_fact:
+    cacheable: no
+    aedir_python3: "{{ aedir_python }}"
+
 - debug:
     var: "{{ item }}"
     verbosity: 1
@@ -13,6 +18,7 @@
     - aedir_templates_dirs
     - aedir_providers_restrictions
     - aedir_replicas_restrictions
+    - aedir_python3
   tags:
     - always
 
@@ -213,11 +219,6 @@
   - name: "Tasks for loading initial data"
     include_tasks: "aedir_init.yml"
     when: aedir_init is defined and openldap_role == "provider"
-
-  - name: "Store Python interpreter used for ansible modules as host fact"
-    set_fact:
-      cacheable: no
-      aedir_python3: "{{ aedir_python }}"
 
   - name: "Init aeHost entry on {{ aedir_main_provider_hostname }}"
     aehost:
