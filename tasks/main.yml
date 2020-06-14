@@ -13,7 +13,6 @@
     - aedir_templates_dirs
     - aedir_providers_restrictions
     - aedir_replicas_restrictions
-    - aedir_python3
   tags:
     - always
 
@@ -48,7 +47,7 @@
 
 - name: "Store Python interpreter used for ansible modules as host fact"
   set_fact:
-    cacheable: no
+    cacheable: yes
     aedir_python3: "{{ aedir_python }}"
 
 - name: "OS base configuration"
