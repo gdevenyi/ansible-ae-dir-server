@@ -1,11 +1,6 @@
 ---
 # tasks file for roles/ae-dir-server
 
-- name: "Store Python interpreter used for ansible modules as host fact"
-  set_fact:
-    cacheable: no
-    aedir_python3: "{{ aedir_python }}"
-
 - debug:
     var: "{{ item }}"
     verbosity: 1
@@ -50,6 +45,11 @@
     - aedir_cron_file
   tags:
     - always
+
+- name: "Store Python interpreter used for ansible modules as host fact"
+  set_fact:
+    cacheable: no
+    aedir_python3: "{{ aedir_python }}"
 
 - name: "OS base configuration"
   include_tasks: "baseos_{{ lsb_id }}.yml"
