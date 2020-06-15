@@ -671,25 +671,29 @@ openldap_threads: 8
 
 # Various database-specific tuning parameters
 # maxsize: see directive 'maxsize' in slapd-mdb(5)
+# checkpoint: see directive 'checkpoint' in slapd-mdb(5)
 # syncprov_sessionlog: see directive 'syncprov-sessionlog' in slapo-syncprov(5)
 # syncprov_checkpoint: see directive 'syncprov-checkpoint' in slapo-syncprov(5)
 # sizelimit: see directive 'sizelimit' in slapd.conf(5)
 # timelimit: see directive 'timelimit' in slapd.conf(5)
 openldap_db_params:
   accesslog:
-    mdb_maxsize: 100000000
+    mdb_maxsize: 500000000
+    checkpoint: "5000 2"
     syncprov_sessionlog: 10000
-    syncprov_checkpoint: "1000 1"
+    syncprov_checkpoint: "5000 2"
     sizelimit: -1
     timelimit: 120
   um:
-    mdb_maxsize: 50000000
+    mdb_maxsize: 100000000
+    checkpoint: "1000 1"
     syncprov_sessionlog: 10000
     syncprov_checkpoint: "1000 1"
     sizelimit: 500
     timelimit: 60
   session:
     mdb_maxsize: 10000000
+    checkpoint: "20000 10"
     syncprov_sessionlog: 1000
     syncprov_checkpoint: "20000 10"
     sizelimit: 2

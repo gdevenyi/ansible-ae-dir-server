@@ -21,9 +21,13 @@ lastmod on
 
 # database parameters
 maxsize {{ openldap_db_params.session.mdb_maxsize }}
+
+{% if openldap_db_params.session.checkpoint %}
+# Better write performance but less crash resistance, see slapd-mdb(5) for details
 dbnosync
-checkpoint 20000 1
-envflags writemap
+checkpoint {{ openldap_db_params.session.checkpoint }}
+envflags writemap mapasync
+{% endif %}
 
 # Maximum number of entries to return from a search operation
 sizelimit {{ openldap_db_params.session.sizelimit }}
