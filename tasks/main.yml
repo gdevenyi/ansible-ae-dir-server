@@ -232,6 +232,7 @@
     vars:
       ansible_python_interpreter: "{{ hostvars[aedir_main_provider_hostname].aedir_python3 }}"
     delegate_to: "{{ aedir_main_provider_hostname }}"
+    become: no
     register: aehost_result
 
   - name: "Update aeService entries for local system accounts via {{ aedir_main_provider_hostname }}"
@@ -259,6 +260,7 @@
       ansible_python_interpreter: "{{ hostvars[aedir_main_provider_hostname].aedir_python3 }}"
     run_once: yes
     delegate_to: "{{ aedir_main_provider_hostname }}"
+    become: no
 
   - name: "Init aeService entry via {{ aedir_main_provider_hostname }}"
     aeservice:
@@ -282,6 +284,7 @@
     vars:
       ansible_python_interpreter: "{{ hostvars[aedir_main_provider_hostname].aedir_python3 }}"
     delegate_to: "{{ aedir_main_provider_hostname }}"
+    become: no
     register: aeservice_result
     notify:
       - "restart {{ openldap_service_name }}"
