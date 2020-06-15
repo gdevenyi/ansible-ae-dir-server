@@ -49,6 +49,8 @@
   set_fact:
     cacheable: yes
     aedir_python3: "{{ aedir_python }}"
+  tags:
+    - always
 
 - name: "OS base configuration"
   include_tasks: "baseos_{{ lsb_id }}.yml"
@@ -58,7 +60,7 @@
       include_tasks: "apparmor.yml"
       when: apparmor_enabled == True
   tags:
-    - apparmor
+    - aedir_apparmor
 
 - name: "Install OpenLDAP packages"
   include_tasks: "install_openldap_{{ lsb_id }}.yml"
@@ -113,7 +115,7 @@
     - name: "Configure OpenLDAP slapd for AE-DIR"
       include_tasks: configure_slapd.yml
   tags:
-    - slapd_conf
+    - aedir_slapd
 
 - block:
     - name: "Install various AE-DIR tools"
@@ -150,68 +152,68 @@
         news: "{{ aedir_news }}"
       when: openldap_role=="provider"
   tags:
-    - htdocs
+    - aedir_htdocs
 
 - block:
     - name: "Configure apache2"
       include_tasks: "configure_apache2.yml"
       when: openldap_role == 'provider'
   tags:
-    - apache_conf
+    - aedir_httpd
 
 - block:
     - name: "Install AE-DIR password service (ae-dir-pwd)"
       include_tasks: "pwd.yml"
       when: openldap_role=="provider"
   tags:
-    - pwd
+    - aedir_pwd
 
 - block:
     - name: "Install and configure web2ldap on {{ openldap_role }}"
       include_tasks: "web2ldap.yml"
       when: openldap_role=="provider"
   tags:
-    - web2ldap
+    - aedir_web2ldap
 
 - block:
     - name: "OATH-LDAP tasks on {{ openldap_role }}"
       include_tasks: "oath_ldap.yml"
       when: oath_ldap_enabled == True
   tags:
-    - oath
+    - aedir_oath
 
 - block:
     - name: "OATH-LDAP enrollment web app on {{ openldap_role }}"
       include_tasks: "oathenroll.yml"
       when: oath_ldap_enabled == True and openldap_role=="provider"
   tags:
-    - oath
-    - oathenroll
+    - aedir_oath
+    - aedir_oathenroll
 
 - block:
     - name: "Password sync tasks on {{ openldap_role }}"
       include_tasks: "pwsync.yml"
       when: openldap_role=="provider" and aedir_pwsync_targeturl
   tags:
-    - pwsync
+    - aedir_pwsync
 
 - block:
     - name: "Monitoring scripts on {{ openldap_role }}"
       include_tasks: "monitoring.yml"
   tags:
-    - monitoring
+    - aedir_monitoring
 
 - block:
     - name: "Install CRON jobs on {{ openldap_role }}"
       include_tasks: "cron.yml"
   tags:
-    - cron
+    - aedir_cron
 
 - block:
     - name: "Services on {{ openldap_role }}"
       include_tasks: "services.yml"
   tags:
-    - services
+    - aedir_services
 
 - block:
 
