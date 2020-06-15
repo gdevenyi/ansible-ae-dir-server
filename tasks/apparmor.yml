@@ -3,8 +3,6 @@
 - name: "Install AppArmor packages"
   include_tasks: "apparmor_{{ lsb_id }}.yml"
   when: apparmor_enabled == True
-  tags:
-    - apparmor
 
 - name: "Create AppArmor directories"
   file:
