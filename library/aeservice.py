@@ -238,6 +238,17 @@ def main():
         pwdPolicySubentry=DNObj.from_str(module.params['ppolicy']),
     )
 
+    # deleting the entry can be done right now
+    if module.params['state'] == 'absent':
+        ldap_conn.delete_s(ae_service.dn_s)
+        module.exit_json(
+            changed=True,
+            original_message=module.params['name'],
+            message='Deleted entry %r' % (ae_service.dn_s),
+            who=ldap_conn.get_whoami_dn(),
+            dn=ae_service.dn_s,
+        )
+
     if module.params['uid_number'] is None and module.params['gid_number'] is None:
         try:
             old = ldap_conn.read_s(ae_service.dn_s, attrlist=['uidNumber', 'gidNumber'])
@@ -256,17 +267,6 @@ def main():
         ae_service.seeAlso = [DNObj.from_str(module.params['see_also'], at_sanitizer=str.lower)]
 
     message = ''
-
-    if module.params['state'] == 'absent':
-
-        ldap_conn.delete_s(ae_service.dn_s)
-
-        module.exit_json(
-            changed=True,
-            original_message=module.params['name'],
-            message='Deleted entry %r' % (ae_service.dn_s),
-            dn=ae_service.dn_s,
-        )
 
     try:
         ldap_ops = ldap_conn.ensure_entry(
@@ -338,6 +338,7 @@ def main():
         changed=bool(message),
         original_message=module.params['name'],
         message=message,
+        who=ldap_conn.get_whoami_dn(),
         dn=ae_service.dn_s,
         cn=ae_service.cn,
         ops_count=len(ldap_ops),

@@ -231,19 +231,19 @@ def main():
         pwdPolicySubentry=DNObj.from_str(module.params['ppolicy']),
     )
 
-    message = ''
-    changed = False
-
+    # deleting the entry can be done right now
     if module.params['state'] == 'absent':
-
         ldap_conn.delete_s(ae_host.dn_s)
-
         module.exit_json(
             changed=True,
             original_message=module.params['name'],
             message='Deleted entry %r' % (ae_host.dn_s),
+            who=ldap_conn.get_whoami_dn(),
             dn=ae_host.dn_s,
         )
+
+    message = ''
+    changed = False
 
     try:
         ldap_ops = ldap_conn.ensure_entry(
@@ -279,6 +279,7 @@ def main():
         changed=changed,
         original_message=module.params['name'],
         message=message,
+        who=ldap_conn.get_whoami_dn(),
         password=new_password,
         dn=ae_host.dn_s,
         cn=ae_host.cn,
