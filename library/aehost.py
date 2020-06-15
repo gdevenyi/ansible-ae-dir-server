@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 """
 ansible module for adding aeHost entries to Æ-DIR
@@ -13,11 +14,29 @@ try:
     import ldap0
     from ldap0 import LDAPError
     from ldap0.dn import DNObj
+    from ldap0.filter import escape_str as escape_filter_str, map_filter_parts
 except ImportError:
     HAS_AEDIR = False
 else:
     HAS_AEDIR = True
 
+# set of attribute types ignored when modifying aeHost entry
+IGNORED_AEHOST_ATTRS = frozenset((
+    'aeExpiryStatus',
+    'aeHwSerialNumber',
+    'aeLocation',
+    'aeNotAfter',
+    'aeNotBefore',
+    'aeOwner',
+    'aeRemoteHost',
+    'aeStockId',
+    'aeTag',
+    'displayName',
+    'l',
+    'serialNumber',
+    'sshPublicKey',
+    'userPassword',
+))
 
 ANSIBLE_METADATA = {
     'metadata_version': '1.1',
@@ -52,6 +71,10 @@ options:
     srvgroup:
         description:
             - name of parent aeSrvGroup entry
+        required: true
+    srvgroups:
+        description:
+            - names of supplemental aeSrvGroup entries
         required: true
     description:
         description:
@@ -105,6 +128,7 @@ def get_module_args():
         ),
         host=dict(type='str', required=False),
         srvgroup=dict(type='str', required=True),
+        srvgroups=dict(type='list', default=[], required=False),
         description=dict(type='str', required=False),
         ticket_id=dict(type='str', required=False),
         ldapurl=dict(
@@ -160,11 +184,42 @@ def main():
 
     ae_srvgroup = ldap_conn.find_aesrvgroup(module.params['srvgroup'])
 
+    if module.params['srvgroups']:
+        srv_groups_filter = '(&(objectClass=aeSrvGroup)(|{0}))'.format(
+            ''.join(map_filter_parts(
+                'cn',
+                [
+                    grp_name
+                    for grp_name in module.params['srvgroups']
+                    if grp_name
+                ],
+            )),
+        )
+        try:
+            ldap_res = ldap_conn.search_s(
+                ldap_conn.search_base,
+                ldap0.SCOPE_SUBTREE,
+                filterstr=srv_groups_filter,
+                attrlist=['1.1'],
+            )
+        except LDAPError as ldap_err:
+            module.fail_json(
+                msg='Search host groups with filter {0!r} failed: {1}'.format(
+                    srv_groups_filter,
+                    ldap_err,
+                )
+            )
+        else:
+            srv_groups = [res.dn_o for res in ldap_res]
+    else:
+        srv_groups = []
+
     ae_host = AEHost(
         parent_dn=ae_srvgroup.dn_o,
         cn=module.params['name'],
         host=module.params['host'],
         aeTicketId=module.params['ticket_id'],
+        aeSrvGroup=srv_groups,
         aeStatus=AEStatus.active,
         description=module.params['description'],
         pwdPolicySubentry=DNObj.from_str(module.params['ppolicy']),
@@ -188,7 +243,7 @@ def main():
         ldap_ops = ldap_conn.ensure_entry(
             ae_host.dn_s,
             ae_host.ldap_entry(),
-            old_attrs=list((AEHost.__must__|AEHost.__may__)-frozenset(('userPassword',))),
+            old_attrs=list((AEHost.__must__|AEHost.__may__)-IGNORED_AEHOST_ATTRS),
         )
     except LDAPError as ldap_err:
         module.fail_json(
