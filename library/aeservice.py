@@ -12,7 +12,8 @@ try:
     from aedir.models import AEService, AEStatus
     import ldap0
     from ldap0 import LDAPError
-    from ldap0.filter import escape_str as escape_filter_str, map_filter_parts
+    from ldap0.filter import escape_str as escape_filter_str
+    from ldap0.filter import map_filter_parts
     from ldap0.dn import DNObj
 except ImportError:
     HAS_AEDIR = False
