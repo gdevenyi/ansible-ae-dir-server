@@ -82,7 +82,7 @@ options:
         required: false
     ldapurl:
         description:
-            - LDAP URI of Æ-DIR server (default ldapi://)
+            - LDAP URI of Æ-DIR server (default ldapi://%2Fopt%2Fae-dir%2Frun%2Fslapd%2Fldapi)
         required: false
     ticket_id:
         description:
@@ -119,6 +119,13 @@ def get_module_args():
     returns dict with ansible module argument declaration
     """
     return dict(
+        # LDAP connection arguments
+        ldapurl=dict(
+            required=False,
+            default='ldapi://%2Fopt%2Fae-dir%2Frun%2Fslapd%2Fldapi',
+            type='str'
+        ),
+        # general arguments
         name=dict(type='str', required=True),
         state=dict(
             required=False,
@@ -126,20 +133,16 @@ def get_module_args():
             choices=['present', 'reset', 'absent'],
             type='str'
         ),
-        host=dict(type='str', required=False),
-        srvgroup=dict(type='str', required=True),
-        srvgroups=dict(type='list', default=[], required=False),
-        description=dict(type='str', required=False),
         ticket_id=dict(type='str', required=False),
-        ldapurl=dict(
-            required=False,
-            default='ldapi://%2Fopt%2Fae-dir%2Frun%2Fslapd%2Fldapi',
-            type='str'
-        ),
+        description=dict(type='str', required=False),
         ppolicy=dict(
             required=False,
             type='str'
         ),
+        host=dict(type='str', required=False),
+        srvgroup=dict(type='str', required=True),
+        srvgroups=dict(type='list', default=[], required=False),
+        object_classes=dict(type='list', default=list(AEHost.__object_classes__), required=False),
     )
 
 
@@ -165,8 +168,6 @@ def main():
 
     if not HAS_AEDIR:
         module.fail_json(msg="Missing required 'aedir' module (pip install aedir).")
-
-    state = module.params['state']
 
     ldap_url = module.params['ldapurl']
 
@@ -204,7 +205,7 @@ def main():
             )
         except LDAPError as ldap_err:
             module.fail_json(
-                msg='Search host groups with filter {0!r} failed: {1}'.format(
+                msg='Searching host groups with filter {0!r} failed: {1}'.format(
                     srv_groups_filter,
                     ldap_err,
                 )
@@ -216,6 +217,7 @@ def main():
 
     ae_host = AEHost(
         parent_dn=ae_srvgroup.dn_o,
+        objectClass=set(module.params['object_classes']),
         cn=module.params['name'],
         host=module.params['host'],
         aeTicketId=module.params['ticket_id'],
@@ -228,7 +230,7 @@ def main():
     message = ''
     changed = False
 
-    if state == 'absent':
+    if module.params['state'] == 'absent':
 
         ldap_conn.delete_s(ae_host.dn_s)
 
@@ -260,7 +262,7 @@ def main():
     new_password = None
 
     if (
-            state == 'reset'
+            module.params['state'] == 'reset'
             or (ldap_ops and ldap_ops[0].rtype == ldap0.RES_ADD)
         ):
         _, new_password = ldap_conn.set_password(module.params['host'], None)

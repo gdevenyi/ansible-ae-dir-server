@@ -93,7 +93,7 @@ options:
         required: false
     ldapurl:
         description:
-            - LDAP URI of Æ-DIR server (default ldapi://)
+            - LDAP URI of Æ-DIR server (default ldapi://%2Fopt%2Fae-dir%2Frun%2Fslapd%2Fldapi)
         required: false
     ticket_id:
         description:
@@ -135,32 +135,34 @@ def get_module_args():
     returns dict with ansible module argument declaration
     """
     return dict(
+        # LDAP connection arguments
+        ldapurl=dict(
+            required=False,
+            default='ldapi://%2Fopt%2Fae-dir%2Frun%2Fslapd%2Fldapi',
+            type='str'
+        ),
+        # general arguments
         name=dict(type='str', required=True),
-        uid=dict(type='str', required=False),
-        uid_number=dict(type='int', required=False),
-        gid_number=dict(type='int', required=False),
         state=dict(
             required=False,
             default='present',
             choices=['present', 'absent'],
             type='str'
         ),
-        host=dict(type='str', required=False),
-        zone=dict(type='str', required=False),
-        srvgroup=dict(type='str', required=False),
-        groups=dict(type='list', required=False),
-        description=dict(type='str', required=False),
         ticket_id=dict(type='str', required=False),
+        description=dict(type='str', required=False),
+        ppolicy=dict(type='str', required=False),
+        uid=dict(type='str', required=False),
+        uid_number=dict(type='int', required=False),
+        gid_number=dict(type='int', required=False),
+        host=dict(type='str', required=False),
+        srvgroup=dict(type='str', required=False),
+        zone=dict(type='str', required=False),
+        groups=dict(type='list', default=[], required=False),
         home_directory=dict(type='str', required=False),
         login_shell=dict(type='str', default='/usr/sbin/nologin', required=False),
-        ldapurl=dict(
-            required=False,
-            default='ldapi://%2Fopt%2Fae-dir%2Frun%2Fslapd%2Fldapi',
-            type='str'
-        ),
-        ppolicy=dict(type='str', required=False),
         see_also=dict(type='str', required=False),
-        object_classes=dict(type='list', required=False),
+        object_classes=dict(type='list', default=list(AEService.__object_classes__), required=False),
     )
 
 
@@ -184,8 +186,6 @@ def main():
 
     if not HAS_AEDIR:
         module.fail_json(msg="Missing required 'aedir' module (pip install aedir).")
-
-    state = module.params['state']
 
     ldap_url = module.params['ldapurl']
 
@@ -220,9 +220,9 @@ def main():
 
     ae_service = AEService(
         parent_dn=parent_dn,
+        objectClass=set(module.params['object_classes']),
         cn=module.params['name'],
         uid=module.params['uid'],
-        objectClass=set(module.params['object_classes'] or AEService.__object_classes__  ),
         uidNumber=-1,
         gidNumber=-1,
         homeDirectory=module.params['home_directory'],
@@ -253,7 +253,7 @@ def main():
 
     message = ''
 
-    if state == 'absent':
+    if module.params['state'] == 'absent':
 
         ldap_conn.delete_s(ae_service.dn_s)
 
