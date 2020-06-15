@@ -319,4 +319,4 @@
     when: aehost_result.changed and aehost_result.password
 
   tags:
-    - init
+    - aedir_init
