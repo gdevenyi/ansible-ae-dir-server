@@ -316,7 +316,9 @@ overlay lastbind
 
 # syncrepl-Overlay
 overlay syncprov
+{% if openldap_db_params.um.syncprov_checkpoint %}
 syncprov-checkpoint {{ openldap_db_params.um.syncprov_checkpoint }}
+{% endif %}
 syncprov-nopresent FALSE
 syncprov-reloadhint FALSE
 
