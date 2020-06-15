@@ -1470,9 +1470,10 @@ overlay lastbind
 
 # syncrepl-Overlay
 overlay syncprov
-syncprov-checkpoint 1000 2
+syncprov-checkpoint {{ openldap_db_params.um.syncprov_checkpoint }}
 syncprov-sessionlog {{ openldap_db_params.um.syncprov_sessionlog }}
-syncprov-reloadhint TRUE
+syncprov-nopresent FALSE
+syncprov-reloadhint FALSE
 
 {% if openldap_syncrepl_providers %}
 {% for provider_replica in openldap_syncrepl_providers if provider_replica!=inventory_hostname %}

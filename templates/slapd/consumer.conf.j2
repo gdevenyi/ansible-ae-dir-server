@@ -316,8 +316,9 @@ overlay lastbind
 
 # syncrepl-Overlay
 overlay syncprov
-syncprov-checkpoint 1000 2
-syncprov-reloadhint TRUE
+syncprov-checkpoint {{ openldap_db_params.um.syncprov_checkpoint }}
+syncprov-nopresent FALSE
+syncprov-reloadhint FALSE
 
 {% for provider_replica in openldap_syncrepl_providers %}
 syncrepl rid=0{{ loop.index }}
