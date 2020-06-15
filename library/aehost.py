@@ -125,6 +125,8 @@ def get_module_args():
             default='ldapi://%2Fopt%2Fae-dir%2Frun%2Fslapd%2Fldapi',
             type='str'
         ),
+        binddn=dict(type='str', required=False),
+        bindpw=dict(type='str', required=False),
         # general arguments
         name=dict(type='str', required=True),
         state=dict(
@@ -169,13 +171,15 @@ def main():
     if not HAS_AEDIR:
         module.fail_json(msg="Missing required 'aedir' module (pip install aedir).")
 
-    ldap_url = module.params['ldapurl']
-
-    # open LDAP connection to AD domain controller
+    # Open LDAP connection to AE-DIR provider
     try:
-        ldap_conn = AEDirObject(ldap_url)
+        ldap_conn = AEDirObject(
+            module.params['ldapurl'],
+            who=module.params['binddn'],
+            cred=module.params['bindpw'],
+        )
     except LDAPError as ldap_err:
-        module.fail_json(msg='Error connecting to %r: %s' % (ldap_url, ldap_err))
+        module.fail_json(msg='Error connecting to %r: %s' % (module.params['ldapurl'], ldap_err))
 
     if module.params['host'] is None:
         module.params['host'] = module.params['name']
