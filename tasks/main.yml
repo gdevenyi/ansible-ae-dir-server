@@ -224,7 +224,7 @@
   - name: "Init aeHost entry on {{ aedir_main_provider_hostname }}"
     aehost:
       name: "{{ inventory_hostname }}"
-      state: "{{ 'reset' if aedir_init is defined else aedir_aehost_state }}"
+      state: "{{ aedir_aehost_state }}"
       srvgroup: "ae-dir-{{ openldap_role }}-hosts"
       description: "AE-DIR {{ openldap_role }} host {{ openldap_service_fqdn }}"
       ticket_id: "{{ aedir_init_ticket_id }}"

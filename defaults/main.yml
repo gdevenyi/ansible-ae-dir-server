@@ -755,7 +755,7 @@ aedir_news: []
 
 # Task state when creating aeHost entry
 # Temporarily set to "reset" for forced update of host password
-aedir_aehost_state: "present"
+aedir_aehost_state: "{{ 'reset' if aedir_init is defined else 'present' }}"
 
 #---------------------------------------------------------------------------
 # OATH-LDAP parameters
