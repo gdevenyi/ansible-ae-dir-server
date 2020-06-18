@@ -48,10 +48,10 @@ DOCUMENTATION = '''
 ---
 module: aehost
 
-short_description: Create or update an aeHost entry
+short_description: Create or update an aeHost entries in Æ-DIR
 
 description:
-    - "This module creates/updates aeHost entries"
+    - "This module creates/updates aeHost entries in Æ-DIR"
 
 options:
     name:
@@ -67,22 +67,20 @@ options:
     host:
         description:
             - Fully-qualified domain name to put in attribute 'host'
-        required: true
+        required: false
     srvgroup:
         description:
-            - name of parent aeSrvGroup entry
-        required: true
+            - Name of parent aeSrvGroup entry beneath which to add new aeHost entry.
+              If not set an existing aeHost entry will be searched.
+        required: false
     srvgroups:
         description:
-            - names of supplemental aeSrvGroup entries
-        required: true
+            - names of supplemental aeSrvGroup entries to be added
+              to attribute aeSrvGroup in aeHost entry
+        required: false
     description:
         description:
             - Purpose description of aeHost object
-        required: false
-    ldapurl:
-        description:
-            - LDAP URI of Æ-DIR server (default ldapi://%2Fopt%2Fae-dir%2Frun%2Fslapd%2Fldapi)
         required: false
     ticket_id:
         description:
@@ -90,7 +88,24 @@ options:
         required: false
     ppolicy:
         description:
-            - DN of the pwdPolicySubentry entry (default cn=ppolicy-systems,cn=ae,<aedir_suffix>)
+            - DN to put in attribute pwdPolicySubentry
+              (default cn=ppolicy-systems,cn=ae,<aeRoot>)
+        required: false
+    ldapurl:
+        description:
+            - LDAP URI of Æ-DIR server (default ldapi://%2Fopt%2Fae-dir%2Frun%2Fslapd%2Fldapi)
+        required: false
+    cacert:
+        description:
+            - Path name of trusted CA certificate bundle file.
+        required: false
+    clcert:
+        description:
+            - Path name of client certificate to be used for SASL/EXTERNAL bind.
+        required: false
+    clkey:
+        description:
+            - Path name of client key to be used for SASL/EXTERNAL bind.
         required: false
 
 author:
@@ -127,6 +142,9 @@ def get_module_args():
         ),
         binddn=dict(type='str', required=False),
         bindpw=dict(type='str', required=False),
+        cacert=dict(type='str', required=False),
+        clcert=dict(type='str', required=False),
+        clkey=dict(type='str', required=False),
         # general arguments
         name=dict(type='str', required=True),
         state=dict(
@@ -142,7 +160,7 @@ def get_module_args():
             type='str'
         ),
         host=dict(type='str', required=False),
-        srvgroup=dict(type='str', required=True),
+        srvgroup=dict(type='str', required=False),
         srvgroups=dict(type='list', default=[], required=False),
         object_classes=dict(type='list', default=list(AEHost.__object_classes__), required=False),
     )
@@ -177,6 +195,9 @@ def main():
             module.params['ldapurl'],
             who=module.params['binddn'],
             cred=module.params['bindpw'],
+            cacert_filename=module.params['cacert'],
+            client_cert_filename=module.params['clcert'],
+            client_key_filename=module.params['clkey'],
         )
     except LDAPError as ldap_err:
         module.fail_json(msg='Error connecting to %r: %s' % (module.params['ldapurl'], ldap_err))
@@ -187,7 +208,11 @@ def main():
     if module.params['ppolicy'] is None:
         module.params['ppolicy'] = 'cn=ppolicy-systems,cn=ae,'+ldap_conn.search_base
 
-    ae_srvgroup = ldap_conn.find_aesrvgroup(module.params['srvgroup'])
+    if module.params['srvgroup'] is None:
+        parent_dn = ldap_conn.find_aehost(module.params['host']).dn_o.parent()
+    else:
+        ae_srvgroup = ldap_conn.find_aesrvgroup(module.params['srvgroup'])
+        parent_dn = ae_srvgroup.dn_o
 
     if module.params['srvgroups']:
         srv_groups_filter = '(&(objectClass=aeSrvGroup)(|{0}))'.format(
@@ -220,7 +245,7 @@ def main():
         srv_groups = []
 
     ae_host = AEHost(
-        parent_dn=ae_srvgroup.dn_o,
+        parent_dn=parent_dn,
         objectClass=set(module.params['object_classes']),
         cn=module.params['name'],
         host=module.params['host'],
