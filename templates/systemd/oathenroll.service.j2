@@ -17,7 +17,7 @@ Type=simple
 Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
 {% endif %}
 Environment=LDAPNOINIT=1
-Environment=PYTHONPATH={{ aedir_etc }}/oathenroll
+Environment=PYTHONPATH={{ oath_ldap_cfg_dir }}/oathenroll
 # some env vars set for Python interpreter
 {% for evar in aedir_python_env %}
 Environment={{ evar.name }}={{ evar.value }}
