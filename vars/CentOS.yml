@@ -27,6 +27,9 @@ python_base_packages:
 # use Python3 venv module
 virtualenv_command: "/usr/bin/python{{ aedir_python_version }} -m venv"
 
+# Pathname of OpenSSL command-line tool
+openssl_exec: "/usr/bin/openssl11"
+
 # OS-specific maps
 openldap_path:
   # LTB-based installation

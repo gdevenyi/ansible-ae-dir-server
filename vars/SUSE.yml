@@ -21,6 +21,9 @@ aedir_python_paths:
   python_exec: "/usr/bin/python{{ aedir_python_version }}"
   site_packages: "/usr/lib/python{{ aedir_python_version }}/site-packages"
 
+# Pathname of OpenSSL command-line tool
+openssl_exec: "/usr/bin/openssl"
+
 # OS-specific maps
 openldap_path:
   # openSUSE packages

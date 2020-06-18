@@ -11,7 +11,7 @@ NEW_CSR_FILE="{{ aedir_etc }}/tls/{{ openldap_service_fqdn }}.csr-${TIMESTAMP}"
 NEW_KEY_FILE="{{ aedir_etc }}/tls/{{ openldap_service_fqdn }}.key-${TIMESTAMP}"
 
 # Generate new CSR file with OpenSSL
-/usr/bin/openssl req \
+{{ openssl_exec }} req \
   -config {{ aedir_etc }}/tls/gen_csr.cnf \
   -batch \
   -new \
