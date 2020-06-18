@@ -22,7 +22,7 @@
     shell: "{{ aedir_nologin_shell }}"
     state: present
     system: yes
-    createhome: no
+    create_home: no
     non_unique: no
     home: "{{ aedir_rundir+'/'+item.key }}"
   with_dict:
