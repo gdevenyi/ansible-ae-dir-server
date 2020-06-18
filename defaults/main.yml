@@ -400,6 +400,9 @@ aedir_hosts:
   # inventory host names of *all* consumer hosts
   consumer: "{{ groups.aedir_consumers }}"
 
+# name of host group (aeSrvGroup) to use for AE-DIR server
+aedir_srvgroup: "ae-dir-{{ openldap_role }}-hosts"
+
 # main provider hostname used for initially loading data
 aedir_main_provider_hostname: "{{ aedir_hosts.provider[0] }}"
 

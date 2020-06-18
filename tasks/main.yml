@@ -225,7 +225,7 @@
     aehost:
       name: "{{ inventory_hostname }}"
       state: "{{ aedir_aehost_state }}"
-      srvgroup: "ae-dir-{{ openldap_role }}-hosts"
+      srvgroup: "{{ aedir_srvgroup }}"
       description: "AE-DIR {{ openldap_role }} host {{ openldap_service_fqdn }}"
       ticket_id: "{{ aedir_init_ticket_id }}"
       ppolicy: "cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}"
