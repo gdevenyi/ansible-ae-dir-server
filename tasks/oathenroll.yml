@@ -12,7 +12,7 @@
     - "{{ oath_ldap_cfg_dir }}/oathenroll"
     - "{{ oath_ldap_cfg_dir }}/oathenroll/templates"
 
-- name: "copy oathenroll HTML templates to {{ aedir_etc }}/oathenroll/templates"
+- name: "copy oathenroll HTML templates to {{ oath_ldap_cfg_dir }}/oathenroll/templates"
   copy:
     src: "oath-ldap/oathenroll/templates/"
     dest: "{{ oath_ldap_cfg_dir }}/oathenroll/templates"
@@ -87,7 +87,7 @@
     mode: 0o0644
   vars:
     name: oathenroll
-    cfgdir: "{{ aedir_etc }}/oathenroll"
+    cfgdir: "{{ oath_ldap_cfg_dir }}/oathenroll"
   notify:
     - "restart apparmor"
     - "restart oathenroll"

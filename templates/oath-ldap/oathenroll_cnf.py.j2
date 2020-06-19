@@ -38,7 +38,7 @@ FILTERSTR_OWNER_READ = '(&(objectClass=aePerson)(aeStatus=0))'
 FILTERSTR_TOKEN_SEARCH = '(&(objectClass=aeAuthcToken)(aeStatus=0)({owner_attr}=*)(objectClass=oathToken)(serialNumber=yubikey-{serial})(aeHwSerialNumber={serial})(oathTokenSerialNumber={serial}))'
 
 # Name of directory containing all the template files
-TEMPLATES_DIRNAME = '{{ aedir_etc }}/oathenroll/templates/'
+TEMPLATES_DIRNAME = '{{ oath_ldap_cfg_dir }}/oathenroll/templates/'
 
 # Name of layout template (without the file suffix .html)
 LAYOUT = 'layout'
