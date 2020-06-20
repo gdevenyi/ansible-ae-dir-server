@@ -146,6 +146,13 @@ authz-regexp
   "gidnumber={{ aedir_rootdn_gid_number }}\\+uidnumber={{ aedir_rootdn_uid_number }},cn=peercred,cn=external,cn=auth"
   "cn=root,{{ aedir_suffix }}"
 
+{% if getent_passwd.aehostd is defined %}
+# Map aehostd user to aeHost entry when SASL/EXTERNAL is used with LDAPI
+authz-regexp
+  "gidnumber={{ getent_passwd.aehostd[2] }}\\+uidnumber={{ getent_passwd.aehostd[1] }},cn=peercred,cn=external,cn=auth"
+  "host={{ inventory_hostname }},cn={{ aedir_srvgroup }},cn=ae,{{ aedir_suffix }}"
+{% endif %}
+
 # Map user/group to existing posixAccount entry when SASL/EXTERNAL is used with LDAPI
 authz-regexp
   "gidnumber=([0-9]+)\\+uidnumber=([0-9]+),cn=peercred,cn=external,cn=auth"

@@ -1,6 +1,13 @@
 ---
 # tasks file for roles/ae-dir-server
 
+# get root user info
+- getent:
+    database: passwd
+    key: aehostd
+  tags:
+    - always
+
 - debug:
     var: "{{ item }}"
     verbosity: 1
@@ -13,6 +20,7 @@
     - aedir_templates_dirs
     - aedir_providers_restrictions
     - aedir_replicas_restrictions
+    - getent_passwd.aehostd
   tags:
     - always
 
