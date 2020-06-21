@@ -207,17 +207,18 @@ def main():
     if not HAS_AEDIR:
         module.fail_json(msg="Missing required 'aedir' module (pip install aedir).")
 
-    if module.params['askotp']:
+    if module.params['binddn'] and module.params['bindpw'] and module.params['askotp']:
         otp_value = getpass.getpass('Enter OTP:')
+        bind_password = module.params['bindpw'] + otp_value
     else:
-        otp_value = ''
+        bind_password = module.params['bindpw']
 
     # Open LDAP connection to AE-DIR provider
     try:
         ldap_conn = AEDirObject(
             module.params['ldapurl'],
             who=module.params['binddn'],
-            cred=module.params['bindpw']+otp_value,
+            cred=bind_password,
             cacert_filename=module.params['cacert'],
             client_cert_filename=module.params['clcert'],
             client_key_filename=module.params['clkey'],
