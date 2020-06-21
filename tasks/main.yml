@@ -227,6 +227,17 @@
 
 - block:
 
+  - name: "Extract subject DN of server cert"
+    command: "openssl x509 -in {{ openldap_cert_filename }} -noout -nameopt rfc2253 -subject"
+    delegate_to: 127.0.0.1
+    become: no
+    register: openldap_cert_subject
+
+  - name: "Store subject DN of server cert as host fact"
+    set_fact:
+      cacheable: yes
+      openldap_cert_subject: "{{ openldap_cert_subject.stdout[8:] }}"
+
   - name: "Tasks for loading initial data"
     include_tasks: "aedir_init.yml"
     when: aedir_init is defined and openldap_role == "provider"
