@@ -5,6 +5,7 @@
 - getent:
     database: passwd
     key: aehostd
+  ignore_errors: yes
   tags:
     - always
 
