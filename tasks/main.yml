@@ -2,7 +2,8 @@
 # tasks file for roles/ae-dir-server
 
 # get root user info
-- getent:
+- name: "getent passwd aehostd"
+  getent:
     database: passwd
     key: aehostd
   ignore_errors: yes
