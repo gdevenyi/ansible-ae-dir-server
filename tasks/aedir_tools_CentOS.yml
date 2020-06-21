@@ -13,7 +13,7 @@
       - openssl-devel
       - cyrus-sasl-devel
       - openldap-devel
-      - python3-devel
+      - "{{ 'python3-devel' if ansible_lsb.major_release == '7' else 'platform-python-devel' }}"
       - libffi-devel
     state: present
     update_cache: no
@@ -43,7 +43,7 @@
       - openssl-devel
       - cyrus-sasl-devel
       - openldap-devel
-      - python3-devel
+      - "{{ 'python3-devel' if ansible_lsb.major_release == '7' else 'platform-python-devel' }}"
       - libffi-devel
     state: absent
     autoremove: yes

@@ -28,7 +28,7 @@ python_base_packages:
 virtualenv_command: "/usr/bin/python{{ aedir_python_version }} -m venv"
 
 # Pathname of OpenSSL command-line tool
-openssl_exec: "/usr/bin/openssl11"
+openssl_exec: "{{ '/usr/bin/openssl11' if ansible_lsb.major_release == '7' else '/usr/bin/openssl' }}"
 
 # OS-specific maps
 openldap_path:
