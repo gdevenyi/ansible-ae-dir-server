@@ -238,6 +238,7 @@
       description: "AE-DIR {{ openldap_role }} host {{ openldap_service_fqdn }}"
       ticket_id: "{{ aedir_init_ticket_id }}"
       ppolicy: "cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}"
+      askotp: "no"
     vars:
       ansible_python_interpreter: "{{ hostvars[aedir_main_provider_hostname].aedir_python3 }}"
     delegate_to: "{{ aedir_main_provider_hostname }}"
