@@ -356,6 +356,10 @@ aedir_base_zone: base
 aedir_unique_person_zones:
   - "{{ aedir_base_zone }}"
 
+# use become when doing initial load
+# useful in case the initial installation is done with non-root ansible user
+aedir_init_become: "no"
+
 # ticket identifier of initial ldapadd
 aedir_init_ticket_id: "INIT-42"
 
