@@ -24,6 +24,7 @@
       - aedir>=1.2.1
       - psutil>=5.6.7
       - prometheus_client>=0.7.1
+      - defusedxml
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
