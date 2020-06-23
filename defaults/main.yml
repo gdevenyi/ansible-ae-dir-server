@@ -250,7 +250,7 @@ aedir_ldapi_services:
   # system user for password self-service web application
   # uid is referenced in OpenLDAP ACLs!
   ae-dir-pwd:
-    cn: Password self-service application
+    cn: "Password self-service application"
     uid_number: "{{ aedir_min_gid-1 }}"
     gid_number: "{{ aedir_min_gid-1 }}"
     description: The system user allowed to set attributes during user password reset (msPwdResetObject) over LDAPI
@@ -258,19 +258,19 @@ aedir_ldapi_services:
       - provider
   # system user for sync processes
   ae-dir-peoplesync:
-    cn: Personnel data sync process
+    cn: "Personnel data sync process"
     uid_number: "{{ aedir_min_gid-2 }}"
     gid_number: "{{ aedir_min_gid-2 }}"
-    description: The system user allowed to maintain aePerson entries over LDAPI
+    description: "The system user allowed to maintain aePerson entries over LDAPI"
     roles:
       - provider
   # system user for OTP registration/enrollment web application
   # uid is referenced in OpenLDAP ACLs!
   ae-dir-otpenroll:
-    cn: 2FA enrollment application
+    cn: "2FA enrollment application"
     uid_number: "{{ aedir_min_gid-3 }}"
     gid_number: "{{ aedir_min_gid-3 }}"
-    description: The system user allowed to init OATH token entries over LDAPI
+    description: "The system user allowed to init OATH token entries over LDAPI"
     roles:
       - provider
     groups:
@@ -278,65 +278,65 @@ aedir_ldapi_services:
   # system user for OTP verification listener
   # uid is referenced in OpenLDAP ACLs!
   ae-dir-otpverify:
-    cn: OATH-LDAP validator demon
+    cn: "OATH-LDAP validator demon"
     uid_number: "{{ aedir_min_gid-4 }}"
     gid_number: "{{ aedir_min_gid-4 }}"
-    description: The system user allowed to read shared secrets (OATH-LDAP)
+    description: "The system user allowed to read shared secrets (OATH-LDAP)"
     roles:
       - provider
     groups:
       - ae-login-proxies
   # system user for bind proxy listener
   ae-dir-bind-proxy:
-    cn: OATH-LDAP bind proxy
+    cn: "OATH-LDAP bind proxy"
     uid_number: "{{ aedir_min_gid-5 }}"
     gid_number: "{{ aedir_min_gid-5 }}"
-    description: The system user used for simple bind proxy
+    description: "The system user used for simple bind proxy"
     roles:
       - consumer
     groups:
       - ae-login-proxies
   # system user for WebSSO component
   ae-dir-web-sso:
-    cn: WebSSO component
+    cn: "WebSSO component"
     uid_number: "{{ aedir_min_gid-6 }}"
     gid_number: "{{ aedir_min_gid-6 }}"
-    description: The system user used for WebSSO
+    description: "The system user used for WebSSO"
     roles:
       - provider
   # system user for pwsync
   ae-dir-pwsync:
-    cn: Password sync listener
+    cn: "Password sync listener"
     uid_number: "{{ aedir_min_gid-7 }}"
     gid_number: "{{ aedir_min_gid-7 }}"
-    description: The system user allowed to intercept password changes and set password
+    description: "The system user allowed to intercept password changes and set password"
     roles:
       - provider
     groups:
       - ae-login-proxies
   # system user which must match UID/GID OpenLDAP's slapd service is running as
   ae-dir-slapd:
-    cn: OpenLDAP slapd demon user
+    cn: "OpenLDAP slapd demon user"
     uid_number: "{{ aedir_min_gid-8 }}"
     gid_number: "{{ aedir_min_gid-8 }}"
-    description: The system user for running OpenLDAP server process (slapd)
+    description: "The system user for running OpenLDAP server process (slapd)"
     roles:
       - provider
       - consumer
   # system user which must match UID/GID Apache service is running as
   ae-dir-httpd:
-    cn: Web server demon user
+    cn: "Web server demon user"
     uid_number: "{{ aedir_min_gid-9 }}"
     gid_number: "{{ aedir_min_gid-9 }}"
-    description: The system user for running Apache server process (httpd)
+    description: "The system user for running Apache server process (httpd)"
     roles:
       - provider
   # system user for running web2ldap instance under control of uwsgi
   ae-dir-web2ldap:
-    cn: web2ldap demon user
+    cn: "web2ldap demon user"
     uid_number: "{{ aedir_min_gid-10 }}"
     gid_number: "{{ aedir_min_gid-10 }}"
-    description: The system user for running web2ldap service process
+    description: "The system user for running web2ldap service process"
     roles:
       - provider
 
