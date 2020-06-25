@@ -22,4 +22,4 @@ IP address from which password reset was invoked:
 {remote_ip}
 
 Show user entry with reset password:
-https://{web_ctx_host}/web2ldap?{ldap_uri}/{userdn}??base??bindname=
+https://{web_ctx_host}/pwd/viewuser?othername={username}
