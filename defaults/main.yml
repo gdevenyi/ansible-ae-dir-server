@@ -264,6 +264,8 @@ aedir_ldapi_services:
     description: "The system user allowed to maintain aePerson entries over LDAPI"
     roles:
       - provider
+    groups:
+      - "{{ aedir_org_zone }}-zone-admins"
   # system user for OTP registration/enrollment web application
   # uid is referenced in OpenLDAP ACLs!
   ae-dir-otpenroll:
@@ -539,7 +541,7 @@ aedir_cron_minutes:
 #---------------------------------------------------------------------------
 
 # replica role, must be either 'provider' or 'consumer'
-openldap_role: "consumer"
+openldap_role: "{{ (inventory_hostname in aedir_hosts.provider)|ternary('provider', 'consumer') }}"
 
 # default FQDN in LDAP service URL
 openldap_service_fqdn: "{{ inventory_hostname }}"
