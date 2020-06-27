@@ -906,12 +906,12 @@ objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
 aeMemberZone: cn=ae,{{ aedir_suffix }}
-{% for host in aedir_hosts['provider'] %}
+{% for host in aedir_hosts.provider %}
 {% set replica = hostvars[host].get('openldap_service_fqdn',host) -%}
 member: uid=ae-dir-slapd_{{ replica }},cn=ae,{{ aedir_suffix }}
 memberUid: ae-dir-slapd_{{ replica }}
 {% endfor %}
-{% for host in aedir_hosts['consumer'] %}
+{% for host in aedir_hosts.consumer %}
 {% set replica = hostvars[host].get('openldap_service_fqdn',host) -%}
 member: uid=ae-dir-slapd_{{ replica }},cn=ae,{{ aedir_suffix }}
 memberUid: ae-dir-slapd_{{ replica }}
@@ -931,7 +931,7 @@ objectClass: posixGroup
 objectClass: aeObject
 objectClass: aeGroup
 aeMemberZone: cn=ae,{{ aedir_suffix }}
-{% for host in aedir_hosts['provider'] %}
+{% for host in aedir_hosts.provider %}
 {% set replica = hostvars[host].get('openldap_service_fqdn',host) -%}
 member: uid=ae-dir-slapd_{{ replica }},cn=ae,{{ aedir_suffix }}
 memberUid: ae-dir-slapd_{{ replica }}

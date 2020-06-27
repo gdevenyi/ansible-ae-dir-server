@@ -712,7 +712,7 @@ openldap_db_params:
 openldap_log_purge: "23+00:00 01+00:00"
 
 # list of syncrepl providers used on a certain replica
-openldap_syncrepl_providers: "{{ aedir_hosts['provider'] }}"
+openldap_syncrepl_providers: "{{ aedir_hosts.provider }}"
 
 # Maximum incoming LDAP PDU size for anonymous sessions
 openldap_sockbuf_max_incoming: "131072"
