@@ -19,12 +19,21 @@
     - playbook_dir
     - role_path
     - openldap_role
+    - aedir_hosts
     - aedir_files_dirs
     - aedir_templates_dirs
-    - aedir_providers_restrictions
     - aedir_replicas_restrictions
-    - aedir_cron_minutes
     - getent_passwd.aehostd
+  tags:
+    - always
+
+- debug:
+    var: "{{ item }}"
+    verbosity: 1
+  with_items:
+    - aedir_providers_restrictions
+    - aedir_cron_minutes
+  when: openldap_role == 'provider'
   tags:
     - always
 
