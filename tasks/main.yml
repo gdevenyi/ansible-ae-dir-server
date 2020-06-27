@@ -33,6 +33,7 @@
   with_items:
     - aedir_providers_restrictions
     - aedir_cron_minutes
+    - aedir_cron_offset
   when: openldap_role == 'provider'
   tags:
     - always
