@@ -74,6 +74,14 @@
   tags:
     - always
 
+- debug:
+    var: "{{ item }}"
+    verbosity: 1
+  with_items:
+    - aedir_python3
+  tags:
+    - always
+
 - name: "OS base configuration"
   include_tasks: "baseos_{{ lsb_id }}.yml"
 
