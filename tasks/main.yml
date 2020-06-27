@@ -18,10 +18,12 @@
     - inventory_dir
     - playbook_dir
     - role_path
+    - openldap_role
     - aedir_files_dirs
     - aedir_templates_dirs
     - aedir_providers_restrictions
     - aedir_replicas_restrictions
+    - aedir_cron_minutes
     - getent_passwd.aehostd
   tags:
     - always
