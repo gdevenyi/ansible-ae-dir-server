@@ -1,5 +1,3 @@
-<h1>{text_heading}</h1>
-
 {text_error}
 
 <form method="POST" action="/web2ldap/searchform">
@@ -8,38 +6,38 @@
   <input type="hidden" name="dn" value="{{ aedir_suffix }}">
   <input type="hidden" name="login_search_root" value="{{ aedir_suffix }}">
 
-  <table>
-    <tr>
-      <td>User:</td>
-      <td>
-        <input name="who"
-               id="login_who"
-               title="User name or bind-DN of &AElig;-DIR entry"
-               placeholder="User name or bind-DN"
-               maxlength="300"
-               size="40"
-               autofocus
-               value="">
-      </td>
-    </tr>
-    <tr>
-      <td>Password:</td>
-      <td>
-        <input type="password"
-               title="Password to be used for login"
-               placeholder="your secret password"
-               name="cred"
-               id="login_cred"
-               maxlength="200"
-               size="60"
-               value="">
-      </td>
-    </tr>
-  </table>
-
-  <p>
+  <fieldset>
+    <legend>&AElig;-DIR login</legend>
+    <table>
+      <tr>
+        <td>User:</td>
+        <td>
+          <input name="who"
+                 id="login_who"
+                 title="User name or bind-DN of &AElig;-DIR entry"
+                 placeholder="User name or bind-DN"
+                 maxlength="300"
+                 size="40"
+                 autofocus
+                 value="">
+        </td>
+      </tr>
+      <tr>
+        <td>Password:</td>
+        <td>
+          <input type="password"
+                 title="Password to be used for login"
+                 placeholder="your secret password"
+                 name="cred"
+                 id="login_cred"
+                 maxlength="200"
+                 size="60"
+                 value="">
+        </td>
+      </tr>
+    </table>
     <input type="submit" id="login_submit" value="Login">
-  </p>
+  </fieldset>
 
 </form>
 
