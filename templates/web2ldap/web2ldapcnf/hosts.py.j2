@@ -800,12 +800,7 @@ GLOBAL_DEFAULTS = Web2LDAPConfig(
 
     # HTML template file for Basic Search form
     searchform_template={
-        '_': os.path.join(templates_dir, 'searchform_base.html'),
-        'NIS': os.path.join(templates_dir, 'searchform_nis.html'),
-        'DHCP': os.path.join(templates_dir, 'searchform_dhcp.html'),
-        'DNS': os.path.join(templates_dir, 'searchform_dns.html'),
-        'Kerberos': os.path.join(templates_dir, 'searchform_mit_krb.html'),
-        'MS AD': os.path.join(templates_dir, 'searchform_msad.html'),
+        '_': os.path.join(templates_dir, 'ae-dir', 'searchform_null.html'),
     },
 
     # HTML template file for rename form
