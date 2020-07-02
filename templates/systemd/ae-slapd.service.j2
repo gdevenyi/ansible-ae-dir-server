@@ -23,7 +23,6 @@ User={{ openldap_slapd_user }}
 Group={{ openldap_slapd_group }}
 CapabilityBoundingSet=CAP_NET_BIND_SERVICE
 AmbientCapabilities=CAP_NET_BIND_SERVICE
-MemoryDenyWriteExecute=yes
 LimitNOFILE={{ openldap_limit_nofile }}
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 {% if aedir_systemd_logging %}

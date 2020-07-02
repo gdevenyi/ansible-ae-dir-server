@@ -163,6 +163,7 @@ aedir_systemd_hardening:
   - "RestrictSUIDSGID=yes"
   - "DevicePolicy=closed"
   - "DeviceAllow=/dev/log w"
+  - "MemoryDenyWriteExecute=yes"
 #  - "InaccessiblePaths=/run/systemd"
 
 # regex patterns for enforcing naming conventions (substring match!)
