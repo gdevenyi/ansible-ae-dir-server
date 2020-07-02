@@ -122,6 +122,8 @@ aedir_python_env:
     value: "{{ aedir_python_warnings }}"
   - name: "PYTHONNOUSERSITE"
     value: "1"
+  - name: "LD_LIBRARY_PATH"
+    value: "{{ openldap_path.libdir }}"
 
 # where to install systemd files
 aedir_systemd_dir: "/etc/systemd/system"

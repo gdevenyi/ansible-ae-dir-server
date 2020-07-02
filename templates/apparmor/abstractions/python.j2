@@ -8,6 +8,10 @@
   # grant read access to check whether FIPS-compliant crypto is available
   @{PROC}/sys/crypto/fips_enabled r,
 
+  # Grant access for dynamic linking of OpenLDAP client libs
+  {{ openldap_path.libdir }}/ r,
+  {{ openldap_path.libdir }}/lib{ldap,lber}* mr,
+
   # grant read access to system-wide Python modules
   /usr/lib{,32,64}/python{{ aedir_python_version }}/ r,
   /usr/lib{,32,64}/python{{ aedir_python_version }}/**.{pyc,so} mr,
