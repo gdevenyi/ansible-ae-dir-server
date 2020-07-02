@@ -7,7 +7,7 @@ LDAPNOINIT=1
 export LDAPNOINIT
 
 # explicitly use specific libldap
-LD_LIBRARY_PATH="{{ slapd_check_lib_dirs|join(':') }}:${LD_LIBRARY_PATH}"
+LD_LIBRARY_PATH="{{ openldap_path.libdir }}:${LD_LIBRARY_PATH}"
 export LD_LIBRARY_PATH
 
 # some env vars set for Python interpreter
