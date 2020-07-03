@@ -44,6 +44,7 @@
     owner: root
     group: root
     mode: 0o0700
+  when: openldap_role=="provider"
 
 - name: "Create OATH bind listener config"
   template:
