@@ -11,7 +11,7 @@ profile {{ oath_bind_listener }} {
   {{ oath_ldap_cfg_dir }}/{{ oath_bind_listener }}/ r,
   {{ oath_ldap_cfg_dir }}/{{ oath_bind_listener }}/{{ oath_bind_listener }}.cfg r,
 
-  # grant read access to master keys needed for decrypting the shared secrets
+  # grant read access to primary keys needed for decrypting the shared secrets
   {{ oath_ldap_keys_dir }}/ r,
   {{ oath_ldap_keys_dir }}/* r,
 

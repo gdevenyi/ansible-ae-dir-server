@@ -802,16 +802,16 @@ oath_bind_listener: "{{ oath_dict[openldap_role].bind_listener }}"
 # System user used to start bind listener
 oath_listener_user: "{{ oath_dict[openldap_role].user }}"
 
-# Directory path where OATH-LDAP master keys are stored
+# Directory path where OATH-LDAP configuration is stored
 oath_ldap_cfg_dir: "{{ aedir_etc }}/oath-ldap"
 
-# Directory path where OATH-LDAP master keys are stored
-oath_ldap_keys_dir: "{{ oath_ldap_cfg_dir }}/master-keys"
+# Directory path where OATH-LDAP primary keys are stored
+oath_ldap_keys_dir: "{{ oath_ldap_cfg_dir }}/primary-keys"
 
 # If variable oath_ldap_key_files is defined all files *.pub and *.key
 # found therein are installed to directory defined with oath_ldap_keys_dir
 # *.key files should be protected with ansible vault or similar
-#oath_ldap_key_files: "{{ inventory_dir }}/files/oath-master-keys/"
+#oath_ldap_key_files: "{{ inventory_dir }}/files/oath-primary-keys/"
 
 # Directory path where Unix domain socket is created
 oath_ldap_socket_dir: "{{ aedir_rundir }}/{{ oath_bind_listener }}"
