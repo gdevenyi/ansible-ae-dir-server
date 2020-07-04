@@ -191,17 +191,6 @@
   notify:
     - "restart {{ openldap_service_name }}"
 
-- name: "Backup slapd databases in CRON job"
-  cron:
-    name: "ae_dir_slapcat"
-    state: present
-    user: root
-    cron_file: "{{ aedir_cron_file }}"
-    minute: "{{openldap_backup_cron_args.minute }}"
-    hour: "{{openldap_backup_cron_args.hour }}"
-    job: "{{ openldap_backup_script }}"
-  when: openldap_role == 'provider'
-
 - name: "Create AppArmor profile {{ openldap_service_name }}"
   template:
     src: "apparmor/{{ openldap_service_name }}.j2"
