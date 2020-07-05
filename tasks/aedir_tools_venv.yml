@@ -66,10 +66,10 @@
     - restart hotp_validator
     - restart web2ldap
 
-- name: "PIP install aedir_cli in virtualenv on provider"
+- name: "PIP install ae-dir-tool in virtualenv on provider"
   pip:
     name:
-      - aedir_cli>=1.0.0
+      - ae-dir-tool>=1.0.1
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"

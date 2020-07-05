@@ -54,10 +54,10 @@
     - restart hotp_validator
     - restart web2ldap
 
-- name: "Install ae-dir-cli on provider"
+- name: "Install ae-dir-tool on provider"
   zypper:
     name:
-      - ae-dir-cli >= 1.0.0
+      - ae-dir-tool >= 1.0.1
     state: present
     disable_recommends: yes
     type: package
