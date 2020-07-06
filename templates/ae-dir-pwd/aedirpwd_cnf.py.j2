@@ -88,10 +88,6 @@ SMTP_FROM = '{{ smtp_from_address }}'
 # handy for reverse proxy setups
 APP_PATH_PREFIX = '/pwd'
 
-# Server ID of provider replica
-# (must be 3 hex-digits with padded zeros)
-SERVER_ID = '{0:03x}'.format(int('{{ openldap_server_id }}'))
-
 # hostname to use in URLs generated in notification e-mails
 WEB_CTX_HOST = '{{ aedir_provider_lb_hostname }}'
 
