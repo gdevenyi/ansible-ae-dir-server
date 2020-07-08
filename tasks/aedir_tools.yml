@@ -18,6 +18,12 @@
     owner: root
     group: root
     mode: 0o0644
+  notify:
+    - "restart ae-dir-pwd"
+    - "restart oathenroll"
+    - "restart {{ oath_bind_listener }}"
+    - "restart web2ldap"
+    - "restart pwsync"
 
 - name: "install CA cert for SMTP/STARTTLS to {{ smtp_cacert_pathname }}"
   copy:
