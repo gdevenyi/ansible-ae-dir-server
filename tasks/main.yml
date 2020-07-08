@@ -223,7 +223,9 @@
 - block:
     - name: "Password sync tasks on {{ openldap_role }}"
       include_tasks: "pwsync.yml"
-      when: openldap_role=="provider" and aedir_pwsync_targeturl
+      when:
+        - openldap_role=="provider"
+        - aedir_pwsync_targeturl is defined
   tags:
     - aedir_pwsync
 
