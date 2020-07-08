@@ -22,9 +22,9 @@ If someone else falsely invoked the password request you can simply
 ignore this message or inform the administrator reachable through
 {fromaddr}.
 
-Have fun!
+Your Æ admins
 
-Your LDAP admins.
+--------------------------- Account details ----------------------------
 
 User name:
 {username}
@@ -37,3 +37,5 @@ Distinguished name of user entry:
 
 IP address from which password reset was invoked:
 {remote_ip}
+
+------------------------------------------------------------------------

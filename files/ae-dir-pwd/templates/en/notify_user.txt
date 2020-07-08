@@ -8,6 +8,8 @@ has created an Æ-DIR personal account for you.
 
 The next step is invoking the password reset process.
 
+Your Æ admins
+
 -------------------------- Password reset ------------------------------
 
 You can request a temporary password for your account here:
@@ -25,7 +27,7 @@ https://{web_ctx_host}/pwd.html#reset-procedure
 
 Afterwards you can connect and login to Æ-DIR with web2ldap here:
 
-https://{web_ctx_host}/web2ldap/searchform?{ldap_uri}/ou=ae-dir????bindname={user_uid}
+https://{web_ctx_host}/web2ldap/searchform?{ldap_uri}/{{ aedir_suffix }}????bindname={user_uid}
 
 You should add a bookmark for the link above
 because you will probably need it more often.
@@ -51,7 +53,3 @@ Created/activated by:
 {admin_cn} <{admin_mail}>
 
 ------------------------------------------------------------------------
-
-Have fun!
-
-Your Æ admins
