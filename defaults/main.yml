@@ -134,9 +134,6 @@ aedir_systemd_dir: "/etc/systemd/system"
 # https://docs.python.org/3/library/logging.config.html#configuration-file-format
 aedir_logging_conf: "ae-logging.conf.j2"
 
-# qualifier name set to choose a specific logger from the logging config
-aedir_logging_qualname: "aedir.syslog"
-
 # logging related systemd options
 aedir_systemd_logging:
   - "StandardOutput=null"
@@ -533,11 +530,9 @@ aedir_cron_offset: "{{ openldap_server_id - 1 }}"
 # => set differently if that's not the case
 aedir_cron_minutes:
   # run each minute on one of the providers
-  aedir_pproc_update: "{{ range(aedir_cron_offset|int, 60, aedir_hosts.provider|length) | select('lessthan', 60) | map('string') | join(',') }}"
+  aedir_pproc: "{{ range(aedir_cron_offset|int, 60, aedir_hosts.provider|length) | select('lessthan', 60) | map('string') | join(',') }}"
   # run each minute on one of the providers
-  aedir_pproc_welcome: "{{ range(aedir_cron_offset|int, 60, aedir_hosts.provider|length) | select('lessthan', 60) | map('string') | join(',') }}"
-  # run every two minutes on one of the providers
-  aedir_pwd_expreset: "{{ range(2*(aedir_cron_offset|int), 60, 2*aedir_hosts.provider|length) | select('lessthan', 60) | map('string') | join(',') }}"
+  aedir_pproc_pwd: "{{ range(aedir_cron_offset|int, 60, aedir_hosts.provider|length) | select('lessthan', 60) | map('string') | join(',') }}"
 
 #---------------------------------------------------------------------------
 # OpenLDAP parameters
@@ -731,10 +726,10 @@ openldap_idletimeout: "900"
 #---------------------------------------------------------------------------
 
 # Target URL for password synchronisation
-# If non-empty this enables password clear-text syncing (rarely needed)
+# If defined this enables password clear-text syncing (rarely needed)
+# to a target server specified by LDAP URL
 # Example:
-# aedir_pwsync_targeturl: "ldaps://msad.example.com/dc=example,dc=org?samaccountname,unicodePwd?sub??bindname=dom-admin@example.com"
-aedir_pwsync_targeturl: ""
+#aedir_pwsync_targeturl: "ldaps://msad.example.com/dc=example,dc=org?samaccountname,unicodePwd?sub??bindname=dom-admin@example.com"
 
 # regex pattern for limiting the entries for which password changes are exported
 # Example: Restrict syncing passwords to aeUser and aeService entries within zones "base" and "test"
