@@ -1,37 +1,25 @@
 ---
 # Install CRON jobs running only on provider
 
-- name: "Install CRON jobs running as root"
+- name: "Install CRON jobs running on provider"
   cron:
     name: "{{ item.key }}"
     state: present
-    user: root
     cron_file: "{{ aedir_cron_file }}"
+    user: "{{ item.value['user']|default('root') }}"
     hour: "{{ item.value['hour']|default('*') }}"
     minute: "{{ item.value.minute }}"
     job: "{{ aedir_python }} -m {{ item.value.pyjob }}"
   with_dict:
-    aedir_pproc_update:
-      minute: "{{ aedir_cron_minutes.aedir_pproc_update }}"
-      pyjob: "aedir_pproc.update {{ aedir_rundir }}/aedir_pproc_update.state"
-
-- name: "Install CRON jobs running as ae-dir-pwd"
-  cron:
-    name: "{{ item.key }}"
-    state: present
-    user: ae-dir-pwd
-    cron_file: "{{ aedir_cron_file }}"
-    hour: "{{ item.value['hour']|default('*') }}"
-    minute: "{{ item.value.minute }}"
-    job: "{{ aedir_python }} -m {{ item.value.pyjob }}"
-  with_dict:
-    aedir_pproc_welcome:
-      minute: "{{ aedir_cron_minutes.aedir_pproc_welcome }}"
-      pyjob: "aedir_pproc.welcome"
-    aedir_pwd_expreset:
-      minute: "{{ aedir_cron_minutes.aedir_pwd_expreset }}"
-      pyjob: "aedir_pproc.pwd.expreset"
-    aedir_pwd_expwarn:
+    aedir_pproc:
+      minute: "{{ aedir_cron_minutes.aedir_pproc }}"
+      pyjob: "aedir_pproc.cron {{ aedir_rundir }}/aedir_pproc_update.state"
+    aedir_pproc_pwd:
+      user: "ae-dir-pwd"
+      minute: "{{ aedir_cron_minutes.aedir_pproc_pwd }}"
+      pyjob: "aedir_pproc.pwd.cron"
+    aedir_pproc_pwd_expwarn:
+      user: "ae-dir-pwd"
       hour: "1"
       minute: "23"
       pyjob: "aedir_pproc.pwd.expwarn"
