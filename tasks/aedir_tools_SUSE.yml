@@ -27,7 +27,7 @@
 
 - name: "Install python3-slapdsock packages on {{ lsb_id }}"
   zypper:
-    name: python3-slapdsock >= 1.0.2
+    name: python3-slapdsock >= 1.0.3
     state: present
     disable_recommends: yes
     type: package
@@ -66,7 +66,7 @@
 - name: "Install ae-dir-pproc on provider"
   zypper:
     name:
-      - ae-dir-pproc >= 1.3.0
+      - ae-dir-pproc >= 1.4.0
     state: present
     disable_recommends: yes
     type: package
