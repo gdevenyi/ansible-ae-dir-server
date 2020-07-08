@@ -23,7 +23,7 @@ Environment=PYTHONPATH={{ oath_ldap_cfg_dir }}/oathenroll
 Environment={{ evar.name }}={{ evar.value }}
 {% endfor %}
 Environment=LOG_CONFIG={{ aedir_etc }}/ae-logging.conf
-Environment=LOG_QUALNAME={{ aedir_logging_qualname }}
+Environment=LOG_QUALNAME=oathldap_srv.web.oathenroll
 ExecStart={{ uwsgi_paths.exec }} --strict --ini {{ aedir_etc }}/uwsgi/oathenroll.ini
 User={{ oath_ldap_oathenroll_web_user }}
 Group={{ oath_ldap_oathenroll_web_group }}
