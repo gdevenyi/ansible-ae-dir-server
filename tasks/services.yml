@@ -87,7 +87,7 @@
       name: "pwsync"
       state: started
       enabled: yes
-    when: aedir_pwsync_targeturl != ""
+    when: aedir_pwsync_targeturl is defined
 
   - name: "ensure oathenroll is running"
     service:

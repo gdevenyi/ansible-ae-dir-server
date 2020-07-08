@@ -46,7 +46,7 @@ profile {{ openldap_service_name }} {
   {{ oath_ldap_socket_path }} rw,
 {% endif %}
 
-{% if openldap_role=="provider" and aedir_pwsync_targeturl %}
+{% if openldap_role=="provider" and aedir_pwsync_targeturl is defined %}
   # allow r/w access to external pwsync listener
   {{ aedir_pwsync_socket_path }} rw,
 {% endif %}

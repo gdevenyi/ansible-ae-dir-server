@@ -245,7 +245,7 @@ access to
 # Access control for various password attributes
 #---------------------------------------------------------------------------
 
-{% if aedir_pwsync_targeturl %}
+{% if aedir_pwsync_targeturl is defined %}
 # grant read access to userPassword to password sync process
 access to
 {% if aedir_pwsync_dn_regex %}
@@ -1442,7 +1442,7 @@ sockdnpat "{{ oath_ldap_dn_regex }}"
 {% endif %}
 {% endif %}
 
-{% if aedir_pwsync_targeturl %}
+{% if aedir_pwsync_targeturl is defined %}
 # send extended requests to external listener process receiving the requests
 # on Unix Domain socket path {{ aedir_pwsync_socket_path }}
 # (after password policy check in slapo-ppolicy)
