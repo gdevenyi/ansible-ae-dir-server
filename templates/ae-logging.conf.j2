@@ -1,5 +1,5 @@
 #--------------------------------------------------------------------------------
-# Logging configuration for all AE-DIR demons and scripts written in Python
+# Logging configuration for all AE-DIR services and scripts written in Python
 #
 # see format in Python 3.x library docs:
 # https://docs.python.org/3/library/logging.config.html#configuration-file-format
@@ -8,49 +8,57 @@
 #--------------------------------------------------------------------------------
 
 [loggers]
-keys=root,syslog,console
+keys=root, aedir_process, aedir_pwd_web, oathldap_srv, web2ldap
 
 [handlers]
-keys=syslog,console
+keys=syslog
 
 [formatters]
-keys=syslog,console
+keys=syslog
 
 [logger_root]
-handlers=syslog,console
+handlers=syslog
 level=INFO
-qualname=aedir
 
-[logger_syslog]
+# logger for all processes derived from class aedir.process.AEProcess
+# e.g. all CRON jobs
+[logger_aedir_process]
 handlers=syslog
 level=INFO
 propagate=0
 facility=local7
-qualname=aedir.syslog
+qualname=aedir.process
+
+# logger for ae-dir-pwd password self-service web application
+[logger_aedir_pwd_web]
+handlers=syslog
+level=INFO
+propagate=0
+facility=local7
+qualname=aedir_pproc.pwd.web
+
+# logger for OATH-LDAP services
+[logger_oathldap_srv]
+handlers=syslog
+level=INFO
+propagate=0
+facility=local7
+qualname=oathldap_srv
+
+# logger for web2ldap
+[logger_web2ldap]
+handlers=syslog
+level=INFO
+propagate=0
+facility=local7
+qualname=web2ldap
 
 [handler_syslog]
 class=logging.handlers.SysLogHandler
 formatter=syslog
-facility=CRON
 args=('/dev/log',)
 
 [formatter_syslog]
 class=logging.Formatter
 format=%(name)s[%(process)d] %(levelname)s - %(message)s
-datefmt=
-
-[logger_console]
-handlers=console
-level=INFO
-propagate=0
-qualname=aedir.console
-
-[handler_console]
-class=logging.StreamHandler
-formatter=console
-args=(sys.stderr,)
-
-[formatter_console]
-class=logging.Formatter
-format=%(asctime)s - %(name)s[%(process)d] %(levelname)s - %(message)s
 datefmt=
