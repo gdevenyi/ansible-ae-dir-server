@@ -15,7 +15,6 @@
     LD_LIBRARY_PATH: "{{ openldap_path.libdir }}"
     LDAPRC: "{{ aedir_etc }}/ldap.conf"
     PYTHONPATH: "{{ aedir_etc }}/ae-dir-pwd"
-    AE_LOGGER_QUALNAME: "{{ aedir_logging_qualname }}"
 
 - name: "Set Python env vars in {{ aedir_cron_file }}"
   cron:
