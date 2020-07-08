@@ -30,7 +30,9 @@
   service:
     name: hotp_validator
     state: restarted
-  when: openldap_role == 'provider' and oath_ldap_enabled == True
+  when:
+    - openldap_role == 'provider'
+    - oath_ldap_enabled == True
 
 - name: "restart oathenroll"
   listen:
@@ -38,7 +40,9 @@
   service:
     name: "oathenroll"
     state: restarted
-  when: openldap_role == 'provider' and oath_ldap_enabled == True
+  when:
+    - openldap_role == 'provider'
+    - oath_ldap_enabled == True
 
 - name: "restart bind_proxy"
   listen:
@@ -46,7 +50,9 @@
   service:
     name: "bind_proxy"
     state: restarted
-  when: openldap_role == 'consumer' and oath_ldap_enabled == True
+  when:
+    - openldap_role == 'consumer'
+    - oath_ldap_enabled == True
 
 - name: "restart ae-apache"
   listen:
@@ -70,4 +76,6 @@
   service:
     name: "pwsync"
     state: restarted
-  when: openldap_role == 'provider' and aedir_pwsync_targeturl
+  when:
+    - openldap_role == 'provider'
+    - aedir_pwsync_targeturl is defined
