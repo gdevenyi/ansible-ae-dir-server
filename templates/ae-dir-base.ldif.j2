@@ -809,25 +809,25 @@ sudoUser: %ae-sys-admins
 # aeSrvGroup, aeHost and aeService entries for all AE-DIR slapd replicas
 #---------------------------------------------------------------------------
 #
-{% for role in ['provider', 'consumer'] %}
-{% set srvgrp_dn = "cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir_suffix }}" -%}
-dn: cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir_suffix }}
+{% for openldap_role in ['provider', 'consumer'] %}
+{% set srvgrp_dn = "cn={{ aedir_srvgroup }},cn=ae,{{ aedir_suffix }}" -%}
+dn: cn={{ aedir_srvgroup }},cn=ae,{{ aedir_suffix }}
 changetype: add
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
-description: AE-DIR {{ role }} hosts
+description: AE-DIR {{ openldap_role }} hosts
 objectClass: aeObject
 objectClass: aeSrvGroup
-cn: ae-dir-{{ role }}-hosts
+cn: {{ aedir_srvgroup }}
 aeSetupGroups: cn=ae-sys-admins,cn=ae,{{ aedir_suffix }}
 aeVisibleGroups: cn=ae-sys-admins,cn=ae,{{ aedir_suffix }}
 aeLoginGroups: cn=ae-sys-admins,cn=ae,{{ aedir_suffix }}
 aeLogStoreGroups: cn=ae-sys-admins,cn=ae,{{ aedir_suffix }}
 aeVisibleSudoers: cn=ae-sudo-sys-admins,cn=ae,{{ aedir_suffix }}
 
-{% for host in aedir_hosts[role] %}
+{% for host in aedir_hosts[openldap_role] %}
 {% set service_fqdn = hostvars[host].get('openldap_service_fqdn',host) -%}
-dn: host={{ host }},cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir_suffix }}
+dn: host={{ host }},cn={{ aedir_srvgroup }},cn=ae,{{ aedir_suffix }}
 changetype: add
 host: {{ host }}
 aeStatus: 0
@@ -839,12 +839,12 @@ objectClass: aeHost
 objectClass: ldapPublicKey
 pwdPolicySubentry: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
 cn: {{ host }}
-description: AE-DIR {{ role }} host {{ service_fqdn }}
+description: AE-DIR {{ openldap_role }} host {{ service_fqdn }}
 
 {% for interface in hostvars[host]['ansible_interfaces'] if interface not in ( "lo", "tunl0") %}
 {% set interface_fact = "ansible_{}".format(interface) -%}
 {% if "active" in hostvars[host][interface_fact] and hostvars[host][interface_fact].active==true %}
-dn: cn={{ interface }},host={{ host }},cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir_suffix }}
+dn: cn={{ interface }},host={{ host }},cn={{ aedir_srvgroup }},cn=ae,{{ aedir_suffix }}
 changetype: add
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
@@ -878,14 +878,14 @@ objectClass: pkiUser
 objectClass: posixAccount
 aeStatus: 0
 aeTicketId: {{ aedir_init_ticket_id }}
-description: AE-DIR slapd {{ role }} {{ service_fqdn }} running on {{ host }}
+description: AE-DIR slapd {{ openldap_role }} {{ service_fqdn }} running on {{ host }}
 homeDirectory: /home/ae-dir-slapd_{{ service_fqdn }}
 cn: ae-dir-slapd_{{ service_fqdn }}
 uidNumber: {{ aedir_min_gid + gid_number|length }}
 gidNumber: {{ aedir_min_gid + gid_number|length }}
 seeAlso: {{ hostvars[host]['openldap_cert_subject'] }}
 loginShell: {{ aedir_nologin_shell }}
-aeHost: host={{ host }},cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir_suffix }}
+aeHost: host={{ host }},cn={{ aedir_srvgroup }},cn=ae,{{ aedir_suffix }}
 {% if gid_number.append(1) -%}{% endif %}
 
 {% endfor %}
