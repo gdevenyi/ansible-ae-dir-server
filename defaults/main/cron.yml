@@ -1,0 +1,27 @@
+---
+# defaults file for roles/ae-dir
+
+#---------------------------------------------------------------------------
+# CRON parameters
+#---------------------------------------------------------------------------
+
+cron_service_name: "{{ cron_config.service_name }}"
+
+cron_pkg_name: "{{ cron_config.pkg_name }}"
+
+# name of CRON file in /etc/cron.d
+aedir_cron_file: "ae-dir-{{ openldap_role }}"
+
+# server-specific offset for rotating CRON execution
+# this assumes that the values of openldap_server_id are consecutive and start with 1
+# => set differently if that's not the case
+aedir_cron_offset: "{{ openldap_server_id - 1 }}"
+
+# minutes values for CRON jobs
+# this assumes that the values of openldap_server_id are consecutive
+# => set differently if that's not the case
+aedir_cron_minutes:
+  # run each minute on one of the providers
+  aedir_pproc: "{{ range(aedir_cron_offset|int, 60, aedir_hosts.provider|length) | select('lessthan', 60) | map('string') | join(',') }}"
+  # run each minute on one of the providers
+  aedir_pproc_pwd: "{{ range(aedir_cron_offset|int, 60, aedir_hosts.provider|length) | select('lessthan', 60) | map('string') | join(',') }}"

@@ -1,0 +1,190 @@
+---
+# defaults file for roles/ae-dir
+
+#---------------------------------------------------------------------------
+# OpenLDAP parameters
+#---------------------------------------------------------------------------
+
+# replica role, must be either 'provider' or 'consumer'
+openldap_role: "{{ (inventory_hostname in aedir_hosts.provider)|ternary('provider', 'consumer') }}"
+
+# default FQDN in LDAP service URL
+openldap_service_fqdn: "{{ inventory_hostname }}"
+
+# Some paths
+openldap_rundir: "{{ aedir_rundir }}/slapd"
+openldap_data: "{{ aedir_prefix }}/slapd-db"
+openldap_ldapi_socket: "{{ openldap_rundir }}/ldapi"
+openldap_ldapi_uri: "ldapi://{{ openldap_ldapi_socket|urlencode|replace('/','%2F') }}"
+# where to place static config file for slapd (slapd.conf)
+openldap_slapd_conf: "{{ aedir_etc_openldap }}/slapd.conf"
+# system user/group to run slapd with
+openldap_slapd_user: "ae-dir-slapd"
+openldap_slapd_group: "ae-dir-slapd"
+# syslog(3) parameters used for slapd's logging
+openldap_syslog_facility: "LOCAL4"
+openldap_syslog_level: "7"
+
+aedir_schema_prefix: "{{ openldap_slapd_conf|dirname }}/schema"
+
+# All additional schema files needed
+openldap_schema_files:
+  - ae-dir.schema
+  - ae-dir-dcr.schema
+  - ae-dir-session.schema
+  - draft-findlay-ldap-groupofentries.schema
+  - draft-stroeder-mailboxrelatedobject.schema
+  - draft-stroeder-namedobject.schema
+  - mail.schema
+  - mspwdreset.schema
+  - oath-ldap.schema
+  - openssh-lpk_openldap.schema
+  - stroeder.com-oid-macros.schema
+  - stroeder.com.schema
+  - sudoers.schema
+  - autofs.schema
+
+# Pathname of backup script
+openldap_backup_script: "{{ aedir_sbin }}/ae-dir-slapcat.sh"
+# Pathname where to export the LDIF data to
+openldap_backup_path: "{{ openldap_data }}"
+# executable and options used to compress exported LDIF data
+# (set to empty string to disable compression)
+# consult the man-page of compressing program used to
+# learn about its resource usage (memory etc.)
+openldap_backup_compressor: "xz -3"
+# maximum number of days to keep local backup files
+openldap_backup_max_days: 21
+# backup cron values
+openldap_backup_cron_args:
+  hour: "{{ range(2*(openldap_server_id-1), 12, aedir_hosts.provider|length) | select('lessthan', 24) | map('string') | join(',') }}"
+  minute: "23"
+
+# List of servers to be added to rootDSE attribute altServer (see RFC 4512)
+openldap_rootdse_alt_servers: "{{ aedir_hosts[openldap_role]|sort }}"
+
+# The CA certificate file for validating the server certs
+openldap_cacert_filename: "ca-chain.pem"
+
+# Suffix expected in subject-DN of server and client certs
+# for authz-regexp directive and pkiUser/seeAlso attributes
+# Must match values in gen_csr.cnf.j2
+openldap_tls_cert_suffixes:
+  - "ou=Edit OU,o=Edit O,l=Edit L,st=Edit ST,c=CO"
+
+# The server certificate and key files (absolute path names on local controller!)
+openldap_cert_filename: "{{ inventory_dir }}/files/{{ openldap_service_fqdn }}.crt"
+openldap_key_filename: "{{ inventory_dir }}/files/{{ openldap_service_fqdn }}.key"
+
+# local directory for fetched CSRs
+local_openldap_csr_dir: "{{ inventory_dir }}/files/pki-csr-files"
+
+# value for slapd.conf directive TLSProtocolMin
+# 3.<x> means TLSv1.<x-1>
+openldap_tls_protocol_min: "3.3"
+
+# value for slapd.conf directive TLSCipherSuite
+openldap_tls_cipher_suite: "HIGH:!aNULL:!kDH:!kECDH:!MD5"
+
+# value for parameter tls_protocol_min of slapd.conf directive 'syncrepl'
+# 3.<x> means TLSv1.<x-1>
+openldap_syncrepl_tls_protocol_min: "3.3"
+
+# value for parameter tls_cipher_suite of slapd.conf directive 'syncrepl'
+openldap_syncrepl_tls_cipher_suite: "ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDH-RSA-AES256-GCM-SHA384:!ADH"
+
+# The full path names on the target system
+openldap_cacert_pathname: "{{ aedir_etc }}/tls/{{ openldap_cacert_filename|basename }}"
+openldap_cert_pathname: "{{ aedir_etc }}/tls/{{ openldap_cert_filename|basename }}"
+openldap_key_pathname: "{{ aedir_etc }}/tls/{{ openldap_key_filename|basename }}"
+
+# for generating DH parameters for perfect forward secrecy
+openldap_dhparam_pathname: "{{ aedir_etc }}/tls/slapd.dhparam"
+openldap_dhparam_numbits: 2048
+
+# password hashing scheme
+# see https://tools.ietf.org/html/draft-stroeder-hashed-userpassword-values
+openldap_password_hash: "{CRYPT}"
+# SHA-512, 128 bits of salt, 20000 iterations (see also crypt(3) man page)
+openldap_password_crypt_salt_format: "$6$rounds=20000$%.16s"
+# new password scheme available in OpenLDAP 2.4.50
+#openldap_password_hash: "{ARGON2}"
+
+# subject alternative names in CSRs
+openldap_csr_subjectdn: "/{{ openldap_tls_cert_suffixes[0].split(',')|reverse|join('/') }}/CN={{ openldap_service_fqdn }}"
+
+# subject alternative names in CSRs (OpenSSL syntax)
+openldap_csr_subjectaltnames:
+  - "DNS:{{ openldap_service_fqdn }}"
+
+# which messages to send to syslog
+# normal for production: stats
+openldap_log_level: "stats"
+
+# timeout parameters (secs) for syncrepl described in slapd.conf(5)
+openldap_syncrepl_network_timeout: 5
+openldap_syncrepl_timeout: 5
+
+# Maximum number of pending requests for anonymous sessions
+openldap_conn_max_pending: 100
+
+# Maximum number of pending requests for authenticated sessions
+openldap_conn_max_pending_auth: 1000
+
+# how many listener threads are started (should be power of 2)
+# rule-of-thumb: 1 for up to 16 cores
+openldap_listener_threads: 1
+
+# number of file descriptors for LDAP connections
+openldap_limit_nofile: 1024
+
+# how many worker threads are started
+# RAM needed per thread: 4MB on 32 bit systems, 8MB on 64 bit systems
+# rule-of-thumb: 4 per real CPU core
+openldap_threads: 8
+
+# Various database-specific tuning parameters
+# maxsize: see directive 'maxsize' in slapd-mdb(5)
+# checkpoint: see directive 'checkpoint' in slapd-mdb(5)
+# syncprov_sessionlog: see directive 'syncprov-sessionlog' in slapo-syncprov(5)
+# syncprov_checkpoint: see directive 'syncprov-checkpoint' in slapo-syncprov(5)
+# sizelimit: see directive 'sizelimit' in slapd.conf(5)
+# timelimit: see directive 'timelimit' in slapd.conf(5)
+openldap_db_params:
+  accesslog:
+    mdb_maxsize: 500000000
+    checkpoint: "5000 2"
+    syncprov_sessionlog: 10000
+    syncprov_checkpoint: "5000 2"
+    sizelimit: -1
+    timelimit: 120
+  um:
+    mdb_maxsize: 100000000
+    checkpoint: "1000 1"
+    syncprov_sessionlog: 10000
+    syncprov_checkpoint: "1000 1"
+    sizelimit: 500
+    timelimit: 60
+  session:
+    mdb_maxsize: 10000000
+    checkpoint: "20000 10"
+    syncprov_sessionlog: 1000
+    syncprov_checkpoint: "20000 10"
+    sizelimit: 2
+    timelimit: 10
+
+# keep for 23 days and scan once per day, see slapo-accesslog(5)
+openldap_log_purge: "23+00:00 01+00:00"
+
+# list of syncrepl providers used on a certain replica
+openldap_syncrepl_providers: "{{ aedir_hosts.provider }}"
+
+# Maximum incoming LDAP PDU size for anonymous sessions
+openldap_sockbuf_max_incoming: "131072"
+
+# Maximum incoming LDAP PDU size for authenticated sessions
+openldap_sockbuf_max_incoming_auth: "{{ openldap_sockbuf_max_incoming_auth_default[openldap_role] }}"
+
+# Number of seconds to wait before forcibly closing an idle client connection
+openldap_idletimeout: "900"
+

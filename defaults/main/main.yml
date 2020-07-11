@@ -1,0 +1,208 @@
+---
+# defaults file for roles/ae-dir
+
+#---------------------------------------------------------------------------
+# general ansible arguments
+#---------------------------------------------------------------------------
+
+# Directories to search for Jinja2 templates (used by with_first_found)
+aedir_templates_dirs:
+  - "{{ inventory_dir }}/templates/{{role_path|basename}}"
+  - "{{ playbook_dir }}/templates/{{role_path|basename}}"
+  - "{{ inventory_dir }}/templates"
+  - "{{ playbook_dir }}/templates"
+  - "{{ role_path }}/templates"
+
+# Directories to search for files (used by with_first_found)
+aedir_files_dirs:
+  - "{{ inventory_dir }}/files/{{role_path|basename}}"
+  - "{{ playbook_dir }}/files/{{role_path|basename}}"
+  - "{{ inventory_dir }}/files"
+  - "{{ playbook_dir }}/files"
+  - "{{ role_path }}/files"
+
+# override service manager fact (e.g. for docker build)
+aedir_service_manager: "{{ ansible_service_mgr }}"
+
+# LSB id to be used during plays
+lsb_id: "{{ lsb_id_map.get(ansible_lsb.id,ansible_lsb.id) }}"
+
+# Task state when creating aeHost entry
+# Temporarily set to "reset" for forced update of host password
+aedir_aehost_state: "{{ 'reset' if aedir_init is defined else 'present' }}"
+
+# name of host group (aeSrvGroup) to use for AE-DIR server
+aedir_srvgroup: "ae-dir-{{ openldap_role }}-hosts"
+
+# main provider hostname used for initially loading data
+aedir_main_provider_hostname: "{{ aedir_hosts.provider[0] }}"
+
+# load-balancer hostname for accessing provider(s) especially used in web URLs
+aedir_provider_lb_hostname: "{{ aedir_main_provider_hostname }}"
+
+#---------------------------------------------------------------------------
+# pip install arguments
+#---------------------------------------------------------------------------
+
+# whether to use PIP to install Python software in a virtual env
+# instead of using native OS packages
+aedir_pip_install: "{{ lsb_id != 'SUSE' }}"
+
+aedir_pip_index_url: "https://pypi.python.org/simple"
+
+aedir_pip_needs_compiler: "{{ aedir_pip_index_url == 'https://pypi.python.org/simple' }}"
+
+aedir_pip_install_options:
+  - "--upgrade"
+  - "--index-url {{ aedir_pip_index_url }}"
+
+aedir_pip_extra_args: "{{ aedir_pip_install_options|join(' ') }}"
+
+#---------------------------------------------------------------------------
+# python environment
+#---------------------------------------------------------------------------
+
+# which Python interpreter to use
+aedir_python: "{{ aedir_python_paths.python_exec }} -ROOBs"
+
+# which value to set for PYTHONWARNINGS
+aedir_python_warnings: "default"
+
+# environment variables set when running Python code
+aedir_python_env:
+  - name: "PYTHONBREAKPOINT"
+    value: "0"
+  - name: "PYTHONOPTIMIZE"
+    value: "2"
+  - name: "PYTHONDONTWRITEBYTECODE"
+    value: "1"
+  - name: "PYTHONWARNINGS"
+    value: "{{ aedir_python_warnings }}"
+  - name: "PYTHONNOUSERSITE"
+    value: "1"
+  - name: "LD_LIBRARY_PATH"
+    value: "{{ openldap_path.libdir }}"
+
+#---------------------------------------------------------------------------
+# host environment
+#---------------------------------------------------------------------------
+
+# Some paths for tools
+aedir_prefix: "/opt/ae-dir"
+aedir_bin: "{{ aedir_prefix }}/bin"
+aedir_sbin: "{{ aedir_prefix }}/sbin"
+aedir_etc: "{{ aedir_prefix }}/etc"
+aedir_etc_openldap: "{{ aedir_etc }}/openldap"
+aedir_rundir: "{{ aedir_prefix }}/run"
+aedir_python_sitepackages: "{{ aedir_python_paths.site_packages }}"
+aedir_htdocsdir: "{{ aedir_prefix }}/htdocs"
+
+# where to install systemd files
+aedir_systemd_dir: "/etc/systemd/system"
+
+# logging related systemd options
+aedir_systemd_logging:
+  - "StandardOutput=null"
+  - "StandardError=syslog"
+
+# various systemd.exec options for hardening the service units
+aedir_systemd_hardening:
+  - "PrivateUsers=no"
+  - "PrivateTmp=yes"
+  - "PrivateDevices=yes"
+  - "ProtectSystem=full"
+  - "ProtectHome=yes"
+  - "ProtectKernelModules=yes"
+  - "ProtectKernelTunables=yes"
+  - "ProtectKernelLogs=yes"
+  - "ProtectControlGroups=yes"
+  - "ProtectHostname=yes"
+  - "ProtectClock=yes"
+  - "NoNewPrivileges=yes"
+  - "MountFlags=private"
+  - "SystemCallArchitectures=native"
+  - "LockPersonality=yes"
+  - "KeyringMode=private"
+  - "RestrictRealtime=yes"
+  - "RestrictNamespaces=yes"
+  - "RestrictSUIDSGID=yes"
+  - "DevicePolicy=closed"
+  - "DeviceAllow=/dev/log w"
+  - "MemoryDenyWriteExecute=yes"
+#  - "InaccessiblePaths=/run/systemd"
+
+# If non-empty this triggers installation and pre-loading of alternative
+# malloc lib in all systemd unit files for all services.
+# Example for using jemalloc on Debian:
+# aedir_malloc_package: "libjemalloc1"
+# aedir_malloc_ld_preload: "/usr/lib/x86_64-linux-gnu/libjemalloc.so.1"
+aedir_malloc_package: ""
+aedir_malloc_ld_preload: ""
+
+# Dictionary defining additional OS package repos
+aedir_pkg_repos: "{{ aedir_package_repos }}"
+
+#---------------------------------------------------------------------------
+# metrics & logging configuration
+#---------------------------------------------------------------------------
+
+# Directory for metrics text exports picked up by Prometheus node-exporter.
+# If empty, no text exporter CRON jobs are installed.
+# Setting this to empty string disables dumping metrics to files.
+#aedir_metricsdir: "/var/spool/metrics"
+aedir_metricsdir: ""
+
+# Group ID or name for setting group ownership of metrics directory and files
+aedir_metrics_owner_group: "root"
+
+# Jinja template used to generate Logging configuration for all AE-DIR
+# demons and scripts written in Python.
+# See format in Python 3.x library docs:
+# https://docs.python.org/3/library/logging.config.html#configuration-file-format
+aedir_logging_conf: "ae-logging.conf.j2"
+
+#---------------------------------------------------------------------------
+# documentation configuration
+#---------------------------------------------------------------------------
+
+# base names with extension of web pages installed to DocumentRoot
+aedir_htdocs_templates:
+  - ae-dir
+  - aehostd
+  - apps
+  - bcp
+  - cli
+  - demo
+  - docs
+  - faq
+  - fun
+  - install
+  - oath
+  - pwd
+  - python
+  - todo
+  - user
+  - web2ldap
+
+# relative filename of Jinja2 base layout template for all web pages
+aedir_htdocs_layout: "layout.html.j2"
+
+#---------------------------------------------------------------------------
+# uwsgi run services configuration
+#---------------------------------------------------------------------------
+
+# some uwsgi parameters per service
+aedir_uwsgi_params:
+  web2ldap:
+    buffer_size: 32768
+    harakiri: 45
+    threads: 10
+  oathenroll:
+    buffer_size: 8192
+    harakiri: 10
+    processes: 5
+  pwd:
+    buffer_size: 8192
+    harakiri: 10
+    processes: 5
+
