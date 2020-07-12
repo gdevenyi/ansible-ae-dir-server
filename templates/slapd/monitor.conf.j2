@@ -16,8 +16,8 @@ access to
 
 access to
   dn.subtree="cn=monitor"
-    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" read
-    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
-    by dn.exact="cn=root,{{ aedir_suffix }}" read
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ slapd_aedir_suffix }}" read
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ slapd_aedir_suffix }}" read
+    by dn.exact="cn=root,{{ slapd_aedir_suffix }}" read
     by * none
 

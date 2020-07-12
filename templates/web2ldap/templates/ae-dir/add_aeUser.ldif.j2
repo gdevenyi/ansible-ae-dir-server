@@ -7,16 +7,16 @@ objectClass: aeObject
 objectClass: aeUser
 objectClass: posixAccount
 objectClass: aeSSHAccount
-{% if oath_ldap_enabled==True %}
+{% if w2ldap_oath_ldap_enabled==True %}
 objectClass: oathUser
 objectClass: oathHOTPUser
 {% endif %}
 aeStatus: 0
-{% if 'aeUser' in ae_expiry_status_defaults %}
-aeExpiryStatus: {{ ae_expiry_status_defaults.aeUser }}
+{% if 'aeUser' in w2ldap_ae_expiry_status_defaults %}
+aeExpiryStatus: {{ w2ldap_ae_expiry_status_defaults.aeUser }}
 {% endif %}
 loginShell: /bin/bash
-pwdPolicySubentry: cn=ppolicy-users,cn=ae,{{ aedir_suffix }}
+pwdPolicySubentry: cn=ppolicy-users,cn=ae,{{ w2ldap_aedir_suffix }}
 aeNotBefore: now
 aeTag: pub-tag-no-welcome-yet
 

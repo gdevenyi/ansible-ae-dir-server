@@ -42,10 +42,10 @@ import web2ldap.app.plugins.nis
 
 import web2ldap.app.plugins.posixautogen
 web2ldap.app.plugins.posixautogen.HomeDirectory.homeDirectoryTemplate = '/home/{uid}'
-web2ldap.app.plugins.posixautogen.AutogenUIDNumber.minNewValue = {{ aedir_min_uid }}
-web2ldap.app.plugins.posixautogen.AutogenUIDNumber.maxNewValue = {{ aedir_max_uid }}
-web2ldap.app.plugins.posixautogen.AutogenGIDNumber.minNewValue = {{ aedir_min_gid }}
-web2ldap.app.plugins.posixautogen.AutogenGIDNumber.maxNewValue = {{ aedir_max_gid }}
+web2ldap.app.plugins.posixautogen.AutogenUIDNumber.minNewValue = {{ w2ldap_aedir_min_uid }}
+web2ldap.app.plugins.posixautogen.AutogenUIDNumber.maxNewValue = {{ w2ldap_aedir_max_uid }}
+web2ldap.app.plugins.posixautogen.AutogenGIDNumber.minNewValue = {{ w2ldap_aedir_min_gid }}
+web2ldap.app.plugins.posixautogen.AutogenGIDNumber.maxNewValue = {{ w2ldap_aedir_max_gid }}
 
 #---------------------------------------------------------------------------
 # sudo-ldap
@@ -334,40 +334,40 @@ import web2ldap.app.plugins.mspwdreset
 import web2ldap.app.plugins.aedir
 
 # plugin settings for attribute aeTicketId
-web2ldap.app.plugins.aedir.AETicketId.reObj = re.compile('^{{ aeticketid_regex }}$')
+web2ldap.app.plugins.aedir.AETicketId.reObj = re.compile('^{{ w2ldap_aeticketid_regex }}$')
 web2ldap.app.plugins.aedir.AETicketId.html_tmpl = '<a href="https://issues.example.com/browse/{av}">{av}</a>'
 
 # Check hostname in DNS and reverse DNS
 web2ldap.app.plugins.aedir.AEHostname.host_lookup=0
 
 # regex patterns for enforcing naming conventions (substring match necessary!)
-web2ldap.app.plugins.aedir.AECommonNameAEZone.reObj = re.compile('^{{ aedir_aezone_cn_regex }}$')
-web2ldap.app.plugins.aedir.AECommonNameAELocation.reObj = re.compile('^{{ aedir_aelocation_cn_regex }}$')
-web2ldap.app.plugins.aedir.AECommonNameAEGroup.reObj = re.compile('^{{ aedir_aesrvgroup_cn_regex }}$')
-web2ldap.app.plugins.aedir.AECommonNameAESrvGroup.reObj = re.compile('^{{ aedir_aegroup_cn_regex }}$')
-web2ldap.app.plugins.aedir.AECommonNameAESudoRule.reObj = re.compile('^{{ aedir_aesudorule_cn_regex }}$')
-web2ldap.app.plugins.aedir.AEDepartmentNumber.reObj = re.compile('^{{ aedir_aedept_deptnumber_regex }}$')
-web2ldap.app.plugins.aedir.AEServiceSshPublicKey.reObj = re.compile('^{{ aedir_aeservice_sshpubkey_regex }}$')
-web2ldap.app.plugins.aedir.AEUserSshPublicKey.reObj = re.compile('^{{ aedir_aeuser_sshpubkey_regex }}$')
-web2ldap.app.plugins.aedir.AEHomeDirectory.homeDirectoryPrefixes = ('{{ aedir_homedirectory_prefixes|join("','") }}',)
-web2ldap.app.plugins.aedir.AEHomeDirectory.homeDirectoryHidden = '{{ aedir_homedirectory_hidden }}'
+web2ldap.app.plugins.aedir.AECommonNameAEZone.reObj = re.compile('^{{ w2ldap_aedir_aezone_cn_regex }}$')
+web2ldap.app.plugins.aedir.AECommonNameAELocation.reObj = re.compile('^{{ w2ldap_aedir_aelocation_cn_regex }}$')
+web2ldap.app.plugins.aedir.AECommonNameAEGroup.reObj = re.compile('^{{ w2ldap_aedir_aesrvgroup_cn_regex }}$')
+web2ldap.app.plugins.aedir.AECommonNameAESrvGroup.reObj = re.compile('^{{ w2ldap_aedir_aegroup_cn_regex }}$')
+web2ldap.app.plugins.aedir.AECommonNameAESudoRule.reObj = re.compile('^{{ w2ldap_aedir_aesudorule_cn_regex }}$')
+web2ldap.app.plugins.aedir.AEDepartmentNumber.reObj = re.compile('^{{ w2ldap_aedir_aedept_deptnumber_regex }}$')
+web2ldap.app.plugins.aedir.AEServiceSshPublicKey.reObj = re.compile('^{{ w2ldap_aedir_aeservice_sshpubkey_regex }}$')
+web2ldap.app.plugins.aedir.AEUserSshPublicKey.reObj = re.compile('^{{ w2ldap_aedir_aeuser_sshpubkey_regex }}$')
+web2ldap.app.plugins.aedir.AEHomeDirectory.homeDirectoryPrefixes = ('{{ w2ldap_aedir_homedirectory_prefixes|join("','") }}',)
+web2ldap.app.plugins.aedir.AEHomeDirectory.homeDirectoryHidden = '{{ w2ldap_aedir_homedirectory_hidden }}'
 web2ldap.app.plugins.aedir.AELoginShell.attr_value_dict = {
-{% for login_shell in aedir_login_shells %}
+{% for login_shell in w2ldap_aedir_login_shells %}
     '{{ login_shell }}': '{{ login_shell }}',
 {% endfor %}
 }
 web2ldap.app.plugins.aedir.AESSHPermissions.attr_value_dict = {
-{% for ssh_perm in aedir_sshkey_perms %}
+{% for ssh_perm in w2ldap_aedir_sshkey_perms %}
     '{{ ssh_perm }}': '{{ ssh_perm }}',
 {% endfor %}
 }
 
 # Parameters for generating/checking user names
 # aeUser entries
-web2ldap.app.plugins.aedir.AEUserUid.genLen = {{ aedir_username_length }}
-web2ldap.app.plugins.aedir.AEUserUid.minLen = {{ aedir_username_minlen }}
-web2ldap.app.plugins.aedir.AEUserUid.maxLen = {{ aedir_username_maxlen }}
-web2ldap.app.plugins.aedir.AEUserUid.reObj = re.compile('^{{ aedir_aeuser_uid_regex }}$')
-web2ldap.app.plugins.aedir.AEUserUid.maxGenTrials = {{ aedir_username_gen_trials }}
+web2ldap.app.plugins.aedir.AEUserUid.genLen = {{ w2ldap_aedir_username_length }}
+web2ldap.app.plugins.aedir.AEUserUid.minLen = {{ w2ldap_aedir_username_minlen }}
+web2ldap.app.plugins.aedir.AEUserUid.maxLen = {{ w2ldap_aedir_username_maxlen }}
+web2ldap.app.plugins.aedir.AEUserUid.reObj = re.compile('^{{ w2ldap_aedir_aeuser_uid_regex }}$')
+web2ldap.app.plugins.aedir.AEUserUid.maxGenTrials = {{ w2ldap_aedir_username_gen_trials }}
 # aeService entries
-web2ldap.app.plugins.aedir.AEUserUid.reObj = re.compile('^{{ aedir_aeservice_uid_regex }}$')
+web2ldap.app.plugins.aedir.AEUserUid.reObj = re.compile('^{{ w2ldap_aedir_aeservice_uid_regex }}$')

@@ -1,4 +1,4 @@
-dn: uniqueIdentifier=,cn={{ aedir_org_zone }},{{ aedir_suffix }}
+dn: uniqueIdentifier=,cn={{ w2ldap_aedir_org_zone }},{{ w2ldap_aedir_suffix }}
 objectClass: person
 objectClass: organizationalPerson
 objectClass: inetOrgPerson
@@ -6,11 +6,11 @@ objectClass: aePerson
 objectClass: aeObject
 objectClass: msPerson
 aeStatus: 0
-{% if 'aePerson' in ae_expiry_status_defaults %}
-aeExpiryStatus: {{ ae_expiry_status_defaults.aePerson }}
+{% if 'aePerson' in w2ldap_ae_expiry_status_defaults %}
+aeExpiryStatus: {{ w2ldap_ae_expiry_status_defaults.aePerson }}
 {% endif %}
-aeSourceUri: https://{{ openldap_service_fqdn }}/web2ldap
+aeSourceUri: https://{{ w2ldap_openldap_service_fqdn }}/web2ldap
 aeNotBefore: now
-aeDept: departmentNumber=0,cn={{ aedir_org_zone }},{{ aedir_suffix }}
-aeLocation: cn=no-location,cn={{ aedir_org_zone }},{{ aedir_suffix }}
+aeDept: departmentNumber=0,cn={{ w2ldap_aedir_org_zone }},{{ w2ldap_aedir_suffix }}
+aeLocation: cn=no-location,cn={{ w2ldap_aedir_org_zone }},{{ w2ldap_aedir_suffix }}
 

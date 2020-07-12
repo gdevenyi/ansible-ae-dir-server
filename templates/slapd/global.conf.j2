@@ -27,7 +27,7 @@ moduleload deref
 moduleload noopsrch
 moduleload pw-argon2
 
-{% if openldap_role=="provider" %}
+{% if slapd_openldap_role=="provider" %}
 # only on provider replicas
 moduleload sssvlv
 moduleload constraint
@@ -50,35 +50,35 @@ include {{ openldap_path.conf_prefix }}/schema/nis.schema
 include {{ openldap_path.conf_prefix }}/schema/duaconf.schema
 
 # mail stuff
-include {{ aedir_schema_prefix }}/mail.schema
+include {{ slapd_aedir_schema_prefix }}/mail.schema
 
 # For SSH keys
-include {{ aedir_schema_prefix }}/openssh-lpk_openldap.schema
+include {{ slapd_aedir_schema_prefix }}/openssh-lpk_openldap.schema
 
 # sudoers schema, see sudoers.ldap(8)
-include {{ aedir_schema_prefix }}/sudoers.schema
+include {{ slapd_aedir_schema_prefix }}/sudoers.schema
 
 # automount schema
-include {{ aedir_schema_prefix }}/autofs.schema
+include {{ slapd_aedir_schema_prefix }}/autofs.schema
 
-include {{ aedir_schema_prefix }}/draft-stroeder-mailboxrelatedobject.schema
-include {{ aedir_schema_prefix }}/draft-stroeder-namedobject.schema
-include {{ aedir_schema_prefix }}/draft-findlay-ldap-groupofentries.schema
+include {{ slapd_aedir_schema_prefix }}/draft-stroeder-mailboxrelatedobject.schema
+include {{ slapd_aedir_schema_prefix }}/draft-stroeder-namedobject.schema
+include {{ slapd_aedir_schema_prefix }}/draft-findlay-ldap-groupofentries.schema
 # OATH-LDAP
-include {{ aedir_schema_prefix }}/oath-ldap.schema
+include {{ slapd_aedir_schema_prefix }}/oath-ldap.schema
 
 # OID macros used in subsequent schema files
-include {{ aedir_schema_prefix }}/stroeder.com-oid-macros.schema
-include {{ aedir_schema_prefix }}/stroeder.com.schema
+include {{ slapd_aedir_schema_prefix }}/stroeder.com-oid-macros.schema
+include {{ slapd_aedir_schema_prefix }}/stroeder.com.schema
 
 # for password self-service
-include {{ aedir_schema_prefix }}/mspwdreset.schema
+include {{ slapd_aedir_schema_prefix }}/mspwdreset.schema
 
 # AE-DIR
-include {{ aedir_schema_prefix }}/ae-dir.schema
-include {{ aedir_schema_prefix }}/ae-dir-dcr.schema
-{% if openldap_role=="provider" %}
-include {{ aedir_schema_prefix }}/ae-dir-session.schema
+include {{ slapd_aedir_schema_prefix }}/ae-dir.schema
+include {{ slapd_aedir_schema_prefix }}/ae-dir-dcr.schema
+{% if slapd_openldap_role=="provider" %}
+include {{ slapd_aedir_schema_prefix }}/ae-dir-session.schema
 {% endif %}
 
 #---------------------------------------------------------------------------
@@ -86,37 +86,37 @@ include {{ aedir_schema_prefix }}/ae-dir-session.schema
 #---------------------------------------------------------------------------
 
 # Where PID and arg files are stored
-pidfile {{ openldap_rundir }}/slapd.pid
-argsfile {{ openldap_rundir }}/slapd.args
+pidfile {{ slapd_openldap_rundir }}/slapd.pid
+argsfile {{ slapd_openldap_rundir }}/slapd.args
 
-{% if openldap_role=="provider" %}
+{% if slapd_openldap_role=="provider" %}
 # serverID must be unique across all provider replicas
 serverID {{ openldap_server_id }}
 {% endif %}
 
 # Maximum number of pending requests for anonymous sessions
-conn_max_pending {{ openldap_conn_max_pending }}
+conn_max_pending {{ slapd_openldap_conn_max_pending }}
 
 # Maximum number of pending requests for authenticated sessions
-conn_max_pending_auth {{ openldap_conn_max_pending_auth }}
+conn_max_pending_auth {{ slapd_slapd_openldap_conn_max_pending_auth }}
 
 # which messages to send to syslog
-loglevel {{ openldap_log_level }}
+loglevel {{ slapd_openldap_log_level }}
 
 # number of listener threads used (should be power of 2)
-listener-threads {{ openldap_listener_threads }}
+listener-threads {{ slapd_openldap_listener_threads }}
 
 # number of worker threads used
-threads {{ openldap_threads }}
+threads {{ slapd_openldap_threads }}
 
 # additional rootDSE attributes in external LDIF file
-rootDSE {{ aedir_etc_openldap }}/rootDSE.ldif
+rootDSE {{ slapd_slapd_aedir_etc_openldap }}/rootDSE.ldif
 
 #---------------------------------------------------------------------------
 # SASL parameters
 #---------------------------------------------------------------------------
 
-sasl-host {{ openldap_service_fqdn }}
+sasl-host {{ slapd_openldap_service_fqdn }}
 
 #---------------------------------------------------------------------------
 # TLS parameters
@@ -125,17 +125,17 @@ sasl-host {{ openldap_service_fqdn }}
 # optional usage of TLS client certs
 TLSVerifyClient allow
 
-TLSProtocolMin {{ openldap_tls_protocol_min }}
-TLSCipherSuite {{ openldap_tls_cipher_suite }}
+TLSProtocolMin {{ slapd_openldap_tls_protocol_min }}
+TLSCipherSuite {{ slapd_openldap_tls_cipher_suite }}
 
-TLSCACertificateFile {{ openldap_cacert_pathname }}
-{% if openldap_cert_pathname %}
-TLSCertificateFile {{ openldap_cert_pathname }}
+TLSCACertificateFile {{ slapd_openldap_cacert_pathname }}
+{% if slapd_openldap_cert_pathname %}
+TLSCertificateFile {{ slapd_openldap_cert_pathname }}
 {% endif %}
-{% if openldap_key_pathname %}
-TLSCertificateKeyFile {{ openldap_key_pathname }}
+{% if slapd_openldap_key_pathname %}
+TLSCertificateKeyFile {{ slapd_openldap_key_pathname }}
 {% endif %}
-TLSDHParamFile {{ openldap_dhparam_pathname }}
+TLSDHParamFile {{ slapd_openldap_dhparam_pathname }}
 
 #---------------------------------------------------------------------------
 # Rewrite SASL identity to DIT identity
@@ -143,41 +143,41 @@ TLSDHParamFile {{ openldap_dhparam_pathname }}
 
 # Map root user to rootdn when SASL/EXTERNAL is used with LDAPI
 authz-regexp
-  "gidnumber={{ aedir_rootdn_gid_number }}\\+uidnumber={{ aedir_rootdn_uid_number }},cn=peercred,cn=external,cn=auth"
-  "cn=root,{{ aedir_suffix }}"
+  "gidnumber={{ slapd_aedir_rootdn_gid_number }}\\+uidnumber={{ slapd_aedir_rootdn_uid_number }},cn=peercred,cn=external,cn=auth"
+  "cn=root,{{ slapd_aedir_suffix }}"
 
 {% if getent_passwd.aehostd is defined %}
 # Map aehostd user to aeHost entry when SASL/EXTERNAL is used with LDAPI
 authz-regexp
   "gidnumber={{ getent_passwd.aehostd[2] }}\\+uidnumber={{ getent_passwd.aehostd[1] }},cn=peercred,cn=external,cn=auth"
-  "host={{ inventory_hostname }},cn={{ aedir_srvgroup }},cn=ae,{{ aedir_suffix }}"
+  "host={{ inventory_hostname }},cn={{ slapd_aedir_srvgroup }},cn=ae,{{ slapd_aedir_suffix }}"
 {% endif %}
 
 # Map user/group to existing posixAccount entry when SASL/EXTERNAL is used with LDAPI
 authz-regexp
   "gidnumber=([0-9]+)\\+uidnumber=([0-9]+),cn=peercred,cn=external,cn=auth"
-  "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=posixAccount)(uidNumber=$2)(aeStatus=0))"
+  "ldap:///{{ slapd_aedir_suffix }}??sub?(&(objectClass=posixAccount)(uidNumber=$2)(aeStatus=0))"
 # Map user/group to existing account entry when SASL/EXTERNAL is used with LDAPI
 # and SASL proxy authz is used with "u:foo"
 authz-regexp
-  "uid=({{ aedir_aeuser_uid_regex }}|{{ aedir_aeservice_uid_regex }}),cn=external,cn=auth"
-  "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=account)(uid=$1)(aeStatus=0))"
+  "uid=({{ slapd_aedir_aeuser_uid_regex }}|{{ slapd_aedir_aeservice_uid_regex }}),cn=external,cn=auth"
+  "ldap:///{{ slapd_aedir_suffix }}??sub?(&(objectClass=account)(uid=$1)(aeStatus=0))"
 
-{% for cert_suffix in openldap_tls_cert_suffixes %}
+{% for cert_suffix in slapd_openldap_tls_cert_suffixes %}
 # Rewrite any cert with subject-DN suffix "{{ cert_suffix }}" by searching it in attribute seeAlso
 authz-regexp
   "(cn=[^,]+,{{ cert_suffix }})"
-  "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=pkiUser)(seeAlso=$1)(seeAlso:dnSubordinateMatch:={{ cert_suffix }})(aeStatus=0))"
+  "ldap:///{{ slapd_aedir_suffix }}??sub?(&(objectClass=pkiUser)(seeAlso=$1)(seeAlso:dnSubordinateMatch:={{ cert_suffix }})(aeStatus=0))"
 
 # Rewrite server cert with subject-DN suffix "{{ cert_suffix }}" by searching CN attribute value in server entry name attributes
 authz-regexp
   "cn=([a-zA-Z0-9.-]+),{{ cert_suffix }}"
-  "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=aeHost)(|(cn=$1)(host=$1))(aeStatus=0))"
+  "ldap:///{{ slapd_aedir_suffix }}??sub?(&(objectClass=aeHost)(|(cn=$1)(host=$1))(aeStatus=0))"
 
 {% endfor %}
 # subject name is equal to AE-DIR entry DN
 authz-regexp
-  "(.+,{{ aedir_suffix }})"
+  "(.+,{{ slapd_aedir_suffix }})"
   "ldap:///$1??base?(&(|(objectClass=aeUser)(objectClass=aeService)(objectClass=aeHost))(aeStatus=0))"
 
 #---------------------------------------------------------------------------
@@ -192,13 +192,13 @@ localSSF 256
 security ssf=128
 
 # Maximum incoming LDAP PDU size for anonymous sessions
-sockbuf_max_incoming {{ openldap_sockbuf_max_incoming }}
+sockbuf_max_incoming {{ slapd_openldap_sockbuf_max_incoming }}
 
 # Maximum incoming LDAP PDU size for authenticated sessions
-sockbuf_max_incoming_auth {{ openldap_sockbuf_max_incoming_auth }}
+sockbuf_max_incoming_auth {{ slapd_slapd_openldap_sockbuf_max_incoming_auth }}
 
 # Number of seconds to wait before forcibly closing an idle client connection
-idletimeout {{ openldap_idletimeout }}
+idletimeout {{ slapd_openldap_idletimeout }}
 
 # enable proxy authorization with authzTo attribute
 authz-policy to
@@ -228,16 +228,16 @@ access to
 access to
   dn.base=""
   attrs=namingContexts
-  val.regex="^{{ aedir_suffix }}$"
+  val.regex="^{{ slapd_aedir_suffix }}$"
     by * read
 
-{% if aedir_accesslog_suffix %}
+{% if slapd_aedir_accesslog_suffix %}
 # grant read access to accesslog suffix value to all zone admins
 access to
   dn.base=""
   attrs=namingContexts
-  val.regex="^{{ aedir_accesslog_suffix }}$"
-    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}" read
+  val.regex="^{{ slapd_aedir_accesslog_suffix }}$"
+    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,{{ slapd_aedir_suffix }}" read
     by * none break
 {% endif %}
 
@@ -245,18 +245,18 @@ access to
 access to
   dn.base=""
   attrs=namingContexts,configContext,monitorContext
-    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" read
-    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
-    by dn.exact="cn=root,{{ aedir_suffix }}" read
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ slapd_aedir_suffix }}" read
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ slapd_aedir_suffix }}" read
+    by dn.exact="cn=root,{{ slapd_aedir_suffix }}" read
     by * none
 
-{% if openldap_role=="provider" %}
+{% if slapd_openldap_role=="provider" %}
 # allow admins to add new children entries (database root entries)
 access to
   dn.base=""
   attrs=children
-    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" write
-    by dn.exact="cn=root,{{ aedir_suffix }}" write
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ slapd_aedir_suffix }}" write
+    by dn.exact="cn=root,{{ slapd_aedir_suffix }}" write
 {% endif %}
 
 # allow all bound users to read rest of rootDSE

@@ -1,4 +1,4 @@
-dn: uid=,cn=ae,{{ aedir_suffix }}
+dn: uid=,cn=ae,{{ w2ldap_aedir_suffix }}
 objectClass: account
 objectClass: aeObject
 objectClass: aeService
@@ -7,9 +7,9 @@ objectClass: pkiUser
 uid: ae-dir-slapd_
 cn: ae-dir-slapd_
 description: System user for OpenLDAP replica on .ae-dir.example.com
-seeAlso: cn=.ae-dir.example.com,{{ openldap_tls_cert_suffixes[0] }}
+seeAlso: cn=.ae-dir.example.com,{{ w2ldap_openldap_tls_cert_suffixes[0] }}
 aeStatus: 0
-pwdPolicySubentry: cn=ppolicy-sasl-external,cn=ae,{{ aedir_suffix }}
+pwdPolicySubentry: cn=ppolicy-sasl-external,cn=ae,{{ w2ldap_aedir_suffix }}
 aeNotBefore: now
-loginShell: {{ aedir_nologin_shell }}
+loginShell: {{ w2ldap_aedir_nologin_shell }}
 
