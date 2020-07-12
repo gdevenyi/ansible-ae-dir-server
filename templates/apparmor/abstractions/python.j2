@@ -13,11 +13,11 @@
   {{ openldap_path.libdir }}/lib{ldap,lber}* mr,
 
   # grant read access to system-wide Python modules
-  /usr/lib{,32,64}/python{{ aedir_python_version }}/ r,
-  /usr/lib{,32,64}/python{{ aedir_python_version }}/**.{pyc,so} mr,
-  /usr/lib{,32,64}/python{{ aedir_python_version }}/**.{egg,py,pth} r,
-  /usr/lib{,32,64}/python{{ aedir_python_version }}/{site,dist}-packages/ r,
-{% if aedir_python_version[0]=="3" %}
+  /usr/lib{,32,64}/python{{ apparmor_aedir_python_version }}/ r,
+  /usr/lib{,32,64}/python{{ apparmor_aedir_python_version }}/**.{pyc,so} mr,
+  /usr/lib{,32,64}/python{{ apparmor_aedir_python_version }}/**.{egg,py,pth} r,
+  /usr/lib{,32,64}/python{{ apparmor_aedir_python_version }}/{site,dist}-packages/ r,
+{% if apparmor_aedir_python_version[0]=="3" %}
   # grant read access to Python 3 shared libs
   /usr/lib{,32,64}/python3.[0-9]/lib-dynload/*.so mr,
 {% endif %}
@@ -30,19 +30,19 @@
   /usr/lib/{pyshared,pycentral,python-support}/**.so     mr,
   /var/lib/{pyshared,pycentral,python-support}/**.pyc    mr,
   /usr/{,local/}lib/python3/dist-packages/**.so          mr,
-  /etc/python{{ aedir_python_version }}/ r,
-  /etc/python{{ aedir_python_version }}/sitecustomize.py r,
+  /etc/python{{ apparmor_aedir_python_version }}/ r,
+  /etc/python{{ apparmor_aedir_python_version }}/sitecustomize.py r,
 {% endif %}
 
 {% if apparmor_lsb_id!="SUSE" %}
   # Separate Python virtual env on {{ apparmor_lsb_id }}
-  {{ apparmor_aedir_python_sitepackages }}/ r,
-  {{ apparmor_aedir_python_sitepackages }}/** r,
+  {{ apparmor_apparmor_aedir_python_sitepackages }}/ r,
+  {{ apparmor_apparmor_aedir_python_sitepackages }}/** r,
   {{ apparmor_aedir_prefix }}/pyvenv.cfg r,
-  {{ apparmor_aedir_prefix }}/lib/python{{ aedir_python_version }}/ r,
-  {{ apparmor_aedir_prefix }}/lib/python{{ aedir_python_version }}/orig-prefix.txt r,
-  {{ apparmor_aedir_prefix }}/lib/python{{ aedir_python_version }}/**.py{,c,o} r,
-  {{ apparmor_aedir_prefix }}/lib/python{{ aedir_python_version }}/**.so* rm,
+  {{ apparmor_aedir_prefix }}/lib/python{{ apparmor_aedir_python_version }}/ r,
+  {{ apparmor_aedir_prefix }}/lib/python{{ apparmor_aedir_python_version }}/orig-prefix.txt r,
+  {{ apparmor_aedir_prefix }}/lib/python{{ apparmor_aedir_python_version }}/**.py{,c,o} r,
+  {{ apparmor_aedir_prefix }}/lib/python{{ apparmor_aedir_python_version }}/**.so* rm,
 {% endif %}
 
   # Python logging config file

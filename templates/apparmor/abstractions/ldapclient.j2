@@ -7,7 +7,7 @@
   # we definitely don't need these => do not mention in audit.log
   deny /etc/ssl/openssl.cnf r,
 
-{% if lsb_id=="Debian" %}
+{% if apparmor_lsb_id=="Debian" %}
   # specifics for Debian
   deny /etc/gss/mech.d/ r,
 {% endif %}

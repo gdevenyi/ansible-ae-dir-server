@@ -21,7 +21,7 @@ Environment=LD_PRELOAD={{ systemd_aedir_malloc_ld_preload }}
 {% for evar in systemd_aedir_python_env %}
 Environment={{ evar.name }}={{ evar.value }}
 {% endfor %}
-ExecStart={{ systemd_aedir_python }} -m aedir_pproc.pwsync "{{ systemd_aedir_pwsync_socket_path }}" "{{ openldap_ldapi_uri|replace('%','%%') }}/????x-saslmech=EXTERNAL" "{{ aedir_pwsync_targeturl|replace('%','%%') }}" "{{ systemd_aedir_pwsync_targetpwfile }}"
+ExecStart={{ systemd_aedir_python }} -m aedir_pproc.pwsync "{{ systemd_aedir_pwsync_socket_path }}" "{{ systemd_openldap_ldapi_uri|replace('%','%%') }}/????x-saslmech=EXTERNAL" "{{ aedir_pwsync_targeturl|replace('%','%%') }}" "{{ systemd_aedir_pwsync_targetpwfile }}"
 User={{ systemd_aedir_pwsync_listener_user }}
 Group={{ systemd_aedir_pwsync_listener_user }}
 CapabilityBoundingSet=

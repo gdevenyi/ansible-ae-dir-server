@@ -27,7 +27,7 @@ profile {{ openldap_service_name }} {
 
   # allow r/w access to database files
   owner {{ apparmor_openldap_data }}/{um,accesslog}/{DUMMY,data.mdb,lock.mdb} rwk,
-{% if openldap_role=="provider" %}
+{% if apparmor_openldap_role=="provider" %}
   owner {{ apparmor_openldap_data }}/session/{DUMMY,data.mdb,lock.mdb} rwk,
 {% endif %}
 
@@ -41,12 +41,12 @@ profile {{ openldap_service_name }} {
 {% endif %}
   {{ apparmor_openldap_dhparam_pathname }} r,
 
-{% if oath_ldap_enabled==True %}
+{% if apparmor_oath_ldap_enabled==True %}
   # allow r/w access to external bind listener (for OATH-LDAP)
   {{ apparmor_oath_ldap_socket_path }} rw,
 {% endif %}
 
-{% if openldap_role=="provider" and aedir_pwsync_targeturl is defined %}
+{% if apparmor_openldap_role=="provider" and aedir_pwsync_targeturl is defined %}
   # allow r/w access to external pwsync listener
   {{ apparmor_aedir_pwsync_socket_path }} rw,
 {% endif %}
@@ -56,12 +56,12 @@ profile {{ openldap_service_name }} {
   # access to OpenLDAP's client config
   {{ openldap_path.conf_prefix }}/ldap.conf rm,
 
-{% if lsb_id=="Debian" %}
+{% if apparmor_lsb_id=="Debian" %}
   /etc/hosts.{allow,deny} r,
   /usr/local/berkeleydb/lib/libdb* rm,
 {% endif %}
 
-{% if lsb_id!="Debian" %}
+{% if apparmor_lsb_id!="Debian" %}
   # SASL config for slapd
   /etc/sasl2/slapd.conf r,
 {% endif %}
