@@ -21,28 +21,6 @@ aedir_files_dirs:
   - "{{ playbook_dir }}/files"
   - "{{ role_path }}/files"
 
-# override service manager fact (e.g. for docker build)
-aedir_service_manager: "{{ ansible_service_mgr }}"
-
-# LSB id to be used during plays
-lsb_id: "{{ lsb_id_map.get(ansible_lsb.id,ansible_lsb.id) }}"
-
-# Task state when creating aeHost entry
-# Temporarily set to "reset" for forced update of host password
-aedir_aehost_state: "{{ 'reset' if aedir_init is defined else 'present' }}"
-
-# name of host group (aeSrvGroup) to use for AE-DIR server
-aedir_srvgroup: "ae-dir-{{ openldap_role }}-hosts"
-
-# main provider hostname used for initially loading data
-aedir_main_provider_hostname: "{{ aedir_hosts.provider[0] }}"
-
-# load-balancer hostname for accessing provider(s) especially used in web URLs
-aedir_provider_lb_hostname: "{{ aedir_main_provider_hostname }}"
-
-# list of HTML snippets to be put as news on the entry web page
-aedir_news: []
-
 #---------------------------------------------------------------------------
 # pip install arguments
 #---------------------------------------------------------------------------
@@ -62,8 +40,69 @@ aedir_pip_install_options:
 aedir_pip_extra_args: "{{ aedir_pip_install_options|join(' ') }}"
 
 #---------------------------------------------------------------------------
-# python environment
+# software repo parameters
 #---------------------------------------------------------------------------
+
+# Dictionary defining additional OS package repos
+aedir_pkg_repos: "{{ aedir_package_repos }}"
+
+#---------------------------------------------------------------------------
+# AE-DIR parameters
+#---------------------------------------------------------------------------
+
+# LSB id to be used during plays
+lsb_id: "{{ lsb_id_map.get(ansible_lsb.id,ansible_lsb.id) }}"
+
+# override service manager fact (e.g. for docker build)
+aedir_service_manager: "{{ ansible_service_mgr }}"
+
+# base DN / search root / naming context for AE-DIR entries
+# Note: Do yourself a favour and keep it short ;-)
+aedir_suffix: "ou=ae-dir"
+
+# base DN / search root for accesslog entries
+# For disabling accesslog DB on the read-only consumers you can set this
+# to an empty string in group_vars/ae-dir-consumers
+aedir_accesslog_suffix: "cn=accesslog-ae-dir"
+
+# base DN / search root for session entries
+# (if empty string, the session database is disabled)
+#aedir_session_suffix: "cn=ae-session"
+aedir_session_suffix: ""
+
+# POSIX-GID number range served by AE-DIR
+aedir_min_gid: 30000
+aedir_max_gid: 59999
+
+# POSIX-UID number range served by AE-DIR
+aedir_min_uid: "{{ aedir_min_gid }}"
+aedir_max_uid: "{{ aedir_max_gid }}"
+
+# Parameters for generating user names
+aedir_username_length: 4
+aedir_username_gen_trials: 15
+# Parameters for checking user names
+aedir_username_minlen: "{{ aedir_username_length }}"
+aedir_username_maxlen: "{{ aedir_username_length }}"
+
+# Some paths for tools
+aedir_prefix: "/opt/ae-dir"
+aedir_bin: "{{ aedir_prefix }}/bin"
+aedir_sbin: "{{ aedir_prefix }}/sbin"
+aedir_etc: "{{ aedir_prefix }}/etc"
+aedir_etc_openldap: "{{ aedir_etc }}/openldap"
+aedir_rundir: "{{ aedir_prefix }}/run"
+aedir_python_sitepackages: "{{ aedir_python_paths.site_packages }}"
+aedir_htdocsdir: "{{ aedir_prefix }}/htdocs"
+
+# Directory for metrics text exports picked up by Prometheus node-exporter.
+# If empty, no text exporter CRON jobs are installed.
+# Setting this to empty string disables dumping metrics to files.
+#aedir_metricsdir: "/var/spool/metrics"
+aedir_metricsdir: ""
+
+# Group ID or name for setting group ownership of metrics directory and files
+aedir_metrics_owner_group: "root"
 
 # which Python interpreter to use
 aedir_python: "{{ aedir_python_paths.python_exec }} -ROOBs"
@@ -86,22 +125,14 @@ aedir_python_env:
   - name: "LD_LIBRARY_PATH"
     value: "{{ openldap_path.libdir }}"
 
-#---------------------------------------------------------------------------
-# host environment
-#---------------------------------------------------------------------------
-
-# Some paths for tools
-aedir_prefix: "/opt/ae-dir"
-aedir_bin: "{{ aedir_prefix }}/bin"
-aedir_sbin: "{{ aedir_prefix }}/sbin"
-aedir_etc: "{{ aedir_prefix }}/etc"
-aedir_etc_openldap: "{{ aedir_etc }}/openldap"
-aedir_rundir: "{{ aedir_prefix }}/run"
-aedir_python_sitepackages: "{{ aedir_python_paths.site_packages }}"
-aedir_htdocsdir: "{{ aedir_prefix }}/htdocs"
-
 # where to install systemd files
 aedir_systemd_dir: "/etc/systemd/system"
+
+# Jinja template used to generate Logging configuration for all AE-DIR
+# demons and scripts written in Python.
+# See format in Python 3.x library docs:
+# https://docs.python.org/3/library/logging.config.html#configuration-file-format
+aedir_logging_conf: "ae-logging.conf.j2"
 
 # logging related systemd options
 aedir_systemd_logging:
@@ -134,39 +165,283 @@ aedir_systemd_hardening:
   - "MemoryDenyWriteExecute=yes"
 #  - "InaccessiblePaths=/run/systemd"
 
-# If non-empty this triggers installation and pre-loading of alternative
-# malloc lib in all systemd unit files for all services.
-# Example for using jemalloc on Debian:
-# aedir_malloc_package: "libjemalloc1"
-# aedir_malloc_ld_preload: "/usr/lib/x86_64-linux-gnu/libjemalloc.so.1"
-aedir_malloc_package: ""
-aedir_malloc_ld_preload: ""
+# regex patterns for enforcing naming conventions (substring match!)
+# Important notes:
+# - patterns are also used as substrings of more complex patterns => do not enclose in ^ and $
+# - you should only *relax* patterns for an existing deployment with existing entries!
+# attribute 'cn'
+aedir_aezone_cn_regex: "[a-z0-9]+"
+aedir_aegroup_cn_regex: "{{ aedir_aezone_cn_regex }}-[a-z0-9-]+"
+aedir_aetag_cn_regex: "{{ aedir_aegroup_cn_regex }}"
+aedir_aesudorule_cn_regex: "{{ aedir_aegroup_cn_regex }}"
+aedir_aesrvgroup_cn_regex: "{{ aedir_aegroup_cn_regex }}"
+# attribute 'serialNumber'
+aedir_aeauthctoken_serial_regex: "[a-z0-9_-]+"
+# attribute 'uid'
+aedir_aeuser_uid_regex: "[a-z]{{ '{' }}{{ aedir_username_minlen }},{{ aedir_username_maxlen }}{{ '}' }}"
+aedir_aeservice_uid_regex: "[a-zA-Z0-9_.-]+"
+# attribute 'aeTicketId'
+aeticketid_regex: "[A-Z]+-[0-9]+"
+# for entries beneath cn={{ aedir_org_zone }}
+aedir_aeperson_uniqueid_regex: "[a-zA-Z0-9_.:/-]+"
+aedir_aelocation_cn_regex: "[a-zA-Z0-9_.:/-]+"
+aedir_aedept_deptnumber_regex: "[a-zA-Z0-9_.:/-]+"
+# special regex policy rules for SSH public keys
+# e.g. for specifying algorithms or naming conventions for key comment
+aedir_aeservice_sshpubkey_regex: "(ssh-rsa|ecdsa-sha2-nistp256|ecdsa-sha2-nistp384|ecdsa-sha2-nistp521|ssh-ed25519) [A-Za-z0-9+=/]+ .+"
+aedir_aeuser_sshpubkey_regex: "(ssh-rsa|ecdsa-sha2-nistp256|ecdsa-sha2-nistp384|ecdsa-sha2-nistp521|ssh-ed25519) [A-Za-z0-9+=/]+ .+"
 
-# Dictionary defining additional OS package repos
-aedir_pkg_repos: "{{ aedir_package_repos }}"
+# filter for self-service ACL for attribute sshPublicKey
+# set to empty string for disabling the self-service ACL
+#aedir_sshpublickey_self_filter: "(&(objectClass=aeUser)(oathToken=*))"
+aedir_sshpublickey_self_filter: ""
 
-#---------------------------------------------------------------------------
-# metrics & logging configuration
-#---------------------------------------------------------------------------
+# List of possible SSH key permissions/option values in
+# attribute 'aeSSHPermissions'
+# Note:
+# The client (SSH-CA or Unixoid system) has to decide which options are
+# enabled in case of empty set
+aedir_sshkey_perms:
+  - pty
+  - X11-forwarding
+  - agent-forwarding
+  - port-forwarding
+  - user-rc
 
-# Directory for metrics text exports picked up by Prometheus node-exporter.
-# If empty, no text exporter CRON jobs are installed.
-# Setting this to empty string disables dumping metrics to files.
-#aedir_metricsdir: "/var/spool/metrics"
-aedir_metricsdir: ""
+# all valid directory prefixes for attribute 'homeDirectory'
+# but without trailing slash
+aedir_homedirectory_prefixes:
+  - "/home"
+#  - "/Users"
 
-# Group ID or name for setting group ownership of metrics directory and files
-aedir_metrics_owner_group: "root"
+# magic value which make homeDirectory attribute invisible
+aedir_homedirectory_hidden: "-/-"
 
-# Jinja template used to generate Logging configuration for all AE-DIR
-# demons and scripts written in Python.
-# See format in Python 3.x library docs:
-# https://docs.python.org/3/library/logging.config.html#configuration-file-format
-aedir_logging_conf: "ae-logging.conf.j2"
+# shell used for denying login
+aedir_nologin_shell: "/usr/sbin/nologin"
 
-#---------------------------------------------------------------------------
-# documentation configuration
-#---------------------------------------------------------------------------
+# available values for attribute 'loginShell'
+aedir_login_shells:
+  - /bin/bash
+  - "{{ aedir_nologin_shell }}"
+  - /bin/true
+  - /bin/false
+
+# who clause for set-based ACL determining visibility of IP address
+# attributes for hosts map
+aedir_aenwdevice_visibility_sets:
+  # 1. only aeHost beneath same aeSrvGroup can see host's network devices
+  - "this/-2 & user/-1"
+  # 2. only aeHost within same aeZone can see host's network devices
+  #- "this/-3 & user/-2"
+  # 3. only aeHost being member of aeSrvGroup which depends on
+  #    the aeSrvGroup can see host's network devices
+  - "this/-2 & user/-1/aeRequires"
+
+# Usernames and POSIX-UID/-GID numbers for system accounts of services
+# running on providers and accessing AE-DIR via LDAPI
+# Important notes:
+# - uid_number/gid_number should be outside aedir_min_uid/aedir_max_uid range defined above
+# - user names must match aedir_aeservice_uid_regex pattern defined above
+# - do not remove items after initializing a AE-DIR deployment
+# - special care needed for usernames used in OpenLDAP ACLs
+
+aedir_ldapi_services:
+  # system user for password self-service web application
+  # uid is referenced in OpenLDAP ACLs!
+  ae-dir-pwd:
+    cn: "Password self-service application"
+    uid_number: "{{ aedir_min_gid-1 }}"
+    gid_number: "{{ aedir_min_gid-1 }}"
+    description: The system user allowed to set attributes during user password reset (msPwdResetObject) over LDAPI
+    roles:
+      - provider
+  # system user for sync processes
+  ae-dir-peoplesync:
+    cn: "Personnel data sync process"
+    uid_number: "{{ aedir_min_gid-2 }}"
+    gid_number: "{{ aedir_min_gid-2 }}"
+    description: "The system user allowed to maintain aePerson entries over LDAPI"
+    roles:
+      - provider
+    groups:
+      - "{{ aedir_org_zone }}-zone-admins"
+  # system user for OTP registration/enrollment web application
+  # uid is referenced in OpenLDAP ACLs!
+  ae-dir-otpenroll:
+    cn: "2FA enrollment application"
+    uid_number: "{{ aedir_min_gid-3 }}"
+    gid_number: "{{ aedir_min_gid-3 }}"
+    description: "The system user allowed to init OATH token entries over LDAPI"
+    roles:
+      - provider
+    groups:
+      - ae-login-proxies
+  # system user for OTP verification listener
+  # uid is referenced in OpenLDAP ACLs!
+  ae-dir-otpverify:
+    cn: "OATH-LDAP validator demon"
+    uid_number: "{{ aedir_min_gid-4 }}"
+    gid_number: "{{ aedir_min_gid-4 }}"
+    description: "The system user allowed to read shared secrets (OATH-LDAP)"
+    roles:
+      - provider
+    groups:
+      - ae-login-proxies
+  # system user for bind proxy listener
+  ae-dir-bind-proxy:
+    cn: "OATH-LDAP bind proxy"
+    uid_number: "{{ aedir_min_gid-5 }}"
+    gid_number: "{{ aedir_min_gid-5 }}"
+    description: "The system user used for simple bind proxy"
+    roles:
+      - consumer
+    groups:
+      - ae-login-proxies
+  # system user for WebSSO component
+  ae-dir-web-sso:
+    cn: "WebSSO component"
+    uid_number: "{{ aedir_min_gid-6 }}"
+    gid_number: "{{ aedir_min_gid-6 }}"
+    description: "The system user used for WebSSO"
+    roles:
+      - provider
+  # system user for pwsync
+  ae-dir-pwsync:
+    cn: "Password sync listener"
+    uid_number: "{{ aedir_min_gid-7 }}"
+    gid_number: "{{ aedir_min_gid-7 }}"
+    description: "The system user allowed to intercept password changes and set password"
+    roles:
+      - provider
+    groups:
+      - ae-login-proxies
+  # system user which must match UID/GID OpenLDAP's slapd service is running as
+  ae-dir-slapd:
+    cn: "OpenLDAP slapd demon user"
+    uid_number: "{{ aedir_min_gid-8 }}"
+    gid_number: "{{ aedir_min_gid-8 }}"
+    description: "The system user for running OpenLDAP server process (slapd)"
+    roles:
+      - provider
+      - consumer
+  # system user which must match UID/GID Apache service is running as
+  ae-dir-httpd:
+    cn: "Web server demon user"
+    uid_number: "{{ aedir_min_gid-9 }}"
+    gid_number: "{{ aedir_min_gid-9 }}"
+    description: "The system user for running Apache server process (httpd)"
+    roles:
+      - provider
+  # system user for running web2ldap instance under control of uwsgi
+  ae-dir-web2ldap:
+    cn: "web2ldap demon user"
+    uid_number: "{{ aedir_min_gid-10 }}"
+    gid_number: "{{ aedir_min_gid-10 }}"
+    description: "The system user for running web2ldap service process"
+    roles:
+      - provider
+
+# POSIX UID and GID which is mapped to rootdn
+aedir_rootdn_uid_number: 0
+aedir_rootdn_gid_number: 0
+
+# which zone to use for aePerson and aeDept entries
+# (must be listed in aedir_init_aezones below)
+aedir_org_zone: people
+
+# which zone to use for primary aeUser entries
+# (must be listed in aedir_init_aezones below)
+aedir_base_zone: base
+
+# zones in which there must be only one unique user account per person
+aedir_unique_person_zones:
+  - "{{ aedir_base_zone }}"
+
+# use become when doing initial load
+# useful in case the initial installation is done with non-root ansible user
+aedir_init_become: "no"
+
+# ticket identifier of initial ldapadd
+aedir_init_ticket_id: "INIT-42"
+
+# List of aeZone entries to be added to ae-dir-base.ldif
+aedir_init_aezones:
+  people:
+    ticket_id: "{{ aedir_init_ticket_id }}"
+    description: "People and department entries"
+  base:
+    ticket_id: "{{ aedir_init_ticket_id }}"
+    description: "Primary office users and groups"
+  otp:
+    ticket_id: "{{ aedir_init_ticket_id }}"
+    description: "OTP tokens (OATH-LDAP)"
+  test:
+    ticket_id: "{{ aedir_init_ticket_id }}"
+    description: "Testing playground"
+
+# dict of dicts for aePerson entries to be added to ae-dir-base.ldif
+# - the dict key will be used as RDN value with LDAP attribute uniqueIdentifier
+# - add a real mail address here to get the welcome e-mail for the account
+#aedir_init_aepersons:
+#  INIT-PERSON-ID-42:
+#    given_name: Theo
+#    sur_name: Täster
+#    mail: theo@example.com
+aedir_init_aepersons: {}
+
+# list of dicts for aeUser entries to be added to ae-dir-base.ldif
+# - user names must match aedir_aeservice_uid_regex pattern defined above
+# - unique_identifier has to be an entry in aedir_init_aepersons
+#aedir_init_aeadmins:
+#  - uid: xkcd
+#    unique_identifier: INIT-PERSON-ID-42
+#    description: initial Æ-DIR admin
+#    ticket_id: "{{ aedir_init_ticket_id }}"
+aedir_init_aeadmins: []
+
+aedir_hosts:
+  # inventory host names of *all* provider hosts
+  provider: "{{ groups.aedir_providers }}"
+  # inventory host names of *all* consumer hosts
+  consumer: "{{ groups.aedir_consumers }}"
+
+# name of host group (aeSrvGroup) to use for AE-DIR server
+aedir_srvgroup: "ae-dir-{{ openldap_role }}-hosts"
+
+# main provider hostname used for initially loading data
+aedir_main_provider_hostname: "{{ aedir_hosts.provider[0] }}"
+
+# load-balancer hostname for accessing provider(s) especially used in web URLs
+aedir_provider_lb_hostname: "{{ aedir_main_provider_hostname }}"
+
+# aePerson attributes only readable by zone admins/auditors of people zone
+aedir_confidential_person_attrs:
+  - employeeNumber
+  - aeNotBefore
+  - aeNotAfter
+
+# Attributes in aeContact, aePerson, aeMailGroup entries
+# readable by address book users of the zone.
+# If empty the ACL is removed.
+#aedir_addressbook_attrs:
+#  - cn
+#  - sn
+#  - givenName
+#  - mail
+#  - userCertificate
+aedir_addressbook_attrs: []
+
+# Specifies whether a AE-DIR instance should send e-mail notifications to users or not
+aedir_user_mail_enabled: "{{ inventory_hostname == aedir_main_provider_hostname }}"
+
+# some stupid LDAP clients insist on searching user or group entries in
+# separate container trees beneath the separately configured search root
+# => always map to {{ aedir_suffix }}
+#aedir_fake_search_roots:
+#  - "ou=users"
+#  - "ou=groups"
+aedir_fake_search_roots: []
 
 # base names with extension of web pages installed to DocumentRoot
 aedir_htdocs_templates:
@@ -190,9 +465,22 @@ aedir_htdocs_templates:
 # relative filename of Jinja2 base layout template for all web pages
 aedir_htdocs_layout: "layout.html.j2"
 
-#---------------------------------------------------------------------------
-# uwsgi run services configuration
-#---------------------------------------------------------------------------
+# If non-empty this triggers installation and pre-loading of alternative
+# malloc lib in all systemd unit files for all services.
+# Example for using jemalloc on Debian:
+# aedir_malloc_package: "libjemalloc1"
+# aedir_malloc_ld_preload: "/usr/lib/x86_64-linux-gnu/libjemalloc.so.1"
+aedir_malloc_package: ""
+aedir_malloc_ld_preload: ""
+
+# Default values for attribute 'aeExpiryStatus' in LDIF templates
+# key is the structural object class
+# Example:
+# ae_expiry_status_defaults:
+#     aeUser: 1
+#     aeGroup: 1
+#     aeService: 1
+ae_expiry_status_defaults: {}
 
 # some uwsgi parameters per service
 aedir_uwsgi_params:
@@ -209,3 +497,490 @@ aedir_uwsgi_params:
     harakiri: 10
     processes: 5
 
+# All relevant aeSrvGroup entries in set-based who clauses for performance tuning:
+# support supplemental service groups, but no support for proxy service groups
+#aedir_who_srvgroup: "(user/-1 | user/aeSrvGroup)"
+# only support for direct parent service groups, no supplemental or proxy service groups
+#aedir_who_srvgroup: "(user/-1)"
+# full features including
+aedir_who_srvgroup: "(user/-1 | user/aeSrvGroup | user/-1/aeProxyFor)"
+
+# additional restrictions added to <who> clauses of provider ACLs
+# Example for restricting all providers' access to come from IPv4 network 10.54.1.0/24:
+# aedir_providers_restrictions: ['peername.ip="10.54.1.0%255.255.255.0"']
+aedir_providers_restrictions: []
+
+# additional restrictions added to <who> clauses of all replica ACLs
+# aedir_replicas_restrictions should include all aedir_providers_restrictions
+# because the providers are a subset of all replicas
+# Example for restricting all replica' access to come from IPv4 network 10.54.1.0/24:
+# aedir_replicas_restrictions: ['peername.ip="10.54.1.0%255.255.255.0"']
+aedir_replicas_restrictions: "{{ aedir_providers_restrictions }}"
+
+# name of CRON file in /etc/cron.d
+aedir_cron_file: "ae-dir-{{ openldap_role }}"
+
+# server-specific offset for rotating CRON execution
+# this assumes that the values of openldap_server_id are consecutive and start with 1
+# => set differently if that's not the case
+aedir_cron_offset: "{{ openldap_server_id - 1 }}"
+
+# minutes values for CRON jobs
+# this assumes that the values of openldap_server_id are consecutive
+# => set differently if that's not the case
+aedir_cron_minutes:
+  # run each minute on one of the providers
+  aedir_pproc: "{{ range(aedir_cron_offset|int, 60, aedir_hosts.provider|length) | select('lessthan', 60) | map('string') | join(',') }}"
+  # run each minute on one of the providers
+  aedir_pproc_pwd: "{{ range(aedir_cron_offset|int, 60, aedir_hosts.provider|length) | select('lessthan', 60) | map('string') | join(',') }}"
+
+#---------------------------------------------------------------------------
+# OpenLDAP parameters
+#---------------------------------------------------------------------------
+
+# replica role, must be either 'provider' or 'consumer'
+openldap_role: "{{ (inventory_hostname in aedir_hosts.provider)|ternary('provider', 'consumer') }}"
+
+# default FQDN in LDAP service URL
+openldap_service_fqdn: "{{ inventory_hostname }}"
+
+# Some paths
+openldap_rundir: "{{ aedir_rundir }}/slapd"
+openldap_data: "{{ aedir_prefix }}/slapd-db"
+openldap_ldapi_socket: "{{ openldap_rundir }}/ldapi"
+openldap_ldapi_uri: "ldapi://{{ openldap_ldapi_socket|urlencode|replace('/','%2F') }}"
+# where to place static config file for slapd (slapd.conf)
+openldap_slapd_conf: "{{ aedir_etc_openldap }}/slapd.conf"
+# system user/group to run slapd with
+openldap_slapd_user: "ae-dir-slapd"
+openldap_slapd_group: "ae-dir-slapd"
+# syslog(3) parameters used for slapd's logging
+openldap_syslog_facility: "LOCAL4"
+openldap_syslog_level: "7"
+
+aedir_schema_prefix: "{{ openldap_slapd_conf|dirname }}/schema"
+
+# All additional schema files needed
+openldap_schema_files:
+  - ae-dir.schema
+  - ae-dir-dcr.schema
+  - ae-dir-session.schema
+  - draft-findlay-ldap-groupofentries.schema
+  - draft-stroeder-mailboxrelatedobject.schema
+  - draft-stroeder-namedobject.schema
+  - mail.schema
+  - mspwdreset.schema
+  - oath-ldap.schema
+  - openssh-lpk_openldap.schema
+  - stroeder.com-oid-macros.schema
+  - stroeder.com.schema
+  - sudoers.schema
+  - autofs.schema
+
+# Pathname of backup script
+openldap_backup_script: "{{ aedir_sbin }}/ae-dir-slapcat.sh"
+# Pathname where to export the LDIF data to
+openldap_backup_path: "{{ openldap_data }}"
+# executable and options used to compress exported LDIF data
+# (set to empty string to disable compression)
+# consult the man-page of compressing program used to
+# learn about its resource usage (memory etc.)
+openldap_backup_compressor: "xz -3"
+# maximum number of days to keep local backup files
+openldap_backup_max_days: 21
+# backup cron values
+openldap_backup_cron_args:
+  hour: "{{ range(2*(openldap_server_id-1), 12, aedir_hosts.provider|length) | select('lessthan', 24) | map('string') | join(',') }}"
+  minute: "23"
+
+# List of servers to be added to rootDSE attribute altServer (see RFC 4512)
+openldap_rootdse_alt_servers: "{{ aedir_hosts[openldap_role]|sort }}"
+
+# The CA certificate file for validating the server certs
+openldap_cacert_filename: "ca-chain.pem"
+
+# Suffix expected in subject-DN of server and client certs
+# for authz-regexp directive and pkiUser/seeAlso attributes
+# Must match values in gen_csr.cnf.j2
+openldap_tls_cert_suffixes:
+  - "ou=Edit OU,o=Edit O,l=Edit L,st=Edit ST,c=CO"
+
+# The server certificate and key files (absolute path names on local controller!)
+openldap_cert_filename: "{{ inventory_dir }}/files/{{ openldap_service_fqdn }}.crt"
+openldap_key_filename: "{{ inventory_dir }}/files/{{ openldap_service_fqdn }}.key"
+
+# local directory for fetched CSRs
+local_openldap_csr_dir: "{{ inventory_dir }}/files/pki-csr-files"
+
+# value for slapd.conf directive TLSProtocolMin
+# 3.<x> means TLSv1.<x-1>
+openldap_tls_protocol_min: "3.3"
+
+# value for slapd.conf directive TLSCipherSuite
+openldap_tls_cipher_suite: "HIGH:!aNULL:!kDH:!kECDH:!MD5"
+
+# value for parameter tls_protocol_min of slapd.conf directive 'syncrepl'
+# 3.<x> means TLSv1.<x-1>
+openldap_syncrepl_tls_protocol_min: "3.3"
+
+# value for parameter tls_cipher_suite of slapd.conf directive 'syncrepl'
+openldap_syncrepl_tls_cipher_suite: "ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDH-RSA-AES256-GCM-SHA384:!ADH"
+
+# The full path names on the target system
+openldap_cacert_pathname: "{{ aedir_etc }}/tls/{{ openldap_cacert_filename|basename }}"
+openldap_cert_pathname: "{{ aedir_etc }}/tls/{{ openldap_cert_filename|basename }}"
+openldap_key_pathname: "{{ aedir_etc }}/tls/{{ openldap_key_filename|basename }}"
+
+# for generating DH parameters for perfect forward secrecy
+openldap_dhparam_pathname: "{{ aedir_etc }}/tls/slapd.dhparam"
+openldap_dhparam_numbits: 2048
+
+# password hashing scheme
+# see https://tools.ietf.org/html/draft-stroeder-hashed-userpassword-values
+openldap_password_hash: "{CRYPT}"
+# SHA-512, 128 bits of salt, 20000 iterations (see also crypt(3) man page)
+openldap_password_crypt_salt_format: "$6$rounds=20000$%.16s"
+# new password scheme available in OpenLDAP 2.4.50
+#openldap_password_hash: "{ARGON2}"
+
+# subject alternative names in CSRs
+openldap_csr_subjectdn: "/{{ openldap_tls_cert_suffixes[0].split(',')|reverse|join('/') }}/CN={{ openldap_service_fqdn }}"
+
+# subject alternative names in CSRs (OpenSSL syntax)
+openldap_csr_subjectaltnames:
+  - "DNS:{{ openldap_service_fqdn }}"
+
+# which messages to send to syslog
+# normal for production: stats
+openldap_log_level: "stats"
+
+# timeout parameters (secs) for syncrepl described in slapd.conf(5)
+openldap_syncrepl_network_timeout: 5
+openldap_syncrepl_timeout: 5
+
+# Maximum number of pending requests for anonymous sessions
+openldap_conn_max_pending: 100
+
+# Maximum number of pending requests for authenticated sessions
+openldap_conn_max_pending_auth: 1000
+
+# how many listener threads are started (should be power of 2)
+# rule-of-thumb: 1 for up to 16 cores
+openldap_listener_threads: 1
+
+# number of file descriptors for LDAP connections
+openldap_limit_nofile: 1024
+
+# how many worker threads are started
+# RAM needed per thread: 4MB on 32 bit systems, 8MB on 64 bit systems
+# rule-of-thumb: 4 per real CPU core
+openldap_threads: 8
+
+# Various database-specific tuning parameters
+# maxsize: see directive 'maxsize' in slapd-mdb(5)
+# checkpoint: see directive 'checkpoint' in slapd-mdb(5)
+# syncprov_sessionlog: see directive 'syncprov-sessionlog' in slapo-syncprov(5)
+# syncprov_checkpoint: see directive 'syncprov-checkpoint' in slapo-syncprov(5)
+# sizelimit: see directive 'sizelimit' in slapd.conf(5)
+# timelimit: see directive 'timelimit' in slapd.conf(5)
+openldap_db_params:
+  accesslog:
+    mdb_maxsize: 500000000
+    checkpoint: "5000 2"
+    syncprov_sessionlog: 10000
+    syncprov_checkpoint: "5000 2"
+    sizelimit: -1
+    timelimit: 120
+  um:
+    mdb_maxsize: 100000000
+    checkpoint: "1000 1"
+    syncprov_sessionlog: 10000
+    syncprov_checkpoint: "1000 1"
+    sizelimit: 500
+    timelimit: 60
+  session:
+    mdb_maxsize: 10000000
+    checkpoint: "20000 10"
+    syncprov_sessionlog: 1000
+    syncprov_checkpoint: "20000 10"
+    sizelimit: 2
+    timelimit: 10
+
+# keep for 23 days and scan once per day, see slapo-accesslog(5)
+openldap_log_purge: "23+00:00 01+00:00"
+
+# list of syncrepl providers used on a certain replica
+openldap_syncrepl_providers: "{{ aedir_hosts.provider }}"
+
+# Maximum incoming LDAP PDU size for anonymous sessions
+openldap_sockbuf_max_incoming: "131072"
+
+# Maximum incoming LDAP PDU size for authenticated sessions
+openldap_sockbuf_max_incoming_auth: "{{ openldap_sockbuf_max_incoming_auth_default[openldap_role] }}"
+
+# Number of seconds to wait before forcibly closing an idle client connection
+openldap_idletimeout: "900"
+
+#---------------------------------------------------------------------------
+# password sync parameters
+#---------------------------------------------------------------------------
+
+# Target URL for password synchronisation
+# If defined this enables password clear-text syncing (rarely needed)
+# to a target server specified by LDAP URL
+# Example:
+#aedir_pwsync_targeturl: "ldaps://msad.example.com/dc=example,dc=org?samaccountname,unicodePwd?sub??bindname=dom-admin@example.com"
+
+# regex pattern for limiting the entries for which password changes are exported
+# Example: Restrict syncing passwords to aeUser and aeService entries within zones "base" and "test"
+# aedir_pwsync_dn_regex: "^uid=({{ aedir_aeuser_uid_regex }}|{{ aedir_aeservice_uid_regex }}),cn=(base|test),{{ aedir_suffix }}$"
+aedir_pwsync_dn_regex: ""
+
+# password of authenticating to sync target (should be ansible vault or similar)
+aedir_pwsync_targetpassword: ""
+
+# The CA certificate file bundle for connecting to sync target
+aedir_pwsync_cacert_filename:  "{{ openldap_cacert_filename }}"
+
+# The CA certificate file bundle for connecting to sync target
+aedir_pwsync_cacert_pathname: "{{ aedir_etc }}/pwsync/{{ aedir_pwsync_cacert_filename|basename }}"
+
+# pathname of file containing target's password
+aedir_pwsync_targetpwfile: "{{ aedir_etc }}/pwsync/target_pw"
+
+# user account for running pwsync
+aedir_pwsync_listener_user: ae-dir-pwsync
+
+# Directory path where Unix domain socket is created
+aedir_pwsync_socket_dir: "{{ aedir_rundir }}/pwsync"
+# Full pathname of Unix domain socket of bind listener
+# (set this to empty string for disabling the external bind listeners completely)
+aedir_pwsync_socket_path: "{{ aedir_pwsync_socket_dir }}/socket"
+
+# list of HTML snippets to be put as news on the entry web page
+aedir_news: []
+
+# Task state when creating aeHost entry
+# Temporarily set to "reset" for forced update of host password
+aedir_aehost_state: "{{ 'reset' if aedir_init is defined else 'present' }}"
+
+#---------------------------------------------------------------------------
+# OATH-LDAP parameters
+#---------------------------------------------------------------------------
+
+# enable OATH-LDAP (with external bind listeners in slapd.conf)
+# set to True to enable (default is False=disabled)
+oath_ldap_enabled: False
+
+# regex pattern for limiting the entries for which bind requests
+# are sent to external OATH-LDAP listener
+# Note:
+# This needs OpenLDAP built with ITS#8051 in otherwise slapd won't start!
+oath_ldap_dn_regex: "^uid=({{ aedir_aeuser_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+
+# map slapd role to bind listener parameters
+oath_dict:
+  provider:
+    bind_listener: hotp_validator
+    user: ae-dir-otpverify
+  consumer:
+    bind_listener: bind_proxy
+    user: ae-dir-bind-proxy
+
+# which type of bind listener to use
+oath_bind_listener: "{{ oath_dict[openldap_role].bind_listener }}"
+
+# System user used to start bind listener
+oath_listener_user: "{{ oath_dict[openldap_role].user }}"
+
+# Directory path where OATH-LDAP configuration is stored
+oath_ldap_cfg_dir: "{{ aedir_etc }}/oath-ldap"
+
+# Directory path where OATH-LDAP primary keys are stored
+oath_ldap_keys_dir: "{{ oath_ldap_cfg_dir }}/primary-keys"
+
+# If variable oath_ldap_key_files is defined all files *.pub and *.key
+# found therein are installed to directory defined with oath_ldap_keys_dir
+# *.key files should be protected with ansible vault or similar
+#oath_ldap_key_files: "{{ inventory_dir }}/files/oath-primary-keys/"
+
+# Directory path where Unix domain socket is created
+oath_ldap_socket_dir: "{{ aedir_rundir }}/{{ oath_bind_listener }}"
+# Full pathname of Unix domain socket of bind listener
+# (set this to empty string for disabling the external bind listeners completely)
+oath_ldap_socket_path: "{{ oath_ldap_socket_dir }}/socket"
+
+# user/group to run password self-service web application
+# must be in {{ aedir_ldapi_services }}
+oath_ldap_oathenroll_web_user: ae-dir-otpenroll
+oath_ldap_oathenroll_web_group: ae-dir-otpenroll
+
+#---------------------------------------------------------------------------
+# SMTP parameters
+#---------------------------------------------------------------------------
+
+# SMTP server used as smart host (SMTP relay)
+# query string of URL may contain two more parameters:
+# STARTTLS: Send STARTTLS
+# VIA: Use this hostname or IP address for connection
+#smtp_relay_url: "smtp://127.0.0.1"
+#smtp_relay_url: "smtp://smtp.example.com:587/?STARTTLS"
+smtp_relay_url: "smtp://localhost:25/"
+
+# from address to be used when sending e-mails
+smtp_admin_address: "ae-admins@{{ openldap_service_fqdn }}"
+
+# from address to be used when sending e-mails
+smtp_from_address: "{{ smtp_admin_address }}"
+
+# Local filename of CA certificate file bundle for sending e-mail via SMTP/STARTTLS
+smtp_cacert_filename:  "{{ openldap_cacert_filename }}"
+
+# Path name of remote CA certificate file for sending e-mail via SMTP/STARTTLS
+smtp_cacert_pathname: "{{ aedir_etc }}/{{ smtp_cacert_filename|basename }}"
+
+#---------------------------------------------------------------------------
+# CRON parameters
+#---------------------------------------------------------------------------
+
+cron_service_name: "{{ cron_config.service_name }}"
+
+cron_pkg_name: "{{ cron_config.pkg_name }}"
+
+#---------------------------------------------------------------------------
+# Parameters for monitoring script
+#---------------------------------------------------------------------------
+
+# directory where to install slapd_check.sh
+# Probably there's no check_mk agent installed, so set other dir as default
+slapd_checkmk_local: "{{ aedir_sbin }}"
+
+# fully-qualified domain name of local LDAPS service
+slapd_check_service_fqdn: "{{ openldap_service_fqdn }}"
+
+# local LDAPS URI
+slapd_check_ldaps_uri: "ldaps://{{ slapd_check_service_fqdn }}"
+
+# expected authz-ID for local LDAPS connection
+# very likely you have to adjust this one
+slapd_check_authz_id: "dn:uid=ae-dir-slapd_{{ slapd_check_service_fqdn }},cn=ae,{{ aedir_suffix }}"
+
+# e-mail address of web server admin(s)#---------------------------------------------------------------------------
+# web2ldap parameters
+#---------------------------------------------------------------------------
+
+# minimum web2ldap version to be installed
+web2ldap_min_version: "1.5.94"
+
+# directory where the configuration files are located
+web2ldapcnf_prefix: "{{ web2ldap_paths.configdir }}"
+
+web2ldap_monitor_access_allowed:
+  - 127.0.0.0/255.0.0.0
+  - ::1
+  - fe00::0
+  - 10.0.0.0/255.0.0.0
+  - 172.16.0.0/255.240.0.0
+  - 192.168.0.0/255.255.0.0
+#  - 0.0.0.0/0.0.0.0
+#  - ::0
+
+# Maximum number of concurrent web sessions
+web2ldap_session_limit: 80
+
+# Maximum number of concurrent web sessions per remote IP
+web2ldap_session_per_ip_limit: "{{ web2ldap_session_limit // 5 }}"
+
+# Amount of time in seconds after which inactive sessions will be expired
+# and the session data is removed silently without the possibility to relogin.
+web2ldap_session_remove: 900
+
+# user/group to run as
+web2ldap_user: "ae-dir-web2ldap"
+web2ldap_group: "ae-dir-web2ldap"
+
+#---------------------------------------------------------------------------
+# Apache httpd parameters
+#---------------------------------------------------------------------------
+
+# FQDN of service interface
+apache_service_fqdn: "{{ openldap_service_fqdn }}"
+
+# where to place static config file for slapd (slapd.conf)
+#apache_conf: "{{ apache2_config.conf_pathname }}"
+apache_conf: "{{ aedir_etc }}/apache2.conf"
+
+# directory used as rundir (for PID etc.)
+apache_rundir: "{{ aedir_rundir }}/apache"
+
+# PID filename of Apache
+apache_pid_file: "{{ apache_rundir }}/apache.pid"
+
+# system user/group to run web server with
+apache_user: "ae-dir-httpd"
+apache_group: "ae-dir-httpd"
+
+# Apache ErrorLog value
+apache_error_log: "syslog:daemon"
+#apache_error_log: "{{ apache2_config.log_dir }}/error.log"
+
+# Apache accesslog file
+apache_access_log: "/var/log/ae-apache/access.log"
+
+# Apache LogLevel value
+apache_log_level: "info"
+
+# URL path to server-status info provided by mod_status
+# (set to empty string to disable)
+apache_status_urlpath: "/server-status"
+
+# see https://httpd.apache.org/docs/2.4/mod/mod_log_config.html#formats
+apache_log_format: !unsafe '{ \"time\":\"%{%Y-%m-%dT%H:%M:%S%z}t\", \"ip\":\"%h\", \"url\":\"%U\", \"query\":\"%q\", \"method\":\"%m\", \"status\":\"%>s\", \"ua\":\"%{User-agent}i\", \"ref\":\"%{Referer}i\", \"reqid\":\"%L\", \"in\":%I, \"out\":%O, \"rbody\":%B, \"etime\":%D, \"tls_proto\":\"%{SSL_PROTOCOL}x\", \"tls_cipher\":\"%{SSL_CIPHER}x\" }'
+
+# Apache ServerAdmin value
+apache_server_admin: "ae-admins@{{ apache_service_fqdn }}"
+
+# which IP nets are allowed to access normal htdocs/
+apache_htdocs_requires:
+  - "ip 127.0.0.1"
+  - "ip ::1"
+  - "ip 10.0.0.0/255.0.0.0"
+  - "ip 172.16.0.0/255.240.0.0"
+  - "ip 192.168.0.0/255.255.0.0"
+
+# which IP nets are allowed to access web2ldap
+apache_web2ldap_requires: "{{ apache_htdocs_requires }}"
+
+# which IP nets are allowed to access oathenroll
+apache_oath_requires: "{{ apache_htdocs_requires }}"
+
+# which IP nets are allowed to access password self-service
+apache_pwd_requires: "{{ apache_htdocs_requires }}"
+
+# Apache TLS protocol/cipher parameters
+#
+# See Apache docs: https://httpd.apache.org/docs/2.4/mod/mod_ssl.html#sslprotocol
+apache_ssl_protocol: "ALL -SSLv2 -SSLv3 -TLSv1 -TLSv1.1"
+# See Apache docs: https://httpd.apache.org/docs/2.4/mod/mod_ssl.html#sslciphersuite
+apache_ssl_cipher_suite: "HIGH:!aNULL:!kDH:!kECDH:!MD5"
+
+# Path name of CA cert bundle file
+apache_cacert_filename: "{{ openldap_cacert_filename }}"
+
+# The server certificate and key files
+apache_cert_filename: "{{ openldap_cert_filename }}"
+apache_key_filename: "{{ openldap_key_filename }}"
+# The full path names on the target system
+apache_cacert_pathname: "{{ openldap_cacert_pathname }}"
+apache_cert_pathname: "{{ openldap_cert_pathname }}"
+apache_key_pathname: "{{ openldap_key_pathname }}"
+
+#---------------------------------------------------------------------------
+# AppArmor parameters
+#---------------------------------------------------------------------------
+
+# set to True to enable mandatory access control with AppArmor
+apparmor_enabled: "{{ ansible_apparmor.status == 'enabled' }}"
+
+# where custom AppArmor profiles are stored
+apparmor_profiles_dir: "/etc/apparmor.d"
