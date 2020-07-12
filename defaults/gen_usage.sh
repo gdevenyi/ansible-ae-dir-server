@@ -3,17 +3,18 @@
 rm ./USAGE.md
 echo "$(
   for f in ./main/main.yml; do
-    echo "Usage files printed **bold** might benefit from a config interface"
     echo
     echo "### \`$f\`"
     echo
     for p in $(yq r $f --printMode p "*" | sort); do
         echo "#### \`$p\`:"
         for r in $(cd .. && rg -l "\{.* $p .*\}" | sort); do
-            if [[ $r == *".yml" ]]; then
-                echo "  - used in _\`$r\`_"
+            if [[ $r == "defaults/main/"*".yml" ]]; then
+                echo "  - variable interfaced in _\`$r\`_"
+            elif [[ $r == *".yml" ]]; then
+                echo "  - ansible usage in \`$r\`"
             else
-                echo "  - used in **\`$r\`**"
+                echo "  - template usage in **\`$r\`**"
             fi
         done
     done
