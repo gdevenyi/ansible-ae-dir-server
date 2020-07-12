@@ -8,6 +8,8 @@ CLIENT="$PREFIX/main/client.yml"
 WEB2LDAP="$PREFIX/main/web2ldap.yml"
 AEDIRPWD="$PREFIX/main/ae-dir-pwd.yml"
 OATHLDAP="$PREFIX/main/oath-ldap.yml"
+SYSTEMD="$PREFIX/main/systemd.yml"
+APPARMOR="$PREFIX/main/apparmor.yml"
 
 cd ..
 
@@ -36,6 +38,14 @@ for p in $(yq r $MAIN --printMode p "*" | sort); do
         if [[ $r == "templates/oath-ldap/"* ]]; then
             sd $p oathldap_$p $r
             yq w -i $OATHLDAP oathldap_$p "{{ $p }}"
+        fi
+        if [[ $r == "templates/systemd/"* ]]; then
+            sd $p systemd_$p $r
+            yq w -i $SYSTEMD systemd_$p "{{ $p }}"
+        fi
+        if [[ $r == "templates/apparmor/"* ]]; then
+            sd $p apparmor_$p $r
+            yq w -i $APPARMOR apparmor_$p "{{ $p }}"
         fi
     done
 done
