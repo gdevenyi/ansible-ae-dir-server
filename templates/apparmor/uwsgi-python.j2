@@ -1,5 +1,5 @@
 # AppArmor profile for UWSGI service {{ name }}
-# installed in virtual env {{ aedir_prefix }}
+# installed in virtual env {{ apparmor_aedir_prefix }}
 # {{ ansible_managed }}
 
 #include <tunables/global>
@@ -17,22 +17,22 @@ profile {{ name }} {
 
 {% if name=="web2ldap" %}
   # access to CA cert for LDAPS
-  {{ openldap_cacert_pathname }} r,
+  {{ apparmor_openldap_cacert_pathname }} r,
 {% endif %}
 
 {% if name=="ae-dir-pwd" or name=="oathenroll" %}
   # access to CA cert for sending e-mail
-  {{ smtp_cacert_pathname }} r,
+  {{ apparmor_smtp_cacert_pathname }} r,
 
   # Allow us to signal ourselves
   signal peer=@{profile_name},
 {% endif %}
 
   # access to uwsgi config
-  {{ aedir_etc }}/uwsgi/{{ name }}.ini r,
+  {{ apparmor_aedir_etc }}/uwsgi/{{ name }}.ini r,
 
   # allow r/w access to own Unix domain socket
-  {{ aedir_rundir }}/uwsgi/{{ name }}/ rw,
-  {{ aedir_rundir }}/uwsgi/{{ name }}/{{ name }}.sock rw,
+  {{ apparmor_aedir_rundir }}/uwsgi/{{ name }}/ rw,
+  {{ apparmor_aedir_rundir }}/uwsgi/{{ name }}/{{ name }}.sock rw,
 
 }

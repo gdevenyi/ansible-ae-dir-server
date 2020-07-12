@@ -4,10 +4,10 @@
   #include <ae-dir/abstractions/python>
 
   # the demon script
-  {{ aedir_sbin }}/{{ oath_bind_listener }}.py r,
+  {{ apparmor_aedir_sbin }}/{{ apparmor_oath_bind_listener }}.py r,
 
   # access to TLS-related files
-  {{ openldap_cacert_pathname }} r,
+  {{ apparmor_openldap_cacert_pathname }} r,
 
   # allow r/w access to own Unix domain socket
-  {{ oath_ldap_socket_path }} rw,
+  {{ apparmor_oath_ldap_socket_path }} rw,

@@ -1,49 +1,49 @@
 #-----------------------------------------------------------------------
-# initiate:   systemctl enable {{ oath_bind_listener }}.service
-# start:      systemctl start {{ oath_bind_listener }}.service
-# get status: systemctl status {{ oath_bind_listener }}.service
+# initiate:   systemctl enable {{ systemd_oath_bind_listener }}.service
+# start:      systemctl start {{ systemd_oath_bind_listener }}.service
+# get status: systemctl status {{ systemd_oath_bind_listener }}.service
 #
 # {{ ansible_managed }}
 #-----------------------------------------------------------------------
 
 [Unit]
-Description={{ oath_bind_listener }} - OATH-LDAP HOTP validation bind listener
+Description={{ systemd_oath_bind_listener }} - OATH-LDAP HOTP validation bind listener
 Requires=local-fs.target
 After=local-fs.target
 
 [Service]
 Type=simple
-{% if aedir_malloc_ld_preload %}
-Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
+{% if systemd_aedir_malloc_ld_preload %}
+Environment=LD_PRELOAD={{ systemd_aedir_malloc_ld_preload }}
 {% endif %}
 Environment=LDAPNOINIT=1
 # some env vars set for Python interpreter
-{% for evar in aedir_python_env %}
+{% for evar in systemd_aedir_python_env %}
 Environment={{ evar.name }}={{ evar.value }}
 {% endfor %}
-ExecStart={{ aedir_python }} -m oathldap_srv.{{ oath_bind_listener }} {{ oath_ldap_cfg_dir }}/{{ oath_bind_listener }}/{{ oath_bind_listener }}.cfg
-User={{ oath_listener_user }}
-Group={{ oath_listener_user }}
+ExecStart={{ systemd_aedir_python }} -m oathldap_srv.{{ systemd_oath_bind_listener }} {{ systemd_oath_ldap_cfg_dir }}/{{ systemd_oath_bind_listener }}/{{ systemd_oath_bind_listener }}.cfg
+User={{ systemd_oath_listener_user }}
+Group={{ systemd_oath_listener_user }}
 CapabilityBoundingSet=
 AmbientCapabilities=
 RestrictAddressFamilies=AF_UNIX
 PrivateNetwork=yes
 IPAddressDeny=any
-{% if aedir_systemd_logging %}
-# various logging options from ansible var aedir_systemd_logging
-{% for systemd_option in aedir_systemd_logging %}
+{% if systemd_aedir_systemd_logging %}
+# various logging options from ansible var systemd_aedir_systemd_logging
+{% for systemd_option in systemd_aedir_systemd_logging %}
 {{ systemd_option }}
 {% endfor %}
 {% endif %}
-{% if aedir_systemd_hardening %}
-# various hardening options from ansible var aedir_systemd_hardening
-{% for systemd_option in aedir_systemd_hardening %}
+{% if systemd_aedir_systemd_hardening %}
+# various hardening options from ansible var systemd_aedir_systemd_hardening
+{% for systemd_option in systemd_aedir_systemd_hardening %}
 {{ systemd_option }}
 {% endfor %}
 {% endif %}
 SystemCallFilter={{ systemd_systemcallfilter.slapdsock }}
-{% if apparmor_enabled %}
-AppArmorProfile={{ oath_bind_listener }}
+{% if systemd_apparmor_enabled %}
+AppArmorProfile={{ systemd_oath_bind_listener }}
 {% endif %}
 
 [Install]

@@ -13,29 +13,29 @@ After=network.target
 
 [Service]
 Type=simple
-Environment=LDAPTLS_CACERT={{ aedir_pwsync_cacert_pathname }}
-{% if aedir_malloc_ld_preload %}
-Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
+Environment=LDAPTLS_CACERT={{ systemd_aedir_pwsync_cacert_pathname }}
+{% if systemd_aedir_malloc_ld_preload %}
+Environment=LD_PRELOAD={{ systemd_aedir_malloc_ld_preload }}
 {% endif %}
 # some env vars set for Python interpreter
-{% for evar in aedir_python_env %}
+{% for evar in systemd_aedir_python_env %}
 Environment={{ evar.name }}={{ evar.value }}
 {% endfor %}
-ExecStart={{ aedir_python }} -m aedir_pproc.pwsync "{{ aedir_pwsync_socket_path }}" "{{ openldap_ldapi_uri|replace('%','%%') }}/????x-saslmech=EXTERNAL" "{{ aedir_pwsync_targeturl|replace('%','%%') }}" "{{ aedir_pwsync_targetpwfile }}"
-User={{ aedir_pwsync_listener_user }}
-Group={{ aedir_pwsync_listener_user }}
+ExecStart={{ systemd_aedir_python }} -m aedir_pproc.pwsync "{{ systemd_aedir_pwsync_socket_path }}" "{{ openldap_ldapi_uri|replace('%','%%') }}/????x-saslmech=EXTERNAL" "{{ aedir_pwsync_targeturl|replace('%','%%') }}" "{{ systemd_aedir_pwsync_targetpwfile }}"
+User={{ systemd_aedir_pwsync_listener_user }}
+Group={{ systemd_aedir_pwsync_listener_user }}
 CapabilityBoundingSet=
 AmbientCapabilities=
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
-{% if aedir_systemd_logging %}
-# various logging options from ansible var aedir_systemd_logging
-{% for systemd_option in aedir_systemd_logging %}
+{% if systemd_aedir_systemd_logging %}
+# various logging options from ansible var systemd_aedir_systemd_logging
+{% for systemd_option in systemd_aedir_systemd_logging %}
 {{ systemd_option }}
 {% endfor %}
 {% endif %}
-{% if aedir_systemd_hardening %}
-# various hardening options from ansible var aedir_systemd_hardening
-{% for systemd_option in aedir_systemd_hardening %}
+{% if systemd_aedir_systemd_hardening %}
+# various hardening options from ansible var systemd_aedir_systemd_hardening
+{% for systemd_option in systemd_aedir_systemd_hardening %}
 {{ systemd_option }}
 {% endfor %}
 {% endif %}
