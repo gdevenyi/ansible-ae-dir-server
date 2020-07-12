@@ -323,9 +323,6 @@ aedir_providers_restrictions: []
 # aedir_replicas_restrictions: ['peername.ip="10.54.1.0%255.255.255.0"']
 aedir_replicas_restrictions: "{{ aedir_providers_restrictions }}"
 
-# list of HTML snippets to be put as news on the entry web page
-aedir_news: []
-
 # Default values for attribute 'aeExpiryStatus' in LDIF templates
 # key is the structural object class
 # Example:

@@ -40,6 +40,9 @@ aedir_main_provider_hostname: "{{ aedir_hosts.provider[0] }}"
 # load-balancer hostname for accessing provider(s) especially used in web URLs
 aedir_provider_lb_hostname: "{{ aedir_main_provider_hostname }}"
 
+# list of HTML snippets to be put as news on the entry web page
+aedir_news: []
+
 #---------------------------------------------------------------------------
 # pip install arguments
 #---------------------------------------------------------------------------

@@ -129,8 +129,6 @@
   - used in **`templates/slapd/provider.conf.j2`**
   - used in **`templates/web2ldap/templates/connect.html.j2`**
   - used in **`templates/web2ldap/web2ldapcnf/plugins.py.j2`**
-#### `aedir_news`:
-  - used in _`tasks/main.yml`_
 #### `aedir_nologin_shell`:
   - used in _`defaults/main/ae-dir.yml`_
   - used in _`tasks/main.yml`_
@@ -425,6 +423,8 @@
   - used in _`tasks/monitoring.yml`_
 #### `aedir_metrics_owner_group`:
   - used in _`tasks/monitoring.yml`_
+#### `aedir_news`:
+  - used in _`tasks/main.yml`_
 #### `aedir_pip_extra_args`:
   - used in _`tasks/aedir_tools_venv.yml`_
   - used in _`tasks/monitoring.yml`_
