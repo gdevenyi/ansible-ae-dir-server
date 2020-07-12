@@ -14,7 +14,7 @@ APPARMOR="$PREFIX/main/apparmor.yml"
 cd ..
 
 for p in $(yq r $MAIN --printMode p "*" | sort); do
-    for r in $(rg -l "\{.* $p .*\}" | sort | uniq); do
+    for r in $(rg -l "\{.* $p.*\}" | sort | uniq); do
         if [[ $r == "templates/slapd/"* ]]; then
             sd $p slapd_$p $r
             yq w -i $SLAPD slapd_$p "{{ $p }}"

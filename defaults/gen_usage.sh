@@ -8,7 +8,7 @@ echo "$(
     echo
     for p in $(yq r $f --printMode p "*" | sort); do
         echo "#### \`$p\`:"
-        for r in $(cd .. && rg -l "\{.* $p .*\}" | sort); do
+        for r in $(cd .. && rg -l "\{.* $p.*\}" | sort); do
             if [[ $r == "defaults/main/"*".yml" ]]; then
                 echo "  - variable interfaced in _\`$r\`_"
             elif [[ $r == *".yml" ]]; then
