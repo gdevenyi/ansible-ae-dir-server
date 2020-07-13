@@ -17,7 +17,9 @@ password-crypt-salt-format "{{ openldap_password_crypt_salt_format }}"
 
 {% include 'config.conf.j2' %}
 
+{% if aedir_accesslog_suffix %}
 {% include 'accesslog.conf.j2' %}
+{% endif %}
 
 {% include 'um/general.conf.j2' %}
 
@@ -494,6 +496,7 @@ sockdnpat "{{ aedir_pwsync_dn_regex }}"
 {% endif %}
 {% endif %}
 
+{% if aedir_accesslog_suffix %}
 # Where to log LDAP write operations (for auditing)
 overlay accesslog
 logdb "{{ aedir_accesslog_suffix }}"
@@ -501,6 +504,7 @@ logops writes
 logold "(objectClass=*)"
 logoldattr entryUUID objectClass cn uid
 logpurge {{ openldap_log_purge }}
+{% endif %}
 
 # for back-links to group entries in member entries
 overlay memberof
