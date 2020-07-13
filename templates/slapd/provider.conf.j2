@@ -17,7 +17,9 @@ password-crypt-salt-format "{{ openldap_password_crypt_salt_format }}"
 
 {% include 'config.conf.j2' %}
 
+{% if aedir_accesslog_suffix %}
 {% include 'accesslog.conf.j2' %}
+{% endif %}
 
 #######################################################################
 # Database for {{ aedir_suffix }}
