@@ -211,10 +211,13 @@ overlay syncprov
 {% if openldap_db_params.um.syncprov_checkpoint %}
 syncprov-checkpoint {{ openldap_db_params.um.syncprov_checkpoint }}
 {% endif %}
+{% if openldap_role=='provider' %}
+syncprov-sessionlog {{ openldap_db_params.um.syncprov_sessionlog }}
+{% endif %}
 syncprov-nopresent FALSE
 syncprov-reloadhint FALSE
 
-{% for provider_replica in openldap_syncrepl_providers %}
+{% for provider_replica in openldap_syncrepl_providers if provider_replica!=inventory_hostname %}
 syncrepl rid=0{{ loop.index }}
   provider=ldaps://{{ hostvars[provider_replica].get('openldap_service_fqdn',provider_replica) }}
   type=refreshAndPersist
