@@ -457,14 +457,6 @@ constraint_attribute aeOwner
 constraint_attribute aeSSHPermissions
   regex "^({{ aedir_sshkey_perms|join('|') }})$"
 
-# Where to log LDAP write operations (for auditing)
-overlay accesslog
-logdb "{{ aedir_accesslog_suffix }}"
-logops writes
-logold "(objectClass=*)"
-logoldattr entryUUID objectClass cn uid
-logpurge {{ openldap_log_purge }}
-
 # Referential integrity checking
 overlay refint
 refint_attributes
@@ -489,6 +481,27 @@ refint_attributes
   oathTOTPToken
   seeAlso
 
+{% if aedir_pwsync_targeturl is defined %}
+# send extended requests to external listener process receiving the requests
+# on Unix Domain socket path {{ aedir_pwsync_socket_path }}
+# (after password policy check in slapo-ppolicy)
+overlay sock
+extensions binddn peername ssf connid
+socketpath {{ aedir_pwsync_socket_path }}
+sockops extended
+{% if aedir_pwsync_dn_regex %}
+sockdnpat "{{ aedir_pwsync_dn_regex }}"
+{% endif %}
+{% endif %}
+
+# Where to log LDAP write operations (for auditing)
+overlay accesslog
+logdb "{{ aedir_accesslog_suffix }}"
+logops writes
+logold "(objectClass=*)"
+logoldattr entryUUID objectClass cn uid
+logpurge {{ openldap_log_purge }}
+
 # for back-links to group entries in member entries
 overlay memberof
 memberof-group-oc groupOfEntries
@@ -504,22 +517,13 @@ memberof-refint true
 overlay sock
 extensions binddn peername ssf connid
 socketpath {{ oath_ldap_socket_path }}
+{% if openldap_role=='provider' %}
 sockops bind compare
+{% else %}
+sockops bind
+{% endif %}
 {% if oath_ldap_dn_regex %}
 sockdnpat "{{ oath_ldap_dn_regex }}"
-{% endif %}
-{% endif %}
-
-{% if aedir_pwsync_targeturl is defined %}
-# send extended requests to external listener process receiving the requests
-# on Unix Domain socket path {{ aedir_pwsync_socket_path }}
-# (after password policy check in slapo-ppolicy)
-overlay sock
-extensions binddn peername ssf connid
-socketpath {{ aedir_pwsync_socket_path }}
-sockops extended
-{% if aedir_pwsync_dn_regex %}
-sockdnpat "{{ aedir_pwsync_dn_regex }}"
 {% endif %}
 {% endif %}
 
