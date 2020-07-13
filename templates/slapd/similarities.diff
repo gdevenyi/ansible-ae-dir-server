@@ -1,0 +1,560 @@
+File consumer.conf.j2: 1238 words, 354 lines
+File provider.conf.j2: 7236 words, 1516 lines
+Total input: 2 files (2 new, 0 old), 8474 words
+
+consumer.conf.j2: line 110-141 [126]
+provider.conf.j2: line 147-178
+< # search/time limits for {{ aedir_suffix }}
+< #---------------------------------------------------------------------------
+< 
+< # Maximum number of entries to return from a search operation
+< sizelimit {{ openldap_db_params.um.sizelimit }}
+< 
+< # Maximum number of time [secs] slapd will spend answering a search request
+< timelimit {{ openldap_db_params.um.timelimit }}
+< 
+< # no limits for AE admins
+< limits
+<   group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}"
+<     time=unlimited
+<     size=unlimited
+< 
+< # no limits for AE auditors
+< limits
+<   group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}"
+<     time=unlimited
+<     size=unlimited
+< 
+< # no limits for all zone admins
+< limits
+<   group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}"
+<     time=unlimited
+<     size=unlimited
+< 
+< # no limits for all zone auditors
+< limits
+<   group/aeGroup/member="cn=ae-all-zone-auditors,cn=ae,{{ aedir_suffix }}"
+<     time=unlimited
+<     size=unlimited
+---
+> # search/time limits for {{ aedir_suffix }}
+> #---------------------------------------------------------------------------
+> 
+> # Maximum number of entries to return from a search operation
+> sizelimit {{ openldap_db_params.um.sizelimit }}
+> 
+> # Maximum number of time [secs] slapd will spend answering a search request
+> timelimit {{ openldap_db_params.um.timelimit }}
+> 
+> # no limits for AE admins
+> limits
+>   group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}"
+>     time=unlimited
+>     size=unlimited
+> 
+> # no limits for AE auditors
+> limits
+>   group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}"
+>     time=unlimited
+>     size=unlimited
+> 
+> # no limits for all zone admins
+> limits
+>   group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}"
+>     time=unlimited
+>     size=unlimited
+> 
+> # no limits for all zone auditors
+> limits
+>   group/aeGroup/member="cn=ae-all-zone-auditors,cn=ae,{{ aedir_suffix }}"
+>     time=unlimited
+>     size=unlimited
+
+consumer.conf.j2: line 330-352 [88]
+provider.conf.j2: line 1486-1508
+< syncrepl rid=0{{ loop.index }}
+<   provider=ldaps://{{ hostvars[provider_replica].get('openldap_service_fqdn',provider_replica) }}
+<   type=refreshAndPersist
+<   network-timeout={{ openldap_syncrepl_network_timeout }}
+<   timeout={{ openldap_syncrepl_timeout }}
+<   sizelimit=unlimited
+<   timelimit=unlimited
+<   interval=00:00:01:00
+<   retry="30 +"
+<   keepalive=240:10:30
+<   searchbase="{{ aedir_suffix }}"
+<   filter="(objectClass=*)"
+<   scope=sub
+<   schemachecking=on
+<   bindmethod=sasl
+<   saslmech=EXTERNAL
+<   tls_cacert={{ openldap_cacert_pathname }}
+<   tls_cert={{ openldap_cert_pathname }}
+<   tls_key={{ openldap_key_pathname }}
+<   tls_protocol_min={{ openldap_syncrepl_tls_protocol_min }}
+<   tls_cipher_suite={{ openldap_syncrepl_tls_cipher_suite }}
+< 
+< {% endfor %}
+---
+> syncrepl rid=0{{ loop.index }}
+>   provider=ldaps://{{ hostvars[provider_replica].get('openldap_service_fqdn',provider_replica) }}
+>   type=refreshAndPersist
+>   network-timeout={{ openldap_syncrepl_network_timeout }}
+>   timeout={{ openldap_syncrepl_timeout }}
+>   sizelimit=unlimited
+>   timelimit=unlimited
+>   interval=00:00:01:00
+>   retry="30 +"
+>   keepalive=240:10:30
+>   searchbase="{{ aedir_suffix }}"
+>   filter="(objectClass=*)"
+>   scope=sub
+>   schemachecking=on
+>   bindmethod=sasl
+>   saslmech=EXTERNAL
+>   tls_cacert={{ openldap_cacert_pathname }}
+>   tls_cert={{ openldap_cert_pathname }}
+>   tls_key={{ openldap_key_pathname }}
+>   tls_protocol_min={{ openldap_syncrepl_tls_protocol_min }}
+>   tls_cipher_suite={{ openldap_syncrepl_tls_cipher_suite }}
+> 
+> {% endfor %}
+
+consumer.conf.j2: line 16-44 [87]
+provider.conf.j2: line 23-51
+< # Database for {{ aedir_suffix }}
+< #######################################################################
+< 
+< database mdb
+< 
+< suffix "{{ aedir_suffix }}"
+< directory {{ openldap_data }}/um
+< 
+< require strong
+< 
+< # Always set rootdn since needed by internally writing overlays
+< rootdn "cn=root,{{ aedir_suffix }}"
+< # rootpw not needed in production!
+< #rootpw donotenable!!!
+< access to
+<   dn.base="cn=root,{{ aedir_suffix }}"
+<     by * none
+< 
+< lastmod on
+< 
+< # database parameters
+< maxsize {{ openldap_db_params.um.mdb_maxsize }}
+< 
+< {% if openldap_db_params.um.checkpoint %}
+< # Better write performance but less crash resistance, see slapd-mdb(5) for details
+< dbnosync
+< checkpoint {{ openldap_db_params.um.checkpoint }}
+< envflags writemap mapasync
+< {% endif %}
+---
+> # Database for {{ aedir_suffix }}
+> #######################################################################
+> 
+> database mdb
+> 
+> suffix "{{ aedir_suffix }}"
+> directory {{ openldap_data }}/um
+> 
+> require strong
+> 
+> # Always set rootdn since needed by internally writing overlays
+> rootdn "cn=root,{{ aedir_suffix }}"
+> # rootpw not needed in production!
+> #rootpw donotenable!!!
+> access to
+>   dn.base="cn=root,{{ aedir_suffix }}"
+>     by * none
+> 
+> lastmod on
+> 
+> # database parameters
+> maxsize {{ openldap_db_params.um.mdb_maxsize }}
+> 
+> {% if openldap_db_params.um.checkpoint %}
+> # Better write performance but less crash resistance, see slapd-mdb(5) for details
+> dbnosync
+> checkpoint {{ openldap_db_params.um.checkpoint }}
+> envflags writemap mapasync
+> {% endif %}
+
+consumer.conf.j2: line 199-215 [86]
+provider.conf.j2: line 387-403
+< access to
+<   dn.subtree="{{ aedir_suffix }}"
+<   attrs=authzTo,authzFrom
+<     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =csrz
+<     by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" =csr
+<     by * none
+< 
+< #---------------------------------------------------------------------------
+< # General ACLs
+< # This MUST be below ACLs for password attrs!
+< #---------------------------------------------------------------------------
+< 
+< # Global first-catch ACLs which fire no matter what else happens afterwards...
+< # AE admins can manage everything else, AE auditors can read everything else
+< access to
+<   dn.subtree="{{ aedir_suffix }}"
+<     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" read
+---
+> access to
+>   dn.subtree="{{ aedir_suffix }}"
+>   attrs=authzTo,authzFrom
+>     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =csrz
+>     by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" =csr
+>     by * none
+> 
+> #---------------------------------------------------------------------------
+> # General ACLs
+> # This MUST be below ACLs for password attrs!
+> #---------------------------------------------------------------------------
+> 
+> # Global first-catch ACLs which fire no matter what else happens afterwards...
+> # AE admins can manage everything else, AE auditors can read everything else
+> access to
+>   dn.subtree="{{ aedir_suffix }}"
+>     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" manage
+
+consumer.conf.j2: line 144-165 [84]
+provider.conf.j2: line 187-210
+< # Access control rules for {{ aedir_suffix }}
+< #---------------------------------------------------------------------------
+< 
+< # First disallow non-active entities to proceed to rest of ACLs
+< # by allowing only auth
+< # This purposely also affects open LDAP connections!
+< #------------------------------------------------------------------
+< 
+< # block access to all other stuff (except userPassword)
+< access to
+<   dn.subtree="{{ aedir_suffix }}"
+<   attrs=!simpleSecurityObject
+<     by set="user/aeStatus & [0]" break
+<     by * auth
+< 
+< # give read access to pseudo-attribute 'entry' in database
+< # naming context to all users and stop further ACL processing
+< access to
+<   dn.base="{{ aedir_suffix }}"
+<   attrs=entry
+<     by users read
+<     by * none
+---
+> # access control rules for {{ aedir_suffix }}
+> #---------------------------------------------------------------------------
+> 
+> # First disallow non-active entities to proceed to rest of ACLs
+> # by allowing only auth
+> # This purposely also affects open LDAP connections!
+> #------------------------------------------------------------------
+> 
+> # block access to all other stuff (except userPassword)
+> access to
+>   dn.subtree="{{ aedir_suffix }}"
+>   attrs=!simpleSecurityObject
+>     by set="user/aeStatus & [0]" break
+>     by * auth
+> 
+> # give read access to pseudo-attribute 'entry' in database
+> # naming context to all users and stop further ACL processing
+> #------------------------------------------------------------------
+> 
+> access to
+>   dn.base="{{ aedir_suffix }}"
+>   attrs=entry
+>     by users read
+>     by * none
+
+consumer.conf.j2: line 300-326 [76]
+provider.conf.j2: line 1454-1480
+< sockdnpat "{{ oath_ldap_dn_regex }}"
+< {% endif %}
+< {% endif %}
+< 
+< # password policy overlay
+< # (after bind-DN rewriting with slapo-rwm)
+< overlay ppolicy
+< # the default password policy is deliberatly unusable
+< ppolicy_default cn=ppolicy-default,cn=ae,{{ aedir_suffix }}
+< ppolicy_hash_cleartext
+< ppolicy_use_lockout
+< 
+< # Record last bind in user entry
+< overlay lastbind
+< 
+< {% include 'slapo-rwm.conf.j2' %}
+< 
+< #---------------------------------------------------------------------------
+< # replication of {{ aedir_suffix }}
+< #---------------------------------------------------------------------------
+< 
+< # syncrepl-Overlay
+< overlay syncprov
+< {% if openldap_db_params.um.syncprov_checkpoint %}
+< syncprov-checkpoint {{ openldap_db_params.um.syncprov_checkpoint }}
+< {% endif %}
+< syncprov-nopresent FALSE
+---
+> sockdnpat "{{ aedir_pwsync_dn_regex }}"
+> {% endif %}
+> {% endif %}
+> 
+> # password policy overlay
+> # (after bind-DN rewriting with slapo-rwm)
+> overlay ppolicy
+> # the default password policy is deliberatly unusable
+> ppolicy_default cn=ppolicy-default,cn=ae,{{ aedir_suffix }}
+> ppolicy_hash_cleartext
+> ppolicy_use_lockout
+> 
+> # Record last bind in user entry
+> overlay lastbind
+> 
+> {% include 'slapo-rwm.conf.j2' %}
+> 
+> #---------------------------------------------------------------------------
+> # replication of {{ aedir_suffix }}
+> #---------------------------------------------------------------------------
+> 
+> # syncrepl-Overlay
+> overlay syncprov
+> {% if openldap_db_params.um.syncprov_checkpoint %}
+> syncprov-checkpoint {{ openldap_db_params.um.syncprov_checkpoint }}
+> {% endif %}
+> syncprov-sessionlog {{ openldap_db_params.um.syncprov_sessionlog }}
+
+consumer.conf.j2: line 283-298 [74]
+provider.conf.j2: line 1424-1439
+< # for back-links to group entries in member entries
+< overlay memberof
+< memberof-group-oc groupOfEntries
+< memberof-member-ad member
+< memberof-memberof-ad memberOf
+< memberof-dangling ignore
+< memberof-refint true
+< 
+< {% if oath_ldap_enabled==True %}
+< # pass bind requests to external listener process receiving the requests
+< # on Unix Domain socket path {{ oath_ldap_socket_path }}
+< # (after password policy check in slapo-ppolicy)
+< overlay sock
+< extensions binddn peername ssf connid
+< socketpath {{ oath_ldap_socket_path }}
+< sockops bind
+---
+> # for back-links to group entries in member entries
+> overlay memberof
+> memberof-group-oc groupOfEntries
+> memberof-member-ad member
+> memberof-memberof-ad memberOf
+> memberof-dangling ignore
+> memberof-refint true
+> 
+> {% if oath_ldap_enabled==True %}
+> # pass bind requests to external listener process receiving the requests
+> # on Unix Domain socket path {{ oath_ldap_socket_path }}
+> # (after password policy check in slapo-ppolicy)
+> overlay sock
+> extensions binddn peername ssf connid
+> socketpath {{ oath_ldap_socket_path }}
+> sockops bind compare
+
+consumer.conf.j2: line 252-271 [46]
+provider.conf.j2: line 997-1016
+< access to
+<   dn.base="{{ aedir_suffix }}"
+<   attrs=children,objectClass,ou,description
+<     by users read
+<     by * auth
+< 
+< access to
+<   dn.subtree="{{ aedir_suffix }}"
+<     by users search
+<     by * auth
+< 
+< #---------------------------------------------------------------------------
+< # overlays used within {{ aedir_suffix }}
+< #---------------------------------------------------------------------------
+< 
+< # for counting search results without retrieving them
+< overlay noopsrch
+< 
+< # for dereferencing attributes
+< overlay deref
+---
+> access to
+>   dn.base="{{ aedir_suffix }}"
+>   attrs=children,objectClass,ou,description
+>     by users read
+>     by * auth
+> 
+> access to
+>   dn.subtree="{{ aedir_suffix }}"
+>     by users search
+>     by * auth
+> 
+> #---------------------------------------------------------------------------
+> # overlays used within {{ aedir_suffix }}
+> #---------------------------------------------------------------------------
+> 
+> # for counting search results without retrieving them
+> overlay noopsrch
+> 
+> # for dereferencing attributes
+> overlay deref
+
+consumer.conf.j2: line 184-194 [43]
+provider.conf.j2: line 367-377
+<     by * none
+< 
+< # Limit proxy authorization by granting access to 'authzTo'
+< # Ensure that no other entity has =x privilege!
+< #---------------------------------------------------------------------------
+< 
+< access to
+<   dn.onelevel="cn=ae,{{ aedir_suffix }}"
+<   attrs=authzTo
+<   filter="(&(objectClass=aeService)(aeStatus=0)(memberOf=cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}))"
+<     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =csrw
+---
+>     by * none
+> 
+> # Limit proxy authorization by granting access to 'authzTo'
+> # Ensure that no other entity has =x privilege!
+> #---------------------------------------------------------------------------
+> 
+> access to
+>   dn.onelevel="cn=ae,{{ aedir_suffix }}"
+>   attrs=authzTo
+>   filter="(&(objectClass=aeService)(aeStatus=0)(memberOf=cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}))"
+>     by self read
+
+consumer.conf.j2: line 64-73 [31]
+provider.conf.j2: line 76-85
+< index mailRoutingAddress eq
+< # mainly for syncrepl
+< index entryCSN eq
+< index entryUUID eq
+< 
+< # for host and network management
+< index macAddress eq
+< index ipHostNumber eq,pres
+< index host sub,eq
+< index aeFqdn sub,eq,pres
+---
+> index mailRoutingAddress sub,eq
+> # mainly for syncrepl
+> index entryCSN eq
+> index entryUUID eq
+> 
+> # for host and network management
+> index macAddress eq
+> index ipHostNumber eq,pres
+> index host sub,eq
+> index aeFqdn sub,eq,pres
+
+consumer.conf.j2: line 221-230 [31]
+provider.conf.j2: line 410-419
+<   filter="(|(aeStatus=-1)(aeStatus=1)(aeStatus=2))"
+<     by * none
+< 
+< # block cross-zone access to zone 'ae'
+< access to
+<   dn.subtree="cn=ae,{{ aedir_suffix }}"
+<     by dn.subtree="cn=ae,{{ aedir_suffix }}" none break
+<     by * auth
+< 
+< # Public entries
+---
+>   filter="(aeStatus=2)"
+>     by * none
+> 
+> ## block cross-zone access to zone 'ae'
+> #access to
+> #  dn.subtree="cn=ae,{{ aedir_suffix }}"
+> #    by dn.subtree="cn=ae,{{ aedir_suffix }}" none break
+> #    by * auth
+> 
+> # Public defaults
+
+consumer.conf.j2: line 274-280 [27]
+provider.conf.j2: line 1392-1398
+< # Where to log LDAP write operations (for auditing)
+< overlay accesslog
+< logdb "{{ aedir_accesslog_suffix }}"
+< logops writes
+< logold "(objectClass=*)"
+< logoldattr entryUUID objectClass cn uid
+< logpurge {{ openldap_log_purge }}
+---
+> # Where to log LDAP write operations (for auditing)
+> overlay accesslog
+> logdb "{{ aedir_accesslog_suffix }}"
+> logops writes
+> logold "(objectClass=*)"
+> logoldattr entryUUID objectClass cn uid
+> logpurge {{ openldap_log_purge }}
+
+consumer.conf.j2: line 231-234 [26]
+provider.conf.j2: line 422-425
+< access to
+<   dn.subtree="cn=pub,{{ aedir_suffix }}"
+<   attrs=entry,entryDN,entryUUID,children,objectClass,hasSubordinates,modifyTimestamp,cn,description,@namedObject,@posixGroup,@sudoRole,@DUAConfigProfile,@pkiCA
+<     by users read
+---
+> access to
+>   dn.subtree="cn=pub,{{ aedir_suffix }}"
+>   attrs=entry,entryDN,entryUUID,children,objectClass,hasSubordinates,modifyTimestamp,cn,description,@namedObject,@posixGroup,@sudoRole,@DUAConfigProfile,@pkiCA
+>     by users read
+
+consumer.conf.j2: line 90-99 [25]
+provider.conf.j2: line 114-123
+< # service attributes
+< index aeHost eq
+< 
+< # login-related attributes
+< index authTimestamp pres,eq
+< index pwdChangedTime pres,eq
+< index pwdFailureTime pres,eq
+< 
+< # for person/employee references
+< index aePerson eq
+---
+> # service attributes
+> index aeHost eq
+> 
+> # login-related attributes
+> index authTimestamp pres,eq
+> index pwdChangedTime pres,eq
+> index pwdFailureTime pres,eq
+> 
+> # for person/employee references
+> index uniqueIdentifier eq
+
+consumer.conf.j2: line 80-88 [25]
+provider.conf.j2: line 98-106
+< index mail sub,eq
+< 
+< # service groups
+< index aeLoginGroups eq
+< index aeVisibleGroups eq
+< index aeVisibleSudoers eq
+< index aeProxyFor pres,eq
+< index aeSSHProxyCommand pres,eq,sub
+< index aeRequires eq
+---
+> index ou sub,eq
+> 
+> # service groups
+> index aeLoginGroups eq
+> index aeVisibleGroups eq
+> index aeVisibleSudoers eq
+> index aeProxyFor pres,eq
+> index aeSSHProxyCommand pres,eq,sub
+> index aeRequires eq
+
