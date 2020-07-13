@@ -1356,45 +1356,7 @@ overlay lastbind
 
 {% include 'slapo-rwm.conf.j2' %}
 
-#---------------------------------------------------------------------------
-# replication of {{ aedir_suffix }}
-#---------------------------------------------------------------------------
-
-# syncrepl-Overlay
-overlay syncprov
-{% if openldap_db_params.um.syncprov_checkpoint %}
-syncprov-checkpoint {{ openldap_db_params.um.syncprov_checkpoint }}
-{% endif %}
-{% if openldap_role=='provider' %}
-syncprov-sessionlog {{ openldap_db_params.um.syncprov_sessionlog }}
-{% endif %}
-syncprov-nopresent FALSE
-syncprov-reloadhint FALSE
-
-{% for provider_replica in openldap_syncrepl_providers if provider_replica!=inventory_hostname %}
-syncrepl rid=0{{ loop.index }}
-  provider=ldaps://{{ hostvars[provider_replica].get('openldap_service_fqdn',provider_replica) }}
-  type=refreshAndPersist
-  network-timeout={{ openldap_syncrepl_network_timeout }}
-  timeout={{ openldap_syncrepl_timeout }}
-  sizelimit=unlimited
-  timelimit=unlimited
-  interval=00:00:01:00
-  retry="30 +"
-  keepalive=240:10:30
-  searchbase="{{ aedir_suffix }}"
-  filter="(objectClass=*)"
-  scope=sub
-  schemachecking=on
-  bindmethod=sasl
-  saslmech=EXTERNAL
-  tls_cacert={{ openldap_cacert_pathname }}
-  tls_cert={{ openldap_cert_pathname }}
-  tls_key={{ openldap_key_pathname }}
-  tls_protocol_min={{ openldap_syncrepl_tls_protocol_min }}
-  tls_cipher_suite={{ openldap_syncrepl_tls_cipher_suite }}
-
-{% endfor %}
+{% include 'um/replication.conf.j2' %}
 
 {% if openldap_syncrepl_providers %}
 mirrormode true
