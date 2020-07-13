@@ -16,39 +16,39 @@ profile {{ openldap_service_name }} {
   {{ openldap_path.modules }}/* rm,
 
   # access to config
-  {{ openldap_slapd_conf }} r,
-  {{ openldap_slapd_conf|dirname }}/rootDSE.ldif r,
+  {{ apparmor_openldap_slapd_conf }} r,
+  {{ apparmor_openldap_slapd_conf|dirname }}/rootDSE.ldif r,
   {{ openldap_path.conf_prefix }}/schema/*.schema r,
-  {{ aedir_schema_prefix }}/*.schema r,
+  {{ apparmor_aedir_schema_prefix }}/*.schema r,
 
   # allow r/w access to PID and args files
-  {{ openldap_rundir }}/slapd.pid rw,
-  {{ openldap_rundir }}/slapd.args rw,
+  {{ apparmor_openldap_rundir }}/slapd.pid rw,
+  {{ apparmor_openldap_rundir }}/slapd.args rw,
 
   # allow r/w access to database files
-  owner {{ openldap_data }}/{um,accesslog}/{DUMMY,data.mdb,lock.mdb} rwk,
-{% if openldap_role=="provider" %}
-  owner {{ openldap_data }}/session/{DUMMY,data.mdb,lock.mdb} rwk,
+  owner {{ apparmor_openldap_data }}/{um,accesslog}/{DUMMY,data.mdb,lock.mdb} rwk,
+{% if apparmor_openldap_role=="provider" %}
+  owner {{ apparmor_openldap_data }}/session/{DUMMY,data.mdb,lock.mdb} rwk,
 {% endif %}
 
   # access to TLS-related files
-  {{ openldap_cacert_pathname }} r,
-{% if openldap_cert_pathname %}
-  {{ openldap_cert_pathname }} r,
+  {{ apparmor_openldap_cacert_pathname }} r,
+{% if apparmor_openldap_cert_pathname %}
+  {{ apparmor_openldap_cert_pathname }} r,
 {% endif %}
-{% if openldap_key_pathname %}
-  {{ openldap_key_pathname }} r,
+{% if apparmor_openldap_key_pathname %}
+  {{ apparmor_openldap_key_pathname }} r,
 {% endif %}
-  {{ openldap_dhparam_pathname }} r,
+  {{ apparmor_openldap_dhparam_pathname }} r,
 
-{% if oath_ldap_enabled==True %}
+{% if apparmor_oath_ldap_enabled==True %}
   # allow r/w access to external bind listener (for OATH-LDAP)
-  {{ oath_ldap_socket_path }} rw,
+  {{ apparmor_oath_ldap_socket_path }} rw,
 {% endif %}
 
-{% if openldap_role=="provider" and aedir_pwsync_targeturl is defined %}
+{% if apparmor_openldap_role=="provider" and aedir_pwsync_targeturl is defined %}
   # allow r/w access to external pwsync listener
-  {{ aedir_pwsync_socket_path }} rw,
+  {{ apparmor_aedir_pwsync_socket_path }} rw,
 {% endif %}
 
   # access to OpenLDAP's client libs
@@ -56,12 +56,12 @@ profile {{ openldap_service_name }} {
   # access to OpenLDAP's client config
   {{ openldap_path.conf_prefix }}/ldap.conf rm,
 
-{% if lsb_id=="Debian" %}
+{% if apparmor_lsb_id=="Debian" %}
   /etc/hosts.{allow,deny} r,
   /usr/local/berkeleydb/lib/libdb* rm,
 {% endif %}
 
-{% if lsb_id!="Debian" %}
+{% if apparmor_lsb_id!="Debian" %}
   # SASL config for slapd
   /etc/sasl2/slapd.conf r,
 {% endif %}

@@ -5,9 +5,9 @@ objectClass: aeObject
 objectClass: aeHost
 objectClass: ldapPublicKey
 aeStatus: 0
-{% if 'aeHost' in ae_expiry_status_defaults %}
-aeExpiryStatus: {{ ae_expiry_status_defaults.aeHost }}
+{% if 'aeHost' in w2ldap_ae_expiry_status_defaults %}
+aeExpiryStatus: {{ w2ldap_ae_expiry_status_defaults.aeHost }}
 {% endif %}
-pwdPolicySubentry: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
+pwdPolicySubentry: cn=ppolicy-systems,cn=ae,{{ w2ldap_aedir_suffix }}
 aeNotBefore: now
 

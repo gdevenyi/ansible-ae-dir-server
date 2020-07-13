@@ -1,5 +1,5 @@
 ############################################################################
-# OpenLDAP configuration for AE-DIR {{ openldap_role }}
+# OpenLDAP configuration for AE-DIR {{ slapd_openldap_role }}
 # This file MUST NOT be world-readable!
 # {{ ansible_managed }}
 ############################################################################
@@ -8,7 +8,7 @@
 
 {% include 'config.conf.j2' %}
 
-{% if aedir_accesslog_suffix %}
+{% if slapd_aedir_accesslog_suffix %}
 {% include 'accesslog.conf.j2' %}
 {% endif %}
 
@@ -16,7 +16,7 @@
 
 {% include 'um/indices.conf.j2' %}
 
-# {{ openldap_role }} special indices
+# {{ slapd_openldap_role }} special indices
 
 # general eq-only indexes
 index mailLocalAddress eq
@@ -27,7 +27,7 @@ index mailRoutingAddress eq
 {% include 'um/acl-consumer.conf.j2' %}
 
 #---------------------------------------------------------------------------
-# overlays used within {{ aedir_suffix }}
+# overlays used within {{ slapd_aedir_suffix }}
 #---------------------------------------------------------------------------
 
 # for counting search results without retrieving them

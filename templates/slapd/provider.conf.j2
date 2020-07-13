@@ -1,5 +1,5 @@
 ############################################################################
-# OpenLDAP configuration for AE-DIR {{ openldap_role }}
+# OpenLDAP configuration for AE-DIR {{ slapd_openldap_role }}
 # This file MUST NOT be world-readable!
 # {{ ansible_managed }}
 ############################################################################
@@ -10,14 +10,14 @@
 # password hash parameters
 #---------------------------------------------------------------------------
 
-password-hash {{ openldap_password_hash }}
-{% if openldap_password_hash.upper()=='{CRYPT}' %}
-password-crypt-salt-format "{{ openldap_password_crypt_salt_format }}"
+password-hash {{ slapd_openldap_password_hash }}
+{% if slapd_openldap_password_hash.upper()=='{CRYPT}' %}
+password-crypt-salt-format "{{ slapd_openldap_password_crypt_salt_format }}"
 {% endif %}
 
 {% include 'config.conf.j2' %}
 
-{% if aedir_accesslog_suffix %}
+{% if slapd_aedir_accesslog_suffix %}
 {% include 'accesslog.conf.j2' %}
 {% endif %}
 
@@ -27,7 +27,7 @@ add_content_acl yes
 
 {% include 'um/indices.conf.j2' %}
 
-# {{ openldap_role }} special indices
+# {{ slapd_openldap_role }} special indices
 
 # general eq-only indexes
 index departmentNumber eq
@@ -76,7 +76,7 @@ index oathTOTPToken eq
 {% include 'um/acl-provider.conf.j2' %}
 
 #---------------------------------------------------------------------------
-# overlays used within {{ aedir_suffix }}
+# overlays used within {{ slapd_aedir_suffix }}
 #---------------------------------------------------------------------------
 
 # for counting search results without retrieving them
@@ -93,11 +93,11 @@ overlay deref
 
 {% include 'um/replication.conf.j2' %}
 
-{% if openldap_syncrepl_providers %}
+{% if slapd_openldap_syncrepl_providers %}
 mirrormode true
 {% endif %}
 
-{% if aedir_session_suffix %}
+{% if slapd_aedir_session_suffix %}
 {% include 'session.conf.j2' %}
 {% endif %}
 

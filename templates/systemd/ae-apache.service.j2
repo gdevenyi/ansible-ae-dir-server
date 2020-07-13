@@ -13,34 +13,34 @@ After=local-fs.target network.target
 
 [Service]
 Type=simple
-{% if aedir_malloc_ld_preload %}
-Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
+{% if systemd_aedir_malloc_ld_preload %}
+Environment=LD_PRELOAD={{ systemd_aedir_malloc_ld_preload }}
 {% endif %}
-Environment=APACHE_PID_FILE={{ apache_pid_file }}
-PIDFile={{ apache_pid_file }}
-User={{ apache_user }}
-Group={{ apache_group }}
+Environment=APACHE_PID_FILE={{ systemd_apache_pid_file }}
+PIDFile={{ systemd_apache_pid_file }}
+User={{ systemd_apache_user }}
+Group={{ systemd_apache_group }}
 UMask=0027
-ExecStart={{ apache2_config.httpd_exec }} -DSYSTEMD -DFOREGROUND -f {{ apache_conf }} -k start
-ExecReload={{ apache2_config.httpd_exec }} -DSYSTEMD -DFOREGROUND -f {{ apache_conf }} -k graceful
-ExecStop={{ apache2_config.httpd_exec }} -DSYSTEMD -DFOREGROUND -f {{ apache_conf }} -k graceful-stop
+ExecStart={{ apache2_config.httpd_exec }} -DSYSTEMD -DFOREGROUND -f {{ systemd_apache_conf }} -k start
+ExecReload={{ apache2_config.httpd_exec }} -DSYSTEMD -DFOREGROUND -f {{ systemd_apache_conf }} -k graceful
+ExecStop={{ apache2_config.httpd_exec }} -DSYSTEMD -DFOREGROUND -f {{ systemd_apache_conf }} -k graceful-stop
 CapabilityBoundingSet=CAP_NET_BIND_SERVICE
 AmbientCapabilities=CAP_NET_BIND_SERVICE
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
-{% if aedir_systemd_logging %}
-# various logging options from ansible var aedir_systemd_logging
-{% for systemd_option in aedir_systemd_logging %}
+{% if systemd_aedir_systemd_logging %}
+# various logging options from ansible var systemd_aedir_systemd_logging
+{% for systemd_option in systemd_aedir_systemd_logging %}
 {{ systemd_option }}
 {% endfor %}
 {% endif %}
-{% if aedir_systemd_hardening %}
-# various hardening options from ansible var aedir_systemd_hardening
-{% for systemd_option in aedir_systemd_hardening %}
+{% if systemd_aedir_systemd_hardening %}
+# various hardening options from ansible var systemd_aedir_systemd_hardening
+{% for systemd_option in systemd_aedir_systemd_hardening %}
 {{ systemd_option }}
 {% endfor %}
 {% endif %}
 SystemCallFilter={{ systemd_systemcallfilter.apache }}
-{% if apparmor_enabled %}
+{% if systemd_apparmor_enabled %}
 AppArmorProfile=ae-apache
 {% endif %}
 

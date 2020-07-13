@@ -1,0 +1,5 @@
+client_aedir_suffix: '{{ aedir_suffix }}'
+client_openldap_cacert_pathname: '{{ openldap_cacert_pathname }}'
+client_openldap_cert_pathname: '{{ openldap_cert_pathname }}'
+client_openldap_key_pathname: '{{ openldap_key_pathname }}'
+client_openldap_ldapi_uri: '{{ openldap_ldapi_uri }}'

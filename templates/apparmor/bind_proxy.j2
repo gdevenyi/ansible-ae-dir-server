@@ -1,14 +1,14 @@
-# AppArmor profile for hotp_validator installed in virtual env {{ aedir_prefix }}
+# AppArmor profile for hotp_validator installed in virtual env {{ apparmor_aedir_prefix }}
 # {{ ansible_managed }}
 
 #include <tunables/global>
 
-profile {{ oath_bind_listener }} {
+profile {{ apparmor_oath_bind_listener }} {
 
-  #include <ae-dir/abstractions/oath_bind_listener>
+  #include <ae-dir/abstractions/apparmor_oath_bind_listener>
 
   # grant read access to service config
-  {{ oath_ldap_cfg_dir }}/{{ oath_bind_listener }}/ r,
-  {{ oath_ldap_cfg_dir }}/{{ oath_bind_listener }}/{{ oath_bind_listener }}.cfg r,
+  {{ apparmor_oath_ldap_cfg_dir }}/{{ apparmor_oath_bind_listener }}/ r,
+  {{ apparmor_oath_ldap_cfg_dir }}/{{ apparmor_oath_bind_listener }}/{{ apparmor_oath_bind_listener }}.cfg r,
 
 }

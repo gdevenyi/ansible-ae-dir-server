@@ -1,11 +1,11 @@
-{% if aedir_accesslog_suffix %}
+{% if slapd_aedir_accesslog_suffix %}
 # Where to log LDAP write operations (for auditing)
 overlay accesslog
-logdb "{{ aedir_accesslog_suffix }}"
+logdb "{{ slapd_aedir_accesslog_suffix }}"
 logops writes
 logold "(objectClass=*)"
 logoldattr entryUUID objectClass cn uid
-logpurge {{ openldap_log_purge }}
+logpurge {{ slapd_openldap_log_purge }}
 {% endif %}
 
 # for back-links to group entries in member entries
@@ -16,20 +16,20 @@ memberof-memberof-ad memberOf
 memberof-dangling ignore
 memberof-refint true
 
-{% if oath_ldap_enabled==True %}
+{% if slapd_oath_ldap_enabled==True %}
 # pass bind requests to external listener process receiving the requests
-# on Unix Domain socket path {{ oath_ldap_socket_path }}
+# on Unix Domain socket path {{ slapd_oath_ldap_socket_path }}
 # (after password policy check in slapo-ppolicy)
 overlay sock
 extensions binddn peername ssf connid
-socketpath {{ oath_ldap_socket_path }}
-{% if openldap_role=='provider' %}
+socketpath {{ slapd_oath_ldap_socket_path }}
+{% if slapd_openldap_role=='provider' %}
 sockops bind compare
 {% else %}
 sockops bind
 {% endif %}
-{% if oath_ldap_dn_regex %}
-sockdnpat "{{ oath_ldap_dn_regex }}"
+{% if slapd_oath_ldap_dn_regex %}
+sockdnpat "{{ slapd_oath_ldap_dn_regex }}"
 {% endif %}
 {% endif %}
 
@@ -37,7 +37,7 @@ sockdnpat "{{ oath_ldap_dn_regex }}"
 # (after bind-DN rewriting with slapo-rwm)
 overlay ppolicy
 # the default password policy is deliberatly unusable
-ppolicy_default cn=ppolicy-default,cn=ae,{{ aedir_suffix }}
+ppolicy_default cn=ppolicy-default,cn=ae,{{ slapd_aedir_suffix }}
 ppolicy_hash_cleartext
 ppolicy_use_lockout
 
