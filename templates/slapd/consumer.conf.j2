@@ -113,7 +113,9 @@ access to
     by dn.subtree="cn=ae,{{ aedir_suffix }}" none break
     by * auth
 
-# Public entries
+# Public defaults
+#------------------------------------------------------------------
+
 access to
   dn.subtree="cn=pub,{{ aedir_suffix }}"
   attrs=entry,entryDN,entryUUID,children,objectClass,hasSubordinates,modifyTimestamp,cn,description,@namedObject,@posixGroup,@sudoRole,@DUAConfigProfile,@pkiCA
