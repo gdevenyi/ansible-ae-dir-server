@@ -12,36 +12,7 @@
 {% include 'accesslog.conf.j2' %}
 {% endif %}
 
-#######################################################################
-# Database for {{ aedir_suffix }}
-#######################################################################
-
-database mdb
-
-suffix "{{ aedir_suffix }}"
-directory {{ openldap_data }}/um
-
-require strong
-
-# Always set rootdn since needed by internally writing overlays
-rootdn "cn=root,{{ aedir_suffix }}"
-# rootpw not needed in production!
-#rootpw donotenable!!!
-access to
-  dn.base="cn=root,{{ aedir_suffix }}"
-    by * none
-
-lastmod on
-
-# database parameters
-maxsize {{ openldap_db_params.um.mdb_maxsize }}
-
-{% if openldap_db_params.um.checkpoint %}
-# Better write performance but less crash resistance, see slapd-mdb(5) for details
-dbnosync
-checkpoint {{ openldap_db_params.um.checkpoint }}
-envflags writemap mapasync
-{% endif %}
+{% include 'um/general.conf.j2' %}
 
 #---------------------------------------------------------------------------
 # Index configuration
