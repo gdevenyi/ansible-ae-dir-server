@@ -1,0 +1,822 @@
+#---------------------------------------------------------------------------
+# access control rules for {{ aedir_suffix }}
+#---------------------------------------------------------------------------
+
+# First disallow non-active entities to proceed to rest of ACLs
+# by allowing only auth
+# This purposely also affects open LDAP connections!
+#------------------------------------------------------------------
+
+# block access to all other stuff (except userPassword)
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  attrs=!simpleSecurityObject
+    by set="user/aeStatus & [0]" break
+    by * auth
+
+# give read access to pseudo-attribute 'entry' in database
+# naming context to all users and stop further ACL processing
+#------------------------------------------------------------------
+
+access to
+  dn.base="{{ aedir_suffix }}"
+  attrs=entry
+    by users read
+    by * none
+
+#---------------------------------------------------------------------------
+# The replica ACLs MUST be before secret attributes' ACLs
+#---------------------------------------------------------------------------
+
+# Access control for entries/attributes only visible on provider replicas
+#---------------------------------------------------------------------------
+
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  attrs=authTimestamp,pwdFailureTime,pwdHistory,msPwdResetAdminPw
+{% for restriction in aedir_providers_restrictions or [''] %}
+    by {{ restriction }} group/aeGroup/member="cn=ae-providers,cn=ae,{{ aedir_suffix }}" read
+{% endfor %}
+    by group/aeGroup/member="cn=ae-replicas,cn=ae,{{ aedir_suffix }}" none
+    by * none break
+
+# OATH token, department, location and person entries only required on providers
+access to
+  filter="(|(objectClass=aeDept)(objectClass=aeLocation)(objectClass=aePerson)(objectClass=oathToken))"
+{% for restriction in aedir_providers_restrictions or [''] %}
+    by {{ restriction }} group/aeGroup/member="cn=ae-providers,cn=ae,{{ aedir_suffix }}" read
+{% endfor %}
+    by group/aeGroup/member="cn=ae-replicas,cn=ae,{{ aedir_suffix }}" none
+    by * none break
+
+# All replicas can read everything else
+access to
+  dn.subtree="{{ aedir_suffix }}"
+{% for restriction in aedir_replicas_restrictions or [''] %}
+    by {{ restriction }} group/aeGroup/member="cn=ae-replicas,cn=ae,{{ aedir_suffix }}" read
+{% endfor %}
+    by * none break
+
+# Access control for various password attributes
+#---------------------------------------------------------------------------
+
+{% if aedir_pwsync_targeturl is defined %}
+# grant read access to userPassword to password sync process
+access to
+{% if aedir_pwsync_dn_regex %}
+  dn.regex="{{ aedir_pwsync_dn_regex }}"
+{% else %}
+  dn.subtree="{{ aedir_suffix }}"
+{% endif %}
+  attrs=entry,objectClass,userPassword
+  filter="(&(|(objectClass=aeUser)(objectClass=aeService))(aeStatus=0)(userPassword=*))"
+    by dn.base="uid={{ aedir_pwsync_listener_user }},cn=ae,{{ aedir_suffix }}" read
+    by * none break
+{% endif %}
+
+# Password of active token entries may be
+# 1. searched but not read or written by AE-DIR admins
+# 2. written but not read by enrollment service
+# 3. removed by self
+# 4. used for LDAP simple bind
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  attrs=userPassword
+  filter="(&(objectClass=oathToken)(aeStatus=0)(pwdPolicySubentry=cn=ppolicy-otptokens,cn=ae,{{ aedir_suffix }})(!(oathHOTPCounter=*)))"
+    by dn.base="uid=ae-dir-otpenroll,cn=ae,{{ aedir_suffix }}" =w
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =s
+    by self =z
+    by anonymous auth
+
+# Safety net for bugs in (H/T)OTP validator:
+# Block auth access to password of users with assigned OTP token
+# because their simple bind requests must be always validated by
+# external bind listener.
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  attrs=userPassword
+  filter="(&(objectClass=aeUser)(aeStatus=0)(oathToken=*))"
+    by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" =r
+    by users none break
+    by * none
+
+# Password of active personal user accounts
+# - can never be read by anyone
+# - AE admins can search and write
+# - AE auditors can search
+# - password self-service app can write
+# - user can write and search own password
+# - anonymous can authenticate
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  attrs=userPassword
+  filter="(&(objectClass=aeUser)(aeStatus=0))"
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =sw
+    by self =sw
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" =s
+    by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" =w
+    by set="(user & this/-1/aePasswordAdmins/member) & (user & this/-1/aeZoneAdmins/member)" =w
+    by anonymous auth
+
+# Subordinate aeHost and aeService entries beneath aeSrvGroup entries
+# Important note:
+# aeService entries running locally on AE-DIR servers MUST NOT have
+# userPassword attribute at all because they always MUST connect via LDAPI
+# and bind with SASL/EXTERNAL
+access to
+  attrs=userPassword
+  filter="(&(|(objectClass=aeHost)(objectClass=aeService))(aeStatus=0)(!(|(uidNumber<={{ aedir_min_uid-1 }})(gidNumber<={{ aedir_min_gid-1 }})(uidNumber>={{ aedir_max_uid+1 }})(gidNumber>={{ aedir_max_gid+1 }}))))"
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =w
+    by set="user & this/-2/aeZoneAdmins/member" =w
+    by set="user & this/-1/aeZoneAdmins/member" =w
+    by set="user & this/-1/aeSetupGroups/member" =w
+    by anonymous auth
+
+# no access to userPassword as last catch
+access to
+  attrs=userPassword
+    by * none
+
+# limited manage access (no read!) to pwdHistory only for AE-DIR admins
+access to
+  attrs=pwdHistory
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =szm
+    by * none
+
+#------------------------------------------------------------------
+# access to OATH-LDAP attribute 'oathSecret'
+# Note: more OATH-LDAP related ACLs below
+#------------------------------------------------------------------
+
+# OTP validator can read oathSecret if token is initialized
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(&(objectClass=oathToken)(aeStatus=0)(oathHOTPCounter>=0))"
+  attrs=oathSecret
+    by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" read
+    by * none break
+
+# 1. AE admin can search and write but not read 'oathSecret'
+# 2. Zone admin can delete but not read 'oathSecret'
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(&(objectClass=oathToken)(aeStatus=0))"
+  attrs=oathSecret
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =sw
+    by set="user & this/-1/aeZoneAdmins/member" =z
+    by * none break
+
+# An uninitialized OATH token device can itself write (not read) some attributes
+# (authenticated with enrollment userPassword value)
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(&(objectClass=oathToken)(aeStatus=0)(!(oathHOTPCounter=*)))"
+  attrs=oathSecret
+    by self =a
+    by * auth
+
+# last-catch: no access to oathSecret from here
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  attrs=oathSecret
+    by * none
+
+# Limit proxy authorization by granting access to 'authzTo'
+# Ensure that no other entity has =x privilege!
+#---------------------------------------------------------------------------
+
+access to
+  dn.onelevel="cn=ae,{{ aedir_suffix }}"
+  attrs=authzTo
+  filter="(&(objectClass=aeService)(aeStatus=0)(memberOf=cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}))"
+    by self read
+    by * none break
+
+access to
+  dn.onelevel="cn=ae,{{ aedir_suffix }}"
+  attrs=authzTo
+  filter="(&(objectClass=aeService)(aeStatus=0))"
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =csrw
+    by * none break
+
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  attrs=authzTo,authzFrom
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =csrz
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" =csr
+    by * none
+
+#---------------------------------------------------------------------------
+# General ACLs
+# This MUST be below ACLs for password attrs!
+#---------------------------------------------------------------------------
+
+# Global first-catch ACLs which fire no matter what else happens afterwards...
+# AE admins can manage everything else, AE auditors can read everything else
+access to
+  dn.subtree="{{ aedir_suffix }}"
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" manage
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
+    by * none break
+
+# Block access to archived entries from here no matter what
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(aeStatus=2)"
+    by * none
+
+## block cross-zone access to zone 'ae'
+#access to
+#  dn.subtree="cn=ae,{{ aedir_suffix }}"
+#    by dn.subtree="cn=ae,{{ aedir_suffix }}" none break
+#    by * auth
+
+# Public defaults
+#------------------------------------------------------------------
+
+access to
+  dn.subtree="cn=pub,{{ aedir_suffix }}"
+  attrs=entry,entryDN,entryUUID,children,objectClass,hasSubordinates,modifyTimestamp,cn,description,@namedObject,@posixGroup,@sudoRole,@DUAConfigProfile,@pkiCA
+    by users read
+
+#------------------------------------------------------------------
+# OATH-LDAP access control
+#------------------------------------------------------------------
+
+# grant read access to password policy DN in oathUser entries to OTP validator
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(objectClass=oathUser)"
+  attrs=pwdPolicySubentry
+    by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" read
+    by * none break
+
+# manage access to attribute 'pwdFailureTime' for OTP validator
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(objectClass=oathUser)"
+  attrs=pwdFailureTime
+    by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" manage
+    by * none break
+
+# An active but uninitialized OATH token device can
+# itself set but not read new oathTokenPIN value
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(&(objectClass=oathToken)(aeStatus=0)(!(oathHOTPCounter=*)))"
+  attrs=oathTokenPIN
+    by self =w
+    by * none break
+
+# FIX ME! (concept for recovering token PIN needed)
+# No other access to oathTokenPIN from here
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  attrs=oathTokenPIN
+    by * none
+
+# An active but uninitialized OATH token device can itself
+# read someother attributes during enrollment
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(&(objectClass=oathToken)(aeStatus=0)(!(oathHOTPCounter=*)))"
+  attrs=entry,objectClass,serialNumber,oathHOTPParams,oathTokenIdentifier
+    by self read
+    by * none break
+
+# read access for devices to some attributes in the associated policy entries
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(&(objectClass=oathHOTPParams)(aeStatus=0))"
+  attrs=entry,objectClass,cn,oathHMACAlgorithm,oathOTPLength,oathEncKey
+    by set="user/oathHOTPParams & this" read
+    by * none break
+
+# read access for devices to some attributes in the associated policy entries
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(&(objectClass=oathTOTPParams)(aeStatus=0))"
+  attrs=entry,objectClass,cn,oathHMACAlgorithm,oathOTPLength,oathEncKey
+    by set="user/oathTOTPParams & this" read
+    by * none break
+
+# Access to read all OATH parameter entries for
+# 1. OTP validator
+# 2. user entries referencing a token controlled by this
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(objectClass=oathParams)"
+    by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" read
+    by set="user/objectClass & [aeUser]" read
+    by set="user/oathHOTPToken/oathHOTPParams & this" read
+    by set="user/oathTOTPToken/oathTOTPParams & this" read
+    by * none
+
+# write access to special status attributes for OTP validator
+access to
+  dn.onelevel="cn=otp,{{ aedir_suffix }}"
+  filter="(objectClass=oathToken)"
+  attrs=oathLastLogin,oathFailureCount,oathLastFailure
+    by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" write
+    by set="user & this/-1/aeZoneAdmins/member" =rz
+    by * none break
+
+# oathHOTPCounter in token entries
+#---------------------------------------------------------------------------
+
+# An active but uninitialized OATH token device can
+# itself reset the oathHOTPCounter value to zero
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(&(objectClass=oathToken)(aeStatus=0)(!(oathHOTPCounter=*)))"
+  attrs=oathHOTPCounter
+  val/integerMatch="0"
+    by self =a
+    by * none break
+
+# 'oathHOTPCounter' in token entries can be
+# 1. read and written by validation service
+# 2. read and deleted by zone admins
+# 3. read by associated users
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(&(objectClass=oathToken)(aeStatus=0))"
+  attrs=oathHOTPCounter
+    by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" write
+    by dn.base="uid=ae-dir-otpenroll,cn=ae,{{ aedir_suffix }}" read
+    by set="user & this/-1/aeZoneAdmins/member" =rz
+    by set="user & this/-1/aeZoneAuditors/member" read
+    by set="user/oathHOTPToken & this" read
+    by * none
+
+# Token entries must be read by OTP validator
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(objectClass=oathToken)"
+    by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" read
+    by * none break
+
+#------------------------------------------------------------------
+# Delegated administration of active zones
+#------------------------------------------------------------------
+
+# Zone admins can add child entries
+access to
+  filter="(&(objectClass=aeZone)(aeStatus=0))"
+  attrs=children
+    by set="user & this/aeZoneAdmins/member" write
+    by set="user & this/aeZoneAuditors/member" read
+    by set="user/-1 & this" search
+    by * none
+# some zone attributes readable for bound entitities in that zone
+access to
+  filter="(&(objectClass=aeZone)(aeStatus=0))"
+  attrs=entry,cn,description,objectClass
+    by set="user & this/aeZoneAdmins/member" read
+    by set="user & this/aeZoneAuditors/member" read
+    by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" read
+    by set="user/-1 & this" read
+    by users search
+    by * none
+# rest of zone attributes only readable for zone admins/auditors
+access to
+  filter="(&(objectClass=aeZone)(aeStatus=0))"
+  attrs=aeZoneAdmins
+    by set="user & this/aeZoneAdmins/member" read
+    by set="user & this/aeZoneAuditors/member" read
+    by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" read
+    by * none
+# rest of zone attributes only readable for zone admins/auditors
+access to
+  filter="(&(objectClass=aeZone)(aeStatus=0))"
+    by set="user & this/aeZoneAdmins/member" read
+    by set="user & this/aeZoneAuditors/member" read
+    by * none
+
+# aeSudoRule entries
+access to
+  dn.regex="^cn=({{ aedir_aesudorule_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(objectClass=aeSudoRule)"
+    by set="user & this/-1/aeZoneAdmins/member" write
+    by set="user & this/-1/aeZoneAuditors/member" read
+    by * none break
+
+# aeGroup entries add-only attributes
+access to
+  dn.regex="^cn=({{ aedir_aegroup_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(objectClass=aeGroup)"
+  attrs=objectClass,entry,cn,gidNumber
+    by set="user & this/-1/aeZoneAdmins/member" =arscxd
+    by set="user & this/-1/aeZoneAuditors/member" read
+    by * none break
+# aeGroup entries
+access to
+  dn.regex="^cn=({{ aedir_aegroup_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(objectClass=aeGroup)"
+    by set="user & this/-1/aeZoneAdmins/member" write
+    by set="user & this/-1/aeZoneAuditors/member" read
+    by * none break
+
+# aeUser entries add-only attributes
+access to
+  dn.regex="^uid=({{ aedir_aeuser_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(objectClass=aeUser)"
+  attrs=objectClass,entry,uid,uidNumber,aePerson
+    by set="user & this/-1/aeZoneAdmins/member" =arscxd
+    by set="user & this/-1/aeZoneAuditors/member" read
+    by * none break
+# block write access for zone admins to some attributes assumed to have NO-USER-MODIFICATION
+access to
+  dn.regex="^uid=({{ aedir_aeuser_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(objectClass=aeUser)"
+  attrs=memberOf
+    by set="user & this/-1/aeZoneAdmins/member" read
+    by * none break
+# aeUser entries not archived
+access to
+  dn.regex="^uid=({{ aedir_aeuser_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(objectClass=aeUser)"
+  attrs=!msPwdResetObject
+    by set="user & this/-1/aeZoneAdmins/member" write
+    by set="user & this/-1/aeZoneAuditors/member" read
+    by * none break
+
+# aeService entries add-only attributes
+access to
+  dn.regex="^uid=({{ aedir_aeservice_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(objectClass=aeService)"
+  attrs=objectClass,entry,uid,uidNumber
+    by set="user & this/-1/aeZoneAdmins/member" =arscxd
+    by set="user & this/-1/aeZoneAuditors/member" read
+    by * none break
+# block write access for zone admins to some attributes assumed to have NO-USER-MODIFICATION
+access to
+  dn.regex="^uid=({{ aedir_aeservice_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(objectClass=aeService)"
+  attrs=memberOf
+    by set="user & this/-1/aeZoneAdmins/member" read
+    by * none break
+# aeService entries
+access to
+  dn.regex="^uid=({{ aedir_aeservice_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(objectClass=aeService)"
+    by set="user & this/-1/aeZoneAdmins/member" write
+    by set="user & this/-1/aeZoneAuditors/member" read
+    by * none break
+
+# aeSrvGroup entries
+access to
+  dn.regex="^cn=({{ aedir_aesrvgroup_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(objectClass=aeSrvGroup)"
+  attrs=children
+    by set="user & this/-1/aeZoneAdmins/member" write
+    by set="user & this/aeSetupGroups/member" write
+    by set="user & this/aeSrvGroup/aeSetupGroups/member" read
+    by set="user & this/-1/aeZoneAuditors/member" read
+    by * none break
+access to
+  dn.regex="^cn=({{ aedir_aesrvgroup_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(objectClass=aeSrvGroup)"
+    by set="user & this/-1/aeZoneAdmins/member" write
+    by set="user & this/-1/aeZoneAuditors/member" read
+    by set="user & this/aeSetupGroups/member" read
+    by * none break
+
+# aeHost entries have to be subordinate entries of aeSrvGroup entries
+access to
+  dn.regex="^host=([a-z]?[a-z0-9.-]+),cn=({{ aedir_aesrvgroup_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(objectClass=aeHost)"
+    by set="user & this/-2/aeZoneAdmins/member" write
+    by set="user & this/-1/aeSetupGroups/member" write
+    by set="user & this/aeSrvGroup/aeSetupGroups/member" read
+    by set="user & this/-2/aeZoneAuditors/member" read
+    by * none break
+
+# aeNwDevice entries have to be subordinate entries of aeHost entries
+access to
+  dn.regex="^cn=.+,host=([a-z]?[a-z0-9.-]+),cn=({{ aedir_aesrvgroup_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(objectClass=aeNwDevice)"
+    by set="user & this/-3/aeZoneAdmins/member" write
+    by set="user & this/-2/aeSetupGroups/member" write
+    by set="user & this/-2/aeSrvGroup/aeSetupGroups/member" read
+    by set="user & this/-1" read
+    by set="user & this/-3/aeZoneAuditors/member" read
+    by * none break
+
+# aeService entries can also be subordinate entries of aeSrvGroup
+# entries if they need read access to aeUser and aeGroup entries
+# aeService entries add-only attributes
+access to
+  dn.regex="^uid=({{ aedir_aeservice_uid_regex }}),cn=({{ aedir_aesrvgroup_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(objectClass=aeService)"
+  attrs=objectClass,entry,uid,uidNumber
+    by set="user & this/-2/aeZoneAdmins/member" =arscxd
+    by set="user & this/-1/aeSetupGroups/member" =arscxd
+    by set="user & this/aeSrvGroup/aeSetupGroups/member" read
+    by set="user & this/-2/aeZoneAuditors/member" read
+    by * none break
+# aeService entries
+access to
+  dn.regex="^uid=({{ aedir_aeservice_uid_regex }}),cn=({{ aedir_aesrvgroup_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(objectClass=aeService)"
+    by set="user & this/-2/aeZoneAdmins/member" write
+    by set="user & this/-1/aeSetupGroups/member" write
+    by set="user & this/aeSrvGroup/aeSetupGroups/member" read
+    by set="user & this/-2/aeZoneAuditors/member" read
+    by * none break
+
+# aeTag entries
+access to
+  dn.regex="^cn=({{ aedir_aetag_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(objectClass=aeTag)"
+    by set="user & this/-1/aeZoneAdmins/member" write
+    by set="user & this/-1/aeZoneAuditors/member" read
+    by * none break
+
+# aeAuthcToken entries
+access to
+  dn.regex="^serialNumber=({{ aedir_aeauthctoken_serial_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(objectClass=aeAuthcToken)"
+    by set="user & this/-1/aeZoneAdmins/member" write
+    by set="user & this/-1/aeZoneAuditors/member" read
+    by set="user/oathHOTPToken & this" read
+    by set="user/oathTOTPToken & this" read
+    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}" read
+    by * none break
+
+# aeContact entries
+access to
+  dn.regex="^(cn|mail)=[^,]+,cn={{ aedir_aezone_cn_regex }},{{ aedir_suffix }}$"
+  filter="(objectClass=aeContact)"
+    by set="user & this/-1/aeZoneAdmins/member" write
+    by set="user & this/-1/aeZoneAuditors/member" read
+    by * none break
+
+# aeMailGroup entries
+access to
+  dn.regex="^cn=({{ aedir_aegroup_cn_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(objectClass=aeMailGroup)"
+    by set="user & this/-1/aeZoneAdmins/member" write
+    by set="user & this/-1/aeZoneAuditors/member" read
+    by * none break
+
+# Organizational entries (departments, locations and persons)
+#------------------------------------------------------------------
+
+# administration of aePerson entries
+access to
+  dn.regex="^uniqueIdentifier=({{ aedir_aeperson_uniqueid_regex }}),cn={{ aedir_aezone_cn_regex }},{{ aedir_suffix }}$"
+  filter="(objectClass=aePerson)"
+    by set="user & this/-1/aeZoneAdmins/member" write
+    by set="user & this/-1/aeZoneAuditors/member" read
+    by * none break
+# administration and readability of aeLocation entries
+access to
+  dn.regex="^cn=({{ aedir_aelocation_cn_regex }}),cn={{ aedir_aezone_cn_regex }},{{ aedir_suffix }}$"
+  filter="(objectClass=aeLocation)"
+    by set="user & this/-1/aeZoneAdmins/member" write
+    by set="user & this/-1/aeZoneAuditors/member" read
+    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}" read
+    by set="user/aePerson/aeLocation & this" read
+    by * none break
+# administration and readability of aeDept entries
+access to
+  dn.regex="^departmentNumber=({{ aedir_aedept_deptnumber_regex }}),cn={{ aedir_aezone_cn_regex }},{{ aedir_suffix }}$"
+  filter="(objectClass=aeDept)"
+    by set="user & this/-1/aeZoneAdmins/member" write
+    by set="user & this/-1/aeZoneAuditors/member" read
+    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}" read
+    by set="user/aePerson/aeDept & this" read
+    by * none break
+
+#---------------------------------------------------------------------------
+# Inactive entries not visible to normal users/systems from here
+#---------------------------------------------------------------------------
+
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(&(aeStatus=*)(!(aeStatus=0)))"
+    by * none
+
+# Password reset for active users
+#------------------------------------------------------------------
+
+# Access to objectClass value "msPwdResetObject"
+# 1. write access for password self-service application
+# 2. read access for the user (self)
+access to
+  dn.regex="^uid=({{ aedir_aeuser_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  attrs=objectClass
+  filter="(objectClass=aeUser)"
+  val=msPwdResetObject
+    by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" write
+    by self read
+    by * none
+
+# Access to aeTag value "pub-tag-no-welcome-yet"
+# 1. write access for password self-service application
+# 2. read access for the user (self)
+access to
+  dn.regex="^uid=({{ aedir_aeuser_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  attrs=aeTag
+  filter="(objectClass=aeUser)"
+  val=pub-tag-no-welcome-yet
+    by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" write
+    by self read
+    by * none
+
+# Restricted access to msPwdReset* password/credential attributes:
+# 1. write-only access for password self-service application
+# 2. read access for zone admins
+access to
+  dn.regex="^uid=({{ aedir_aeuser_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(objectClass=aeUser)"
+  attrs=msPwdResetPasswordHash
+    by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" =w
+    by * none
+access to
+  dn.regex="^uid=({{ aedir_aeuser_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(objectClass=aeUser)"
+  attrs=msPwdResetAdminPw
+    by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" =w
+    by set="user & this/-1/aeZoneAdmins/member" read
+    by * none
+
+# Access to rest of msPwdReset* attributes
+access to
+  dn.regex="^uid=({{ aedir_aeuser_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+  filter="(objectClass=aeUser)"
+  attrs=@msPwdResetObject
+    by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" write
+    by set="user & this/-1/aeZoneAdmins/member" read
+    by set="user & this/-1/aeZoneAuditors/member" read
+    by self read
+    by * none
+
+# Allow read access on necessary attributes
+access to
+  filter="(objectClass=aeUser)"
+  attrs=entry,uid,aeStatus,objectClass,mail,pwdPolicySubentry,pwdChangedTime,aeTag,cn,displayName,description,entryCSN,creatorsName,createTimestamp,modifiersName,modifyTimestamp,memberOf,aeRemoteHost
+    by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" read
+    by * none break
+
+# Allow search access to memberOf for special services
+access to
+  filter="(objectClass=aeUser)"
+  attrs=memberOf
+    by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" search
+    by * none break
+
+# Self-service attributes of active users
+#------------------------------------------------------------------
+
+# users can edit the description describing purpose of own account
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(objectClass=aeUser)"
+  attrs=description
+    by self write
+    by * none break
+
+{% if aedir_sshpublickey_self_filter %}
+# users can maintain own sshPublicKey attribute
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="{{ aedir_sshpublickey_self_filter }}"
+  attrs=sshPublicKey
+    by self write
+    by * none break
+{% endif %}
+
+{% include 'service_access.conf.j2' %}
+
+# Last catch ACLs
+#------------------------------------------------------------------
+
+# groups ae-all-zone-admins and ae-all-zone-auditors must be excluded after this!
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(&(objectClass=aeGroup)(cn=ae-all-zone-*))"
+    by * none
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  attrs=memberOf
+  val.exact="cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}"
+    by * none
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  attrs=memberOf
+  val.exact="cn=ae-all-zone-auditors,cn=ae,{{ aedir_suffix }}"
+    by * none
+
+# Read access for all active group members
+# Notes:
+# - aeService as member must not see the groups!
+# - the groups ae-all-zone-admins and ae-all-zone-auditors must be excluded!
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(objectClass=aeGroup)"
+    by set="user & ([ldap:///] + user + [?entryDN?base?(&(objectClass=aeUser)(memberOf=] + this + [)(aeStatus=0))])/entryDN" read
+    by * auth
+
+# Read access to aeUser and aeService entries for all aeUser members
+# in at least one same group(s)
+# Notes:
+# - aeService as member must not see the users!
+# - the groups ae-all-zone-admins and ae-all-zone-auditors must be excluded!
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(|(objectClass=aeUser)(objectClass=aeService))"
+    by self read
+    by set="this/memberOf & ( [ldap:///] + user + [?memberOf?base?(&(objectClass=aeUser)(aeStatus=0))])/memberOf" read
+    by * auth
+
+# ID pool attributes
+#------------------------------------------------------------------
+
+# write access to next UID/GID counter for all zone admins
+access to
+  dn.base="{{ aedir_suffix }}"
+  attrs=uidNumber,gidNumber
+    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}" write
+    by * none
+
+# read access to the POSIX ID ranges for all active aeUser entries
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  attrs=@aePosixIdRanges
+    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}" read
+    by group/aeGroup/member="cn=ae-all-zone-auditors,cn=ae,{{ aedir_suffix }}" read
+    by * none
+
+# Password policy entries
+#------------------------------------------------------------------
+
+# Read access for
+# 1. Password self-service application
+# 2. all zone admins/auditors
+# 3. all active aeUser entries
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(objectClass=pwdPolicy)"
+    by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_suffix }}" read
+    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}" read
+    by group/aeGroup/member="cn=ae-all-zone-auditors,cn=ae,{{ aedir_suffix }}" read
+    by set="user & ([ldap:///] + user + [?entryDN?base?(&(objectClass=aeUser)(aeStatus=0))])/entryDN" read
+    by * auth
+
+# Read-only (but no administrative) access to active aePerson entries
+#---------------------------------------------------------------------------
+
+# Give read access to confidential HR attributes only to
+# personal user accounts referencing the person entry
+# (access for zone admins/auditors is granted above)
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(objectClass=aePerson)"
+  attrs={{ aedir_confidential_person_attrs|join(',') }}
+    by set="user/aePerson & this" read
+    by * none
+
+# Give read access to other attributes to:
+# - personal user accounts referencing the person entry
+# - all zone admins
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(objectClass=aePerson)"
+    by set="user/aePerson & this" read
+    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}" read
+    by * none break
+
+{% if aedir_addressbook_attrs %}
+# restricted addressbook read access to person entries for
+# members of groups referenced as address book user groups in the zone
+access to
+  dn.subtree="{{ aedir_suffix }}"
+  filter="(|(objectClass=aeContact)(objectClass=aePerson)(objectClass=aeMailGroup))"
+  attrs=entry,{{ aedir_addressbook_attrs|join(',') }}
+    by set="user & this/-1/aeABAccessGroups/member" read
+    by * none
+{% endif %}
+
+# active zone admins are granted to access the accesslog DB
+# (for web2ldap [Audit] links)
+#------------------------------------------------------------------
+
+access to
+  dn.base="{{ aedir_suffix }}"
+  attrs=auditContext
+    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}" read
+    by * none
+
+access to
+  dn.base="{{ aedir_suffix }}"
+  attrs=children,objectClass,ou,description
+    by users read
+    by * auth
+
+access to
+  dn.subtree="{{ aedir_suffix }}"
+    by users search
+    by * auth
+

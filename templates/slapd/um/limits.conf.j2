@@ -1,0 +1,34 @@
+#---------------------------------------------------------------------------
+# search/time limits for {{ aedir_suffix }}
+#---------------------------------------------------------------------------
+
+# Maximum number of entries to return from a search operation
+sizelimit {{ openldap_db_params.um.sizelimit }}
+
+# Maximum number of time [secs] slapd will spend answering a search request
+timelimit {{ openldap_db_params.um.timelimit }}
+
+# no limits for AE admins
+limits
+  group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}"
+    time=unlimited
+    size=unlimited
+
+# no limits for AE auditors
+limits
+  group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}"
+    time=unlimited
+    size=unlimited
+
+# no limits for all zone admins
+limits
+  group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}"
+    time=unlimited
+    size=unlimited
+
+# no limits for all zone auditors
+limits
+  group/aeGroup/member="cn=ae-all-zone-auditors,cn=ae,{{ aedir_suffix }}"
+    time=unlimited
+    size=unlimited
+
