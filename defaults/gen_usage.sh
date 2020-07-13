@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rm ./USAGE.md
+rm ./USAGE_REPORT.md
 echo "$(
   for f in ./main/main.yml; do
     echo
@@ -26,4 +26,4 @@ echo "$(
         done
     done
   done
-)" > ./USAGE.md
+)" > ./USAGE_REPORT.md
