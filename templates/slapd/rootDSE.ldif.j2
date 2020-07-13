@@ -1,9 +1,9 @@
 # {{ ansible_managed }}
 dn: 
-defaultNamingContext: {{ aedir_suffix }}
-aeRoot: {{ aedir_suffix }}
-host: {{ openldap_service_fqdn }}
-{% for host in openldap_rootdse_alt_servers %}
-altServer: ldaps://{{ hostvars[host].get('openldap_service_fqdn',host) }}
+defaultNamingContext: {{ slapd_aedir_suffix }}
+aeRoot: {{ slapd_aedir_suffix }}
+host: {{ slapd_openldap_service_fqdn }}
+{% for host in slapd_openldap_rootdse_alt_servers %}
+altServer: ldaps://{{ hostvars[host].get('slapd_openldap_service_fqdn',host) }}
 {% endfor%}
 

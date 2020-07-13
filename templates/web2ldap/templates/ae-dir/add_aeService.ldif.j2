@@ -3,11 +3,11 @@ objectClass: account
 objectClass: aeObject
 objectClass: aeService
 aeStatus: 0
-{% if 'aeService' in ae_expiry_status_defaults %}
-aeExpiryStatus: {{ ae_expiry_status_defaults.aeService }}
+{% if 'aeService' in w2ldap_ae_expiry_status_defaults %}
+aeExpiryStatus: {{ w2ldap_ae_expiry_status_defaults.aeService }}
 {% endif %}
 uid: system_service_
-loginShell: {{ aedir_nologin_shell }}
-pwdPolicySubentry: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
+loginShell: {{ w2ldap_aedir_nologin_shell }}
+pwdPolicySubentry: cn=ppolicy-systems,cn=ae,{{ w2ldap_aedir_suffix }}
 aeNotBefore: now
 

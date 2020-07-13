@@ -5,16 +5,16 @@
 #
 # {{ ansible_managed }}
 
-BASE {{ aedir_suffix }}
-URI {{ openldap_ldapi_uri }}
+BASE {{ client_aedir_suffix }}
+URI {{ client_openldap_ldapi_uri }}
 
 # use SASL/EXTERNAL mechanism
 SASL_MECH EXTERNAL
 
 # TLS cert/key files
-TLS_CACERT {{ openldap_cacert_pathname }}
-TLS_CERT {{ openldap_cert_pathname }}
-TLS_KEY {{ openldap_key_pathname }}
+TLS_CACERT {{ client_openldap_cacert_pathname }}
+TLS_CERT {{ client_openldap_cert_pathname }}
+TLS_KEY {{ client_openldap_key_pathname }}
 
 # never dereference aliases
 DEREF never

@@ -2,9 +2,9 @@
 
 <form method="POST" action="/web2ldap/searchform">
 
-  <input type="hidden" name="ldapurl" value="{{ openldap_ldapi_uri }}">
-  <input type="hidden" name="dn" value="{{ aedir_suffix }}">
-  <input type="hidden" name="login_search_root" value="{{ aedir_suffix }}">
+  <input type="hidden" name="ldapurl" value="{{ w2ldap_openldap_ldapi_uri }}">
+  <input type="hidden" name="dn" value="{{ w2ldap_aedir_suffix }}">
+  <input type="hidden" name="login_search_root" value="{{ w2ldap_aedir_suffix }}">
 
   <fieldset>
     <legend>&AElig;-DIR login</legend>
@@ -53,7 +53,7 @@
   <li>
     <a href="/pwd">Password Self-Service</a>
   </li>
-{% if oath_ldap_enabled==True %}
+{% if w2ldap_oath_ldap_enabled==True %}
   <li>
     <a href="/oath">OATH-LDAP Token Enrollment Service</a>
   </li>
@@ -69,7 +69,7 @@
   <tr>
     <td>
       <a class="CL"
-         href="/web2ldap?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub?(&(objectClass=aeUser)(aeStatus=0)(!(userPassword=*)))?bindname=">
+         href="/web2ldap?{{ w2ldap_openldap_ldapi_uri }}/{{ w2ldap_aedir_suffix }}??sub?(&(objectClass=aeUser)(aeStatus=0)(!(userPassword=*)))?bindname=">
         Search active personal user accounts without password
       </a>
     </td>
@@ -79,7 +79,7 @@
   </tr>
     <td>
       <a class="CL"
-         href="/web2ldap?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub?(&(objectClass=aeGroup)(aeStatus=0)(!(member=*)))?bindname=">
+         href="/web2ldap?{{ w2ldap_openldap_ldapi_uri }}/{{ w2ldap_aedir_suffix }}??sub?(&(objectClass=aeGroup)(aeStatus=0)(!(member=*)))?bindname=">
         Search active groups without members
       </a>
     </td>
@@ -90,7 +90,7 @@
   <tr>
     <td>
       <a class="CL"
-         href="/web2ldap?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub?(&(objectClass=aeObject)(aeStatus=0)(aeNotAfter<={value_currenttime}))?bindname=">
+         href="/web2ldap?{{ w2ldap_openldap_ldapi_uri }}/{{ w2ldap_aedir_suffix }}??sub?(&(objectClass=aeObject)(aeStatus=0)(aeNotAfter<={value_currenttime}))?bindname=">
         Search expired entries still active
       </a>
     </td>
@@ -101,7 +101,7 @@
   <tr>
     <td>
       <a class="CL"
-         href="/web2ldap?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub?(objectClass=msPwdResetObject)?bindname=">
+         href="/web2ldap?{{ w2ldap_openldap_ldapi_uri }}/{{ w2ldap_aedir_suffix }}??sub?(objectClass=msPwdResetObject)?bindname=">
         Search on-going password resets
       </a>
     </td>
@@ -112,7 +112,7 @@
   <tr>
     <td>
       <a class="CL"
-         href="/web2ldap/searchform?{{ openldap_ldapi_uri }}/{{ aedir_accesslog_suffix }}????bindname=">
+         href="/web2ldap/searchform?{{ w2ldap_openldap_ldapi_uri }}/{{ w2ldap_aedir_accesslog_suffix }}????bindname=">
         Search access log
       </a>
     </td>
@@ -131,12 +131,12 @@
     <th>Host</th>
     <th>Id</th>
   </tr>
-{% for host in aedir_hosts[role]|sort %}
-{% set replica = hostvars[host].get('openldap_service_fqdn',host) -%}
+{% for host in w2ldap_aedir_hosts[role]|sort %}
+{% set replica = hostvars[host].get('w2ldap_openldap_service_fqdn',host) -%}
 {% set server_id = hostvars[host].get('openldap_server_id','') -%}
   <tr>
     <td>
-      <a class="CL" href="/web2ldap/searchform?ldaps://{{ replica }}/{{ aedir_suffix }}????bindname=">{{ replica }}</a>
+      <a class="CL" href="/web2ldap/searchform?ldaps://{{ replica }}/{{ w2ldap_aedir_suffix }}????bindname=">{{ replica }}</a>
     </td>
 {% if replica!=host %}
     <td>
@@ -160,7 +160,7 @@
 <table>
   <tr>
     <td>Service FQDN:</td>
-    <td>{{ openldap_service_fqdn }}</td>
+    <td>{{ w2ldap_openldap_service_fqdn }}</td>
   </tr>
   <tr>
     <td>Inventory hostname:</td>
@@ -168,14 +168,14 @@
   </tr>
   <tr>
     <td>base DN / search root:</td>
-    <td>{{ aedir_suffix }}</td>
+    <td>{{ w2ldap_aedir_suffix }}</td>
   </tr>
   <tr>
     <td>POSIX-UID number range:</td>
-    <td>{{ aedir_min_uid }}..{{ aedir_max_uid }}</td>
+    <td>{{ w2ldap_aedir_min_uid }}..{{ w2ldap_aedir_max_uid }}</td>
   </tr>
   <tr>
     <td>POSIX-GID number range:</td>
-    <td>{{ aedir_min_gid }}..{{ aedir_max_gid }}</td>
+    <td>{{ w2ldap_aedir_min_gid }}..{{ w2ldap_aedir_max_gid }}</td>
   </tr>
 </table>

@@ -1,16 +1,16 @@
 [bind_proxy]
 
 # Pathname of Unix domain socket where slapd-sock sends requests to
-socket_path = {{ oath_ldap_socket_path }}
+socket_path = {{ oathldap_oath_ldap_socket_path }}
 
 # LDAPI URI for connecting to local slapd
-ldapi_uri = {{ openldap_ldapi_uri }}
+ldapi_uri = {{ oathldap_openldap_ldapi_uri }}
 
 # logging level (key-word known in logging module)
 log_level = INFO
 
 # logging configuration file
-logging_conf = {{ aedir_etc }}/ae-logging.conf
+logging_conf = {{ oathldap_aedir_etc }}/ae-logging.conf
 
 # logging qualifier name
 logger_name = oathldap_srv.bind_proxy
@@ -23,12 +23,12 @@ allowed_uids = 0 ae-dir-slapd
 cache_ttl = -1.0
 
 # CA certificate file to use for connecting to OATH-LDAP providers
-cacert_file = {{ openldap_cacert_pathname }}
+cacert_file = {{ oathldap_openldap_cacert_pathname }}
 
 # Space- or line separated list of LDAP URIs of OATH-LDAP providers
 providers =
-{% for host in openldap_syncrepl_providers %}
-  ldaps://{{ hostvars[host].get('openldap_service_fqdn',host) }}
+{% for host in oathldap_openldap_syncrepl_providers %}
+  ldaps://{{ hostvars[host].get('oathldap_openldap_service_fqdn',host) }}
 {% endfor %}
 
 # Space- or line separated list network addresses of clients for which bind
@@ -37,4 +37,4 @@ providers =
 proxy_peer_nets = 10.0.0.0/8
 
 # peer addresses always excluded from proxying to OTP validator
-noproxy_peer_addrs = {{ openldap_ldapi_socket }} 127.0.0.1
+noproxy_peer_addrs = {{ oathldap_openldap_ldapi_socket }} 127.0.0.1

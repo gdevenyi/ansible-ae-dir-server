@@ -11,12 +11,12 @@ LD_LIBRARY_PATH="{{ openldap_path.libdir }}:${LD_LIBRARY_PATH}"
 export LD_LIBRARY_PATH
 
 # some env vars set for Python interpreter
-{% for evar in aedir_python_env %}
+{% for evar in oathldap_oathldap_aedir_python_env %}
 {{ evar.name }}={{ evar.value }}
 export {{ evar.name }}
 {% endfor %}
 
-{{ aedir_python }} -m oathldap_tool.cli decpin \
-  --ldap-url '{{ openldap_ldapi_uri }}/{{ aedir_suffix }}' \
-  --key-path '{{ oath_ldap_keys_dir }}' \
+{{ oathldap_aedir_python }} -m oathldap_tool.cli decpin \
+  --ldap-url '{{ oathldap_openldap_ldapi_uri }}/{{ oathldap_aedir_suffix }}' \
+  --key-path '{{ oathldap_oath_ldap_keys_dir }}' \
   --token-id "$1"
