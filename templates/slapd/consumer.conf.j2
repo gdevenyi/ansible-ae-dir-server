@@ -295,7 +295,7 @@ memberof-refint true
 overlay sock
 extensions binddn peername ssf connid
 socketpath {{ oath_ldap_socket_path }}
-sockops bind
+sockops bind compare
 {% if oath_ldap_dn_regex %}
 sockdnpat "{{ oath_ldap_dn_regex }}"
 {% endif %}
