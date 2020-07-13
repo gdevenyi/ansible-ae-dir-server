@@ -159,7 +159,7 @@
     - "restart {{ openldap_service_name }}"
   when: lsb_id != "Debian"
 
-- name: "Create role-specific slapd.conf for {{ openldap_role }}"
+- name: "Create role-specific slapd.conf"
   template:
     src: "slapd/{{ openldap_role }}.conf.j2"
     dest: "{{ openldap_slapd_conf }}"
