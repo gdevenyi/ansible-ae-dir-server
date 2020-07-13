@@ -23,58 +23,26 @@ password-crypt-salt-format "{{ openldap_password_crypt_salt_format }}"
 
 add_content_acl yes
 
-#---------------------------------------------------------------------------
-# Index configuration
-#---------------------------------------------------------------------------
+{% include 'um/indices.conf.j2' %}
+
+# {{ openldap_role }} special indices
 
 # general eq-only indexes
-
 index departmentNumber eq
-index gidNumber eq
 index mailLocalAddress sub,eq
 index mailRoutingAddress sub,eq
-index member eq
-index memberOf eq
-index memberUid eq
 index memberURL pres
-index modifyTimestamp eq
-index nickName eq
-index objectClass eq
 index rfc822MailMember sub,eq
-index seeAlso eq
-index sudoUser pres,eq
-index uid eq
-index uidNumber eq
-# mainly for syncrepl
-index entryCSN eq
-index entryUUID eq
 
 # for host and network management
-index aeFqdn sub,eq,pres
 index aeNwDevice eq
-index host sub,eq
-index ipHostNumber eq,pres
-index macAddress eq
-
-# for aeUser
-index aeRemoteHost pres,eq
 
 # sub and eq indexes
-index cn sub,eq
 index displayName sub,eq
 index givenName sub,eq
-index mail sub,eq
 index o sub,eq
 index ou sub,eq
 index sn sub,eq
-
-# service groups
-index aeLoginGroups eq
-index aeProxyFor pres,eq
-index aeRequires eq
-index aeSSHProxyCommand pres,eq,sub
-index aeVisibleGroups eq
-index aeVisibleSudoers eq
 
 # zones
 index aeABAccessGroups pres,eq
@@ -82,30 +50,17 @@ index aePasswordAdmins pres,eq
 index aeZoneAdmins pres,eq
 index aeZoneAuditors pres,eq
 
-# service attributes
-index aeHost eq
-
-# login-related attributes
-index authTimestamp pres,eq
-index pwdChangedTime pres,eq
-index pwdFailureTime pres,eq
-
 # for person/employee references
 index aeDept eq
 index aeLocation eq
-index aePerson eq
 index employeeNumber eq
 index uniqueIdentifier eq
 
 # Meta data
 index aeNotBefore,aeNotAfter pres,eq
-index aeTag eq,sub
-index aeTicketId eq
 
 # hardware devices
-index aeHwSerialNumber eq,sub
 index aeOwner eq
-index serialNumber eq,sub
 
 # for OATH-LDAP (indexes only needed on provider)
 index oathHOTPParams eq
