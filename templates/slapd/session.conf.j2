@@ -1,39 +1,39 @@
 #######################################################################
-# SSO session database {{ aedir_session_suffix }}
+# SSO session database {{ slapd_aedir_session_suffix }}
 #######################################################################
 
 database mdb
 
-suffix "{{ aedir_session_suffix }}"
-directory {{ openldap_data }}/session
+suffix "{{ slapd_aedir_session_suffix }}"
+directory {{ slapd_openldap_data }}/session
 
 require strong
 
 # Always set rootdn since needed by internally writing overlays
-rootdn "cn=root,{{ aedir_session_suffix }}"
+rootdn "cn=root,{{ slapd_aedir_session_suffix }}"
 # rootpw not needed in production!
 #rootpw donotenable!!!
 access to
-  dn.base="cn=root,{{ aedir_session_suffix }}"
+  dn.base="cn=root,{{ slapd_aedir_session_suffix }}"
     by * none
 
 lastmod on
 
 # database parameters
-maxsize {{ openldap_db_params.session.mdb_maxsize }}
+maxsize {{ slapd_openldap_db_params.session.mdb_maxsize }}
 
-{% if openldap_db_params.session.checkpoint %}
+{% if slapd_openldap_db_params.session.checkpoint %}
 # Better write performance but less crash resistance, see slapd-mdb(5) for details
 dbnosync
-checkpoint {{ openldap_db_params.session.checkpoint }}
+checkpoint {{ slapd_openldap_db_params.session.checkpoint }}
 envflags writemap mapasync
 {% endif %}
 
 # Maximum number of entries to return from a search operation
-sizelimit {{ openldap_db_params.session.sizelimit }}
+sizelimit {{ slapd_openldap_db_params.session.sizelimit }}
 
 # Maximum number of time [secs] slapd will spend answering a search request
-timelimit {{ openldap_db_params.session.timelimit }}
+timelimit {{ slapd_openldap_db_params.session.timelimit }}
 
 add_content_acl yes
 
@@ -49,81 +49,81 @@ index aeNotBefore eq
 index aeNotAfter eq
 
 #---------------------------------------------------------------------------
-# Access rights {{ aedir_session_suffix }}
+# Access rights {{ slapd_aedir_session_suffix }}
 #---------------------------------------------------------------------------
 
 access to
-  dn.subtree="{{ aedir_session_suffix }}"
-    by group/aeGroup/member="cn=ae-providers,cn=ae,{{ aedir_suffix }}" read
+  dn.subtree="{{ slapd_aedir_session_suffix }}"
+    by group/aeGroup/member="cn=ae-providers,cn=ae,{{ slapd_aedir_suffix }}" read
     by * none break
 
 # who can add subordinate entries
 access
-  to dn.base="{{ aedir_session_suffix }}"
+  to dn.base="{{ slapd_aedir_session_suffix }}"
   attrs=children
-    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" write
-    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" write
-    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
-    by dn.exact="cn=root,{{ aedir_suffix }}" write
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ slapd_aedir_suffix }}" write
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ slapd_aedir_suffix }}" write
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ slapd_aedir_suffix }}" read
+    by dn.exact="cn=root,{{ slapd_aedir_suffix }}" write
     by * none
 
 access
-  to dn.base="{{ aedir_session_suffix }}"
-    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
-    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" write
-    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
-    by dn.exact="cn=root,{{ aedir_suffix }}" manage
+  to dn.base="{{ slapd_aedir_session_suffix }}"
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ slapd_aedir_suffix }}" read
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ slapd_aedir_suffix }}" write
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ slapd_aedir_suffix }}" read
+    by dn.exact="cn=root,{{ slapd_aedir_suffix }}" manage
     by * none
 
 # restricted access to session secret
 access
-  to dn.onelevel="{{ aedir_session_suffix }}"
+  to dn.onelevel="{{ slapd_aedir_session_suffix }}"
   attrs=aeSessionSecret
-    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" =ascx
-    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =ascx
-    by dn.exact="cn=root,{{ aedir_suffix }}" =ascx
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ slapd_aedir_suffix }}" =ascx
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ slapd_aedir_suffix }}" =ascx
+    by dn.exact="cn=root,{{ slapd_aedir_suffix }}" =ascx
     by dnattr=aeOwner =scx
     by * none
 
 # add-only (but readable) attributes which cannot be altered later on
 access
-  to dn.onelevel="{{ aedir_session_suffix }}"
+  to dn.onelevel="{{ slapd_aedir_session_suffix }}"
   attrs=aeSessionId,aeOwner,aeSessionBindings,aeNotBefore,aeNotAfter,aeSessionAccessTime
-    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" =arscxd
-    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =arscxd
-    by dn.exact="cn=root,{{ aedir_suffix }}" =arscxd
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ slapd_aedir_suffix }}" =arscxd
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ slapd_aedir_suffix }}" =arscxd
+    by dn.exact="cn=root,{{ slapd_aedir_suffix }}" =arscxd
     by dnattr=aeOwner read
     by * none
 
 # access to session counter
 access
-  to dn.onelevel="{{ aedir_session_suffix }}"
+  to dn.onelevel="{{ slapd_aedir_session_suffix }}"
   attrs=aeSessionCounter
-    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" write
-    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" write
-    by dn.exact="cn=root,{{ aedir_suffix }}" write
-    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ slapd_aedir_suffix }}" write
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ slapd_aedir_suffix }}" write
+    by dn.exact="cn=root,{{ slapd_aedir_suffix }}" write
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ slapd_aedir_suffix }}" read
     by dnattr=aeOwner read
     by * none
 
 # rest of session objects
 access
-  to dn.onelevel="{{ aedir_session_suffix }}"
+  to dn.onelevel="{{ slapd_aedir_session_suffix }}"
   filter="(&(objectClass=aeSession)(aeSessionCounter>=0))"
     by dnattr=aeOwner write
-    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
-    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" read
-    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
-    by dn.exact="cn=root,{{ aedir_suffix }}" write
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ slapd_aedir_suffix }}" read
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ slapd_aedir_suffix }}" read
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ slapd_aedir_suffix }}" read
+    by dn.exact="cn=root,{{ slapd_aedir_suffix }}" write
     by * none
 
 # block all other access
 access
-  to dn.subtree="{{ aedir_session_suffix }}"
+  to dn.subtree="{{ slapd_aedir_session_suffix }}"
     by * none
 
 #---------------------------------------------------------------------------
-# overlays used within {{ aedir_session_suffix }}
+# overlays used within {{ slapd_aedir_session_suffix }}
 #---------------------------------------------------------------------------
 
 # for counting search results without retrieving them
@@ -133,14 +133,14 @@ overlay noopsrch
 overlay deref
 
 overlay unique
-unique_uri "ldap:///{{ aedir_session_suffix }}?aeOwner?sub?(objectClass=*)"
+unique_uri "ldap:///{{ slapd_aedir_session_suffix }}?aeOwner?sub?(objectClass=*)"
 
 overlay constraint
 
 # session owners must reference active users or services/hosts
 constraint_attribute
   aeOwner
-  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(|(objectClass=aeUser)(objectClass=aeHost)(objectClass=aeService))(aeStatus=0))"
+  uri "ldap:///{{ slapd_aedir_suffix }}?entryDN?sub?(&(|(objectClass=aeUser)(objectClass=aeHost)(objectClass=aeService))(aeStatus=0))"
 
 # session usage time must be within validity period
 constraint_attribute
@@ -152,41 +152,41 @@ constraint_attribute
   regex "^ae-dir-{{ openldap_server_id }}-[0-9]+\.[0-9]+$"
 
 #---------------------------------------------------------------------------
-# replication of {{ aedir_session_suffix }}
+# replication of {{ slapd_aedir_session_suffix }}
 #---------------------------------------------------------------------------
 
 # syncrepl-Overlay
 overlay syncprov
-syncprov-checkpoint {{ openldap_db_params.session.syncprov_checkpoint }}
-{% if openldap_db_params.session.syncprov_checkpoint %}
-syncprov-checkpoint {{ openldap_db_params.session.syncprov_checkpoint }}
+syncprov-checkpoint {{ slapd_openldap_db_params.session.syncprov_checkpoint }}
+{% if slapd_openldap_db_params.session.syncprov_checkpoint %}
+syncprov-checkpoint {{ slapd_openldap_db_params.session.syncprov_checkpoint }}
 {% endif %}
 syncprov-nopresent FALSE
 syncprov-reloadhint FALSE
 
-{% if openldap_syncrepl_providers %}
-{% for provider_replica in openldap_syncrepl_providers if provider_replica!=inventory_hostname %}
+{% if slapd_openldap_syncrepl_providers %}
+{% for provider_replica in slapd_openldap_syncrepl_providers if provider_replica!=inventory_hostname %}
 syncrepl rid=1{{ loop.index }}
-  provider=ldaps://{{ hostvars[provider_replica].get('openldap_service_fqdn',provider_replica) }}
+  provider=ldaps://{{ hostvars[provider_replica].get('slapd_openldap_service_fqdn',provider_replica) }}
   type=refreshAndPersist
-  network-timeout={{ openldap_syncrepl_network_timeout }}
-  timeout={{ openldap_syncrepl_timeout }}
+  network-timeout={{ slapd_openldap_syncrepl_network_timeout }}
+  timeout={{ slapd_openldap_syncrepl_timeout }}
   sizelimit=unlimited
   timelimit=unlimited
   interval=00:00:01:00
   retry="30 +"
   keepalive=240:10:30
-  searchbase="{{ aedir_session_suffix }}"
+  searchbase="{{ slapd_aedir_session_suffix }}"
   filter="(objectClass=*)"
   scope=sub
   schemachecking=on
   bindmethod=sasl
   saslmech=EXTERNAL
-  tls_cacert={{ openldap_cacert_pathname }}
-  tls_cert={{ openldap_cert_pathname }}
-  tls_key={{ openldap_key_pathname }}
-  tls_protocol_min={{ openldap_syncrepl_tls_protocol_min }}
-  tls_cipher_suite={{ openldap_syncrepl_tls_cipher_suite }}
+  tls_cacert={{ slapd_openldap_cacert_pathname }}
+  tls_cert={{ slapd_openldap_cert_pathname }}
+  tls_key={{ slapd_openldap_key_pathname }}
+  tls_protocol_min={{ slapd_openldap_syncrepl_tls_protocol_min }}
+  tls_cipher_suite={{ slapd_openldap_syncrepl_tls_cipher_suite }}
 
 {% endfor %}
 mirrormode true

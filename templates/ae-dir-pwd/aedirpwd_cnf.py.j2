@@ -4,7 +4,7 @@ Configuration module for aepwd_web and aepwd_cron
 """
 
 # LDAP-URL describing the connection parameters and bind information
-PWD_LDAP_URL = r'{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub??trace=0,x-saslmech=EXTERNAL'
+PWD_LDAP_URL = r'{{ aedirpwd_openldap_ldapi_uri }}/{{ aedirpwd_aedir_suffix }}??sub??trace=0,x-saslmech=EXTERNAL'
 
 # Filter string templates for the various use-cases
 # String-keyed dictionary with input field names used
@@ -22,7 +22,7 @@ FILTERSTR_USER = '(&(objectClass=aeUser)(aeStatus=0)(displayName=*)(mail=*))'
 PWD_RESET_ENABLED = 'TRUE'
 
 # Name of directory containing all the template files
-TEMPLATES_DIRNAME = '{{ aedir_etc }}/ae-dir-pwd/templates/en/'
+TEMPLATES_DIRNAME = '{{ aedirpwd_aedir_etc }}/ae-dir-pwd/templates/en/'
 
 # Name of layout template (without the file suffix .html)
 LAYOUT = 'layout'
@@ -44,7 +44,7 @@ PWD_ADMIN_LEN = 8
 # Where to send admin notification if PWD_ADMIN_LEN is non-zero
 # and responsible zone admins cannot be determined
 PWD_ADMIN_MAILTO = [
-  '{{ smtp_admin_address }}',
+  '{{ aedirpwd_smtp_admin_address }}',
 ]
 
 # Number of seconds a temporary password is valid
@@ -66,10 +66,10 @@ EMAIL_SUBJECT_ADMIN = 'Password reset for "{username}" needs help'
 EMAIL_TEMPLATE_ADMIN = TEMPLATES_DIRNAME+'requestpw_admin.txt'
 
 # SMTP server used as smart host (SMTP relay)
-SMTP_URL = '{{ smtp_relay_url }}'
+SMTP_URL = '{{ aedirpwd_smtp_relay_url }}'
 
 # Specifies whether a AE-DIR instance should send e-mail notifications to users or not
-USER_MAIL_ENABLED = {{ aedir_user_mail_enabled }}
+USER_MAIL_ENABLED = {{ aedirpwd_aedir_user_mail_enabled }}
 
 # Debug level for SMTP messages sent to stderr
 SMTP_DEBUGLEVEL = 0
@@ -79,17 +79,17 @@ SMTP_DEBUGLEVEL = 0
 SMTP_LOCALHOSTNAME = '{{ inventory_hostname }}'
 
 # Path name of file containing CA certificates used to validate TLS server certs
-SMTP_TLS_CACERTS = '{{ smtp_cacert_pathname }}'
+SMTP_TLS_CACERTS = '{{ aedirpwd_smtp_cacert_pathname }}'
 
 # From address in sent e-mail
-SMTP_FROM = '{{ smtp_from_address }}'
+SMTP_FROM = '{{ aedirpwd_smtp_from_address }}'
 
 # URL path prefix used when generating URLs in e-mails
 # handy for reverse proxy setups
 APP_PATH_PREFIX = '/pwd'
 
 # hostname to use in URLs generated in notification e-mails
-WEB_CTX_HOST = '{{ aedir_provider_lb_hostname }}'
+WEB_CTX_HOST = '{{ aedirpwd_aedir_provider_lb_hostname }}'
 
 # Filter string templates
 FILTERSTR_EXPIRE = (
@@ -116,7 +116,7 @@ NOTIFY_OLDEST_TIMESPAN = 86400.0
 # E-Mail subject for notification message
 NOTIFY_EMAIL_SUBJECT = 'New Æ-DIR account "{user_uid}" added/activated for {user_cn}'
 # E-Mail body template file for notification message
-NOTIFY_EMAIL_TEMPLATE = '{{ aedir_etc }}/ae-dir-pwd/templates/en/notify_user.txt'
+NOTIFY_EMAIL_TEMPLATE = '{{ aedirpwd_aedir_etc }}/ae-dir-pwd/templates/en/notify_user.txt'
 
 # modifications to be applied to user entry after successfully sending e-mail
 NOTIFY_SUCCESSFUL_MOD = [

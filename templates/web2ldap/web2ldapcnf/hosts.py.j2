@@ -27,15 +27,15 @@ from web2ldap.app.cnf import Web2LDAPConfig
 
 ldap_uri_list = [
     (
-        '{{ openldap_ldapi_uri }}',
+        '{{ w2ldap_openldap_ldapi_uri }}',
         'Local access (LDAPI)',
     ),
 {% for role in ['provider', 'consumer'] %}
-{% for host in aedir_hosts[role]|sort %}
-{% set replica = hostvars[host].get('openldap_service_fqdn',host) -%}
+{% for host in w2ldap_aedir_hosts[role]|sort %}
+{% set replica = hostvars[host].get('w2ldap_openldap_service_fqdn',host) -%}
 {% set server_id = hostvars[host].get('openldap_server_id','') -%}
     (
-        'ldaps://{{ replica }}/{{ aedir_suffix }}????bindname=',
+        'ldaps://{{ replica }}/{{ w2ldap_aedir_suffix }}????bindname=',
         (
             '{{ replica }}'
 {% if server_id!="" %}
@@ -717,7 +717,7 @@ GLOBAL_DEFAULTS = Web2LDAPConfig(
         ldap0.OPT_X_TLS_REQUIRE_CERT: ldap0.OPT_X_TLS_DEMAND,
         # Directory containing all the trusted root CA certs (symbolic hash links required!)
         # File containing all the trusted root CA certs
-        ldap0.OPT_X_TLS_CACERTFILE: '{{ openldap_cacert_pathname }}',
+        ldap0.OPT_X_TLS_CACERTFILE: '{{ w2ldap_openldap_cacert_pathname }}',
         ldap0.OPT_X_TLS_CIPHER_SUITE: 'HIGH',
         ldap0.OPT_X_TLS_PROTOCOL_MIN: 3,
         #ldap0.OPT_X_TLS_CRLCHECK: ldap0.OPT_X_TLS_CRL_PEER,
@@ -1044,9 +1044,9 @@ ldap_def = {
     'ldap:///cn=config': CN_CONFIG,
 
     # Æ-DIR's main DB
-    'ldap:///{{ aedir_suffix }}': AE_DIR_CONFIG,
+    'ldap:///{{ w2ldap_aedir_suffix }}': AE_DIR_CONFIG,
 
     # Æ-DIR's accesslog
-    'ldap:///{{ aedir_accesslog_suffix }}': OPENLDAP_ACCESSLOG_CONFIG,
+    'ldap:///{{ w2ldap_aedir_accesslog_suffix }}': OPENLDAP_ACCESSLOG_CONFIG,
 
 }

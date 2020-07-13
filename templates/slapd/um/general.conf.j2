@@ -1,0 +1,31 @@
+#######################################################################
+# Database for {{ slapd_aedir_suffix }}
+#######################################################################
+
+database mdb
+
+suffix "{{ slapd_aedir_suffix }}"
+directory {{ slapd_openldap_data }}/um
+
+require strong
+
+# Always set rootdn since needed by internally writing overlays
+rootdn "cn=root,{{ slapd_aedir_suffix }}"
+# rootpw not needed in production!
+#rootpw donotenable!!!
+access to
+  dn.base="cn=root,{{ slapd_aedir_suffix }}"
+    by * none
+
+lastmod on
+
+# database parameters
+maxsize {{ slapd_openldap_db_params.um.mdb_maxsize }}
+
+{% if slapd_openldap_db_params.um.checkpoint %}
+# Better write performance but less crash resistance, see slapd-mdb(5) for details
+dbnosync
+checkpoint {{ slapd_openldap_db_params.um.checkpoint }}
+envflags writemap mapasync
+{% endif %}
+

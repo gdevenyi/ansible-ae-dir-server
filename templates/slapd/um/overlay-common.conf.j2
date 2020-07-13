@@ -1,0 +1,46 @@
+{% if slapd_aedir_accesslog_suffix %}
+# Where to log LDAP write operations (for auditing)
+overlay accesslog
+logdb "{{ slapd_aedir_accesslog_suffix }}"
+logops writes
+logold "(objectClass=*)"
+logoldattr entryUUID objectClass cn uid
+logpurge {{ slapd_openldap_log_purge }}
+{% endif %}
+
+# for back-links to group entries in member entries
+overlay memberof
+memberof-group-oc groupOfEntries
+memberof-member-ad member
+memberof-memberof-ad memberOf
+memberof-dangling ignore
+memberof-refint true
+
+{% if slapd_oath_ldap_enabled==True %}
+# pass bind requests to external listener process receiving the requests
+# on Unix Domain socket path {{ slapd_oath_ldap_socket_path }}
+# (after password policy check in slapo-ppolicy)
+overlay sock
+extensions binddn peername ssf connid
+socketpath {{ slapd_oath_ldap_socket_path }}
+{% if slapd_openldap_role=='provider' %}
+sockops bind compare
+{% else %}
+sockops bind
+{% endif %}
+{% if slapd_oath_ldap_dn_regex %}
+sockdnpat "{{ slapd_oath_ldap_dn_regex }}"
+{% endif %}
+{% endif %}
+
+# password policy overlay
+# (after bind-DN rewriting with slapo-rwm)
+overlay ppolicy
+# the default password policy is deliberatly unusable
+ppolicy_default cn=ppolicy-default,cn=ae,{{ slapd_aedir_suffix }}
+ppolicy_hash_cleartext
+ppolicy_use_lockout
+
+# Record last bind in user entry
+overlay lastbind
+

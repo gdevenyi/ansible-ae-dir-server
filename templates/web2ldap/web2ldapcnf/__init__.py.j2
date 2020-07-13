@@ -75,14 +75,14 @@ log_error_details = True
 #---------------------------------------------------------------------------
 
 # Maximum number of concurrent web sessions stored
-session_limit = {{ web2ldap_session_limit }}
+session_limit = {{ w2ldap_web2ldap_session_limit }}
 
 # Maximum number of concurrent web sessions per remote IP
-session_per_ip_limit = {{ web2ldap_session_per_ip_limit }}
+session_per_ip_limit = {{ w2ldap_web2ldap_session_per_ip_limit }}
 
 # Amount of time in seconds after which inactive sessions will be expired
 # and the session data is removed silently without the possibility to relogin.
-session_remove = {{ web2ldap_session_remove }}
+session_remove = {{ w2ldap_web2ldap_session_remove }}
 
 # List of environment variables assumed to be constant throughout
 # web sessions with the same ID if existent.
@@ -183,7 +183,7 @@ cookie_max_age = 86400
 
 # Cookie domain to send with Set-Cookie (DNS name)
 # None lets web2ldap send the hostname
-#cookie_domain = '{{ apache_service_fqdn }}'
+#cookie_domain = '{{ w2ldap_apache_service_fqdn }}'
 cookie_domain = None
 
 # If non-zero this is the time-span in seconds after which a
@@ -208,12 +208,12 @@ access_allowed = {
         '::0',
     ],
     'monitor': [
-{% for allowed in web2ldap_monitor_access_allowed %}
+{% for allowed in w2ldap_web2ldap_monitor_access_allowed %}
         '{{ allowed }}',
 {% endfor %}
     ],
     'metrics': [
-{% for allowed in web2ldap_monitor_access_allowed %}
+{% for allowed in w2ldap_web2ldap_monitor_access_allowed %}
         '{{ allowed }}',
 {% endfor %}
     ],

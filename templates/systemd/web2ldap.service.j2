@@ -13,39 +13,39 @@ After=local-fs.target network.target
 
 [Service]
 Type=simple
-{% if aedir_malloc_ld_preload %}
-Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
+{% if systemd_aedir_malloc_ld_preload %}
+Environment=LD_PRELOAD={{ systemd_aedir_malloc_ld_preload }}
 {% endif %}
 Environment=LDAPNOINIT=1
 # some env vars set for Python interpreter
-{% for evar in aedir_python_env %}
+{% for evar in systemd_aedir_python_env %}
 Environment={{ evar.name }}={{ evar.value }}
 {% endfor %}
-Environment=LOG_CONFIG={{ aedir_etc }}/ae-logging.conf
+Environment=LOG_CONFIG={{ systemd_aedir_etc }}/ae-logging.conf
 Environment=LOG_QUALNAME=web2ldap
-ExecStart={{ uwsgi_paths.exec }} --strict --ini {{ aedir_etc }}/uwsgi/web2ldap.ini
-User={{ web2ldap_user }}
-Group={{ web2ldap_group }}
+ExecStart={{ uwsgi_paths.exec }} --strict --ini {{ systemd_aedir_etc }}/uwsgi/web2ldap.ini
+User={{ systemd_web2ldap_user }}
+Group={{ systemd_web2ldap_group }}
 KillSignal=SIGQUIT
-LimitNOFILE={{ web2ldap_session_limit * 4 }}
+LimitNOFILE={{ systemd_web2ldap_session_limit * 4 }}
 Restart=always
 CapabilityBoundingSet=
 AmbientCapabilities=
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
-{% if aedir_systemd_logging %}
-# various logging options from ansible var aedir_systemd_logging
-{% for systemd_option in aedir_systemd_logging %}
+{% if systemd_aedir_systemd_logging %}
+# various logging options from ansible var systemd_aedir_systemd_logging
+{% for systemd_option in systemd_aedir_systemd_logging %}
 {{ systemd_option }}
 {% endfor %}
 {% endif %}
-{% if aedir_systemd_hardening %}
-# various hardening options from ansible var aedir_systemd_hardening
-{% for systemd_option in aedir_systemd_hardening %}
+{% if systemd_aedir_systemd_hardening %}
+# various hardening options from ansible var systemd_aedir_systemd_hardening
+{% for systemd_option in systemd_aedir_systemd_hardening %}
 {{ systemd_option }}
 {% endfor %}
 {% endif %}
 SystemCallFilter={{ systemd_systemcallfilter.web2ldap }}
-{% if apparmor_enabled %}
+{% if systemd_apparmor_enabled %}
 AppArmorProfile=web2ldap
 {% endif %}
 

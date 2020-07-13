@@ -1,0 +1,39 @@
+
+# some rewriting is needed to accommodate unusual LDAP clients
+overlay rwm
+rwm-rewriteEngine on
+rwm-drop-unrequested-attrs no
+
+# Bind-DN rewriting with internal searches (before external bind listener)
+# uid=foo,{{ slapd_aedir_suffix }} -> entryDN of entry within {{ slapd_aedir_suffix }} matching (uid=foo)
+rwm-rewriteMap slapd uid2dn "ldap:///{{ slapd_aedir_suffix }}?entryDN?sub?"
+rwm-rewriteContext bindDN
+rwm-rewriteRule "^(uid=[^,]+),{{ slapd_aedir_suffix }}$" "${uid2dn($1)}" ":@I"
+
+# host=foo,{{ slapd_aedir_suffix }} -> entryDN of entry within {{ slapd_aedir_suffix }} matching (host=foo)
+rwm-rewriteMap slapd host2dn "ldap:///{{ slapd_aedir_suffix }}?entryDN?sub?"
+rwm-rewriteContext bindDN
+rwm-rewriteRule "^(host=[^,]+),{{ slapd_aedir_suffix }}$" "${host2dn($1)}" ":@I"
+
+{% if slapd_oath_ldap_enabled==True and slapd_openldap_role=="provider" %}
+# serialNumber=foo,{{ slapd_aedir_suffix }} -> entryDN of entry within {{ slapd_aedir_suffix }} matching (serialNumber=foo)
+rwm-rewriteMap slapd serial2dn "ldap:///{{ slapd_aedir_suffix }}?entryDN?sub?"
+rwm-rewriteContext bindDN
+rwm-rewriteRule "^(serialNumber=[^,]+),{{ slapd_aedir_suffix }}$" "${serial2dn($1)}" ":@I"
+{% endif %}
+
+{% if slapd_aedir_fake_search_roots %}
+# some stupid LDAP clients insist on searching user or group entries in
+# separate container trees beneath the separately configured search root
+# => always map to {{ slapd_aedir_suffix }}
+rwm-rewriteContext searchDN
+{% for fake_dn in slapd_aedir_fake_search_roots %}
+rwm-rewriteRule "^{{ fake_dn }},{{ slapd_aedir_suffix }}$" "{{ slapd_aedir_suffix }}" ":@I"
+{% endfor %}
+{% endif %}
+
+# rewrite a group search filter for the short bind-DN form
+# (member=uid=foobar,{{ slapd_aedir_suffix }}) to (memberUid=foobar)
+rwm-rewriteContext searchFilter
+rwm-rewriteRule "member=uid=([^,]+),{{ slapd_aedir_suffix }}" "memberUid=$1" ":@I"
+

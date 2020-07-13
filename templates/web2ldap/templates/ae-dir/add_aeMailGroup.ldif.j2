@@ -6,8 +6,8 @@ objectClass: nisMailAlias
 objectClass: aeMailGroup
 objectClass: mailboxRelatedObject
 aeStatus: 0
-{% if 'aeMailGroup' in ae_expiry_status_defaults %}
-aeExpiryStatus: {{ ae_expiry_status_defaults.aeMailGroup }}
+{% if 'aeMailGroup' in w2ldap_ae_expiry_status_defaults %}
+aeExpiryStatus: {{ w2ldap_ae_expiry_status_defaults.aeMailGroup }}
 {% endif %}
 aeNotBefore: now
 

@@ -1,39 +1,39 @@
 #######################################################################
-# Audit database {{ aedir_accesslog_suffix }}
+# Audit database {{ slapd_aedir_accesslog_suffix }}
 #######################################################################
 
 database mdb
 
-suffix "{{ aedir_accesslog_suffix }}"
-directory {{ openldap_data }}/accesslog
+suffix "{{ slapd_aedir_accesslog_suffix }}"
+directory {{ slapd_openldap_data }}/accesslog
 
 require strong
 
 # Always set rootdn since needed by internally writing overlays
-rootdn "cn=root,{{ aedir_accesslog_suffix }}"
+rootdn "cn=root,{{ slapd_aedir_accesslog_suffix }}"
 # rootpw not needed in production!
 #rootpw donotenable!!!
 access to
-  dn.base="cn=root,{{ aedir_accesslog_suffix }}"
+  dn.base="cn=root,{{ slapd_aedir_accesslog_suffix }}"
     by * none
 
 lastmod on
 
 # database parameters
-maxsize {{ openldap_db_params.accesslog.mdb_maxsize }}
+maxsize {{ slapd_openldap_db_params.accesslog.mdb_maxsize }}
 
-{% if openldap_db_params.accesslog.checkpoint %}
+{% if slapd_openldap_db_params.accesslog.checkpoint %}
 # Better write performance but less crash resistance, see slapd-mdb(5) for details
 dbnosync
-checkpoint {{ openldap_db_params.accesslog.checkpoint }}
+checkpoint {{ slapd_openldap_db_params.accesslog.checkpoint }}
 envflags writemap mapasync
 {% endif %}
 
 # Maximum number of entries to return from a search operation
-sizelimit {{ openldap_db_params.accesslog.sizelimit }}
+sizelimit {{ slapd_openldap_db_params.accesslog.sizelimit }}
 
 # Maximum number of time [secs] slapd will spend answering a search request
-timelimit {{ openldap_db_params.accesslog.timelimit }}
+timelimit {{ slapd_openldap_db_params.accesslog.timelimit }}
 
 # Indexing configuration
 index reqStart eq
@@ -45,27 +45,27 @@ index reqEntryUUID eq
 index objectClass eq
 
 #---------------------------------------------------------------------------
-# Access rights {{ aedir_accesslog_suffix }}
+# Access rights {{ slapd_aedir_accesslog_suffix }}
 #---------------------------------------------------------------------------
 
 access
-  to dn.base="{{ aedir_accesslog_suffix }}"
-    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" read
-    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
-    by dn.exact="cn=root,{{ aedir_suffix }}" read
-    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}" read
+  to dn.base="{{ slapd_aedir_accesslog_suffix }}"
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ slapd_aedir_suffix }}" read
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ slapd_aedir_suffix }}" read
+    by dn.exact="cn=root,{{ slapd_aedir_suffix }}" read
+    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,{{ slapd_aedir_suffix }}" read
     by * none
 
 access
-  to dn.onelevel="{{ aedir_accesslog_suffix }}"
-    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" read
-    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
-    by dn.exact="cn=root,{{ aedir_suffix }}" read
+  to dn.onelevel="{{ slapd_aedir_accesslog_suffix }}"
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ slapd_aedir_suffix }}" read
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ slapd_aedir_suffix }}" read
+    by dn.exact="cn=root,{{ slapd_aedir_suffix }}" read
     by dnattr=reqAuthzID read
     by * none
 
 #---------------------------------------------------------------------------
-# overlays used within {{ aedir_accesslog_suffix }}
+# overlays used within {{ slapd_aedir_accesslog_suffix }}
 #---------------------------------------------------------------------------
 
 # for counting search results without retrieving them
