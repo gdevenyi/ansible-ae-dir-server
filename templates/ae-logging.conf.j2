@@ -8,13 +8,13 @@
 #--------------------------------------------------------------------------------
 
 [loggers]
-keys=root, aedir_process, aedir_pwd_web, oathldap_srv, web2ldap
+keys=root, aedir_tool, aedir_process, aedir_pwd_web, oathldap_srv, web2ldap
 
 [handlers]
-keys=syslog
+keys=console,syslog
 
 [formatters]
-keys=syslog
+keys=console,syslog
 
 [logger_root]
 handlers=syslog
@@ -61,4 +61,22 @@ args=('/dev/log',)
 [formatter_syslog]
 class=logging.Formatter
 format=%(name)s[%(process)d] %(levelname)s - %(message)s
+datefmt=
+
+# logger for all commands implemented by ae-dir-tool
+[logger_aedir_tool]
+handlers=console,syslog
+level=INFO
+propagate=0
+facility=local7
+qualname=aedir_tool
+
+[handler_console]
+class=logging.StreamHandler
+formatter=console
+args=(sys.stderr,)
+
+[formatter_console]
+class=logging.Formatter
+format=%(asctime)s - %(name)s[%(process)d] %(levelname)s - %(message)s
 datefmt=
