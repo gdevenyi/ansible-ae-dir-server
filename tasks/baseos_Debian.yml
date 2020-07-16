@@ -36,3 +36,4 @@
       - ldap-utils
     state: absent
     purge: yes
+    autoremove: yes

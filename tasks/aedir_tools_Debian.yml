@@ -62,6 +62,7 @@
       - libpython3-dev
       - libffi-dev
     state: absent
+    purge: yes
     autoremove: yes
     update_cache: no
     dpkg_options: 'force-confold,force-confdef'
