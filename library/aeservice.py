@@ -290,8 +290,8 @@ def main():
 
     if module.params['groups']:
         for group_filter_tmpl, mod_op in (
-            ('(&(objectClass=aeGroup)(|{0})(!(member={1})))', ldap0.MOD_ADD),
-            ('(&(objectClass=aeGroup)(!(|{0}))(member={1}))', ldap0.MOD_DELETE),
+            ('(&(objectClass=aeGroup)(!(memberURL=*))(|{0})(!(member={1})))', ldap0.MOD_ADD),
+            ('(&(objectClass=aeGroup)(!(memberURL=*))(!(|{0}))(member={1}))', ldap0.MOD_DELETE),
         ):
             group_filter = group_filter_tmpl.format(
                 ''.join(map_filter_parts(
