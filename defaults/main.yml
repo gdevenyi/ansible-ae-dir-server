@@ -358,6 +358,10 @@ aedir_base_zone: base
 aedir_unique_person_zones:
   - "{{ aedir_base_zone }}"
 
+# Filename of Jinja2 template for generating a LDIF file for initially
+# loading data into the empty database
+aedir_init_template: "ae-dir-base.ldif.j2"
+
 # use become when doing initial load
 # useful in case the initial installation is done with non-root ansible user
 aedir_init_become: "no"

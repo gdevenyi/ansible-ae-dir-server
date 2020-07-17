@@ -2,9 +2,9 @@
 
 # initial load of main provider
 
-- name: "Create ae-dir-base.ldif"
+- name: "Create {{ aedir_etc }}/ae-dir-base.ldif"
   template:
-    src: "ae-dir-base.ldif.j2"
+    src: "{{ aedir_init_template }}"
     dest: "{{ aedir_etc }}/ae-dir-base.ldif"
     owner: root
     group: root
