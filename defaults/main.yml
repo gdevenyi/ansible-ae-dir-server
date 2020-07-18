@@ -869,7 +869,7 @@ slapd_check_ldaps_uri: "ldaps://{{ slapd_check_service_fqdn }}"
 # very likely you have to adjust this one
 slapd_check_authz_id: "dn:uid=ae-dir-slapd_{{ slapd_check_service_fqdn }},cn=ae,{{ aedir_suffix }}"
 
-# e-mail address of web server admin(s)#---------------------------------------------------------------------------
+#---------------------------------------------------------------------------
 # web2ldap parameters
 #---------------------------------------------------------------------------
 
