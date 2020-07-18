@@ -37,10 +37,10 @@
   cron:
     name: "slapd_metrics"
     state: present
-    user: root
+    user: "{{ slapd_check_cron_args.user }}"
     cron_file: "{{ aedir_cron_file }}"
-    hour: "*"
-    minute: "*/2"
+    hour: "{{ slapd_check_cron_args.hour }}"
+    minute: "{{ slapd_check_cron_args.minute }}"
     job: "{{ aedir_sbin }}/slapd_metrics.sh > {{ aedir_metricsdir }}/{{ openldap_service_name }}.prom.tmp && mv {{ aedir_metricsdir }}/{{ openldap_service_name }}.prom.tmp {{ aedir_metricsdir }}/{{ openldap_service_name }}.prom"
   when: aedir_metricsdir != ""
 

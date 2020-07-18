@@ -869,6 +869,12 @@ slapd_check_ldaps_uri: "ldaps://{{ slapd_check_service_fqdn }}"
 # very likely you have to adjust this one
 slapd_check_authz_id: "dn:uid=ae-dir-slapd_{{ slapd_check_service_fqdn }},cn=ae,{{ aedir_suffix }}"
 
+# Arguments for cron job exporting metrics
+slapd_check_cron_args:
+  user: "root"
+  hour: "*"
+  minute: "*"
+
 #---------------------------------------------------------------------------
 # web2ldap parameters
 #---------------------------------------------------------------------------
