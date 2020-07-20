@@ -1,0 +1,67 @@
+---
+
+- name: "Check whether all C wrapper modules are installed"
+  command: "{{ aedir_python }} -c 'import ldap0, psutil'"
+  ignore_errors: yes
+  when: aedir_pip_install
+  register: ldap0_installed
+
+- name: "Install Python {{ aedir_python_version }} packages on {{ lsb_id }}"
+  apt:
+    name:
+      - "libpython{{ aedir_python_version }}"
+      - "python{{ aedir_python_version }}-venv"
+      - python3-setuptools
+      - python3-pip
+    state: present
+    update_cache: no
+    install_recommends: no
+    dpkg_options: 'force-confold,force-confdef'
+  notify:
+    - restart ae-dir-pwd
+    - restart hotp_validator
+    - restart oathenroll
+    - restart bind_proxy
+    - restart web2ldap
+
+- name: "Install C compiler packages on {{ lsb_id }}"
+  apt:
+    name:
+      - gcc
+      - libssl-dev
+      - libsasl2-dev
+      - libldap-dev
+      - python3-dev
+      - libpython3-dev
+      - libffi-dev
+    state: present
+    update_cache: no
+    install_recommends: no
+    dpkg_options: 'force-confold,force-confdef'
+  when: aedir_pip_needs_compiler==True and ldap0_installed.rc != 0
+
+- name: "Generate /etc/python{{ aedir_python_version }}/sitecustomize.py"
+  copy:
+    content: "# Managed by ansible!\n# Deliberately empty!\n# Do not edit!\n"
+    dest: "/etc/python{{ aedir_python_version }}/sitecustomize.py"
+    owner: root
+    group: root
+    mode: 0o0644
+
+- name: "AE-DIR tools installation in virtualenv {{ aedir_prefix }}"
+  include_tasks: "aedir_tools_venv.yml"
+
+- name: "Uninstall C compiler packages on {{ lsb_id }}"
+  apt:
+    name:
+      - gcc
+      - libssl-dev
+      - libsasl2-dev
+      - libldap-dev
+      - python3-dev
+      - libpython3-dev
+      - libffi-dev
+    state: absent
+    autoremove: yes
+    update_cache: no
+    dpkg_options: 'force-confold,force-confdef'

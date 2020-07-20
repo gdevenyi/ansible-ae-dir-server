@@ -1,0 +1,22 @@
+---
+# install and activate AppArmor on Ubuntu
+
+- name: "Install AppArmor packages on {{ lsb_id }}"
+  apt:
+    name:
+      - libapparmor1
+      - libapparmor-perl
+      - apparmor
+    state: present
+    update_cache: no
+    install_recommends: no
+    dpkg_options: 'force-confold,force-confdef'
+  notify:
+    - restart apparmor
+    - restart ae-dir-pwd
+    - restart hotp_validator
+    - restart oathenroll
+    - restart bind_proxy
+    - restart web2ldap
+    - "restart {{ openldap_service_name }}"
+    - "restart ae-apache"
