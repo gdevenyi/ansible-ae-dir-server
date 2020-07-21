@@ -624,7 +624,7 @@ local_openldap_csr_dir: "{{ inventory_dir }}/files/pki-csr-files"
 openldap_tls_protocol_min: "3.3"
 
 # value for slapd.conf directive TLSCipherSuite
-openldap_tls_cipher_suite: "HIGH:!aNULL:!kDH:!kECDH:!MD5"
+openldap_tls_cipher_suite: "EECDH+aRSA+AESGCM:EECDH+aRSA+SHA256:EECDH:+AES256:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!DSS:!RC4:!SEED:!IDEA:!ECDSA:!kRSA"
 
 # value for parameter tls_protocol_min of slapd.conf directive 'syncrepl'
 # 3.<x> means TLSv1.<x-1>
@@ -975,7 +975,7 @@ apache_pwd_requires: "{{ apache_htdocs_requires }}"
 # See Apache docs: https://httpd.apache.org/docs/2.4/mod/mod_ssl.html#sslprotocol
 apache_ssl_protocol: "ALL -SSLv2 -SSLv3 -TLSv1 -TLSv1.1"
 # See Apache docs: https://httpd.apache.org/docs/2.4/mod/mod_ssl.html#sslciphersuite
-apache_ssl_cipher_suite: "HIGH:!aNULL:!kDH:!kECDH:!MD5"
+apache_ssl_cipher_suite: "EECDH+aRSA+AESGCM:EECDH+aRSA+SHA256:EECDH:+AES256:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!DSS:!RC4:!SEED:!IDEA:!ECDSA:!kRSA"
 
 # Path name of CA cert bundle file
 apache_cacert_filename: "{{ openldap_cacert_filename }}"
