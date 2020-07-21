@@ -11,7 +11,7 @@
 - name: "Install base OS packages"
   yum:
     name:
-      - "{{ openssl_exec|basename }}"
+      - openssl11
       - "{{ cron_pkg_name }}"
       - tar
       - gzip
