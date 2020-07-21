@@ -167,12 +167,21 @@ authz-regexp
 {% for cert_suffix in openldap_tls_cert_suffixes %}
 # Rewrite any cert with subject-DN suffix "{{ cert_suffix }}" by searching it in attribute seeAlso
 authz-regexp
+{% if cert_suffix %}
   "(cn=[^,]+,{{ cert_suffix }})"
   "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=pkiUser)(seeAlso=$1)(seeAlso:dnSubordinateMatch:={{ cert_suffix }})(aeStatus=0))"
+{% else %}
+  "(cn=[^,]+)"
+  "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=pkiUser)(seeAlso=$1)(aeStatus=0))"
+{% endif %}
 
 # Rewrite server cert with subject-DN suffix "{{ cert_suffix }}" by searching CN attribute value in server entry name attributes
 authz-regexp
+{% if cert_suffix %}
   "cn=([a-zA-Z0-9.-]+),{{ cert_suffix }}"
+{% else %}
+  "cn=([a-zA-Z0-9.-]+)"
+{% endif %}
   "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=aeHost)(|(cn=$1)(host=$1))(aeStatus=0))"
 
 {% endfor %}
