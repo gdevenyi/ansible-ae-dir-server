@@ -1,5 +1,5 @@
 ---
-# install OpenLDAP packages
+# install OpenLDAP packages on Debian
 
 - name: "Add AE-DIR repository key"
   apt_key:

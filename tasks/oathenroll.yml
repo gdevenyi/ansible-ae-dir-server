@@ -1,5 +1,5 @@
 ---
-# Install AE-DIR password service (oathenroll)
+# Install OATH-LDAP enrollment web service (oathenroll)
 
 - name: "Create directories for oathenroll"
   file:

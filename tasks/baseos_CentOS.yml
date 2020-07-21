@@ -1,5 +1,5 @@
 ---
-# tasks file for roles/ae-dir-server
+# basic OS installation/configuration tasks on CentOS
 
 - name: "Install epel repo"
   yum:

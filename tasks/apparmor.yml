@@ -1,4 +1,5 @@
 ---
+# install and configure AppArmor
 
 - name: "Install AppArmor packages"
   include_tasks: "apparmor_{{ lsb_id }}.yml"

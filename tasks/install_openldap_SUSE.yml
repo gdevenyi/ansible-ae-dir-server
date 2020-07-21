@@ -1,5 +1,5 @@
 ---
-# install OpenLDAP packages
+# install OpenLDAP packages in openSUSE/SLE
 
 - name: "Install OpenLDAP packages and dependencies"
   zypper:

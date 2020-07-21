@@ -1,5 +1,5 @@
 ---
-# install and activate AppArmor on openSUSE and SLE
+# install AppArmor on Debian
 
 - name: "Install AppArmor packages on {{ lsb_id }}"
   apt:

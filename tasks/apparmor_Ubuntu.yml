@@ -1,11 +1,10 @@
 ---
-# install and activate AppArmor on Ubuntu
+# install AppArmor on Ubuntu
 
 - name: "Install AppArmor packages on {{ lsb_id }}"
   apt:
     name:
       - libapparmor1
-      - libapparmor-perl
       - apparmor
     state: present
     update_cache: no
