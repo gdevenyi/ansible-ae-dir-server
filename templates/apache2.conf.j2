@@ -70,7 +70,12 @@ Listen 80
 # for SSL vhost
 Listen 443
 
-# SSL Session Resumption
+# TLS protocol and cipher settings
+SSLProtocol {{ apache_ssl_protocol }}
+SSLCipherSuite {{ apache_ssl_cipher_suite }}
+SSLHonorCipherOrder on
+
+# TLS Session Resumption Cache
 SSLSessionCache        shmcb:{{ apache2_config.run_dir }}/ssl_scache(512000)
 SSLSessionCacheTimeout  7200
 SSLRandomSeed          startup file:/dev/urandom  512
@@ -135,14 +140,6 @@ ProxyPreserveHost On
   SSLCACertificateFile {{ apache_cacert_pathname }}
   SSLCertificateFile {{ apache_cert_pathname }}
   SSLCertificateKeyFile {{ apache_key_pathname }}
-
-  # Optionally ask for client cert
-#  SSLCARevocationFile /etc/ssl/certs/crl-bundle.pem
-#  SSLVerifyClient optional
-#  SSLVerifyDepth 2
-
-  SSLProtocol {{ apache_ssl_protocol }}
-  SSLCipherSuite {{ apache_ssl_cipher_suite }}
 
   # do not use .htaccess files
   AccessFileName .htaccess-this-does-not-exist
