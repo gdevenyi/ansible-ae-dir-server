@@ -98,10 +98,13 @@ aedir_htdocsdir: "{{ aedir_prefix }}/htdocs"
 # Directory for metrics text exports picked up by Prometheus node-exporter.
 # If empty, no text exporter CRON jobs are installed.
 # Setting this to empty string disables dumping metrics to files.
-#aedir_metricsdir: "/var/spool/metrics"
+# Example:
+# aedir_metricsdir: "/var/spool/metrics"
 aedir_metricsdir: ""
 
 # Group ID or name for setting group ownership of metrics directory and files
+# to grant at least read access to directory specified by aedir_metricsdir.
+# This group has to already exist on the system!
 aedir_metrics_owner_group: "root"
 
 # which Python interpreter to use
