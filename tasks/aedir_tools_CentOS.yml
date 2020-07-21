@@ -22,8 +22,8 @@
 - name: "Install base packages on {{ lsb_id }}"
   yum:
     name:
-      - "{{ 'python3-setuptools' if ansible_lsb.major_release == '7' else 'platform-python-setuptools' }}"
-      - "{{ 'python3-pip' if ansible_lsb.major_release == '7' else 'platform-python-pip' }}"
+      - python3-setuptools
+      - python3-pip
     state: present
     update_cache: no
   notify:
