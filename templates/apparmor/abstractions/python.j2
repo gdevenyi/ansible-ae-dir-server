@@ -22,8 +22,8 @@
   /usr/lib{,32,64}/python3.[0-9]/lib-dynload/*.so mr,
 {% endif %}
 
-{% if lsb_id=="Debian" %}
-  # some special rules for Debian's shared Python module directories
+{% if lsb_id=="Debian" or lsb_id=="Ubuntu" %}
+  # some special rules for shared Python module directories for Debian-based operating systems
   # shared python paths and config
   /usr/share/{pyshared,pycentral,python-support}/**      r,
   /{var,usr}/lib/{pyshared,pycentral,python-support}/**  r,

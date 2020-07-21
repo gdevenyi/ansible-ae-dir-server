@@ -1,0 +1,38 @@
+---
+# tasks file for roles/ae-dir-server
+
+- name: "Install base OS packages"
+  apt:
+    name:
+      - acl
+      - apt-transport-https
+      - ca-certificates
+      - "{{ cron_pkg_name }}"
+      - gzip
+      - gpg
+      - gpg-agent
+      - openssl
+      - python3
+      - tar
+    state: present
+    update_cache: yes
+    autoclean: yes
+    cache_valid_time: 3600
+    install_recommends: no
+    dpkg_options: 'force-confold,force-confdef'
+
+- name: "Install alternative malloc package {{ aedir_malloc_package }}"
+  apt:
+    name: "{{ aedir_malloc_package }}"
+    state: present
+    update_cache: no
+    install_recommends: no
+    dpkg_options: 'force-confold,force-confdef'
+  when: aedir_malloc_package!=""
+
+- name: "Remove unwanted Ubuntu packages"
+  apt:
+    name:
+      - ldap-utils
+    state: absent
+    purge: yes

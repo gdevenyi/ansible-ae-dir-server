@@ -1,0 +1,75 @@
+---
+# vars file for roles/ae-dir-server
+
+# explicit use of a specific Python version
+aedir_python_version: "3.8"
+
+aedir_package_repos:
+  "AE-DIR":
+    repo: "deb https://ae-dir.com/repo/debian/ buster main"
+    key: "AE-DIR-project.gpg.key"
+
+# OS-specific Python paths
+aedir_python_paths:
+  python_exec: "{{ aedir_prefix }}/bin/python{{ aedir_python_version.split('.')[0] }}"
+  site_packages: "{{ aedir_prefix }}/lib/python{{ aedir_python_version }}/site-packages"
+
+# use virtualenv tool
+virtualenv_command: "/usr/bin/python{{ aedir_python_version }} -m venv"
+
+# Pathname of OpenSSL command-line tool
+openssl_exec: "/usr/bin/openssl"
+
+# OS-specific maps
+openldap_path:
+  # LTB-based installation
+  prefix: /opt/openldap-ms
+  bin: /opt/openldap-ms/bin
+  sbin: /opt/openldap-ms/sbin
+  conf_prefix: /opt/openldap-ms/etc/openldap
+  data: /opt/openldap-ms/var/openldap-data
+  rundir: /opt/openldap-ms/var/run
+  slapd_exec: /opt/openldap-ms/libexec/slapd
+  libdir: /opt/openldap-ms/lib64
+  modules: /opt/openldap-ms/libexec/openldap
+
+cron_config:
+  service_name: "cron"
+  pkg_name: "cron"
+
+# conf_pathname: where to place the monolithic apache configuration file
+# mod_dir: directory where Apache modules are found
+# modules: which modules to load
+apache2_config:
+  service_name: "apache2"
+  user: "www-data"
+  group: "www-data"
+  pid_file: "${APACHE_PID_FILE}"
+  httpd_exec: "/usr/sbin/apache2"
+  conf_pathname: "/etc/apache2/apache2.conf"
+  mod_dir: "/usr/lib/apache2/modules"
+  run_dir: "/var/run/apache2"
+  modules:
+    - mpm_prefork
+    - socache_shmcb
+    - env
+    - dir
+    - alias
+    - ssl
+    - mime
+    - authz_core
+    - authz_host
+    - headers
+    - deflate
+    - filter
+    - proxy
+    - proxy_uwsgi
+
+web2ldap_paths:
+  configdir: "{{ aedir_prefix }}/etc/web2ldap"
+
+# which uwsgi executable to use
+uwsgi_paths:
+  exec: "/usr/bin/uwsgi-core"
+  syslog_plugin: "/usr/lib/uwsgi/plugins/syslog_plugin.so"
+  python_plugin: "/usr/lib/uwsgi/plugins/python38_plugin.so"
