@@ -136,6 +136,7 @@ TLSCertificateFile {{ openldap_cert_pathname }}
 TLSCertificateKeyFile {{ openldap_key_pathname }}
 {% endif %}
 TLSDHParamFile {{ openldap_dhparam_pathname }}
+TLSECName {{ openldap_ec_name }}
 
 #---------------------------------------------------------------------------
 # Rewrite SASL identity to DIT identity

@@ -642,6 +642,9 @@ openldap_key_pathname: "{{ aedir_etc }}/tls/{{ openldap_key_filename|basename }}
 openldap_dhparam_pathname: "{{ aedir_etc }}/tls/slapd.dhparam"
 openldap_dhparam_numbits: 2048
 
+# The name of a curve to use for Elliptic curve Diffie-Hellman ephemeral key exchange
+openldap_ec_name: "secp521r1"
+
 # password hashing scheme
 # see https://tools.ietf.org/html/draft-stroeder-hashed-userpassword-values
 openldap_password_hash: "{CRYPT}"
