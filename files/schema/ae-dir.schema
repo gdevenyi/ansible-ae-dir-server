@@ -329,7 +329,7 @@ objectclass ( ae-dir-oc:1
 objectclass ( ae-dir-oc:27
   NAME 'aeMailGroup'
   X-ORIGIN 'AE-DIR'
-  DESC 'AE-DIR: Nailing list entry'
+  DESC 'AE-DIR: Mailing list entry'
   STRUCTURAL
   SUP ( groupOfEntries $ nisMailAlias $ groupOfURLs $ aeObject )
   MUST ( mail $ description )
