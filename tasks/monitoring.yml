@@ -32,7 +32,7 @@
     group: root
     mode: 0o0755
 
-- name: "Install metrics wrapper script {{ slapd_metrics_local }}/slapd_metrics.sh"
+- name: "Install metrics wrapper script {{ aedir_sbin }}/slapd_metrics.sh"
   template:
     src: "slapd_metrics.sh.j2"
     dest: "{{ aedir_sbin }}/slapd_metrics.sh"
