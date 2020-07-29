@@ -1,6 +1,6 @@
 # define constants for general some regex prefixes
 const SLAPD_CONN /^.* {{ openldap_service_name }}\[\d+\]: conn=(?P<conn>\d+) /
-const SLAPD_OP // + SLAPD_CONN + /op=(?P<op>\d+)( | \[(|IP=[^ ]+)[ ]*(|NAME=[^ ]+)[ ]*(|USERNAME=[^ ]+)\])/
+const SLAPD_OP // + SLAPD_CONN + /op=(?P<op>\d+)( | \[(|IP=[^ ]+)[ ]*(|NAME=[^ ]+)[ ]*(|USERNAME=[^ ]+)\] )/
 const SLAPD_FD // + SLAPD_CONN + /fd=(?P<fd>\d+) /
 
 # count RESULT lines with type (tag=) and LDAP result code (err=)
@@ -12,6 +12,17 @@ const SLAPD_RESULT // + SLAPD_OP + /.*RESULT tag=(?P<tag>\d+) (oid=(?P<oid>\d+) 
 
 // + SLAPD_RESULT {
     slapd_result_count[$tag, $err]++
+}
+
+# count request lines
+#---------------------------------------------------------------------------
+
+counter slapd_req_count by rtype
+
+const SLAPD_REQUEST // + SLAPD_OP + /(?P<rtype>(BIND|UNBIND|ADD|MOD|DEL|EXT|WHOAMI|PASSMOD|SRCH)) .*$/
+
+// + SLAPD_REQUEST {
+    slapd_req_count[$rtype]++
 }
 
 # count ACCEPT lines with source and destination address
