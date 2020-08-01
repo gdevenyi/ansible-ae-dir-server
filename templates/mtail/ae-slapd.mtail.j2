@@ -18,18 +18,25 @@ const SLAPD_RESULT // + SLAPD_OP + /.*RESULT tag=(?P<tag>\d+) (oid=(?P<oid>\d+) 
 #---------------------------------------------------------------------------
 
 counter slapd_req_count by rtype
+counter slapd_bind_method_count by method
 
 # SRCH requests cause two log lines, only count the first
 // + SLAPD_OP + /(?P<rtype>(SRCH)) base.*$/ {
     slapd_req_count[$rtype]++
 }
 
+# BIND requests cause multiple log lines, only count the first
+// + SLAPD_OP + /(?P<rtype>(BIND)) dn=.* method=(?P<method>\d+)$/ {
+    slapd_req_count[$rtype]++
+    slapd_bind_method_count[$method]++
+}
+
 # MOD requests cause two log lines, only count the first
-// + SLAPD_OP + /(?P<rtype>(MOD)) dn.*$/ {
+// + SLAPD_OP + /(?P<rtype>(MOD)) dn=.*$/ {
     slapd_req_count[$rtype]++
 }
 
-// + SLAPD_OP + /(?P<rtype>(BIND|UNBIND|ADD|MODRDN|DEL|EXT|WHOAMI|PASSMOD)) .*$/ {
+// + SLAPD_OP + /(?P<rtype>(UNBIND|ADD|MODRDN|DEL|EXT|WHOAMI|PASSMOD))(| .*)$/ {
     slapd_req_count[$rtype]++
 }
 
@@ -57,10 +64,10 @@ const SLAPD_ACCEPT_PATH // + SLAPD_ACCEPT_FROM + /PATH=(?P<src>[^ ]+) \(PATH=(?P
 # count "deferring" messages
 #---------------------------------------------------------------------------
 
-counter slapd_deferring_operation by defer_type
+counter slapd_deferred_ops_count by defer_type
 
 const SLAPD_DEFERRING /^.* {{ openldap_service_name }}\[\d+\]: connection_input: conn=(?P<conn>\d+) deferring operation: (?P<defer_type>.+)$/
 
 // + SLAPD_DEFERRING {
-    slapd_deferring_operation[$defer_type]++
+    slapd_deferred_ops_count[$defer_type]++
 }
