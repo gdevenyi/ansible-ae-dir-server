@@ -3,8 +3,9 @@
 # Pathname of Unix domain socket where slapd-sock sends requests to
 socket_path = {{ oath_ldap_socket_path }}
 
-# LDAPI URI for connecting to local slapd
-ldapi_uri = {{ openldap_ldapi_uri }}
+# LDAP URI specifying the parameters for searching user entries for
+# which BIND requests have to be forwarded to OATH-LDAP providers
+proxy_user_search = {{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub?(&(objectClass=aeUser)(aeStatus=0)(oathToken=*))
 
 # logging level (key-word known in logging module)
 log_level = INFO
