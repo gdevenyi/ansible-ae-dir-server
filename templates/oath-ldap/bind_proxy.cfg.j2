@@ -23,6 +23,11 @@ allowed_uids = 0 ae-dir-slapd
 # (set to negative number to disable caching)
 cache_ttl = -1.0
 
+# Time in seconds for which an unavailable OATH-LDAP provider will
+# not be tried for subsequent BIND requests
+# (Default: 120.0)
+ldap_unreachable_ttl = 120.0
+
 # CA certificate file to use for connecting to OATH-LDAP providers
 cacert_file = {{ openldap_cacert_pathname }}
 
