@@ -11,10 +11,10 @@ proxy_user_search = {{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub?(&(objectCl
 log_level = INFO
 
 # logging configuration file
-logging_conf = {{ aedir_etc }}/ae-logging.conf
+log_config = {{ aedir_etc }}/ae-logging.conf
 
 # logging qualifier name
-logger_name = oathldap_srv.bind_proxy
+log_name = oathldap_srv.bind_proxy
 
 # UIDs which are granted access
 allowed_uids = 0 ae-dir-slapd
