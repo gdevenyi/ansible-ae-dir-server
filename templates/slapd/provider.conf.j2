@@ -1257,7 +1257,7 @@ constraint_attribute aePerson,sn
 
 # 'sudoUser' only may contain a reference to 'cn' of an active group
 constraint_attribute sudoUser
-  set "([%] + [ldap:///{{ aedir_suffix }}??sub?(&(objectClass=aeGroup)(aeStatus=0)(!(|(cn=ae-admins)(cn=ae-auditors)(cn=ae-provider)(cn=ae-replicas)(cn=ae-login-proxies)(cn=*-zone-admins)(cn=*-zone-auditors))))]/cn) & this/sudoUser"
+  set "([%] + [ldap:///{{ aedir_suffix }}??sub?(&(objectClass=aeGroup)(aeStatus=0)(!(|(cn=ae-admins)(cn=ae-auditors)(cn=ae-providers)(cn=ae-replicas)(cn=ae-login-proxies)(cn=*-zone-admins)(cn=*-zone-auditors))))]/cn) & this/sudoUser"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeSudoRule)"
 
 # 'homeDirectory' must be either
