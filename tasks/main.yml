@@ -13,7 +13,7 @@
 - debug:
     var: "{{ item }}"
     verbosity: 1
-  with_items:
+  loop:
     - lsb_id
     - inventory_dir
     - playbook_dir
@@ -30,7 +30,7 @@
 - debug:
     var: "{{ item }}"
     verbosity: 1
-  with_items:
+  loop:
     - aedir_providers_restrictions
     - aedir_cron_minutes
     - aedir_cron_offset
@@ -44,7 +44,7 @@
     state: stopped
   ignore_errors: yes
   when: aedir_stop is defined
-  with_items:
+  loop:
     - ae-dir-pwd
     - "{{ openldap_service_name }}"
     - ae-apache
@@ -61,7 +61,7 @@
 - debug:
     var: "{{ item }}"
     verbosity: 1
-  with_items:
+  loop:
     - aedir_python
     - aedir_cron_file
   tags:
@@ -77,7 +77,7 @@
 - debug:
     var: "{{ item }}"
     verbosity: 1
-  with_items:
+  loop:
     - aedir_python3
   tags:
     - always
@@ -110,7 +110,7 @@
         path: "{{ item }}"
         state: absent
       ignore_errors: yes
-      with_items:
+      loop:
         - "{{ aedir_bin }}"
         - "{{ aedir_prefix }}/include"
         - "{{ aedir_prefix }}/lib"
@@ -125,7 +125,7 @@
         owner: root
         group: root
         mode: u=rwx,g=rx,o=rx
-      with_items:
+      loop:
         - "{{ aedir_etc }}"
         - "{{ aedir_etc }}/uwsgi"
         - "{{ aedir_bin }}"

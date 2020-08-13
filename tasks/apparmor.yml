@@ -7,14 +7,14 @@
 
 - name: "Create AppArmor directories"
   file:
-    path: "{{ item }}"
+    path: "{{ apparmor_profiles_dir }}/{{ item }}"
     state: directory
     owner: root
     group: root
     mode: 0o0755
-  with_items:
-    - "{{ apparmor_profiles_dir }}/ae-dir"
-    - "{{ apparmor_profiles_dir }}/ae-dir/abstractions"
+  loop:
+    - "ae-dir"
+    - "ae-dir/abstractions"
   notify:
     - restart apparmor
 
@@ -25,7 +25,7 @@
     owner: root
     group: root
     mode: 0o0644
-  with_items:
+  loop:
     - base
     - ldapclient
     - nameservice

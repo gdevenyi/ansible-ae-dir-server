@@ -3,14 +3,14 @@
 
 - name: "Create directories for oathenroll"
   file:
-    path: "{{ item }}"
+    path: "{{ oath_ldap_cfg_dir }}/{{ item }}"
     state: directory
     owner: root
     group: root
     mode: u=rwx,g=rx,o=rx
-  with_items:
-    - "{{ oath_ldap_cfg_dir }}/oathenroll"
-    - "{{ oath_ldap_cfg_dir }}/oathenroll/templates"
+  loop:
+    - "oathenroll"
+    - "oathenroll/templates"
 
 - name: "copy oathenroll HTML templates to {{ oath_ldap_cfg_dir }}/oathenroll/templates"
   copy:

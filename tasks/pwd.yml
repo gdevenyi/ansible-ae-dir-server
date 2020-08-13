@@ -8,7 +8,7 @@
     owner: root
     group: root
     mode: u=rwx,g=rx,o=rx
-  with_items:
+  loop:
     - "{{ aedir_etc }}/ae-dir-pwd"
     - "{{ aedir_etc }}/ae-dir-pwd/templates"
     - "{{ aedir_etc }}/ae-dir-pwd/templates/en"

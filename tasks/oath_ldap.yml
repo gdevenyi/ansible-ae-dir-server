@@ -53,8 +53,6 @@
     owner: root
     group: "{{ oath_listener_user }}"
     mode: 0o0640
-  with_items:
-    - "{{ oath_bind_listener }}"
   notify:
     - "restart {{ oath_bind_listener }}"
 
@@ -99,7 +97,7 @@
   when: openldap_role=="provider"
   notify:
     - "restart {{ oath_bind_listener }}"
-  with_items: "{{ master_keys.files|map(attribute='path')|list }}"
+  loop: "{{ master_keys.files|map(attribute='path')|list }}"
 
 - name: "Create socket directory {{ oath_ldap_socket_dir }}"
   file:

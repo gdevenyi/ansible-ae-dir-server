@@ -47,7 +47,7 @@
     owner: root
     group: root
     mode: 0o0755
-  with_items:
+  loop:
     - "{{ openldap_slapd_conf|dirname }}"
     - "{{ aedir_schema_prefix }}"
     - "{{ aedir_rundir }}"
@@ -84,7 +84,7 @@
     owner: "{{ openldap_slapd_user }}"
     group: "{{ openldap_slapd_group }}"
     mode: 0o0750
-  with_items:
+  loop:
     - accesslog
     - um
   notify:
@@ -107,7 +107,7 @@
     owner: "{{ openldap_slapd_user }}"
     group: "{{ openldap_slapd_group }}"
     recurse: yes
-  with_items:
+  loop:
     - accesslog
     - um
   notify:
@@ -134,7 +134,7 @@
     owner: root
     group: "{{ openldap_slapd_group }}"
     mode: 0o0644
-  with_items: "{{ openldap_schema_files }}"
+  loop: "{{ openldap_schema_files }}"
   notify:
     - "restart {{ openldap_service_name }}"
 

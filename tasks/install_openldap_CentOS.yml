@@ -37,15 +37,15 @@
 
 - name: "Fix ownership in LTB sub-directories"
   file:
-    path: "{{ item }}"
+    path: "/usr/local/openldap/{{ item }}"
     owner: root
     group: root
     recurse: yes
-  with_items:
-    - /usr/local/openldap/bin
-    - /usr/local/openldap/etc
-    - /usr/local/openldap/include
-    - /usr/local/openldap/lib64
-    - /usr/local/openldap/libexec
-    - /usr/local/openldap/sbin
-    - /usr/local/openldap/share
+  loop:
+    - bin
+    - etc
+    - include
+    - lib64
+    - libexec
+    - sbin
+    - share

@@ -24,7 +24,7 @@
     state: present
     user: root
     cron_file: "{{ aedir_cron_file }}"
-  with_items: "{{ aedir_python_env }}"
+  loop: "{{ aedir_python_env }}"
 
 - name: "Remove metrics text export CRON job"
   cron:
