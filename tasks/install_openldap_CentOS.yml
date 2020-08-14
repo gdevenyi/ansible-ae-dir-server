@@ -28,24 +28,3 @@
     update_cache: yes
   notify:
     - "restart {{ openldap_service_name }}"
-
-- name: "Fix ownership of LTB directory"
-  file:
-    path: /usr/local/openldap
-    owner: root
-    group: root
-
-- name: "Fix ownership in LTB sub-directories"
-  file:
-    path: "/usr/local/openldap/{{ item }}"
-    owner: root
-    group: root
-    recurse: yes
-  loop:
-    - bin
-    - etc
-    - include
-    - lib64
-    - libexec
-    - sbin
-    - share
