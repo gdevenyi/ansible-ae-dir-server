@@ -10,6 +10,8 @@
     virtualenv_site_packages: no
     virtualenv_command: "{{ virtualenv_command }}"
     extra_args: "{{ aedir_pip_extra_args }}"
+  vars:
+    ansible_python_interpreter: "/usr/bin/python3"
 
 - name: "Additional PIP packages in virtualenv {{ aedir_prefix }}"
   pip:
@@ -29,6 +31,8 @@
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
+  vars:
+    ansible_python_interpreter: "/usr/bin/python3"
   notify:
     - restart ae-dir-pwd
     - restart hotp_validator
@@ -42,6 +46,8 @@
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
+  vars:
+    ansible_python_interpreter: "/usr/bin/python3"
   notify:
     - restart hotp_validator
     - restart bind_proxy
@@ -59,6 +65,8 @@
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
+  vars:
+    ansible_python_interpreter: "/usr/bin/python3"
   when: openldap_role == 'provider'
   notify:
     - restart ae-dir-pwd
@@ -73,6 +81,8 @@
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
+  vars:
+    ansible_python_interpreter: "/usr/bin/python3"
   when: openldap_role == 'provider'
 
 - name: "PIP install aedir_pproc in virtualenv on provider"
@@ -82,6 +92,8 @@
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
+  vars:
+    ansible_python_interpreter: "/usr/bin/python3"
   when: openldap_role == 'provider'
   notify:
     - restart ae-dir-pwd
