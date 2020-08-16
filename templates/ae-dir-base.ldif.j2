@@ -809,7 +809,6 @@ sudoUser: %ae-sys-admins
 #---------------------------------------------------------------------------
 #
 {% for role in ['provider', 'consumer'] %}
-{% set srvgrp_dn = "cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir_suffix }}" -%}
 dn: cn=ae-dir-{{ role }}-hosts,cn=ae,{{ aedir_suffix }}
 changetype: add
 aeStatus: 0
