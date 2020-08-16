@@ -358,7 +358,7 @@ objectclass ( ae-dir-oc:2
   MUST ( uid $ aePerson $ givenName $ displayName )
   MAY ( aeRemoteHost ) )
 
-# Server groups
+# Service/server groups
 #-----------------------------------------------------------------------
 
 attributetype ( ae-dir-at:4
@@ -391,13 +391,13 @@ attributetype ( ae-dir-at:15
 attributetype ( ae-dir-at:25
   NAME 'aeProxyFor'
   X-ORIGIN 'AE-DIR'
-  DESC 'AE-DIR: DN of server groups this server group is proxy for'
+  DESC 'AE-DIR: DN of service groups this service group is proxy for'
   SUP aeObjectReference )
 
 attributetype ( ae-dir-at:26
   NAME 'aeSSHProxyCommand'
   X-ORIGIN 'AE-DIR'
-  DESC 'AE-DIR: SSH proxy command to be used to connect to server within this server group'
+  DESC 'AE-DIR: SSH proxy command to be used to connect to server within this service group'
   EQUALITY caseIgnoreMatch
   SUBSTR caseIgnoreSubstringsMatch
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{32768} )
@@ -405,7 +405,7 @@ attributetype ( ae-dir-at:26
 attributetype ( ae-dir-at:20
   NAME 'aeVisibleGroups'
   X-ORIGIN 'AE-DIR'
-  DESC 'AE-DIR: DN(s) of group entries usable with a certain server group, server, or service'
+  DESC 'AE-DIR: DN(s) of group entries usable with a certain service group, server, or service'
   SUP aeGroupReference )
 
 attributetype ( ae-dir-at:30
@@ -417,19 +417,19 @@ attributetype ( ae-dir-at:30
 attributetype ( ae-dir-at:21
   NAME 'aeVisibleSudoers'
   X-ORIGIN 'AE-DIR'
-  DESC 'AE-DIR: DN(s) of sudoer entries usable with a certain server group or server'
+  DESC 'AE-DIR: DN(s) of sudoer entries usable on servers with a certain service group or a server'
   SUP aeObjectReference )
 
 attributetype ( ae-dir-at:48
   NAME 'aeRequires'
   X-ORIGIN 'AE-DIR'
-  DESC 'AE-DIR: DN of server groups this server group depends on'
+  DESC 'AE-DIR: DN of service groups this service group depends on'
   SUP aeObjectReference )
 
 objectclass ( ae-dir-oc:13
   NAME 'aeSrvGroup'
   X-ORIGIN 'AE-DIR'
-  DESC 'AE-DIR: Server type/group'
+  DESC 'AE-DIR: Service type/group'
   STRUCTURAL
   SUP ( namedObject $ aeObject )
   MUST ( cn $ description )
@@ -463,7 +463,7 @@ attributetype ( ae-dir-at:28
 attributetype ( ae-dir-at:27
   NAME 'aeSrvGroup'
   X-ORIGIN 'AE-DIR'
-  DESC 'AE-DIR: DN of server group this server also is member of'
+  DESC 'AE-DIR: DN of service group this server also is member of'
   SUP aeObjectReference )
 
 # Unique inventory number
