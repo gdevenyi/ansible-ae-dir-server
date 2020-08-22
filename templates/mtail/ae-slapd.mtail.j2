@@ -71,3 +71,26 @@ const SLAPD_DEFERRING /^.* {{ openldap_service_name }}\[\d+\]: connection_input:
 // + SLAPD_DEFERRING {
     slapd_deferred_ops_count[$defer_type]++
 }
+
+# count different "closed" messages
+#---------------------------------------------------------------------------
+
+counter slapd_closed_count by close_type
+
+const SLAPD_CLOSED // + SLAPD_FD + /closed/
+
+// + SLAPD_CLOSED {
+    slapd_closed_count["normal"]++
+}
+
+// + SLAPD_CLOSED + / \(slapd shutdown\)$/ {
+    slapd_closed_count["shutdown"]++
+}
+
+// + SLAPD_CLOSED + / \(idletimeout\)$/ {
+    slapd_closed_count["idle"]++
+}
+
+// + SLAPD_CLOSED + / \(connection lost\)$/ {
+    slapd_closed_count["lost"]++
+}
