@@ -70,7 +70,7 @@
 - name: "Store Python interpreter used for ansible modules as host fact"
   set_fact:
     cacheable: yes
-    aedir_python3: "{{ aedir_python }}"
+    aedir_python3: "{{ aedir_python.split(' ', 1)[0] }}"
   tags:
     - always
 
