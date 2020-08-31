@@ -30,7 +30,7 @@
       - gcc
       - libssl-dev
       - libsasl2-dev
-      - libldap-dev
+      - libldap2-dev
       - python3-dev
       - libpython3-dev
       - libffi-dev
@@ -57,7 +57,7 @@
       - gcc
       - libssl-dev
       - libsasl2-dev
-      - libldap-dev
+      - libldap2-dev
       - python3-dev
       - libpython3-dev
       - libffi-dev
