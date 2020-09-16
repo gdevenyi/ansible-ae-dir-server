@@ -826,6 +826,20 @@ oath_ldap_socket_path: "{{ oath_ldap_socket_dir }}/socket"
 oath_ldap_oathenroll_web_user: ae-dir-otpenroll
 oath_ldap_oathenroll_web_group: ae-dir-otpenroll
 
+# Values for bind_proxy.cfg
+#--------------------------
+# 1. peer addresses always excluded from proxying to OTP validator
+oath_ldap_noproxy_peer_addrs:
+  - "{{ openldap_ldapi_socket }}"
+  - "127.0.0.1"
+
+# 2. peer addresses proxied to OTP validator (after checking noproxy_peer_addrs)
+oath_ldap_proxy_peer_addrs: []
+
+# 3. peer address nets proxied to OTP validator (final check)
+oath_ldap_proxy_peer_nets:
+  - "0.0.0.0/0"
+
 #---------------------------------------------------------------------------
 # SMTP parameters
 #---------------------------------------------------------------------------

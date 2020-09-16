@@ -37,10 +37,14 @@ providers =
   ldaps://{{ hostvars[host].get('openldap_service_fqdn',host) }}
 {% endfor %}
 
-# Space- or line separated list network addresses of clients for which bind
+# Space- or line separated list network or host addresses of clients for which bind
 # requests might be proxied to an OATH-LDAP provider
-#proxy_peer_nets = 0.0.0.0/0
-proxy_peer_nets = 10.0.0.0/8
 
-# peer addresses always excluded from proxying to OTP validator
-noproxy_peer_addrs = {{ openldap_ldapi_socket }} 127.0.0.1
+# 1. peer addresses always excluded from proxying to OTP validator
+noproxy_peer_addrs = {{ oath_ldap_noproxy_peer_addrs|join(' ') }}
+
+# 2. peer addresses proxied to OTP validator (after checking noproxy_peer_addrs)
+proxy_peer_addrs = {{ oath_ldap_proxy_peer_addrs|join(' ') }}
+
+# 3. peer address nets proxied to OTP validator (final check)
+proxy_peer_nets = {{ oath_ldap_proxy_peer_nets|join(' ') }}
