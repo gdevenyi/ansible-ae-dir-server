@@ -22,7 +22,9 @@ Environment=PYTHONPATH={{ aedir_etc }}/ae-dir-pwd
 {% for evar in aedir_python_env %}
 Environment={{ evar.name }}={{ evar.value }}
 {% endfor %}
-ExecStart={{ uwsgi_paths.exec }} --strict --ini {{ aedir_etc }}/uwsgi/ae-dir-pwd.ini
+ExecStartPre=rm -f {{ aedir_rundir }}/gunicorn/ae-dir-pwd/ae-dir-pwd.sock
+ExecStart={{ aedir_gunicorn }} --workers=4 aedir_pproc.pwd.web:application
+WorkingDirectory={{ aedir_rundir }}/gunicorn/ae-dir-pwd
 User=ae-dir-pwd
 Group=ae-dir-pwd
 KillSignal=SIGQUIT
@@ -42,7 +44,7 @@ RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 {{ systemd_option }}
 {% endfor %}
 {% endif %}
-SystemCallFilter={{ systemd_systemcallfilter.default }}
+SystemCallFilter={{ systemd_systemcallfilter.gunicorn }}
 {% if apparmor_enabled %}
 AppArmorProfile=ae-dir-pwd
 {% endif %}

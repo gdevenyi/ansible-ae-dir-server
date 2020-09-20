@@ -1,4 +1,4 @@
-# AppArmor profile for UWSGI service {{ name }}
+# AppArmor profile for WSGI application {{ name }}
 # installed in virtual env {{ aedir_prefix }}
 # {{ ansible_managed }}
 
@@ -6,17 +6,14 @@
 
 profile {{ name }} {
 
-  #include <ae-dir/abstractions/uwsgi-python>
-
-  # access to uwsgi executable
-  {{ uwsgi_paths.exec }} rix,
+  #include <ae-dir/abstractions/gunicorn>
 
   # access to {{ name }} application config
   {{ cfgdir }}/ r,
   {{ cfgdir }}/** r,
 
 {% if name=="web2ldap" %}
-  # access to CA cert for LDAPS
+  # read access to CA cert for LDAPS
   {{ openldap_cacert_pathname }} r,
 {% endif %}
 
@@ -28,11 +25,10 @@ profile {{ name }} {
   signal peer=@{profile_name},
 {% endif %}
 
-  # access to uwsgi config
-  {{ aedir_etc }}/uwsgi/{{ name }}.ini r,
-
+  {{ aedir_rundir }}/gunicorn/{{ name }}/ rw,
+  # allow r/w access to own heart-beat temporary file
+  owner {{ aedir_rundir }}/gunicorn/{{ name }}/wgunicorn-[0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_] rw,
   # allow r/w access to own Unix domain socket
-  {{ aedir_rundir }}/uwsgi/{{ name }}/ rw,
-  {{ aedir_rundir }}/uwsgi/{{ name }}/{{ name }}.sock rw,
+  owner {{ aedir_rundir }}/gunicorn/{{ name }}/{{ name }}.sock rw,
 
 }

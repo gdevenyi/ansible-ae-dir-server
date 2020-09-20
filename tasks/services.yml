@@ -2,28 +2,6 @@
 
 # disable unwanted services
 
-- name: "Disable and stop uwsgi"
-  service:
-    name: uwsgi
-    state: stopped
-    enabled: no
-  ignore_errors: yes
-  when: aedir_service_manager != "systemd"
-
-- block:
-  - name: "Disable and stop uwsgi.service"
-    systemd:
-      name: uwsgi
-      state: stopped
-      enabled: no
-    ignore_errors: yes
-  - name: "Mask systemd unit for uwsgi.service"
-    systemd:
-      name: uwsgi
-      masked: yes
-    ignore_errors: yes
-  when: aedir_service_manager == "systemd"
-
 # enable running services
 
 - block:

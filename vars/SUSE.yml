@@ -68,13 +68,7 @@ apache2_config:
     - filter
     - logio
     - proxy
-    - proxy_uwsgi
+    - proxy_http
 
 web2ldap_paths:
   configdir: "/etc/web2ldap"
-
-# which uwsgi executable to use
-uwsgi_paths:
-  exec: "/usr/sbin/uwsgi"
-  syslog_plugin: "/usr/lib64/uwsgi/syslog_plugin.so"
-  python_plugin: "/usr/lib64/uwsgi/python3_plugin.so"

@@ -28,6 +28,7 @@
       - prometheus_client>=0.7.1
       - python-dateutil
       - defusedxml
+      - gunicorn
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"

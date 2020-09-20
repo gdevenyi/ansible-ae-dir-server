@@ -11,14 +11,3 @@
     type: package
   notify:
     - "restart ae-apache"
-
-- name: "Install UWSGI packages {{ lsb_id }}"
-  zypper:
-    name:
-      - uwsgi
-      - uwsgi-python3
-    state: present
-    disable_recommends: yes
-    type: package
-  notify:
-    - "restart ae-apache"

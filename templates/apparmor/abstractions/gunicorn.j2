@@ -1,0 +1,24 @@
+# AppArmor abstraction for all Python web apps started via gunicorn
+# {{ ansible_managed }}
+
+  #include <ae-dir/abstractions/python>
+
+  # we need MIME types
+  /etc/mime.types r,
+
+  /{usr/,}bin/uname ix,
+  /bin/dash ix,
+
+  # read access to Python interpreter
+  /usr/bin/python{{ aedir_python_version }} r,
+
+  # read-write access to /tmp
+  /tmp/ r,
+  owner /tmp/#[0-9][0-9][0-9][0-9][0-9][0-9] mwr,
+
+  # read access to own mount points
+  @{PROC}/@{pid}/mounts r,
+  # read access to own file descriptors
+  @{PROC}/@{pid}/fd/ r,
+  # read access to number of max. possible connections
+  @{PROC}/sys/net/core/somaxconn r,

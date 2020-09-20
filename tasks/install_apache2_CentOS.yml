@@ -6,20 +6,7 @@
     name:
       - httpd
       - mod_ssl
-      - mod_proxy_uwsgi
     state: present
     update_cache: no
   notify:
     - "restart ae-apache"
-
-- name: "Install UWSGI packages on {{ lsb_id }}"
-  yum:
-    name:
-      - uwsgi
-      - "uwsgi-plugin-python{{ aedir_python_version|replace('.', '') }}"
-    state: present
-    update_cache: no
-  notify:
-    - "restart ae-dir-pwd"
-    - "restart oathenroll"
-    - "restart web2ldap"

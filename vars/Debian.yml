@@ -63,13 +63,7 @@ apache2_config:
     - deflate
     - filter
     - proxy
-    - proxy_uwsgi
+    - proxy_http
 
 web2ldap_paths:
   configdir: "{{ aedir_prefix }}/etc/web2ldap"
-
-# which uwsgi executable to use
-uwsgi_paths:
-  exec: "/usr/bin/uwsgi-core"
-  syslog_plugin: "/usr/lib/uwsgi/plugins/syslog_plugin.so"
-  python_plugin: "/usr/lib/uwsgi/plugins/python37_plugin.so"
