@@ -38,32 +38,13 @@
   notify:
     - "restart oathenroll"
 
-- name: "Create UWSGI socket directory for oathenroll"
+- name: "Create socket directory for oathenroll"
   file:
-    path: "{{ aedir_rundir }}/uwsgi/oathenroll"
+    path: "{{ aedir_rundir }}/gunicorn/oathenroll"
     state: directory
     owner: ae-dir-otpenroll
     group: ae-dir-httpd
     mode: u=rwx,g=rx,o=
-  notify:
-    - "restart oathenroll"
-
-- name: "Create uwsgi.ini for oathenroll"
-  template:
-    src: "uwsgi.ini.j2"
-    dest: "{{ aedir_etc }}/uwsgi/{{ name }}.ini"
-    owner: root
-    group: root
-    mode: 0o0644
-  vars:
-    name: oathenroll
-    user: ae-dir-pwd
-    module: "oathldap_srv.web.oathenroll:application"
-    master: "true"
-    processes: "{{ aedir_uwsgi_params.oathenroll.processes }}"
-    stats_port: 9093
-    buffer_size: "{{ aedir_uwsgi_params.oathenroll.buffer_size }}"
-    harakiri: "{{ aedir_uwsgi_params.oathenroll.harakiri }}"
   notify:
     - "restart oathenroll"
 
@@ -80,7 +61,7 @@
 
 - name: "Create AppArmor profile for oathenroll"
   template:
-    src: "apparmor/uwsgi-python.j2"
+    src: "apparmor/gunicorn-app.j2"
     dest: "{{ apparmor_profiles_dir }}/oathenroll"
     owner: root
     group: root

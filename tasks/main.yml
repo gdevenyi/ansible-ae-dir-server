@@ -127,11 +127,11 @@
         mode: u=rwx,g=rx,o=rx
       loop:
         - "{{ aedir_etc }}"
-        - "{{ aedir_etc }}/uwsgi"
+        - "{{ aedir_etc }}/gunicorn"
         - "{{ aedir_bin }}"
         - "{{ aedir_sbin }}"
         - "{{ aedir_rundir }}"
-        - "{{ aedir_rundir }}/uwsgi"
+        - "{{ aedir_rundir }}/gunicorn"
   tags:
     - aedir_tools
 

@@ -107,32 +107,13 @@
   with_fileglob:
     "../templates/web2ldap/templates/ae-dir/*.*.j2"
 
-- name: "Create UWSGI socket directory {{ aedir_rundir }}/uwsgi/web2ldap"
+- name: "Create socket directory {{ aedir_rundir }}/gunicorn/web2ldap"
   file:
-    path: "{{ aedir_rundir }}/uwsgi/web2ldap"
+    path: "{{ aedir_rundir }}/gunicorn/web2ldap"
     state: directory
     owner: ae-dir-web2ldap
     group: ae-dir-httpd
     mode: u=rwx,g=rx,o=
-  notify:
-    - "restart web2ldap"
-
-- name: "Create {{ aedir_etc }}/uwsgi/{{ name }}.ini"
-  template:
-    src: "uwsgi.ini.j2"
-    dest: "{{ aedir_etc }}/uwsgi/{{ name }}.ini"
-    owner: root
-    group: root
-    mode: 0o0644
-  vars:
-    name: web2ldap
-    user: ae-dir-web2ldap
-    module: "web2ldap.wsgi:application"
-    master: "false"
-    threads: "{{ aedir_uwsgi_params.web2ldap.threads }}"
-    stats_port: 9091
-    buffer_size: "{{ aedir_uwsgi_params.web2ldap.buffer_size }}"
-    harakiri: "{{ aedir_uwsgi_params.web2ldap.harakiri }}"
   notify:
     - "restart web2ldap"
 
@@ -149,7 +130,7 @@
 
 - name: "Create AppArmor profile for web2ldap"
   template:
-    src: "apparmor/uwsgi-python.j2"
+    src: "apparmor/gunicorn-app.j2"
     dest: "{{ apparmor_profiles_dir }}/web2ldap"
     owner: root
     group: root

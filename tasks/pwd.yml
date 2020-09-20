@@ -37,32 +37,13 @@
   notify:
     - "restart ae-dir-pwd"
 
-- name: "Create directory {{ aedir_rundir }}/uwsgi/ae-dir-pwd"
+- name: "Create directory {{ aedir_rundir }}/gunicorn/ae-dir-pwd"
   file:
-    path: "{{ aedir_rundir }}/uwsgi/ae-dir-pwd"
+    path: "{{ aedir_rundir }}/gunicorn/ae-dir-pwd"
     state: directory
     owner: ae-dir-pwd
     group: ae-dir-httpd
     mode: u=rwx,g=rx,o=
-  notify:
-    - "restart ae-dir-pwd"
-
-- name: "Create UWSGI config {{ aedir_etc }}/uwsgi/{{ name }}.ini"
-  template:
-    src: "uwsgi.ini.j2"
-    dest: "{{ aedir_etc }}/uwsgi/{{ name }}.ini"
-    owner: root
-    group: root
-    mode: 0o0644
-  vars:
-    name: ae-dir-pwd
-    user: ae-dir-pwd
-    module: "aedir_pproc.pwd.web:application"
-    master: "true"
-    processes: "{{ aedir_uwsgi_params.pwd.processes }}"
-    stats_port: 9092
-    buffer_size: "{{ aedir_uwsgi_params.pwd.buffer_size }}"
-    harakiri: "{{ aedir_uwsgi_params.pwd.harakiri }}"
   notify:
     - "restart ae-dir-pwd"
 
@@ -79,7 +60,7 @@
 
 - name: "Create AppArmor profile for ae-dir-pwd"
   template:
-    src: "apparmor/uwsgi-python.j2"
+    src: "apparmor/gunicorn-app.j2"
     dest: "{{ apparmor_profiles_dir }}/ae-dir-pwd"
     owner: root
     group: root

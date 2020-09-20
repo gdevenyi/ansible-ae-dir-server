@@ -169,11 +169,11 @@ ProxyPreserveHost On
   Header always set Strict-Transport-Security "max-age=15552000; includeSubDomains; preload"
 
   #---------------------------------------------------------------------
-  # web2ldap (via mod_proxy_uwsgi)
+  # web2ldap
   #---------------------------------------------------------------------
 
   <Location /web2ldap>
-    ProxyPass unix:{{ aedir_rundir }}/uwsgi/web2ldap/web2ldap.sock|uwsgi://web2ldap/
+    ProxyPass unix:{{ aedir_rundir }}/gunicorn/web2ldap/web2ldap.sock|http://127.0.0.1:8080/web2ldap
     # Tell mod_ssl to set the SSL standard env vars
     SSLOptions +StdEnvVars
     <Limit GET POST>
@@ -194,12 +194,12 @@ ProxyPreserveHost On
   </Location>
 
   #----------------------------------------------------------------------
-  # Æ-DIR password self-service web application (via mod_proxy_uwsgi)
+  # Æ-DIR password self-service web application
   #----------------------------------------------------------------------
 
   RedirectPermanent /pwd /pwd/
   <Location /pwd/>
-    ProxyPass unix:{{ aedir_rundir }}/uwsgi/ae-dir-pwd/ae-dir-pwd.sock|uwsgi://ae-dir-pwd/pwd/
+    ProxyPass unix:{{ aedir_rundir }}/gunicorn/ae-dir-pwd/ae-dir-pwd.sock|http://127.0.0.1:8081/
     <Limit GET POST>
 {% for require in apache_pwd_requires %}
       Require {{ require }}
@@ -209,12 +209,12 @@ ProxyPreserveHost On
 
 {% if oath_ldap_enabled==True %}
   #----------------------------------------------------------------------
-  # OATH-LDAP enrollment web application (via mod_proxy_uwsgi)
+  # OATH-LDAP enrollment web application
   #----------------------------------------------------------------------
 
   RedirectPermanent /oath /oath/
   <Location /oath/>
-    ProxyPass unix:{{ aedir_rundir }}/uwsgi/oathenroll/oathenroll.sock|uwsgi://oath_enroll/oath/
+    ProxyPass unix:{{ aedir_rundir }}/gunicorn/oathenroll/oathenroll.sock|http://127.0.0.1:8082/
     <Limit GET POST>
 {% for require in apache_oath_requires %}
       Require {{ require }}

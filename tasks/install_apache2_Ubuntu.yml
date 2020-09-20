@@ -5,24 +5,9 @@
   apt:
     name:
       - apache2
-      - libapache2-mod-proxy-uwsgi
     state: present
     update_cache: no
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
   notify:
     - "restart ae-apache"
-
-- name: "Install UWSGI packages on {{ lsb_id }}"
-  apt:
-    name:
-      - uwsgi
-      - uwsgi-plugin-python3
-    state: present
-    update_cache: no
-    install_recommends: no
-    dpkg_options: 'force-confold,force-confdef'
-  notify:
-    - "restart ae-dir-pwd"
-    - "restart oathenroll"
-    - "restart web2ldap"

@@ -110,6 +110,17 @@ aedir_metrics_owner_group: "root"
 # which Python interpreter to use
 aedir_python: "{{ aedir_python_paths.python_exec }} -ROOBs"
 
+# Common arguments for running gunicorn
+aedir_gunicorn_args:
+  - "--log-syslog"
+  - "--log-syslog-prefix=%N"
+  - "--preload"
+  - "--forwarded-allow-ips=*"
+  - "--worker-tmp-dir={{ aedir_rundir }}/gunicorn/%N"
+  - "--bind=unix:{{ aedir_rundir }}/gunicorn/%N/%N.sock"
+# Command for starting gunicorn application potentially in virtual env
+aedir_gunicorn: "{{ aedir_python }} -m gunicorn.app.wsgiapp {{ aedir_gunicorn_args | join(' ') }}"
+
 # which value to set for PYTHONWARNINGS
 aedir_python_warnings: "default"
 
@@ -164,8 +175,8 @@ aedir_systemd_hardening:
   - "RestrictNamespaces=yes"
   - "RestrictSUIDSGID=yes"
   - "DevicePolicy=closed"
-  - "DeviceAllow=/dev/log w"
   - "MemoryDenyWriteExecute=yes"
+#  - "DeviceAllow=/dev/log w"
 #  - "InaccessiblePaths=/run/systemd"
 
 # regex patterns for enforcing naming conventions (substring match!)
@@ -336,7 +347,7 @@ aedir_ldapi_services:
     description: "The system user for running Apache server process (httpd)"
     roles:
       - provider
-  # system user for running web2ldap instance under control of uwsgi
+  # system user for running web2ldap instance
   ae-dir-web2ldap:
     cn: "web2ldap demon user"
     uid_number: "{{ aedir_min_gid-10 }}"
@@ -488,21 +499,6 @@ aedir_malloc_ld_preload: ""
 #     aeGroup: 1
 #     aeService: 1
 ae_expiry_status_defaults: {}
-
-# some uwsgi parameters per service
-aedir_uwsgi_params:
-  web2ldap:
-    buffer_size: 32768
-    harakiri: 45
-    threads: 10
-  oathenroll:
-    buffer_size: 8192
-    harakiri: 10
-    processes: 5
-  pwd:
-    buffer_size: 8192
-    harakiri: 10
-    processes: 5
 
 # All relevant aeSrvGroup entries in set-based who clauses for performance tuning:
 # support supplemental service groups, but no support for proxy service groups
@@ -901,7 +897,7 @@ slapd_check_cron_args:
 #---------------------------------------------------------------------------
 
 # minimum web2ldap version to be installed
-web2ldap_min_version: "1.5.94"
+web2ldap_min_version: "1.5.97"
 
 # directory where the configuration files are located
 web2ldapcnf_prefix: "{{ web2ldap_paths.configdir }}"
@@ -921,6 +917,9 @@ web2ldap_session_limit: 80
 
 # Maximum number of concurrent web sessions per remote IP
 web2ldap_session_per_ip_limit: "{{ web2ldap_session_limit // 5 }}"
+
+# Maximum number of threads
+web2ldap_wsgi_threads: 20
 
 # Amount of time in seconds after which inactive sessions will be expired
 # and the session data is removed silently without the possibility to relogin.

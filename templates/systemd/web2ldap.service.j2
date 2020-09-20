@@ -23,7 +23,9 @@ Environment={{ evar.name }}={{ evar.value }}
 {% endfor %}
 Environment=LOG_CONFIG={{ aedir_etc }}/ae-logging.conf
 Environment=LOG_QUALNAME=web2ldap
-ExecStart={{ uwsgi_paths.exec }} --strict --ini {{ aedir_etc }}/uwsgi/web2ldap.ini
+ExecStartPre=rm -f {{ aedir_rundir }}/gunicorn/web2ldap/web2ldap.sock
+ExecStart={{ aedir_gunicorn }} --threads={{ web2ldap_wsgi_threads }} web2ldap.wsgi:application
+WorkingDirectory={{ aedir_rundir }}/gunicorn/web2ldap
 User={{ web2ldap_user }}
 Group={{ web2ldap_group }}
 KillSignal=SIGQUIT
@@ -44,7 +46,7 @@ RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 {{ systemd_option }}
 {% endfor %}
 {% endif %}
-SystemCallFilter={{ systemd_systemcallfilter.web2ldap }}
+SystemCallFilter={{ systemd_systemcallfilter.gunicorn }}
 {% if apparmor_enabled %}
 AppArmorProfile=web2ldap
 {% endif %}
