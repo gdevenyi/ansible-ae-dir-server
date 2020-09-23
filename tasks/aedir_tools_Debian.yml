@@ -38,7 +38,7 @@
     update_cache: no
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
-  when: aedir_pip_needs_compiler==True and ldap0_installed.rc != 0
+  when: aedir_pip_needs_compiler==True and (aedir_pip_install_compiler is defined or ldap0_installed.rc != 0)
 
 - name: "Generate /etc/python{{ aedir_python_version }}/sitecustomize.py"
   copy:
