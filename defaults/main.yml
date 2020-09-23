@@ -33,7 +33,7 @@ aedir_pip_index_url: "https://pypi.python.org/simple"
 
 aedir_pip_needs_compiler: "{{ aedir_pip_index_url == 'https://pypi.python.org/simple' }}"
 
-# set this variable to enforce install build tools for pip install
+# set this variable to enforce installing build tools for pip install
 #aedir_pip_install_compiler: True
 
 aedir_pip_install_options:
