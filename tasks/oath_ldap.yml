@@ -116,8 +116,6 @@
     state: latest
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
-  vars:
-    ansible_python_interpreter: "/usr/bin/python3"
   when: aedir_pip_install
   notify:
     - "restart {{ oath_bind_listener }}"
@@ -161,8 +159,6 @@
     virtualenv: "{{ aedir_prefix }}"
     virtualenv_command: "{{ virtualenv_command }}"
     extra_args: "{{ aedir_pip_extra_args }}"
-  vars:
-    ansible_python_interpreter: "/usr/bin/python3"
   when: openldap_role == 'provider' and aedir_pip_install
 
 - name: "Create AppArmor abstractions"
