@@ -22,7 +22,6 @@ openssl_exec: "/usr/bin/openssl"
 
 # OS-specific maps
 openldap_path:
-  # LTB-based installation
   prefix: /opt/openldap-ms
   bin: /opt/openldap-ms/bin
   sbin: /opt/openldap-ms/sbin
