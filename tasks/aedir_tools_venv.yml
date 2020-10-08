@@ -30,6 +30,8 @@
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
+  environment:
+    LDFLAGS: "-fuse-ld=bfd"
   notify:
     - restart ae-dir-pwd
     - restart hotp_validator
