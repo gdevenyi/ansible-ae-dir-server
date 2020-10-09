@@ -488,9 +488,9 @@ aedir_htdocs_layout: "layout.html.j2"
 
 # If non-empty this triggers installation and pre-loading of alternative
 # malloc lib in all systemd unit files for all services.
-# Example for using jemalloc on Debian:
-# aedir_malloc_package: "libjemalloc1"
-# aedir_malloc_ld_preload: "/usr/lib/x86_64-linux-gnu/libjemalloc.so.1"
+# Example for using jemalloc on Debian buster:
+# aedir_malloc_package: "libjemalloc2"
+# aedir_malloc_ld_preload: "/usr/lib/x86_64-linux-gnu/libjemalloc.so.2"
 aedir_malloc_package: ""
 aedir_malloc_ld_preload: ""
 
