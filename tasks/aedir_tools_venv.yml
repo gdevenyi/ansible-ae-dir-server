@@ -16,7 +16,7 @@
     name:
       - cffi
       - cryptography
-      - asn1crypto
+      - asn1crypto>=1.4.0
       - jwcrypto
       - pyasn1>=0.4.5
       - pyasn1_modules>=0.2.5
