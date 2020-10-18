@@ -23,7 +23,7 @@ Environment={{ evar.name }}={{ evar.value }}
 {% endfor %}
 Environment=LOG_CONFIG={{ aedir_etc }}/ae-logging.conf
 Environment=LOG_QUALNAME=web2ldap
-ExecStartPre=rm -f {{ aedir_rundir }}/gunicorn/web2ldap/web2ldap.sock
+ExecStartPre={{ rm_exec }} -f {{ aedir_rundir }}/gunicorn/web2ldap/web2ldap.sock
 ExecStart={{ aedir_gunicorn }} --threads={{ web2ldap_wsgi_threads }} web2ldap.wsgi:application
 WorkingDirectory={{ aedir_rundir }}/gunicorn/web2ldap
 User={{ web2ldap_user }}

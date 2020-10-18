@@ -24,7 +24,7 @@ Environment={{ evar.name }}={{ evar.value }}
 {% endfor %}
 Environment=LOG_CONFIG={{ aedir_etc }}/ae-logging.conf
 Environment=LOG_QUALNAME=oathldap_srv.web.oathenroll
-ExecStartPre=rm -f {{ aedir_rundir }}/gunicorn/oathenroll/oathenroll.sock
+ExecStartPre={{ rm_exec }} -f {{ aedir_rundir }}/gunicorn/oathenroll/oathenroll.sock
 ExecStart={{ aedir_gunicorn }} --workers=4 oathldap_srv.web.oathenroll:application
 WorkingDirectory={{ aedir_rundir }}/gunicorn/oathenroll
 User={{ oath_ldap_oathenroll_web_user }}

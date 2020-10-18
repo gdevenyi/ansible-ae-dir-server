@@ -23,6 +23,9 @@ aedir_python_paths:
 # Pathname of OpenSSL command-line tool
 openssl_exec: "/usr/bin/openssl"
 
+# Pathname of rm command-line tool
+rm_exec: "/usr/bin/rm"
+
 # OS-specific maps
 openldap_path:
   # openSUSE packages
