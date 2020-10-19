@@ -14,9 +14,12 @@ openldap_sockbuf_max_incoming_auth_default:
   provider: 4194304
   consumer: 262143
 
+# system-specific limited replacement for @resources
+systemcallfilter_resources: "{{ 'sched_setparam sched_setscheduler sched_setaffinity setpriority setrlimit set_mempolicy migrate_pages move_pages mbind sched_setattr' if ansible_lsb.description=='openSUSE Leap 15.2' else '@resources' }}"
+
 # values for SystemCallFilter= (see systemd.exec(5) for details)
 systemd_systemcallfilter:
-  default: "~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete @chown @privileged @resources @pkey @setuid @timer"
-  apache: "~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete @chown @privileged @resources @pkey @setuid"
-  gunicorn: "~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete @resources @pkey @timer fork"
-  slapdsock: "~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete @chown @privileged @resources @pkey @setuid @timer fork"
+  default: "~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete @chown @privileged {{ systemcallfilter_resources }} @pkey @setuid @timer"
+  apache: "~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete @chown @privileged {{ systemcallfilter_resources }} @pkey @setuid"
+  gunicorn: "~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete {{ systemcallfilter_resources }} @pkey @timer fork"
+  slapdsock: "~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete @chown @privileged {{ systemcallfilter_resources }} @pkey @setuid @timer fork"
