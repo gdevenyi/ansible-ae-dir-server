@@ -1,17 +1,28 @@
 ---
 # install OpenLDAP packages in openSUSE/SLE
 
-- name: "Install OpenLDAP packages and dependencies"
+- name: "Install OpenLDAP dependencies"
   zypper:
     name:
-      - cyrus-sasl
-      - libldap-2_4-2
-      - openldap2
-      - openldap2-back-sock
-      - openldap2-client
-      - openldap2-contrib
+      - "libsasl2-3"
+      - "cyrus-sasl"
     state: latest
     disable_recommends: yes
+    type: package
+  notify:
+    - "restart {{ openldap_service_name }}"
+
+- name: "Install OpenLDAP packages"
+  zypper:
+    name:
+      - "libldap-2_4-2"
+      - "openldap2"
+      - "openldap2-back-sock"
+      - "openldap2-client"
+      - "openldap2-contrib"
+    state: latest
+    disable_recommends: yes
+    extra_args: "--allow-vendor-change"
     type: package
   notify:
     - "restart {{ openldap_service_name }}"

@@ -36,7 +36,7 @@
     - restart hotp_validator
     - restart bind_proxy
 
-- name: "Install additional packages on {{ openldap_role }} on {{ lsb_id }}"
+- name: "Install additional packages on provider"
   zypper:
     name:
       - python3-paramiko
