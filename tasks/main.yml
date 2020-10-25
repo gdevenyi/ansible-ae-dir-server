@@ -274,6 +274,7 @@
       ppolicy: "cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}"
       askotp: "no"
     vars:
+      ansible_ssh_user: "{{ aedir_init_user|default(omit) }}"
       ansible_python_interpreter: "{{ hostvars[aedir_main_provider_hostname].aedir_python3 }}"
     delegate_to: "{{ aedir_main_provider_hostname }}"
     become: "{{ aedir_init_become }}"
@@ -301,6 +302,7 @@
     with_dict:
       "{{ aedir_ldapi_services }}"
     vars:
+      ansible_ssh_user: "{{ aedir_init_user|default(omit) }}"
       ansible_python_interpreter: "{{ hostvars[aedir_main_provider_hostname].aedir_python3 }}"
     run_once: yes
     delegate_to: "{{ aedir_main_provider_hostname }}"
@@ -326,6 +328,7 @@
         - "ae-replicas"
         - "{{ 'ae-providers' if openldap_role == 'provider' else None }}"
     vars:
+      ansible_ssh_user: "{{ aedir_init_user|default(omit) }}"
       ansible_python_interpreter: "{{ hostvars[aedir_main_provider_hostname].aedir_python3 }}"
     delegate_to: "{{ aedir_main_provider_hostname }}"
     become: "{{ aedir_init_become }}"
