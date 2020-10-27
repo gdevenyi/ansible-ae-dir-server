@@ -655,6 +655,8 @@ openldap_password_hash: "{CRYPT}"
 openldap_password_crypt_salt_format: "$6$rounds=20000$%.16s"
 # new password scheme available in OpenLDAP 2.4.50
 #openldap_password_hash: "{ARGON2}"
+# Specifies whether OpenLDAP's slapd-pw-argon2 is available
+openldap_argon2_available: "{{ openldap_password_hash == '{ARGON2}' }}"
 
 # subject alternative names in CSRs
 openldap_csr_subjectdn: "/{{ openldap_tls_cert_suffixes[0].split(',')|reverse|join('/') }}/CN={{ openldap_service_fqdn }}"

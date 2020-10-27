@@ -3,27 +3,26 @@
 
 - name: "Copy GPG key file for LTB OpenLDAP repository"
   copy:
-    src: "{{ aedir_pkg_repos['ltb_project_org'].key }}"
-    dest: "/etc/pki/rpm-gpg/{{ aedir_pkg_repos['ltb_project_org'].key }}"
+    src: "{{ aedir_pkg_repos['sofl'].key }}"
+    dest: "/etc/pki/rpm-gpg/{{ aedir_pkg_repos['sofl'].key }}"
     owner: root
     group: root
     mode: 0o0600
 
-- name: "Add LTB OpenLDAP repository"
+- name: "Add Symas OpenLDAP for Linux repository"
   yum_repository:
-    name: ltp-openldap
-    description: LTB OpenLDAP repository
-    baseurl: "{{ aedir_pkg_repos['ltb_project_org'].repo }}"
-    gpgkey: "file:///etc/pki/rpm-gpg/{{ aedir_pkg_repos['ltb_project_org'].key }}"
+    name: sofl
+    description: "Symas OpenLDAP for Linux RPM repository"
+    baseurl: "{{ aedir_pkg_repos['sofl'].repo }}"
+    gpgkey: "file:///etc/pki/rpm-gpg/{{ aedir_pkg_repos['sofl'].key }}"
     gpgcheck: yes
 
-- name: "Install OpenLDAP packages and dependencies"
+- name: "Install Symas OpenLDAP for Linux packages"
   yum:
     name:
-      - openldap-ltb
-      - openldap-ltb-contrib-overlays
-      - openldap-ltb-mdb-utils
-      - cracklib
+      - symas-openldap
+      - symas-openldap-clients
+      - symas-openldap-servers
     state: latest
     update_cache: yes
   notify:

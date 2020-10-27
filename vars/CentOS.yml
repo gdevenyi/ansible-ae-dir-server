@@ -5,9 +5,9 @@
 aedir_python_version: "3.6"
 
 aedir_package_repos:
-  "ltb_project_org":
-    repo: "https://ltb-project.org/rpm/$releasever/$basearch"
-    key: "RPM-GPG-KEY-LTB-project"
+  "sofl":
+    repo: "https://repo.symas.com/repo/rpm/SOFL/rhel$releasever"
+    key: "RPM-GPG-KEY-symas-com-signing-key"
 
 # OS-specific Python paths
 aedir_python_paths:
@@ -37,14 +37,14 @@ rm_exec: "/usr/bin/rm"
 openldap_path:
   # LTB-based installation
   prefix: /usr/local/openldap
-  bin: /usr/local/openldap/bin
-  sbin: /usr/local/openldap/sbin
-  conf_prefix: /usr/local/openldap/etc/openldap
-  data: /usr/local/openldap/var/openldap-data
-  rundir: /usr/local/openldap/var/run
-  slapd_exec: /usr/local/openldap/libexec/slapd
-  libdir: /usr/local/openldap/lib64
-  modules: /usr/local/openldap/libexec/openldap
+  bin: /usr/bin
+  sbin: /usr/sbin
+  conf_prefix: /etc/openldap
+  data: /var/lib/ldap
+  rundir: /var/run/openldap
+  slapd_exec: /usr/sbin/slapd
+  libdir: /usr/lib64
+  modules: /usr/lib64/openldap
 
 cron_config:
   service_name: "crond"
