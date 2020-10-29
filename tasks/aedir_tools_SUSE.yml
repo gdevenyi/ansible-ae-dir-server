@@ -86,14 +86,3 @@
   notify:
     - restart ae-dir-pwd
     - restart oathenroll
-
-- name: "Install additional packages for web2ldap on {{ openldap_role }} on {{ lsb_id }}"
-  zypper:
-    name:
-      - python3-dnspython >= 2.0.0
-    state: present
-    disable_recommends: yes
-    type: package
-  when: openldap_role == 'provider'
-  notify:
-    - restart web2ldap

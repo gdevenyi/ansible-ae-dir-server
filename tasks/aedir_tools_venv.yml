@@ -56,7 +56,6 @@
       - paramiko
       - passlib
       - xlwt
-      - dnspython>=2.0.0
       - web.py>=0.40
       - pynacl>=1.2
     state: present
