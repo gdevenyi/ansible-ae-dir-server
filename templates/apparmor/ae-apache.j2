@@ -3,7 +3,7 @@
 
 #include <tunables/global>
 
-profile ae-apache {
+profile ae-apache flags=(attach_disconnected) {
 
   #include <ae-dir/abstractions/base>
   #include <ae-dir/abstractions/nameservice>

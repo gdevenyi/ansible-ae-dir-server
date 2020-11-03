@@ -3,7 +3,7 @@
 
 #include <tunables/global>
 
-profile {{ openldap_service_name }} {
+profile {{ openldap_service_name }} flags=(attach_disconnected) {
 
   #include <ae-dir/abstractions/base>
   #include <ae-dir/abstractions/nameservice>

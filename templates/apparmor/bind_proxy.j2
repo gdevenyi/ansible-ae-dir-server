@@ -3,7 +3,7 @@
 
 #include <tunables/global>
 
-profile {{ oath_bind_listener }} {
+profile {{ oath_bind_listener }} flags=(attach_disconnected) {
 
   #include <ae-dir/abstractions/oath_bind_listener>
 

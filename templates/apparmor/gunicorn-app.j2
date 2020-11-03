@@ -4,7 +4,7 @@
 
 #include <tunables/global>
 
-profile {{ name }} {
+profile {{ name }} flags=(attach_disconnected) {
 
   #include <ae-dir/abstractions/gunicorn>
 
