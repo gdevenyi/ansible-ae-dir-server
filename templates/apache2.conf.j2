@@ -82,14 +82,10 @@ SSLRandomSeed          startup file:/dev/urandom  512
 SSLRandomSeed          connect builtin
 
 # Default headers always sent
-Header always set Strict-Transport-Security "max-age=15768000 ; includeSubDomains"
-Header always set X-XSS-Protection "1; mode=block"
-Header always set X-Content-Type-Options "nosniff"
-Header always set X-Frame-Options "deny"
-Header always set Frame-Options "DENY"
-Header always set Content-Security-Policy "base-uri 'none'; child-src 'none'; connect-src 'none'; default-src 'none'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; frame-src 'none'; img-src 'self' data:; media-src 'none'; object-src 'none'; script-src 'none'; style-src 'self';"
-Header always set Referrer-Policy "same-origin"
-Header always set Feature-Policy "ambient-light-sensor 'none'; autoplay 'none'; accelerometer 'none'; camera 'none'; display-capture 'none'; document-domain 'none'; encrypted-media 'none'; fullscreen 'none'; geolocation 'none'; gyroscope 'none'; magnetometer 'none'; microphone 'none'; midi 'none'; payment 'none'; picture-in-picture 'none'; speaker 'none'; sync-xhr 'none'; usb 'none'; wake-lock 'none'; vr 'none'; xr 'none'"
+{% for header in apache_headers %}
+Header onsuccess unset {{ header.name }}
+Header always set {{ header.name }} "{{ header.value }}"
+{% endfor %}
 
 ProxyRequests Off
 ProxyPreserveHost On

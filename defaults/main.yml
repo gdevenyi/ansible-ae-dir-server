@@ -948,6 +948,25 @@ apache_service_fqdn: "{{ openldap_service_fqdn }}"
 #apache_conf: "{{ apache2_config.conf_pathname }}"
 apache_conf: "{{ aedir_etc }}/apache2.conf"
 
+# list for Header directive
+apache_headers:
+  - name: "Strict-Transport-Security"
+    value: "max-age=15768000 ; includeSubDomains"
+  - name: "X-XSS-Protection"
+    value: "1; mode=block"
+  - name: "X-Content-Type-Options"
+    value: "nosniff"
+  - name: "X-Frame-Options"
+    value: "deny"
+  - name: "Frame-Options"
+    value: "DENY"
+  - name: "Content-Security-Policy"
+    value: "base-uri 'none'; child-src 'none'; connect-src 'none'; default-src 'none'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; frame-src 'none'; img-src 'self' data:; media-src 'none'; object-src 'none'; script-src 'none'; style-src 'self';"
+  - name: "Referrer-Policy"
+    value: "same-origin"
+  - name: "Feature-Policy"
+    value: "ambient-light-sensor 'none'; autoplay 'none'; accelerometer 'none'; camera 'none'; display-capture 'none'; document-domain 'none'; encrypted-media 'none'; fullscreen 'none'; geolocation 'none'; gyroscope 'none'; magnetometer 'none'; microphone 'none'; midi 'none'; payment 'none'; picture-in-picture 'none'; speaker 'none'; sync-xhr 'none'; usb 'none'; wake-lock 'none'; vr 'none'; xr 'none'"
+
 # directory used as rundir (for PID etc.)
 apache_rundir: "{{ aedir_rundir }}/apache"
 
