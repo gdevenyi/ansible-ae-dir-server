@@ -966,6 +966,8 @@ apache_headers:
     value: "same-origin"
   - name: "Feature-Policy"
     value: "ambient-light-sensor 'none'; autoplay 'none'; accelerometer 'none'; camera 'none'; display-capture 'none'; document-domain 'none'; encrypted-media 'none'; fullscreen 'none'; geolocation 'none'; gyroscope 'none'; magnetometer 'none'; microphone 'none'; midi 'none'; payment 'none'; picture-in-picture 'none'; speaker 'none'; sync-xhr 'none'; usb 'none'; wake-lock 'none'; vr 'none'; xr 'none'"
+  - name: "Server"
+    value: "unknown"
 
 # directory used as rundir (for PID etc.)
 apache_rundir: "{{ aedir_rundir }}/apache"
