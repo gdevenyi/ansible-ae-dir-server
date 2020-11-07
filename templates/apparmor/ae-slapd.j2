@@ -1,6 +1,10 @@
 # AppArmor profile for service {{ openldap_service_name }}
 # {{ ansible_managed }}
 
+{% if apparmor_abi_version %}
+abi <abi/{{ apparmor_abi_version }}>,
+{% endif %}
+
 #include <tunables/global>
 
 profile {{ openldap_service_name }} flags=(attach_disconnected) {

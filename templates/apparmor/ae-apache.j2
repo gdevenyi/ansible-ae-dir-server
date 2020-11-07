@@ -1,6 +1,10 @@
 # AppArmor profile for ae-apache
 # {{ ansible_managed }}
 
+{% if apparmor_abi_version %}
+abi <abi/{{ apparmor_abi_version }}>,
+{% endif %}
+
 #include <tunables/global>
 
 profile ae-apache flags=(attach_disconnected) {

@@ -2,6 +2,10 @@
 # installed in virtual env {{ aedir_prefix }}
 # {{ ansible_managed }}
 
+{% if apparmor_abi_version %}
+abi <abi/{{ apparmor_abi_version }}>,
+{% endif %}
+
 #include <tunables/global>
 
 profile {{ name }} flags=(attach_disconnected) {

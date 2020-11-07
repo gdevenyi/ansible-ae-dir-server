@@ -1043,3 +1043,6 @@ apparmor_enabled: "{{ ansible_apparmor.status == 'enabled' }}"
 
 # where custom AppArmor profiles are stored
 apparmor_profiles_dir: "/etc/apparmor.d"
+
+# this sets the ABI version in AppArmor profiles
+apparmor_abi_version: "{{ '3.0' if ansible_distribution in ['Ubuntu', 'openSUSE Tumbleweed'] else '' }}"

@@ -1,6 +1,10 @@
 # AppArmor profile for hotp_validator installed in virtual env {{ aedir_prefix }}
 # {{ ansible_managed }}
 
+{% if apparmor_abi_version %}
+abi <abi/{{ apparmor_abi_version }}>,
+{% endif %}
+
 #include <tunables/global>
 
 profile {{ oath_bind_listener }} flags=(attach_disconnected) {
