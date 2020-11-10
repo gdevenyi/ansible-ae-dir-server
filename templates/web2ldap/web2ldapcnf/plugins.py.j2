@@ -320,6 +320,16 @@ web2ldap.app.plugins.aedir.AEUserUid.reObj = re.compile('^{{ aedir_aeservice_uid
 #web2ldap.app.plugins.aedir.AEUserUid.maxLen = 4
 #web2ldap.app.plugins.aedir.AEUserUid.maxCollisionChecks = 15
 
+# Filters for valid group membership
+web2ldap.app.plugins.aedir.AEGroupMember.ldap_url = (
+    'ldap:///_?displayName?sub?'
+    '{{ aedir_aegroup_member_filter }}'
+)
+web2ldap.app.plugins.aedir.AEMailGroupMember.ldap_url = (
+    'ldap:///_?displayName?sub?'
+    '{{ aedir_aemailgroup_member_filter }}'
+)
+
 #---------------------------------------------------------------------------
 # Composed attributes for..
 #---------------------------------------------------------------------------

@@ -208,6 +208,11 @@ aedir_aedept_deptnumber_regex: "[a-zA-Z0-9_.:/-]+"
 aedir_aeservice_sshpubkey_regex: "(ssh-rsa|ecdsa-sha2-nistp256|ecdsa-sha2-nistp384|ecdsa-sha2-nistp521|ssh-ed25519) [A-Za-z0-9+=/]+ .+"
 aedir_aeuser_sshpubkey_regex: "(ssh-rsa|ecdsa-sha2-nistp256|ecdsa-sha2-nistp384|ecdsa-sha2-nistp521|ssh-ed25519) [A-Za-z0-9+=/]+ .+"
 
+# Filter constraining the members of aeGroup entries (attribut 'member' and 'memberUid')
+aedir_aegroup_member_filter: "(&(|(objectClass=aeUser)(objectClass=aeService))(aeStatus=0))"
+# Filter constraining the members of aeMailGroup entries (attribut 'member' and 'rfc822MailMember')
+aedir_aemailgroup_member_filter: "(&(|(objectClass=inetLocalMailRecipient)(objectClass=aeContact))(mail=*)(aeStatus=0))"
+
 # filter for self-service ACL for attribute sshPublicKey
 # set to empty string for disabling the self-service ACL
 #aedir_sshpublickey_self_filter: "(&(objectClass=aeUser)(oathToken=*))"

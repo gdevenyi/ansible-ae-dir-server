@@ -1284,12 +1284,12 @@ constraint_attribute aeMemberZone
 
 # restrict references from user groups to have only active accounts as members
 constraint_attribute member
-  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(|(objectClass=aeUser)(objectClass=aeService))(aeStatus=0))"
+  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?{{ aedir_aegroup_member_filter }}"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeGroup)"
 
 # restrict references from mail groups to have only active accounts/contacts with e-mail address as members
 constraint_attribute member
-  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?(&(|(objectClass=inetLocalMailRecipient)(objectClass=aeContact))(mail=*)(aeStatus=0))"
+  uri "ldap:///{{ aedir_suffix }}?entryDN?sub?{{ aedir_aemailgroup_member_filter }}"
   restrict="ldap:///{{ aedir_suffix }}??sub?(objectClass=aeMailGroup)"
 
 # zone-constrainted groups must contain only members from specific zone
@@ -1309,7 +1309,7 @@ constraint_attribute member
 
 # restrict memberUid to be uid of an active posixAccount
 constraint_attribute memberUid
-  uri "ldap:///{{ aedir_suffix }}?uid?sub?(&(|(objectClass=aeUser)(objectClass=aeService))(objectClass=posixAccount)(aeStatus=0))"
+  uri "ldap:///{{ aedir_suffix }}?uid?sub?(&(objectClass=posixAccount){{ aedir_aegroup_member_filter }})"
   restrict="ldap:///{{ aedir_suffix }}??sub"
 
 # restrict memberUid to be consistent with group membership defined in member
@@ -1319,7 +1319,7 @@ constraint_attribute memberUid,member
 
 # restrict rfc822MailMember to be mail of an active local e-mail account
 constraint_attribute rfc822MailMember
-  uri "ldap:///{{ aedir_suffix }}?mail?sub?(&(|(objectClass=inetLocalMailRecipient)(objectClass=aeContact))(mail=*)(aeStatus=0))"
+  uri "ldap:///{{ aedir_suffix }}?mail?sub?{{ aedir_aemailgroup_member_filter }}"
   restrict="ldap:///{{ aedir_suffix }}??sub"
 
 # restrict rfc822MailMember to be consistent with group membership defined in member
