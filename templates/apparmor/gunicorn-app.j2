@@ -19,6 +19,9 @@ profile {{ name }} flags=(attach_disconnected) {
 {% if name=="web2ldap" %}
   # read access to CA cert for LDAPS
   {{ openldap_cacert_pathname }} r,
+
+  # LDIF input field needs to write temporary field
+  owner /tmp/* rw,
 {% endif %}
 
 {% if name=="ae-dir-pwd" or name=="oathenroll" %}
