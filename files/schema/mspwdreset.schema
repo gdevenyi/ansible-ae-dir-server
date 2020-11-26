@@ -36,7 +36,8 @@ attributetype ( stroeder-com-pub-ldap-at:334
       NAME 'msPwdResetAdminPw'
       DESC 'Clear-text part of temporary password to be read by admin'
       EQUALITY caseIgnoreIA5Match
-      SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
+      SINGLE-VALUE )
 
 objectclass ( stroeder-com-pub-ldap-oc:330
       NAME 'msPwdResetObject'
