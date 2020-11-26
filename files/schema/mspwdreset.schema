@@ -88,9 +88,16 @@ attributetype ( stroeder-com-pub-ldap-at:338
       SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
       SINGLE-VALUE )
 
+attributetype ( stroeder-com-pub-ldap-at:339
+      NAME 'msPwdChangeNotification'
+      DESC 'Flag for enabling password change notification mail.'
+      EQUALITY booleanMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.7
+      SINGLE-VALUE )
+
 objectclass ( stroeder-com-pub-ldap-oc:331
       NAME 'msPwdResetPolicy'
       DESC 'Entry defining the password reset policy'
       AUXILIARY
       MUST ( msPwdResetMaxAge $ msPwdResetEnabled $ msPwdResetHashAlgorithm $
-             msPwdResetPwLen $ msPwdResetAdminPwLen ) )
+             msPwdResetPwLen $ msPwdResetAdminPwLen $ msPwdChangeNotification ) )
