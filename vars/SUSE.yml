@@ -53,7 +53,7 @@ apache2_config:
   pid_file: ""
   httpd_exec: "/usr/sbin/httpd-prefork"
   conf_pathname: "/etc/apache2/httpd.conf"
-  mod_dir: "/usr/lib64/apache2"
+  mod_dir: "/usr/lib64/apache2-prefork"
   run_dir: "/var/run/apache2"
   modules:
     - log_config
