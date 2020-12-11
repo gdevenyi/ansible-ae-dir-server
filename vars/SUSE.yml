@@ -51,9 +51,9 @@ apache2_config:
   user: "wwwrun"
   group: "www"
   pid_file: ""
-  httpd_exec: "/usr/sbin/httpd-prefork"
+  httpd_exec: "/usr/sbin/httpd-event"
   conf_pathname: "/etc/apache2/httpd.conf"
-  mod_dir: "/usr/lib64/apache2-prefork"
+  mod_dir: "/usr/lib64/apache2{{ '' if ansible_lsb.release == '15.2' else '-event' }}"
   run_dir: "/var/run/apache2"
   modules:
     - log_config

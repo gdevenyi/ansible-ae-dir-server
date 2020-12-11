@@ -5,7 +5,7 @@
   zypper:
     name:
       - apache2
-      - apache2-prefork
+      - apache2-event
     state: present
     disable_recommends: yes
     type: package

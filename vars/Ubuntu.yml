@@ -52,7 +52,7 @@ apache2_config:
   mod_dir: "/usr/lib/apache2/modules"
   run_dir: "/var/run/apache2"
   modules:
-    - mpm_prefork
+    - mpm_event
     - socache_shmcb
     - env
     - dir
