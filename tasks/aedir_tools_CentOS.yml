@@ -17,7 +17,7 @@
       - libffi-devel
     state: present
     update_cache: no
-  when: aedir_pip_needs_compiler==True and (aedir_pip_install_compiler is defined or ldap0_installed.rc != 0)
+  when: aedir_pip_install_compiler is defined or ldap0_installed.rc != 0
 
 - name: "Install base packages on {{ lsb_id }}"
   yum:
