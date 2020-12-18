@@ -122,7 +122,7 @@ access to
   attrs=entry,entryDN,entryUUID,objectClass,structuralObjectClass,aeStatus,aeVisibleGroups,aeVisibleSudoers,aeLogStorePeriod,aeLoginGroups,aeLogStoreGroups
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by self.level{1} read
-    by set="(user/-1/aeProxyFor | user/aeSrvGroup/aeProxyFor) & this" read
+    by set="(user/-1/aeProxyFor | user/aeSrvGroup/aeProxyFor | user/aeSrvGroup) & this" read
     by * none break
 
 # Read access to server entries filtered by (objectClass=aeHost)
