@@ -971,6 +971,8 @@ apache_headers:
     value: "same-origin"
   - name: "Feature-Policy"
     value: "ambient-light-sensor 'none'; autoplay 'none'; accelerometer 'none'; camera 'none'; display-capture 'none'; document-domain 'none'; encrypted-media 'none'; fullscreen 'none'; geolocation 'none'; gyroscope 'none'; magnetometer 'none'; microphone 'none'; midi 'none'; payment 'none'; picture-in-picture 'none'; speaker 'none'; sync-xhr 'none'; usb 'none'; wake-lock 'none'; vr 'none'; xr 'none'"
+  - name: "Permissions-Policy"
+    value: "geolocation=(none), notifications=(none), push=(none), midi=(none), camera=(none), microphone=(none), speaker-selection=(none), device-info=(none), background-fetch=(none), background-sync=(none), bluetooth=(none), persistent-storage=(none), ambient-light-sensor=(none), accelerometer=(none), gyroscope=(none), magnetometer=(none), clipboard-read=(none), clipboard-write=(none), display-capture=(none), nfc=(none)"
   - name: "Server"
     value: "unknown"
 
