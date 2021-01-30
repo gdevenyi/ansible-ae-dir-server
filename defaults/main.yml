@@ -152,9 +152,10 @@ aedir_systemd_dir: "/etc/systemd/system"
 aedir_logging_conf: "ae-logging.conf.j2"
 
 # logging related systemd options
-aedir_systemd_logging:
-  - "StandardOutput=null"
-  - "StandardError=syslog"
+#aedir_systemd_logging:
+#  - "StandardOutput=null"
+#  - "StandardError=syslog"
+aedir_systemd_logging: []
 
 # various systemd.exec options for hardening the service units
 aedir_systemd_hardening:
