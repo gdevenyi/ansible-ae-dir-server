@@ -4,7 +4,7 @@
 - name: "PIP install slapdcheck in virtualenv {{ aedir_prefix }}"
   pip:
     name:
-      - slapdcheck>=3.6.8
+      - slapdcheck>=3.7.0
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
@@ -13,7 +13,7 @@
 - name: "Install slapdcheck package on {{ openldap_role }}"
   zypper:
     name:
-      - slapdcheck >= 3.6.8
+      - slapdcheck >= 3.7.0
     state: present
     disable_recommends: yes
     type: package
