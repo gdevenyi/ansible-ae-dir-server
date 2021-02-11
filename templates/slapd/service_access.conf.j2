@@ -119,7 +119,7 @@ access to
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(objectClass=aeSrvGroup)"
-  attrs=entry,entryDN,entryUUID,objectClass,structuralObjectClass,aeStatus,aeVisibleGroups,aeVisibleSudoers,aeLogStorePeriod,aeLoginGroups,aeLogStoreGroups
+  attrs=entry,entryDN,entryUUID,objectClass,structuralObjectClass,aeStatus,aeVisibleGroups,aeVisibleSudoers,aeLogStorePeriod,aeLoginGroups,aeLogStoreGroups,aeDisplayNameGroups
     by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
     by self.level{1} read
     by set="(user/-1/aeProxyFor | user/aeSrvGroup/aeProxyFor | user/aeSrvGroup) & this" read
