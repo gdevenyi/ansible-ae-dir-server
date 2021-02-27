@@ -15,7 +15,7 @@
       - python3-prometheus_client >= 0.7.1
       - python3-python-dateutil
       - python3-defusedxml
-      - python3-gunicorn
+      - python3-gunicorn >= 20.0.4
     state: present
     disable_recommends: yes
     type: package
