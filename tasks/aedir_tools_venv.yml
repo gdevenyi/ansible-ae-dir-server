@@ -18,8 +18,8 @@
       - cryptography
       - asn1crypto>=1.4.0
       - jwcrypto
-      - pyasn1
-      - pyasn1_modules
+      - pyasn1>=0.4.8
+      - pyasn1_modules>=0.2.8
       - ldap0>=1.1.4
       - aedir>=1.4.2
       - psutil>=5.6.7
