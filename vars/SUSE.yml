@@ -43,6 +43,8 @@ cron_config:
   service_name: "cron"
   pkg_name: "cron"
 
+apache2_mpm_model: "{{ 'prefork' if ansible_lsb.id == 'SUSE' else 'event' }}"
+
 # conf_pathname: where to place the monolithic apache configuration file
 # mod_dir: directory where Apache modules are found
 # modules: which modules to load
@@ -51,9 +53,9 @@ apache2_config:
   user: "wwwrun"
   group: "www"
   pid_file: ""
-  httpd_exec: "/usr/sbin/httpd-event"
+  httpd_exec: "/usr/sbin/httpd-{{ apache2_mpm_model }}"
   conf_pathname: "/etc/apache2/httpd.conf"
-  mod_dir: "/usr/lib64/apache2{{ '' if ansible_lsb.release == '15.2' else '-event' }}"
+  mod_dir: "/usr/lib64/apache2{{ '-'+apache2_mpm_model if ansible_lsb.description == 'openSUSE Tumbleweed' else '' }}"
   run_dir: "/var/run/apache2"
   modules:
     - log_config

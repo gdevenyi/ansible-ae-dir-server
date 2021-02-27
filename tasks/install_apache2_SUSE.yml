@@ -5,7 +5,7 @@
   zypper:
     name:
       - apache2
-      - apache2-event
+      - "apache2-{{ apache2_mpm_model }}"
     state: present
     disable_recommends: yes
     type: package

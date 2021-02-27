@@ -179,7 +179,7 @@ aedir_systemd_hardening:
   - "RestrictNamespaces=yes"
   - "RestrictSUIDSGID=yes"
   - "DevicePolicy=closed"
-  - "MemoryDenyWriteExecute=yes"
+  - "MemoryDenyWriteExecute={{ 'no' if ansible_lsb.id == 'SUSE' else 'yes' }}"
 #  - "DeviceAllow=/dev/log w"
 #  - "InaccessiblePaths=/run/systemd"
 
