@@ -15,7 +15,7 @@ openldap_sockbuf_max_incoming_auth_default:
   consumer: 262143
 
 # system-specific limited replacement for @resources
-systemcallfilter_resources: "{{ '@resources' if ansible_lsb.description=='openSUSE Tumbleweed' else 'sched_setparam sched_setscheduler sched_setaffinity setpriority setrlimit set_mempolicy migrate_pages move_pages mbind sched_setattr' }}"
+systemcallfilter_resources: "{{ '@resources' if ansible_lsb.id not in ('openSUSE', 'SUSE') or ansible_lsb.description=='openSUSE Tumbleweed' else 'sched_setparam sched_setscheduler sched_setaffinity setpriority setrlimit set_mempolicy migrate_pages move_pages mbind sched_setattr' }}"
 
 # values for SystemCallFilter= (see systemd.exec(5) for details)
 systemd_systemcallfilter:
