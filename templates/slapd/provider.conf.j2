@@ -445,19 +445,25 @@ access to
     by dn.base="uid=ae-dir-otpverify,cn=ae,{{ aedir_suffix }}" manage
     by * none break
 
-# An active but uninitialized OATH token device can
-# itself set but not read new oathTokenPIN value
+# Setting new oathTokenPIN value in active but not yet initialized
+# OATH token device entries granted to
+# 1. AE admins
+# 2. token itself (authenticated by enrollment password)
 access to
   dn.subtree="{{ aedir_suffix }}"
   filter="(&(objectClass=oathToken)(aeStatus=0)(!(oathHOTPCounter=*)))"
   attrs=oathTokenPIN
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =w
     by self =w
     by * none break
 
-# No other access to oathTokenPIN from here
+# General access to oathTokenPIN value
+# 1. AE admin can search but not read or write 'oathTokenPIN'
+# 2. No other access to oathTokenPIN from here
 access to
   dn.subtree="{{ aedir_suffix }}"
   attrs=oathTokenPIN
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =s
     by * none
 
 # An active but uninitialized OATH token device can itself
