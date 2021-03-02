@@ -169,8 +169,13 @@ access to
 
 # Entities may authenticate via LDAP simple bind with userPassword if:
 # - in active state
-# - not associated with a OATH-LDAP token
 # - UID and GID not outside specified ID ranges
+{% if oath_ldap_enabled==True %}
+# Note:
+# If an entry is associated with an OATH-LDAP token the local bind_proxy
+# may also block direct simple bind and enforce multi-factor login at
+# provider depending on client's peer address.
+{% endif %}
 access to
   dn.subtree="{{ aedir_suffix }}"
   attrs=userPassword
