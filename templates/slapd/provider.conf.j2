@@ -260,7 +260,7 @@ access to
 {% endif %}
 
 # Password of active token entries may be
-# 1. searched but not read or written by AE-DIR admins
+# 1. searched or removed but not read or set by AE-DIR admins
 # 2. written but not read by enrollment service
 # 3. removed by self
 # 4. used for LDAP simple bind
@@ -269,9 +269,10 @@ access to
   attrs=userPassword
   filter="(&(objectClass=oathToken)(aeStatus=0)(pwdPolicySubentry=cn=ppolicy-otptokens,cn=ae,{{ aedir_suffix }})(!(oathHOTPCounter=*)))"
     by dn.base="uid=ae-dir-otpenroll,cn=ae,{{ aedir_suffix }}" =w
-    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =s
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =sz
     by self =z
     by anonymous auth
+    by * none
 
 # Safety net for bugs in (H/T)OTP validator:
 # Block auth access to password of users with assigned OTP token
