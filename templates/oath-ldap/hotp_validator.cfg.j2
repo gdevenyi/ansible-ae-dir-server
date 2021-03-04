@@ -15,6 +15,9 @@ log_config = {{ aedir_etc }}/ae-logging.conf
 # logging qualifier name
 log_name = oathldap_srv.hotp_validator
 
+# regex pattern defining whether request DN directly addresses a token entry
+token_cmp_regex = ^serialNumber={{ aedir_aeauthctoken_serial_regex }},cn={{ aedir_aezone_cn_regex }},{{ aedir_suffix }}$
+
 # time in seconds for which to cache bind requests
 # (set to negative number to disable caching)
 cache_ttl = -1.0
