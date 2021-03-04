@@ -797,7 +797,7 @@ oath_ldap_enabled: False
 # are sent to external OATH-LDAP listener
 # Note:
 # This needs OpenLDAP built with ITS#8051 in otherwise slapd won't start!
-oath_ldap_dn_regex: "^uid=({{ aedir_aeuser_uid_regex }}),cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
+oath_ldap_dn_regex: "^(uid={{ aedir_aeuser_uid_regex }}|serialNumber={{ aedir_aeauthctoken_serial_regex }}),cn={{ aedir_aezone_cn_regex }},{{ aedir_suffix }}$"
 
 # map slapd role to bind listener parameters
 oath_dict:
