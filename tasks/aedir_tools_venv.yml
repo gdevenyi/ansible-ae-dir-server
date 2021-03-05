@@ -71,7 +71,7 @@
 - name: "PIP install ae-dir-tool in virtualenv on provider"
   pip:
     name:
-      - ae-dir-tool>=1.0.2
+      - ae-dir-tool>=1.0.6
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"

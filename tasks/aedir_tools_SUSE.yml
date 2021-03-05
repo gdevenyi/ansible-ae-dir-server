@@ -58,7 +58,7 @@
 - name: "Install ae-dir-tool on provider"
   zypper:
     name:
-      - ae-dir-tool >= 1.0.2
+      - ae-dir-tool >= 1.0.6
     state: present
     disable_recommends: yes
     type: package
