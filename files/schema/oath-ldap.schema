@@ -416,7 +416,7 @@ objectclass ( oath-ldap-oc:2.2
   AUXILIARY
   SUP oathParams
   MUST ( oathTOTPTimeStepPeriod )
-  MAY ( oathTOTPTimeStepWindow $ oathTOTPTimeStepDrift ) )
+  MAY ( oathTOTPTimeStepWindow ) )
 
 objectclass ( oath-ldap-oc:3.2
   NAME 'oathTOTPToken'
@@ -424,5 +424,5 @@ objectclass ( oath-ldap-oc:3.2
   X-ORIGIN 'OATH-LDAP'
   AUXILIARY
   SUP oathToken
-  MAY ( oathTOTPParams $ oathTOTPLastTimeStep ) )
+  MAY ( oathTOTPParams $ oathTOTPLastTimeStep $ oathTOTPTimeStepDrift ) )
 
