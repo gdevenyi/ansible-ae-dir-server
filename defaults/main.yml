@@ -119,6 +119,7 @@ aedir_gunicorn_args:
   - "--log-syslog-prefix=%N"
   - "--preload"
   - "--forwarded-allow-ips=*"
+  - "--graceful-timeout=2"
   - "--worker-tmp-dir={{ aedir_rundir }}/gunicorn/%N"
   - "--bind=unix:{{ aedir_rundir }}/gunicorn/%N/%N.sock"
 # Command for starting gunicorn application potentially in virtual env
