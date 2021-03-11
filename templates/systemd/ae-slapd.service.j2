@@ -36,8 +36,9 @@ RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 {% for systemd_option in aedir_systemd_hardening %}
 {{ systemd_option }}
 {% endfor %}
-{% endif %}
+MemoryDenyWriteExecute=yes
 SystemCallFilter={{ systemd_systemcallfilter.default }}
+{% endif %}
 {% if apparmor_enabled %}
 AppArmorProfile={{ openldap_service_name }}
 {% endif %}

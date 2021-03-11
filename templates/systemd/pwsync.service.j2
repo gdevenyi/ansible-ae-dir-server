@@ -38,8 +38,9 @@ RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 {% for systemd_option in aedir_systemd_hardening %}
 {{ systemd_option }}
 {% endfor %}
-{% endif %}
+MemoryDenyWriteExecute=yes
 SystemCallFilter={{ systemd_systemcallfilter.slapdsock }}
+{% endif %}
 
 [Install]
 WantedBy=multi-user.target

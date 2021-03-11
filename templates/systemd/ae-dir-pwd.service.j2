@@ -43,8 +43,9 @@ RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 {% for systemd_option in aedir_systemd_hardening %}
 {{ systemd_option }}
 {% endfor %}
-{% endif %}
+MemoryDenyWriteExecute={{ 'yes' if ansible_lsb.description == 'openSUSE Tumbleweed' else 'no' }}
 SystemCallFilter={{ systemd_systemcallfilter.gunicorn }}
+{% endif %}
 {% if apparmor_enabled %}
 AppArmorProfile=ae-dir-pwd
 {% endif %}

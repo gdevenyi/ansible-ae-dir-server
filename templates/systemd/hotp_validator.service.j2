@@ -40,8 +40,9 @@ IPAddressDeny=any
 {% for systemd_option in aedir_systemd_hardening %}
 {{ systemd_option }}
 {% endfor %}
-{% endif %}
+MemoryDenyWriteExecute=yes
 SystemCallFilter={{ systemd_systemcallfilter.slapdsock }}
+{% endif %}
 {% if apparmor_enabled %}
 AppArmorProfile={{ oath_bind_listener }}
 {% endif %}
