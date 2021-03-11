@@ -1,9 +1,5 @@
 ---
 
-# disable unwanted services
-
-# enable running services
-
 - block:
   - name: "Ensure AppArmor service is running"
     service:
@@ -16,9 +12,17 @@
       state: restarted
   when: apparmor_enabled == True
 
-- name: "Make sure systemd unit files are reloaded"
-  systemd:
-    daemon_reload: yes
+- block:
+
+  # must be done after(!) system accounts/groups were created
+  - name: "Update run-time directories in {{ aedir_rundir }}"
+    command: "systemd-tmpfiles --create --remove --prefix={{ aedir_rundir }}"
+    when: aedir_rundir.startswith("/run")
+
+  - name: "Make sure systemd unit files are reloaded"
+    systemd:
+      daemon_reload: yes
+
   when: aedir_service_manager == "systemd"
 
 - name: "Enable and start service {{ openldap_service_name }}"

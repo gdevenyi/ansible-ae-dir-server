@@ -130,8 +130,28 @@
         - "{{ aedir_etc }}/gunicorn"
         - "{{ aedir_bin }}"
         - "{{ aedir_sbin }}"
+
+    - name: "Create file /etc/tmpfiles.d/ae-dir.conf from template"
+      template:
+        src: "tmpfiles-ae-dir.conf.j2"
+        dest: "/etc/tmpfiles.d/ae-dir.conf"
+        owner: root
+        group: root
+        mode: 0o0644
+      when: aedir_service_manager == "systemd" and aedir_rundir.startswith("/run")
+
+    - name: "Create directory structure {{ aedir_rundir }}"
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        mode: 0o0755
+      loop:
         - "{{ aedir_rundir }}"
         - "{{ aedir_rundir }}/gunicorn"
+      when: aedir_service_manager != "systemd" or not aedir_rundir.startswith("/run")
+
   tags:
     - aedir_tools
 
@@ -268,6 +288,7 @@
     aehost:
       name: "{{ inventory_hostname }}"
       state: "{{ aedir_aehost_state }}"
+      ldapurl: "{{ openldap_ldapi_uri }}"
       srvgroup: "{{ aedir_srvgroup }}"
       description: "AE-DIR {{ openldap_role }} host {{ openldap_service_fqdn }}"
       ticket_id: "{{ aedir_init_ticket_id }}"
@@ -284,6 +305,7 @@
     aeservice:
       name: "{{ item.value.cn }}"
       state: "present"
+      ldapurl: "{{ openldap_ldapi_uri }}"
       object_classes:
         - account
         - aeObject
@@ -312,6 +334,7 @@
     aeservice:
       name: "ae-dir-slapd_{{ openldap_service_fqdn }}"
       state: "present"
+      ldapurl: "{{ openldap_ldapi_uri }}"
       object_classes:
         - account
         - aeObject

@@ -38,13 +38,14 @@
   notify:
     - "restart oathenroll"
 
-- name: "Create socket directory for oathenroll"
+- name: "Create socket directory {{ aedir_rundir }}/gunicorn/oathenroll"
   file:
     path: "{{ aedir_rundir }}/gunicorn/oathenroll"
     state: directory
     owner: ae-dir-otpenroll
     group: ae-dir-httpd
     mode: u=rwx,g=rx,o=
+  when: aedir_service_manager != "systemd" or not aedir_rundir.startswith("/run")
   notify:
     - "restart oathenroll"
 

@@ -112,6 +112,7 @@
     owner: ae-dir-web2ldap
     group: ae-dir-httpd
     mode: u=rwx,g=rx,o=
+  when: aedir_service_manager != "systemd" or not aedir_rundir.startswith("/run")
   notify:
     - "restart web2ldap"
 
