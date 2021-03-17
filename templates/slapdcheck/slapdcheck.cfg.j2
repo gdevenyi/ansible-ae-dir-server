@@ -1,0 +1,10 @@
+# Configuration for slapdcheck package
+# {{ ansible_managed }}
+
+[slapdcheck]
+
+ldapi_uri = {{ openldap_ldapi_uri }}
+
+ldaps_uri = {{ slapd_check_ldaps_uri }}
+
+ldaps_authz_id = {{ slapd_check_authz_id }}

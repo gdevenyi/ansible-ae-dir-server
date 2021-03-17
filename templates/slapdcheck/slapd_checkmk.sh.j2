@@ -16,7 +16,4 @@ export LD_LIBRARY_PATH
 export {{ evar.name }}
 {% endfor %}
 
-{{ aedir_python }} -m slapdcheck.checkmk \
-  '{{ openldap_ldapi_uri }}' \
-  '{{ slapd_check_ldaps_uri }}' \
-  '{{ slapd_check_authz_id }}'
+{{ aedir_python }} -m slapdcheck.checkmk {{ aedir_etc }}/slapdcheck.cfg
