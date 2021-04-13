@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Configuration module for aepwd_web and aepwd_cron
+Configuration module for aedir_pproc.pwd
 """
 
 # LDAP-URL describing the connection parameters and bind information
-PWD_LDAP_URL = r'{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub??trace=0,x-saslmech=EXTERNAL'
+PWD_LDAP_URL = '{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub??trace=0,x-saslmech=EXTERNAL'
 
 # Filter string templates for the various use-cases
 # String-keyed dictionary with input field names used
@@ -111,14 +111,14 @@ FILTERSTR_NO_WELCOME_YET = (
 
 # Maximum timespan to search for new entries in the past
 # to send welcome e-mail
-NOTIFY_OLDEST_TIMESPAN = 86400.0
+WELCOME_OLDEST_TIMESPAN = 86400.0
 
 # E-Mail subject for notification message
-NOTIFY_EMAIL_SUBJECT = 'New Æ-DIR account "{user_uid}" added/activated for {user_cn}'
+WELCOME_EMAIL_SUBJECT = 'New Æ-DIR account "{user_uid}" added/activated for {user_cn}'
 # E-Mail body template file for notification message
-NOTIFY_EMAIL_TEMPLATE = '{{ aedir_etc }}/ae-dir-pwd/templates/en/notify_user.txt'
+WELCOME_EMAIL_TEMPLATE = '{{ aedir_etc }}/ae-dir-pwd/templates/en/notify_user.txt'
 
 # modifications to be applied to user entry after successfully sending e-mail
-NOTIFY_SUCCESSFUL_MOD = [
+WELCOME_SUCCESSFUL_MOD = [
     (1, b'aeTag', [b'pub-tag-no-welcome-yet'])
 ]
