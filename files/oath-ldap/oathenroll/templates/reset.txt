@@ -28,8 +28,6 @@ Important notes:
   immediately for getting help as the token will no longer work!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-Have fun!
-
 Your OTP admins.
 
 IP address from which enrollment was invoked:
