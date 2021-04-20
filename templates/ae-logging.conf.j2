@@ -8,7 +8,7 @@
 #--------------------------------------------------------------------------------
 
 [loggers]
-keys=root, aedir_tool, aedir_process, aedir_pwd_web, oathldap_srv, web2ldap
+keys=root, aedir_tool, aedir_process, aedir_pwd_web, oathldap_srv, oathldap_web, web2ldap
 
 [handlers]
 keys=console,syslog
@@ -44,6 +44,14 @@ level=INFO
 propagate=0
 facility=local7
 qualname=oathldap_srv
+
+# logger for OATH-LDAP web apps
+[logger_oathldap_web]
+handlers=syslog
+level=INFO
+propagate=0
+facility=local7
+qualname=oathldap_web
 
 # logger for web2ldap
 [logger_web2ldap]

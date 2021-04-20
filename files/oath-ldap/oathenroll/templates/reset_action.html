@@ -1,8 +1,6 @@
-$def with (message, serial='', token='', owner='', email='', enrollpw2='')
-$var title: Initialize OATH Token
+{% extends 'layout.html' %}
 
-<div id="content">
-
+{% block content %}
   <h1>Initialize OATH Token</h1>
 
   <p>
@@ -13,21 +11,21 @@ $var title: Initialize OATH Token
     </p>
 
     <p>
-      Temporary enrollment password part #2: <strong>$enrollpw2</strong>
+      Temporary enrollment password part #2: <strong>{{ enrollpw2 }}</strong>
     </p>
 
     <table>
       <tr>
         <td>Token:</td>
-        <td>$token</td>
+        <td>{{ token }}</td>
       </tr>
       <tr>
         <td>Owner:</td>
-        <td><a href="mailto:$email">$owner</a></td>
+        <td><a href="mailto:{{ email }}">{{ owner }}</a></td>
       </tr>
       <tr>
         <td>Owner's e-mail address:</td>
-        <td><a href="mailto:$email">$email</a></td>
+        <td><a href="mailto:{{ email }}">{{ email }}</a></td>
       </tr>
     </table>
   </p>
@@ -45,9 +43,8 @@ $var title: Initialize OATH Token
     <li>
       Please advice the token owner that the temporary password will
       be valid only for a few minutes. If password has expired you can
-      simply request <a href="reset?serial=$serial">token reinitialization</a>
+      simply request <a href="reset?serial={{ serial }}">token reinitialization</a>
       again.
     </li>
   </ul>
-
-</div>
+{% endblock content %}

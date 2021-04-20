@@ -1,6 +1,28 @@
 ---
 # Install OATH-LDAP enrollment web service (oathenroll)
 
+- name: "PIP install OATH-LDAP web apps in virtualenv {{ aedir_prefix }}"
+  pip:
+    name:
+      - oath-ldap-web
+    state: latest
+    virtualenv: "{{ aedir_prefix }}"
+    extra_args: "{{ aedir_pip_extra_args }}"
+  when: aedir_pip_install
+  notify:
+    - "restart oathenroll"
+
+- name: "Install OATH-LDAP web apps package"
+  zypper:
+    name:
+      - oath-ldap-web
+    state: latest
+    disable_recommends: yes
+    type: package
+  when: lsb_id == 'SUSE'
+  notify:
+    - "restart oathenroll"
+
 - name: "Create directories for oathenroll"
   file:
     path: "{{ oath_ldap_cfg_dir }}/{{ item }}"
@@ -12,7 +34,7 @@
     - "oathenroll"
     - "oathenroll/templates"
 
-- name: "copy oathenroll HTML templates to {{ oath_ldap_cfg_dir }}/oathenroll/templates"
+- name: "Copy oathenroll HTML templates to {{ oath_ldap_cfg_dir }}/oathenroll/templates"
   copy:
     src: "oath-ldap/oathenroll/templates/"
     dest: "{{ oath_ldap_cfg_dir }}/oathenroll/templates"
@@ -24,16 +46,16 @@
   notify:
     - "restart oathenroll"
 
-- name: "Create oathenroll_cnf.py"
+- name: "Create {{ oath_ldap_cfg_dir }}/oathenroll/oathenroll.cfg"
   template:
     src: "{{ item }}"
-    dest: "{{ oath_ldap_cfg_dir }}/oathenroll/oathenroll_cnf.py"
+    dest: "{{ oath_ldap_cfg_dir }}/oathenroll/oathenroll.cfg"
     owner: root
     group: "{{ oath_ldap_oathenroll_web_group }}"
     mode: 0o0640
   with_first_found:
     - files:
-        - "oath-ldap/oathenroll_cnf.py.j2"
+        - "oath-ldap/oathenroll.cfg.j2"
       paths: "{{ aedir_templates_dirs }}"
   notify:
     - "restart oathenroll"

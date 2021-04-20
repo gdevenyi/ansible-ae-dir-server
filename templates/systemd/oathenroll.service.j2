@@ -17,15 +17,14 @@ Type=simple
 Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
 {% endif %}
 Environment=LDAPNOINIT=1
-Environment=PYTHONPATH={{ oath_ldap_cfg_dir }}/oathenroll
 # some env vars set for Python interpreter
 {% for evar in aedir_python_env %}
 Environment={{ evar.name }}={{ evar.value }}
 {% endfor %}
-Environment=LOG_CONFIG={{ aedir_etc }}/ae-logging.conf
-Environment=LOG_QUALNAME=oathldap_srv.web.oathenroll
+Environment=OATHENROLL_CFG={{ oath_ldap_cfg_dir }}/oathenroll/oathenroll.cfg
+Environment=FLASK_ENV=production
 ExecStartPre={{ rm_exec }} -f {{ aedir_rundir }}/gunicorn/oathenroll/oathenroll.sock
-ExecStart={{ aedir_gunicorn }} --workers=4 oathldap_srv.web.oathenroll:application
+ExecStart={{ aedir_gunicorn }} --workers=4 "oathldap_web.app:create_app()"
 WorkingDirectory={{ aedir_rundir }}/gunicorn/oathenroll
 User={{ oath_ldap_oathenroll_web_user }}
 Group={{ oath_ldap_oathenroll_web_group }}

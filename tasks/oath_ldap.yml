@@ -119,7 +119,6 @@
   when: aedir_pip_install
   notify:
     - "restart {{ oath_bind_listener }}"
-    - "restart oathenroll"
 
 - name: "Install OATH-LDAP services package on {{ openldap_role }}"
   zypper:
@@ -131,7 +130,6 @@
   when: lsb_id == 'SUSE'
   notify:
     - "restart {{ oath_bind_listener }}"
-    - "restart oathenroll"
 
 - name: "Install systemd unit file for OATH-LDAP bind listener"
   template:

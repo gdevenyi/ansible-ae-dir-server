@@ -1,26 +1,26 @@
-$def with (message, admin='', serial='', token='', owner='', email='', accounts=None, confirm='')
-$var title: Initialize OATH Token
+{% extends 'layout.html' %}
 
-<div id="content">
-
+{% block content %}
   <h1>Initialize OATH Token</h1>
 
-  $if message:
+  {% if message %}
       <p class="message">
-          $message
+          {{ message }}
       </p>
+  {% endif %}
 
   <form
     method="POST"
-    action="reset"
+    action="{{ config['APPLICATION_ROOT'] }}{{ url_for('reset') }}"
     enctype="application/x-www-form-urlencoded"
     accept-charset="utf-8"
   >
 
-    $if token:
-        <input type="hidden" name="serial" value="$serial">
+    {% if token %}
+        <input type="hidden" name="serial" value="{{ serial }}">
+    {% endif %}
 
-    <input type="hidden" name="confirm" value="$confirm">
+    <input type="hidden" name="confirm" value="{{ confirm }}">
 
     <fieldset>
 
@@ -28,41 +28,43 @@ $var title: Initialize OATH Token
 
       <table>
 
-      $if token:
+      {% if token %}
           <tr>
               <th>Token:</th>
-              <td>$token</td>
+              <td>{{ token }}</td>
           </tr>
           <tr>
               <th>Token owner:</th>
               <td>
-                <a href="mailto:$email">$owner</a>
+                <a href="mailto:{{ email }}">{{ owner }}</a>
               </td>
           </tr>
-
-      $else:
+      {% else %}
           <tr>
               <th>Token serial no.:</th>
               <td>
-                  <input name="serial" value="$serial" size="8">
+                  <input name="serial" value="{{ serial }}" size="8">
               </td>
           </tr>
+      {% endif %}
 
       </table>
 
     </fieldset>
 
-    $if accounts:
+    {% if accounts %}
         <fieldset>
           <legend>Affected accounts</legend>
           <table>
-              $for uname, udesc in accounts:
+              {% for uname, udesc in accounts %}
                   <tr>
-                      <th>$uname:</th>
-                      <td>$udesc</td>
+                      <th>{{ uname }}</th>
+                      <td>{{ udesc }}</td>
                   </tr>
+              {% endfor %}
           </table>
         </fieldset>
+    {% endif %}
 
     <fieldset>
       <legend>OATH-LDAP admin login</legend>
@@ -70,7 +72,7 @@ $var title: Initialize OATH Token
         <tr>
           <th>User name:</th>
           <td>
-            <input name="admin" value="$admin" size="10">
+            <input name="admin" value="{{ admin }}" size="10">
           </td>
         </tr>
         <tr>
@@ -82,10 +84,11 @@ $var title: Initialize OATH Token
       </table>
     </fieldset>
 
-  $if confirm:
+  {% if confirm %}
       <input type="submit" class="submit" name="submit" value="Generate enroll password">
-  $else:
+  {% else %}
       <input type="submit" class="submit" name="submit" value="Get token info">
+  {% endif %}
 
   </form>
 
@@ -130,5 +133,4 @@ $var title: Initialize OATH Token
       <strong>only valid for a few minutes</strong>.
     </li>
   </ul>
-
-</div>
+{% endblock content %}

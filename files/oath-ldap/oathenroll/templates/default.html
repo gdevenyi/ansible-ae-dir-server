@@ -1,9 +1,13 @@
-$def with ()
-$var title: OATH Token Enrollment Service
+{% extends 'layout.html' %}
 
-<div id="content">
-
+{% block content %}
   <h1>Overview</h1>
+
+  {% if message %}
+      <p class="message">
+          {{ message }}
+      </p>
+  {% endif %}
 
   <p>
     As an <em>OATH-LDAP admin</em> you can invoke the following actions:
@@ -14,5 +18,4 @@ $var title: OATH Token Enrollment Service
       <a href="reset">Reset OATH Token and request enrollment password</a>
     </li>
   </ul>
-
-</div>
+{% endblock content %}

@@ -1,15 +1,15 @@
-# -*- coding: utf-8 -*-
-"""
-Configuration module for oathenroll
-"""
+# Configuration module for oathenroll
+# {{ ansible_managed }}
 
-import os.path
+LOG_CONFIG = '{{ aedir_etc }}/ae-logging.conf'
+
+LOG_NAME = 'oathldap_web.oathenroll'
 
 # Trace level for ldap0 logs
 LDAP0_TRACE_LEVEL = 0
 
 # LDAP-URL describing the connection parameters and bind information
-LDAP_URL = r'{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub??trace=0,x-saslmech=EXTERNAL'
+LDAP_URL = '{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub??trace=0,x-saslmech=EXTERNAL'
 
 # SASL authz-ID to be sent along with SASL/EXTERNAL bind
 LDAPI_AUTHZ_ID = 'dn:uid=ae-dir-otpenroll,cn=ae,{{ aedir_suffix }}'
@@ -57,10 +57,10 @@ PWD_LENGTH = 12
 PWD_ADMIN_LEN = 6
 
 # Characters used for the temporary passwords
-PWD_TMP_CHARS = u'abcdefghijkmnopqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ23456789'
+PWD_TMP_CHARS = 'abcdefghijkmnopqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ23456789'
 
 # Filename of template for sending e-mail message to user
-EMAIL_SUBJECT = u'Your temporary enrollment password for Yubikey #%(serial)s'
+EMAIL_SUBJECT = 'Your temporary enrollment password for Yubikey #%(serial)s'
 EMAIL_TEMPLATE = TEMPLATES_DIRNAME+'reset.txt'
 
 # SMTP server used as smart host (SMTP relay)

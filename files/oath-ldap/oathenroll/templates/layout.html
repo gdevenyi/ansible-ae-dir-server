@@ -1,9 +1,8 @@
-$def with (content)
 <!DOCTYPE html>
 <html>
 
   <head>
-    <title>$content.title</title>
+    <title>{{ title }}</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <base target="_top">
     <meta name="robots" content="noindex,nofollow">
@@ -32,7 +31,10 @@ $def with (content)
       <a title="Reset OATH token and request enrollment password" href="reset">Reset</a>
     </div>
 
-    $:content
+<div id="content">
+    {% block content %}
+    {% endblock content %}
+</div>
 
     <p id="footer">
       <a href="/oath.html"
