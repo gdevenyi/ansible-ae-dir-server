@@ -1,16 +1,13 @@
-$def with (username,email,userdn)
-$var title: Temporary password requested for $username
+{% extends 'layout.html' %}
 
-<div id="content">
-
-  <h1>Temporary password set for $username</h1>
+{% block content %}
+  <h1>Temporary password set for {{ username }}</h1>
 
   <p>
-    A temporary password was set for user <em>$username</em> and sent to <em>$email</em>.
+    A temporary password was set for user <em>{{ username }}</em> and sent to <em>{{ email }}</em>.
   </p>
 
   <p>
     <strong>Check your e-mail now to proceed!</strong>
   </p>
-
-</div>
+{% endblock content %}

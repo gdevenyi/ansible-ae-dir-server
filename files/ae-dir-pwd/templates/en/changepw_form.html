@@ -1,14 +1,18 @@
-$def with (username,message)
-$var title: Change password
+{% extends 'layout.html' %}
 
-<div id="content">
-
+{% block content %}
   <h1>Change password</h1>
 
-  $if message:
-    <p class="message">$message</p>
+  {% if message %}
+    <p class="message">{{ message }}</p>
+  {% endif %}
 
-  <form method="POST" action="changepw" enctype="application/x-www-form-urlencoded" accept-charset="utf-8">
+  <form
+    method="POST"
+    action="{{ config['APPLICATION_ROOT'] }}{{ url_for('changepw') }}"
+    enctype="application/x-www-form-urlencoded"
+    accept-charset="utf-8"
+  >
 
     <fieldset>
       <table>
@@ -17,7 +21,7 @@ $var title: Change password
             User name:
           </th>
           <td>
-            <input name="username" value="$username" size="25">
+            <input name="username" value="{{ username }}" size="25">
           </td>
         </tr>
         <tr>
@@ -57,8 +61,7 @@ $var title: Change password
     <li><strong>Password must not be used before!</strong></li>
     <li>
       Forgot old password? &rarr;
-      <a href="requestpw?username=$username">Request password reset</a>.
+      <a href="requestpw?username={{ username }}">Request password reset</a>.
     </li>
   </ul>
-
-</div>
+{% endblock content %}

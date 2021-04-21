@@ -1,21 +1,18 @@
-$def with (username,userdn,valid_until)
-$var title: Password check for $username
+{% extends 'layout.html' %}
 
-<div id="content">
-
-  <h1>Password check for $username</h1>
+{% block content %}
+  <h1>Password check for {{ username }}</h1>
 
   <p>
     Password of LDAP entry
   </p>
   <p class="userDN">
-    $userdn
+    {{ userdn }}
   </p>
   <p>
     was successfully checked.
   </p>
   <p>
-    Valid until: $valid_until
+    Valid until: {{ valid_until }}
   </p>
-
-</div>
+{% endblock content %}

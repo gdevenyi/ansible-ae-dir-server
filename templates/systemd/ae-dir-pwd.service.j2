@@ -17,13 +17,13 @@ Type=simple
 Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
 {% endif %}
 Environment=LDAPNOINIT=1
-Environment=PYTHONPATH={{ aedir_etc }}/ae-dir-pwd
 # some env vars set for Python interpreter
 {% for evar in aedir_python_env %}
 Environment={{ evar.name }}={{ evar.value }}
 {% endfor %}
+Environment=AEDIRPWD_CFG={{ aedir_etc }}/ae-dir-pwd/aedirpwd_cnf.py
 ExecStartPre={{ rm_exec }} -f {{ aedir_rundir }}/gunicorn/ae-dir-pwd/ae-dir-pwd.sock
-ExecStart={{ aedir_gunicorn }} --workers=4 aedir_pproc.pwd.web:application
+ExecStart={{ aedir_gunicorn }} --workers=4 "aedir_pproc.pwd.web.app:create_app()"
 WorkingDirectory={{ aedir_rundir }}/gunicorn/ae-dir-pwd
 User=ae-dir-pwd
 Group=ae-dir-pwd

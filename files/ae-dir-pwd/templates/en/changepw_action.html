@@ -1,15 +1,13 @@
-$def with (username,userdn,ldap_uri)
-$var title: Password change for $username
+{% extends 'layout.html' %}
 
-<div id="content">
-
-  <h1>Password change for $username</h1>
+{% block content %}
+  <h1>Password change for {{ username }}</h1>
 
   <p>
     New password of LDAP entry
   </p>
   <p class="userDN">
-    $userdn
+    {{ userdn }}
   </p>
   <p>
     successfully set.
@@ -17,11 +15,10 @@ $var title: Password change for $username
 
   <ul class="tip">
     <li>
-      Try to <a href="checkpw?username=$username">check password</a> right now.
+      Try to <a href="checkpw?username={{ username }}">check password</a> right now.
     </li>
     <li>
-      <a href="/web2ldap/searchform?$ldap_uri/ou%3Dae-dir????bindname=$username">Login to web2ldap as $username</a>.
+      <a href="/web2ldap/searchform?{{ ldap_uri }}/ou%3Dae-dir????bindname={{ username }}">Login to web2ldap as {{ username }}</a>.
     </li>
   </ul>
-
-</div>
+{% endblock content %}

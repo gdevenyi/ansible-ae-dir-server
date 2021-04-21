@@ -1,11 +1,9 @@
-$def with (message)
-$var title: Error
+{% extends 'layout.html' %}
 
-<div id="content">
-
+{% block content %}
   <h1>Error</h1>
 
-  $if message:
-    <p class="message">$message</p>
-
-</div>
+  {% if message %}
+    <p class="message">{{ message }}</p>
+  {% endif %}
+{% endblock content %}
