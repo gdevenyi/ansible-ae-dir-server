@@ -56,7 +56,6 @@
       - paramiko
       - passlib
       - xlwt
-      - web.py>=0.40
       - pynacl>=1.2
     state: present
     virtualenv: "{{ aedir_prefix }}"
@@ -76,6 +75,20 @@
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
   when: openldap_role == 'provider'
+
+- name: "PIP install additional modules for Flask web apps on {{ openldap_role }}"
+  pip:
+    name:
+      - Flask>=1.1.0
+      - Jinja2>=2.10.0
+      - Werkzeug>=1.0.0
+      - WTForms>=2.2.0
+    state: present
+    virtualenv: "{{ aedir_prefix }}"
+    extra_args: "{{ aedir_pip_extra_args }}"
+  when: openldap_role == 'provider'
+  notify:
+    - "restart flask-apps"
 
 - name: "PIP install aedir_pproc in virtualenv on provider"
   pip:

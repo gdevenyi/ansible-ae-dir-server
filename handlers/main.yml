@@ -19,6 +19,7 @@
 - name: "restart ae-dir-pwd"
   listen:
     - "restart ae-dir-pwd"
+    - "restart flask-apps"
   service:
     name: "ae-dir-pwd"
     state: restarted
@@ -37,6 +38,7 @@
 - name: "restart oathenroll"
   listen:
     - "restart oathenroll"
+    - "restart flask-apps"
   service:
     name: "oathenroll"
     state: restarted

@@ -64,6 +64,20 @@
     type: package
   when: openldap_role == 'provider'
 
+- name: "Install additional packages for Flask web apps on {{ openldap_role }}"
+  zypper:
+    name:
+      - python3-Flask >= 1.1.0
+      - python3-Jinja2 >= 2.10.0
+      - python3-Werkzeug >= 1.0.0
+      - python3-WTForms >= 2.2.0
+    state: present
+    disable_recommends: yes
+    type: package
+  when: openldap_role == 'provider'
+  notify:
+    - "restart flask-apps"
+
 - name: "Install ae-dir-pproc on provider"
   zypper:
     name:
@@ -74,15 +88,3 @@
   when: openldap_role == 'provider'
   notify:
     - restart ae-dir-pwd
-
-- name: "Install additional packages for simple web apps on {{ openldap_role }} on {{ lsb_id }}"
-  zypper:
-    name:
-      - python3-web.py >= 0.40
-    state: present
-    disable_recommends: yes
-    type: package
-  when: openldap_role == 'provider'
-  notify:
-    - restart ae-dir-pwd
-    - restart oathenroll
