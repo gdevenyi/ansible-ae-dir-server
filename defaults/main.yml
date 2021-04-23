@@ -549,6 +549,9 @@ aedir_cron_minutes:
   # run each minute on one of the providers
   aedir_pproc_pwd: "{{ range(aedir_cron_offset|int, 60, aedir_hosts.provider|length) | select('lessthan', 60) | map('string') | join(',') }}"
 
+# number of gunicorn workers for ae-dir-pwd
+aedir_pwd_workers: 4
+
 #---------------------------------------------------------------------------
 # OpenLDAP parameters
 #---------------------------------------------------------------------------
@@ -835,6 +838,9 @@ oath_ldap_socket_path: "{{ oath_ldap_socket_dir }}/socket"
 # must be in {{ aedir_ldapi_services }}
 oath_ldap_oathenroll_web_user: ae-dir-otpenroll
 oath_ldap_oathenroll_web_group: ae-dir-otpenroll
+
+# number of gunicorn workers for oathenroll
+oath_ldap_oathenroll_workers: 4
 
 # Values for bind_proxy.cfg
 #--------------------------
