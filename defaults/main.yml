@@ -907,7 +907,13 @@ slapd_check_ldaps_uri: "ldaps://{{ slapd_check_service_fqdn }}"
 slapd_check_authz_id: "dn:uid=ae-dir-slapd_{{ slapd_check_service_fqdn }},cn=ae,{{ aedir_suffix }}"
 
 # Template used for generating slapdcheck.conf
+# (see example file ansible-ae-dir-server/templates/slapdcheck/slapdcheck.cfg.j2)
 slapd_check_cfg_template: "slapdcheck/slapdcheck.cfg.j2"
+
+# number of minimum connections expected
+# if real connection count falls below this treshold it could mean
+# that slapd is not reachable from LDAP clients
+slapd_check_cfg_connections_warn_lower: 3
 
 # Arguments for cron job exporting metrics
 slapd_check_cron_args:
