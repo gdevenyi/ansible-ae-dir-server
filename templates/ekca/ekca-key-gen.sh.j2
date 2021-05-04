@@ -6,7 +6,8 @@
 
 umask 0077
 
-{{ ekca_ssh_keygen_exec }} -t rsa -b 4096 -f "{{ ekca_sshca_dir }}/priv/{{ ekca_name }}"
+# generate new SSH-CA key pair
+{{ ekca_ssh_keygen_command }}
 
 # generate SSH-CA directory structure
 mkdir -p "{{ ekca_sshca_dir }}/{{ ekca_name }}/certs"

@@ -1103,6 +1103,9 @@ ekca_cfg: "{{ aedir_etc }}/ekca/ekca.cfg"
 # full path name of EKCA base directory for storing SSH-CA data
 ekca_sshca_dir: "{{ aedir_etc }}/ekca"
 
+# comment to put into the SSH-CA's public key
+ekca_ssh_keygen_command: "/usr/bin/ssh-keygen -t rsa -b 4096 -C '{{ ekca_name }} on {{ inventory_hostname }}' -f '{{ ekca_sshca_dir }}/priv/{{ ekca_name }}'"
+
 # Path name of ssh-agent socket used by EKCA
 ekca_agent_socket: "{{ aedir_rundir }}/ekca-agent/ekca-agent.sock"
 
@@ -1130,9 +1133,6 @@ ekca_sshca_cert_validity: "+1h"
 # from LDAP attribute 'aeRemoteHost' in user's LDAP entry
 #ekca_sshca_fromip_method: "user:aeRemoteHost"
 ekca_sshca_fromip_method: False
-
-# Path name of ssh-keygen executable
-ekca_ssh_keygen_exec: "/usr/bin/ssh-keygen"
 
 # PKCS#11 module
 ekca_pkcs11_module: ""
