@@ -78,4 +78,14 @@
       enabled: yes
     when: oath_ldap_enabled == True
 
+  - name: "ensure EKCA services running"
+    service:
+      name: "{{ item }}"
+      state: started
+      enabled: yes
+    with_items:
+      - "ekca-service"
+      - "ekca-agent"
+    when: ekca_enabled == True
+
   when: openldap_role == "provider"
