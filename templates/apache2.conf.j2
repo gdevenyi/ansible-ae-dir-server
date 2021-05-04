@@ -215,4 +215,23 @@ ProxyPreserveHost On
   </Location>
 {% endif %}
 
+{% if ekca_enabled == True %}
+  #----------------------------------------------------------------------
+  # EKCA web service
+  #----------------------------------------------------------------------
+
+  <Location "/ekca/check">
+    <Limit GET>
+{% for require in ekca_check_requires %}
+      Require {{ require }}
+{% endfor %}
+    </Limit>
+  </Location>
+
+  <Location "/ekca">
+    ProxyPass unix:{{ ekca_service_socket }}|http://127.0.0.1:8083/{{ ekca_name }}
+  </Location>
+
+{% endif %}
+
 </VirtualHost>

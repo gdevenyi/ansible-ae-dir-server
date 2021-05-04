@@ -364,6 +364,14 @@ aedir_ldapi_services:
     description: "The system user for running web2ldap service process"
     roles:
       - provider
+  # system user for running ekca-service and key-agent
+  ae-dir-ekca:
+    cn: "EKCA service demon user"
+    uid_number: "{{ aedir_min_gid-11 }}"
+    gid_number: "{{ aedir_min_gid-11 }}"
+    description: "The system user for running EKCA services"
+    roles:
+      - provider
 
 # POSIX UID and GID which is mapped to rootdn
 aedir_rootdn_uid_number: 0
@@ -1069,3 +1077,59 @@ apparmor_profiles_dir: "/etc/apparmor.d"
 
 # this sets the ABI version in AppArmor profiles
 apparmor_abi_version: "{{ '3.0' if ansible_distribution in ['Ubuntu', 'openSUSE Tumbleweed'] else '' }}"
+
+#---------------------------------------------------------------------------
+# EKCA parameters
+#---------------------------------------------------------------------------
+
+# whether to run EKCA on Æ-DIR provider
+ekca_enabled: False
+
+# Only one EKCA instance on Æ-DIR provider
+ekca_name: "ssh-ca-{{ openldap_server_id }}"
+
+# directory where EKCA service sockets are created
+ekca_service_socketdir: "{{ aedir_rundir }}/gunicorn/ekca"
+
+# EKCA service socket
+ekca_service_socket: "{{ ekca_service_socketdir }}/ekca-service.sock"
+
+# see https://flask.palletsprojects.com/en/1.1.x/config/#environment-and-debug-features
+ekca_flask_env: "production"
+
+# Full path name of EKCA configuration file
+ekca_cfg: "{{ aedir_etc }}/ekca/ekca.cfg"
+
+# full path name of EKCA base directory for storing SSH-CA data
+ekca_sshca_dir: "{{ aedir_etc }}/ekca"
+
+# Path name of ssh-agent socket used by EKCA
+ekca_agent_socket: "{{ aedir_rundir }}/ekca-agent/ekca-agent.sock"
+
+# Path name of gunicorn executable and its commands
+ekca_service_execstart: "{{ aedir_python3 }} -ROOBs -m gunicorn.app.wsgiapp --log-syslog --log-syslog-prefix=ekca_service --preload --forwarded-allow-ips=* --graceful-timeout=2 --workers=10 --worker-tmp-dir={{ ekca_service_socketdir }} --bind=unix:{{ ekca_service_socket }} ekca_service.srv:app"
+
+# list of environment vars to set for ssh-agent
+ekca_agent_env: []
+
+# path name of directory wih the AppArmor profiles
+ekca_apparmor_profiles_dir: "/etc/apparmor.d"
+
+# require lines for allowing anonymous GET requests to URL <ekca_name>/check
+# typically the monitoring systems are listed here
+ekca_check_requires:
+  - "ip 127.0.0.1"
+  - "ip ::1"
+
+# SSH delta time format specifying the validity period of SSH user cert
+ekca_sshca_cert_validity: "+1h"
+
+# Where to get the user's client IP to be added as cert option
+# from the HTTP request's remote address attribute
+#ekca_sshca_fromip_method: "request.remote_addr"
+# from LDAP attribute 'aeRemoteHost' in user's LDAP entry
+#ekca_sshca_fromip_method: "user:aeRemoteHost"
+ekca_sshca_fromip_method: False
+
+# PKCS#11 module
+ekca_pkcs11_module: ""

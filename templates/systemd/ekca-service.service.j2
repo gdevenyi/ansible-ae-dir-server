@@ -1,0 +1,65 @@
+#-----------------------------------------------------------------------
+# initiate:   systemctl enable ekca_service.service
+# start:      systemctl start ekca_service.service
+# get status: systemctl status ekca_service.service
+#
+# {{ ansible_managed }}
+#-----------------------------------------------------------------------
+
+[Unit]
+Description=EKCA service
+Requires=network.target
+After=network.target
+Documentation=https://ekca.stroeder.com
+
+[Service]
+Type=simple
+User=ae-dir-ekca
+Group=ae-dir-ekca
+Environment=LDAPNOINIT=1
+Environment=SSH_AUTH_SOCK="{{ ekca_agent_socket }}"
+Environment=EKCA_CFG={{ ekca_cfg }}
+Environment=PYTHONBREAKPOINT=0
+Environment=PYTHONOPTIMIZE=2
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONNOUSERSITE=1
+Environment=FLASK_ENV={{ ekca_flask_env }}
+ExecStart={{ ekca_service_execstart }}
+WorkingDirectory={{ ekca_service_socketdir }}
+CapabilityBoundingSet=
+AmbientCapabilities=
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+Restart=always
+KillSignal=SIGQUIT
+StandardOutput=null
+StandardError=syslog
+NotifyAccess=all
+# various hardening options
+PrivateUsers=no
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=full
+ProtectHome=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectHostname=yes
+ProtectClock=yes
+NoNewPrivileges=yes
+MountFlags=private
+SystemCallArchitectures=native
+LockPersonality=yes
+KeyringMode=private
+RestrictRealtime=yes
+RestrictNamespaces=yes
+RestrictSUIDSGID=yes
+DevicePolicy=closed
+DeviceAllow=/dev/log w
+SystemCallFilter=~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete @chown @timer @privileged @resources
+{% if apparmor_enabled %}
+AppArmorProfile=ekca-service
+{% endif %}
+
+[Install]
+WantedBy=multi-user.target

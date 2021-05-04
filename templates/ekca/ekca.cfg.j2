@@ -1,0 +1,78 @@
+############################################################################
+# Settings for ekca-service to be used with local Æ-DIR server via LDAPI
+#
+# {{ ansible_managed }}
+############################################################################
+
+LOG_CONFIG = '{{ aedir_etc }}/ae-logging.conf'
+
+LOG_NAME = 'ekca_service'
+
+LOG_LEVEL = 'INFO'
+
+# maximum byte size of incoming requests
+MAX_CONTENT_LENGTH = 500
+
+# global timeout default passed to socket.setdefaulttimeout()
+SOCKET_TIMEOUT = 5.0
+
+# Plugin module for checking OTP
+#OTP_CHECK_MOD = 'dummy'
+
+# Plugin module for checking password
+PASSWORD_CHECK_MOD = 'aedir'
+
+#---------------------------------------------------------------------------
+# Validation parameters
+#---------------------------------------------------------------------------
+
+# regex pattern for restricting user names
+VALID_USERNAME_REGEX = '^[a-z]+$'
+
+# regex pattern for restricting OTP values
+# here: 8-digit OTP prefixed with OATH identifier
+VALID_OTP_REGEX = '^[a-z]{4}[0-9]{8}[0-9]{8}$'
+
+#---------------------------------------------------------------------------
+# SSH-CA parameters
+#---------------------------------------------------------------------------
+
+# name of SSH CA instance
+SSH_CA_NAME = '{{ ekca_name }}'
+
+# full pathname of root directory where to store all CA data
+SSH_CA_DIR = '{{ ekca_sshca_dir }}'
+
+# SSH delta time format specifying the validity period of SSH user cert
+SSH_CERT_VALIDITY = '{{ ekca_sshca_cert_validity }}'
+
+# default SSH cert extensions
+# see https://github.com/openssh/openssh-portable/blob/master/PROTOCOL.certkeys
+# Note: values are case-sensitive!
+SSH_CERT_PERMISSIONS = [
+    'pty',
+#    'X11-forwarding',
+#    'agent-forwarding',
+#    'port-forwarding',
+#    'user-rc',
+]
+
+# LDAP attribute from where to read the SSH key permissions for ssh-keygen -O
+SSH_CERT_PERMISSIONS_ATTR = 'aeSSHPermissions'
+
+{% if ekca_sshca_fromip_method %}
+# Where to get the user's client IP to be added as cert option
+SSH_FROMIP_METHOD = '{{ ekca_sshca_fromip_method }}'
+{% endif %}
+
+#---------------------------------------------------------------------------
+# LDAP parameters
+#---------------------------------------------------------------------------
+
+# LDAP connection parameters
+LDAP_URI = '{{ openldap_ldapi_uri }}'
+
+# String formatting template for LDAP filter for reading the user's entry
+# with variables:
+# raddr - the remote IP address where the user invokes the SSH client
+LDAP_READ_FILTER = '(|(!(aeRemoteHost=*))(aeRemoteHost={raddr}))'

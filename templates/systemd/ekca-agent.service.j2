@@ -1,0 +1,55 @@
+#-----------------------------------------------------------------------
+# initiate:   systemctl enable ekca_agent.service
+# start:      systemctl start ekca_agent.service
+# get status: systemctl status ekca_agent.service
+#
+# {{ ansible_managed }}
+#-----------------------------------------------------------------------
+
+[Unit]
+Description=EKCA key agent
+Requires=network.target
+After=network.target
+Documentation=https://man.openbsd.org/ssh-agent
+
+[Service]
+Type=simple
+{% for evar in ekca_agent_env %}
+Environment={{ evar }}
+{% endfor %}
+ExecStartPre=/bin/rm -f {{ ekca_agent_socket }}
+ExecStart=/usr/bin/ssh-agent{{ ' -P ' if ekca_pkcs11_module != '' else '' }}{{ ekca_pkcs11_module }} -d -a {{ ekca_agent_socket }}
+User=ae-dir-ekca
+Group=ae-dir-ekca
+CapabilityBoundingSet=
+AmbientCapabilities=
+RestrictAddressFamilies=AF_UNIX
+RemoveIPC=yes
+# various hardening options
+PrivateNetwork=yes
+PrivateUsers=no
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=full
+ProtectHome=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectHostname=yes
+ProtectClock=yes
+NoNewPrivileges=yes
+MountFlags=private
+IPAddressDeny=any
+SystemCallArchitectures=native
+LockPersonality=yes
+KeyringMode=private
+RestrictRealtime=yes
+RestrictNamespaces=yes
+RestrictSUIDSGID=yes
+DevicePolicy=closed
+DeviceAllow=/dev/log w
+SystemCallFilter=~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete @chown @timer @privileged fork clone clone2 clone3 @resources
+
+[Install]
+WantedBy=multi-user.target

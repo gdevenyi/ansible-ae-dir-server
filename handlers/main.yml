@@ -72,6 +72,22 @@
     state: restarted
   when: openldap_role == 'provider'
 
+- name: "restart ekca-service"
+  listen:
+    - "restart ekca-service"
+  service:
+    name: "ekca-service"
+    state: restarted
+  when: openldap_role == 'provider'
+
+- name: "restart ekca-agent"
+  listen:
+    - "restart ekca-agent"
+  service:
+    name: "ekca-agent"
+    state: restarted
+  when: openldap_role == 'provider'
+
 - name: "restart pwsync"
   listen:
     - "restart pwsync"

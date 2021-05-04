@@ -1,0 +1,20 @@
+#!/bin/bash
+# Load PKCS#11 module into EKCA's ssh-agent
+# interactively asks for PKCS#11 slot password
+#
+# {{ ansible_managed }}
+
+SSHCA_NAME="${1}"
+
+SSH_AUTH_SOCK="{{ ekca_agent_socket }}"
+export SSH_AUTH_SOCK
+
+/usr/bin/ssh-add -s {{ ekca_pkcs11_module }}
+
+# generate SSH-CA directory structure
+mkdir -p "{{ ekca_sshca_dir }}/${SSHCA_NAME}/certs"
+chmod 0750 "{{ ekca_sshca_dir }}/${SSHCA_NAME}"
+chmod 0770 "{{ ekca_sshca_dir }}/${SSHCA_NAME}/certs"
+chown -R root:ekca "{{ ekca_sshca_dir }}/${SSHCA_NAME}"
+# copy public key to part readable by EKCA service
+/usr/bin/ssh-add -L && /usr/bin/ssh-add -L > "{{ ekca_sshca_dir }}/${SSHCA_NAME}/${SSHCA_NAME}.pub"

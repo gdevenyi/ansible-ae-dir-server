@@ -1,0 +1,21 @@
+# mtail program for collecting metrics from ekca_service log messages
+
+const EKCA_SERVICE /^.* ekca-service@\[(?P<pid>[0-9]+)\]/
+
+counter ekca_logmsg by loglevel
+
+//+ EKCA_SERVICE +/ (?P<loglevel>[A-Z]+) - .*$/ {
+    ekca_logmsg[$loglevel]++
+}
+
+counter ekca_error by class
+
+//+ EKCA_SERVICE +/ ERROR - (?P<short_msg>[A-Za-z0-9_. -]+): (?P<class>[A-Za-z0-9_.]+).*$/ {
+    ekca_error[$class]++
+}
+
+counter ekca_user_certs by user
+
+//+ EKCA_SERVICE +/ INFO - SSH-CA '(?P<ca_name>[a-zA-Z0-9-]+)' signs cert no. '(?P<serial>[^']+)' for user '(?P<user>[^']+)' .*$/ {
+    ekca_user_certs[$user]++
+}

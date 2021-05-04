@@ -1,0 +1,137 @@
+---
+
+# Tasks for installing EKCA
+
+- name: "PIP install EKCA in virtualenv {{ aedir_prefix }}"
+  pip:
+    name:
+      - ekca-service
+      - ekca-plugin-aedir
+    state: latest
+    virtualenv: "{{ aedir_prefix }}"
+    extra_args: "{{ aedir_pip_extra_args }}"
+  when: aedir_pip_install
+  notify:
+    - "restart ekca-service"
+
+- name: "Install EKCA packages"
+  zypper:
+    name:
+      - ekca-service
+      - ekca-plugin-aedir
+    state: latest
+    disable_recommends: yes
+    type: package
+  when: lsb_id == 'SUSE'
+  notify:
+    - "restart ekca-service"
+
+- name: "Create EKCA CA directory {{ ekca_sshca_dir }}"
+  file:
+    path: "{{ ekca_sshca_dir }}"
+    state: directory
+    owner: root
+    group: ae-dir-ekca
+    mode: 0o0750
+  notify:
+    - "restart ekca-service"
+
+- name: "Create EKCA private keys directory {{ ekca_sshca_dir }}/priv"
+  file:
+    path: "{{ ekca_sshca_dir }}/priv"
+    state: directory
+    owner: root
+    group: root
+    mode: 0o0700
+
+- name: "Create EKCA socket directory {{ ekca_service_socketdir }}"
+  file:
+    path: "{{ ekca_service_socketdir }}"
+    state: directory
+    owner: ae-dir-ekca
+    group: "{{ apache_group }}"
+    mode: 0o0750
+  notify:
+    - "restart ekca-service"
+
+- name: "Create EKCA agent directory {{ ekca_agent_socket|dirname }}"
+  file:
+    path: "{{ ekca_agent_socket|dirname }}"
+    state: directory
+    owner: ae-dir-ekca
+    group: ae-dir-ekca
+    mode: 0o0750
+  notify:
+    - "restart ekca-agent"
+
+- name: "Install EKCA service config"
+  template:
+    src: "ekca/{{ ekca_cfg|basename }}.j2"
+    dest: "{{ ekca_cfg }}"
+    follow: no
+    owner: root
+    group: ae-dir-ekca
+    mode: 0o0640
+  notify:
+    - "restart ekca-service"
+
+- name: "Install EKCA scripts"
+  template:
+    src: "ekca/{{ item }}.j2"
+    dest: "{{ aedir_bin }}/{{ item }}"
+    follow: no
+    owner: root
+    group: ae-dir-ekca
+    mode: 0o0750
+  with_items:
+    - ekca-key-add.sh
+    - ekca-key-gen.sh
+
+- name: "Install systemd unit file for EKCA agent"
+  template:
+    src: "systemd/ekca-agent.service.j2"
+    dest: "/etc/systemd/system/ekca-agent.service"
+    follow: no
+    owner: root
+    group: root
+    mode: 0o0644
+  notify:
+    - "restart ekca-agent"
+
+- name: "Install systemd unit file for EKCA service"
+  template:
+    src: "systemd/ekca-service.service.j2"
+    dest: "/etc/systemd/system/ekca-service.service"
+    follow: no
+    owner: root
+    group: root
+    mode: 0o0644
+  notify:
+    - "restart ekca-service"
+
+- name: "Create AppArmor profile for EKCA service"
+  template:
+    src: "apparmor/ekca-service.j2"
+    dest: "{{ ekca_apparmor_profiles_dir }}/ekca_service"
+    owner: root
+    group: root
+    mode: 0o0644
+  vars:
+    name: ekca_service
+    cfg: "{{ ekca_cfg }}"
+  notify:
+    - "restart apparmor"
+    - "restart ekca-service"
+  when: apparmor_enabled == True
+
+- name: "Copy mtail programs to {{ mtail_progs }}/"
+  template:
+    src: "mtail/{{ item }}.mtail.j2"
+    dest: "{{ mtail_progs }}/{{ item }}.mtail"
+    follow: no
+    owner: root
+    group: root
+    mode: 0o0644
+  with_items:
+    - "ekca-service"
+  when: mtail_progs is defined

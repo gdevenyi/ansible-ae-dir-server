@@ -241,6 +241,13 @@
     - aedir_oathenroll
 
 - block:
+    - name: "EKCA tasks"
+      include_tasks: "ekca.yml"
+      when: ekca_enabled == True and openldap_role=="provider"
+  tags:
+    - aedir_ekca
+
+- block:
     - name: "Password sync tasks on {{ openldap_role }}"
       include_tasks: "pwsync.yml"
       when:

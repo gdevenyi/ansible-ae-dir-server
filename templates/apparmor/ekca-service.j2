@@ -1,0 +1,36 @@
+# AppArmor profile for service ekca_service
+# {{ ansible_managed }}
+
+{% if apparmor_abi_version %}
+abi <abi/{{ apparmor_abi_version }}>,
+{% endif %}
+
+#include <tunables/global>
+
+profile ekca-service flags=(attach_disconnected) {
+
+  #include <ae-dir/abstractions/gunicorn>
+
+  network netlink raw,
+
+  # access to ekca_service application config
+  {{ ekca_cfg|dirname }}/ r,
+  {{ ekca_cfg }} r,
+
+  {{ ekca_sshca_dir }}/*/ r,
+  {{ ekca_sshca_dir }}/*/* r,
+  {{ ekca_sshca_dir }}/*/certs/* rw,
+
+  # invocation of OpenSSH command-line tool
+  /usr/bin/ssh-keygen ix,
+
+  # Allow us to signal ourselves
+  signal peer=@{profile_name},
+
+  {{ ekca_service_socketdir }}/ rw,
+  # allow r/w access to own heart-beat temporary file
+  owner {{ ekca_service_socketdir }}/wgunicorn-[0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_] rw,
+  # allow r/w access to own Unix domain socket
+  owner {{ ekca_service_socketdir }}/{{ name }}.sock rw,
+
+}
