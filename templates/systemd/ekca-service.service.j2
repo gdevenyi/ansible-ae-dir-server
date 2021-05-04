@@ -55,8 +55,7 @@ RestrictRealtime=yes
 RestrictNamespaces=yes
 RestrictSUIDSGID=yes
 DevicePolicy=closed
-DeviceAllow=/dev/log w
-SystemCallFilter=~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete @chown @timer @privileged @resources
+SystemCallFilter={{ systemd_systemcallfilter.gunicorn }}
 {% if apparmor_enabled %}
 AppArmorProfile=ekca-service
 {% endif %}
