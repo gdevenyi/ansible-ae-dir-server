@@ -31,6 +31,6 @@ profile ekca-service flags=(attach_disconnected) {
   # allow r/w access to own heart-beat temporary file
   owner {{ ekca_service_socketdir }}/wgunicorn-[0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_] rw,
   # allow r/w access to own Unix domain socket
-  owner {{ ekca_service_socketdir }}/{{ name }}.sock rw,
+  owner {{ ekca_service_socket }} rw,
 
 }
