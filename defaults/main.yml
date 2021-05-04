@@ -1131,5 +1131,8 @@ ekca_sshca_cert_validity: "+1h"
 #ekca_sshca_fromip_method: "user:aeRemoteHost"
 ekca_sshca_fromip_method: False
 
+# Path name of ssh-keygen executable
+ekca_ssh_keygen_exec: "/usr/bin/ssh-keygen"
+
 # PKCS#11 module
 ekca_pkcs11_module: ""

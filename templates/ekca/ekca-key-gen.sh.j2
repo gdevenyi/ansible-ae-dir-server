@@ -6,14 +6,14 @@
 
 umask 0077
 
-/usr/bin/ssh-keygen -t rsa -b 4096 -f "{{ ekca_sshca_dir }}/priv/{{ ekca_name }}"
+{{ ekca_ssh_keygen_exec }} -t rsa -b 4096 -f "{{ ekca_sshca_dir }}/priv/{{ ekca_name }}"
 
 # generate SSH-CA directory structure
 mkdir -p "{{ ekca_sshca_dir }}/{{ ekca_name }}/certs"
 chmod 0750 "{{ ekca_sshca_dir }}/{{ ekca_name }}"
 chmod 0770 "{{ ekca_sshca_dir }}/{{ ekca_name }}/certs"
-chown -R root:ekca "{{ ekca_sshca_dir }}/{{ ekca_name }}"
+chown -R root:ae-dir-ekca "{{ ekca_sshca_dir }}/{{ ekca_name }}"
 # copy public key to part readable by EKCA service
 cp "{{ ekca_sshca_dir }}/priv/{{ ekca_name }}.pub" "{{ ekca_sshca_dir }}/{{ ekca_name }}/{{ ekca_name }}.pub"
-chown root:ekca "{{ ekca_sshca_dir }}/{{ ekca_name }}/{{ ekca_name }}.pub"
+chown root:ae-dir-ekca "{{ ekca_sshca_dir }}/{{ ekca_name }}/{{ ekca_name }}.pub"
 chmod 0640 "{{ ekca_sshca_dir }}/{{ ekca_name }}/{{ ekca_name }}.pub"
