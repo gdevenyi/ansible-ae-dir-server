@@ -76,3 +76,6 @@ LDAP_URI = '{{ openldap_ldapi_uri }}'
 # with variables:
 # raddr - the remote IP address where the user invokes the SSH client
 LDAP_READ_FILTER = '(|(!(aeRemoteHost=*))(aeRemoteHost={raddr}))'
+
+# not really used but must be set
+LDAP_CA_CERT = '{{ openldap_cacert_pathname }}'
