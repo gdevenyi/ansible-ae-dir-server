@@ -4,10 +4,8 @@
 #
 # {{ ansible_managed }}
 
-SSHCA_NAME="${1}"
-
 SSH_AUTH_SOCK="{{ ekca_agent_socket }}"
 export SSH_AUTH_SOCK
 
-/usr/bin/ssh-add "{{ ekca_sshca_dir }}/priv/${SSHCA_NAME}"
+/usr/bin/ssh-add "{{ ekca_sshca_dir }}/priv/{{ ekca_name }}"
 /usr/bin/ssh-add -L
