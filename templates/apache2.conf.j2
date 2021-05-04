@@ -229,7 +229,7 @@ ProxyPreserveHost On
   </Location>
 
   <Location "/ekca">
-    ProxyPass unix:{{ ekca_service_socket }}|http://127.0.0.1:8083/{{ ekca_name }}
+    ProxyPass unix:{{ ekca_service_socket }}|http://127.0.0.1:8083/
   </Location>
 
 {% endif %}
