@@ -177,7 +177,7 @@
     - name: "TLS configuration for OpenLDAP slapd"
       include_tasks: tls_files.yml
   tags:
-    - openldap_tls_files
+    - aedir_tlsfiles
 
 - block:
     - name: "Specific AE-DIR tool tasks on {{ lsb_id }}"
