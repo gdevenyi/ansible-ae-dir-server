@@ -647,10 +647,10 @@ openldap_tls_cipher_suite: "TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:
 
 # value for parameter tls_protocol_min of slapd.conf directive 'syncrepl'
 # 3.<x> means TLSv1.<x-1>
-openldap_syncrepl_tls_protocol_min: "3.4"
+openldap_syncrepl_tls_protocol_min: "{{ openldap_tls_protocol_min }}"
 
 # value for parameter tls_cipher_suite of slapd.conf directive 'syncrepl'
-openldap_syncrepl_tls_cipher_suite: "TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256"
+openldap_syncrepl_tls_cipher_suite: "{{ openldap_tls_cipher_suite }}"
 
 # The full path names on the target system
 openldap_cacert_pathname: "{{ aedir_etc }}/tls/{{ openldap_cacert_filename|basename }}"
