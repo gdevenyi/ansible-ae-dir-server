@@ -1,6 +1,6 @@
 # mtail program for collecting metrics from ekca_service log messages
 
-const EKCA_SERVICE /^.* ekca-service@\[(?P<pid>[0-9]+)\]/
+const EKCA_SERVICE /^.* ekca-service\[(?P<pid>[0-9]+)\]/
 
 counter ekca_logmsg by loglevel
 
