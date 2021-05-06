@@ -1098,7 +1098,7 @@ ekca_service_socket: "{{ ekca_service_socketdir }}/ekca-service.sock"
 ekca_service_workers: "4"
 
 # Path name of gunicorn executable and its commands
-ekca_service_execstart: "{{ aedir_python3 }} -ROOBs -m gunicorn.app.wsgiapp --log-syslog --log-syslog-prefix=ekca_service --preload --forwarded-allow-ips=* --graceful-timeout=2 --workers={{ ekca_service_workers }} --worker-tmp-dir={{ ekca_service_socketdir }} --bind=unix:{{ ekca_service_socket }} ekca_service.srv:app"
+ekca_service_execstart: "{{ aedir_python3 }} -ROOBs -m gunicorn.app.wsgiapp --log-syslog --log-syslog-prefix=ekca-service --preload --forwarded-allow-ips=* --graceful-timeout=2 --workers={{ ekca_service_workers }} --worker-tmp-dir={{ ekca_service_socketdir }} --bind=unix:{{ ekca_service_socket }} ekca_service.srv:app"
 
 # see https://flask.palletsprojects.com/en/1.1.x/config/#environment-and-debug-features
 ekca_flask_env: "production"
