@@ -1124,8 +1124,8 @@ ekca_apparmor_profiles_dir: "/etc/apparmor.d"
 # require lines for allowing anonymous GET requests to URL <ekca_name>/check
 # typically the monitoring systems are listed here
 ekca_check_requires:
-  - "ip 127.0.0.1"
-  - "ip ::1"
+  - "ip {{ '127.0.0.1' if not ansible_default_ipv4 else ansible_default_ipv4.address }}"
+  - "ip {{ '::1' if not ansible_default_ipv6 else ansible_default_ipv6.address }}"
 
 # SSH delta time format specifying the validity period of SSH user cert
 ekca_sshca_cert_validity: "+1h"
