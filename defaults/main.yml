@@ -1094,6 +1094,12 @@ ekca_service_socketdir: "{{ aedir_rundir }}/gunicorn/ekca"
 # EKCA service socket
 ekca_service_socket: "{{ ekca_service_socketdir }}/ekca-service.sock"
 
+# number of EKCA service worker processes
+ekca_service_workers: "4"
+
+# Path name of gunicorn executable and its commands
+ekca_service_execstart: "{{ aedir_python3 }} -ROOBs -m gunicorn.app.wsgiapp --log-syslog --log-syslog-prefix=ekca_service --preload --forwarded-allow-ips=* --graceful-timeout=2 --workers={{ ekca_service_workers }} --worker-tmp-dir={{ ekca_service_socketdir }} --bind=unix:{{ ekca_service_socket }} ekca_service.srv:app"
+
 # see https://flask.palletsprojects.com/en/1.1.x/config/#environment-and-debug-features
 ekca_flask_env: "production"
 
@@ -1108,9 +1114,6 @@ ekca_ssh_keygen_command: "/usr/bin/ssh-keygen -t rsa -b 4096 -C '{{ ekca_name }}
 
 # Path name of ssh-agent socket used by EKCA
 ekca_agent_socket: "{{ aedir_rundir }}/ekca-agent/ekca-agent.sock"
-
-# Path name of gunicorn executable and its commands
-ekca_service_execstart: "{{ aedir_python3 }} -ROOBs -m gunicorn.app.wsgiapp --log-syslog --log-syslog-prefix=ekca_service --preload --forwarded-allow-ips=* --graceful-timeout=2 --workers=10 --worker-tmp-dir={{ ekca_service_socketdir }} --bind=unix:{{ ekca_service_socket }} ekca_service.srv:app"
 
 # list of environment vars to set for ssh-agent
 ekca_agent_env: []
