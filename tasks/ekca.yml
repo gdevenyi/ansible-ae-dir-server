@@ -78,7 +78,7 @@
 - name: "Install EKCA scripts"
   template:
     src: "ekca/{{ item }}.j2"
-    dest: "{{ aedir_bin }}/{{ item }}"
+    dest: "{{ aedir_sbin }}/{{ item }}"
     follow: no
     owner: root
     group: ae-dir-ekca
