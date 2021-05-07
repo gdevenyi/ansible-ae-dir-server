@@ -490,6 +490,7 @@ aedir_htdocs_templates:
   - cli
   - demo
   - docs
+  - ekca
   - faq
   - fun
   - install
