@@ -1110,8 +1110,10 @@ ekca_cfg: "{{ aedir_etc }}/ekca/ekca.cfg"
 # full path name of EKCA base directory for storing SSH-CA data
 ekca_sshca_dir: "{{ aedir_etc }}/ekca"
 
-# comment to put into the SSH-CA's public key
-ekca_ssh_keygen_command: "/usr/bin/ssh-keygen -t rsa -b 4096 -C '{{ ekca_name }} on {{ inventory_hostname }}' -f '{{ ekca_sshca_dir }}/priv/{{ ekca_name }}'"
+# Full ssh-keygen command used when generating SSH-CA key pair
+# see argument details: https://man.openbsd.org/ssh-keygen
+# Note: Choosing usable algorithms depend on OS vendor and versions.
+ekca_ssh_keygen: "/usr/bin/ssh-keygen -t rsa -b 4096 -C '{{ ekca_name }} on {{ inventory_hostname }}' -f '{{ ekca_sshca_dir }}/priv/{{ ekca_name }}'"
 
 # Path name of ssh-agent socket used by EKCA
 ekca_agent_socket: "{{ aedir_rundir }}/ekca-agent/ekca-agent.sock"
@@ -1122,7 +1124,7 @@ ekca_agent_socket: "{{ aedir_rundir }}/ekca-agent/ekca-agent.sock"
 ekca_agent_env: []
 
 # path name of directory wih the AppArmor profiles
-ekca_apparmor_profiles_dir: "/etc/apparmor.d"
+ekca_apparmor_profiles_dir: "{{ apparmor_profiles_dir }}"
 
 # require lines for allowing anonymous GET requests to URL <ekca_name>/check
 # typically the monitoring systems are listed here
@@ -1140,5 +1142,9 @@ ekca_sshca_cert_validity: "+1h"
 #ekca_sshca_fromip_method: "user:aeRemoteHost"
 ekca_sshca_fromip_method: False
 
-# PKCS#11 module
+# Path name of PKCS#11 module, typically a shared library file.
 ekca_pkcs11_module: ""
+
+# Full ssh-agent start command used in ekca-agent.service
+# see argument details: https://man.openbsd.org/ssh-agent
+ekca_ssh_agent: "/usr/bin/ssh-agent{{ ' -P ' if ekca_pkcs11_module != '' else '' }}{{ ekca_pkcs11_module }} -d -a {{ ekca_agent_socket }}"

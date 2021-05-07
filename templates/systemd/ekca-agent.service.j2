@@ -18,7 +18,7 @@ Type=simple
 Environment={{ evar }}
 {% endfor %}
 ExecStartPre=/bin/rm -f {{ ekca_agent_socket }}
-ExecStart=/usr/bin/ssh-agent{{ ' -P ' if ekca_pkcs11_module != '' else '' }}{{ ekca_pkcs11_module }} -d -a {{ ekca_agent_socket }}
+ExecStart={{ ekca_ssh_agent }}
 User=ae-dir-ekca
 Group=ae-dir-ekca
 CapabilityBoundingSet=
