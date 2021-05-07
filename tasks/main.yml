@@ -92,8 +92,11 @@
   tags:
     - aedir_apparmor
 
-- name: "Install OpenLDAP packages"
-  include_tasks: "install_openldap_{{ lsb_id }}.yml"
+- block:
+  - name: "Install OpenLDAP packages"
+    include_tasks: "install_openldap_{{ lsb_id }}.yml"
+  tags:
+    - aedir_slapd
 
 - name: "Install apache2 on {{ lsb_id }}"
   include_tasks: "install_apache2_{{ lsb_id }}.yml"
