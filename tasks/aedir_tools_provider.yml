@@ -8,3 +8,12 @@
     owner: root
     group: root
     mode: 0o0750
+
+- name: "Install database compacting script"
+  template:
+    src: "scripts/ae-dir-compact-db.sh.j2"
+    dest: "{{ aedir_sbin }}/ae-dir-compact-db.sh"
+    owner: root
+    group: root
+    mode: 0o0750
+  when: mdb_tools_dir != ''

@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# Don't use uninitialized vars
+set -o nounset
+# After here exit on any error
+set -e
+
+# current timestamp
+DATETIME="$(date +%Y%m%d%H%M%S)"
+
+# strict permissions
+umask 077
+
+systemctl start ae-slapd
+
+# export all real database backends found to LDIF time-stamped files
+DB_DIR_NAMES="$({{ openldap_path.bin }}/ldapsearch -Q -LLL -b 'cn=config' -s one '(olcSuffix=*)' olcDbDirectory | grep olcDbDirectory|cut -d' ' -f2)"
+
+for db_dir in ${DB_DIR_NAMES}
+do
+
+  old_dir="${db_dir}.old-${DATETIME}"
+  tmp_dir="${db_dir}.tmp-${DATETIME}"
+
+  mkdir "${tmp_dir}"
+
+  {{ mdb_tools_dir }}/mdb_copy -c "${db_dir}" "${tmp_dir}"
+  chown -R ae-dir-slapd:ae-dir-slapd "${tmp_dir}"
+
+  mv "${db_dir}" "${old_dir}"
+  mv "${tmp_dir}" "${db_dir}"
+
+  rm -rf "${old_dir}"
+
+done
+
+systemctl start ae-slapd
