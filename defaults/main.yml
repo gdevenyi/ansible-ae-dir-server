@@ -1116,7 +1116,9 @@ ekca_ssh_keygen_command: "/usr/bin/ssh-keygen -t rsa -b 4096 -C '{{ ekca_name }}
 # Path name of ssh-agent socket used by EKCA
 ekca_agent_socket: "{{ aedir_rundir }}/ekca-agent/ekca-agent.sock"
 
-# list of environment vars to set for ssh-agent
+# List of environment vars to set for ssh-agent.
+# E.g. used when using a hardware security module (HSM) with a vendor-specific
+# PKCS#11 module which need specific config passed via env vars.
 ekca_agent_env: []
 
 # path name of directory wih the AppArmor profiles
