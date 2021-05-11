@@ -11,13 +11,15 @@ DATETIME="$(date +%Y%m%d%H%M%S)"
 # strict permissions
 umask 077
 
-systemctl start ae-slapd
-
 # export all real database backends found to LDIF time-stamped files
 DB_DIR_NAMES="$({{ openldap_path.bin }}/ldapsearch -Q -LLL -b 'cn=config' -s one '(olcSuffix=*)' olcDbDirectory | grep olcDbDirectory|cut -d' ' -f2)"
 
+systemctl stop ae-slapd
+
 for db_dir in ${DB_DIR_NAMES}
 do
+
+  echo "Compacting DB in directory ${db_dir}"
 
   old_dir="${db_dir}.old-${DATETIME}"
   tmp_dir="${db_dir}.tmp-${DATETIME}"
@@ -25,10 +27,15 @@ do
   mkdir "${tmp_dir}"
 
   {{ mdb_tools_dir }}/mdb_copy -c "${db_dir}" "${tmp_dir}"
-  chown -R ae-dir-slapd:ae-dir-slapd "${tmp_dir}"
 
   mv "${db_dir}" "${old_dir}"
   mv "${tmp_dir}" "${db_dir}"
+
+  # set ownership
+  chown -Rc {{ openldap_slapd_user }}:{{ openldap_slapd_group }} "${db_dir}"
+  # set permissions
+  chmod -c 0750 "${db_dir}"
+  chmod -c 0600 ${db_dir}/*.mdb
 
   rm -rf "${old_dir}"
 
