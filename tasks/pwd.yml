@@ -12,6 +12,8 @@
     - "{{ aedir_etc }}/ae-dir-pwd"
     - "{{ aedir_etc }}/ae-dir-pwd/templates"
     - "{{ aedir_etc }}/ae-dir-pwd/templates/en"
+  notify:
+    - "restart ae-dir-pwd"
 
 - name: "Copy ae-dir-pwd HTML templates to {{ aedir_etc }}/ae-dir-pwd/templates"
   copy:
@@ -22,6 +24,8 @@
     group: root
     mode: u=rw,g=r,o=r
     directory_mode: u=rwx,g=rx,o=rx
+  notify:
+    - "restart ae-dir-pwd"
 
 - name: "Create {{ aedir_etc }}/ae-dir-pwd/aedirpwd_cnf.py"
   template:
