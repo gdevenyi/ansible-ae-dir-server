@@ -81,7 +81,7 @@
 - name: "Install ae-dir-pproc on provider"
   zypper:
     name:
-      - ae-dir-pproc >= 1.5.0
+      - ae-dir-pproc >= 1.5.1
     state: present
     disable_recommends: yes
     type: package
