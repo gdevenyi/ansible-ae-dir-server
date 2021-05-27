@@ -5,6 +5,7 @@
 lsb_id_map:
   openSUSE: "SUSE"
   RedHatEnterpriseServer: "CentOS"
+  AlmaLinux: "CentOS"
 
 # Service name for OpenLDAP slapd process
 openldap_service_name: "ae-slapd"
