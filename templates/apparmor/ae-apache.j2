@@ -34,6 +34,7 @@ profile ae-apache flags=(attach_disconnected) {
 {% if apache_pid_file!="" %}
   # the PID file
   {{ apache_pid_file }} rw,
+  {{ apache_pid_file }}.[0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z] rw,
 {% endif %}
 
   # allow r/w access to SSL session cache
