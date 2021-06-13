@@ -12,7 +12,7 @@
       - python3-asn1crypto >= 1.4.0
       - python3-jwcrypto >= 0.9.1
       - python3-psutil >= 5.6.7
-      - python3-prometheus_client >= 0.7.1
+      - python3-prometheus_client >= 0.11.0
       - python3-python-dateutil
       - python3-defusedxml
       - python3-gunicorn >= 20.0.4
