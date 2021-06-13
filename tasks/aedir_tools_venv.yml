@@ -17,7 +17,7 @@
       - cffi
       - cryptography
       - asn1crypto>=1.4.0
-      - jwcrypto
+      - jwcrypto>=0.9.1
       - pyasn1>=0.4.8
       - pyasn1_modules>=0.2.8
       - ldap0>=1.2.8
