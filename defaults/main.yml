@@ -666,15 +666,26 @@ openldap_dhparam_numbits: 2048
 # set to empty string to omit slapd.conf directive TLSECName
 openldap_ec_name: "secp521r1"
 
-# password hashing scheme
+# Password hashing scheme and hashing parameters
+# Danger zone! Think twice here! Read relevant documentation!
 # see https://tools.ietf.org/html/draft-stroeder-hashed-userpassword-values
 openldap_password_hash: "{CRYPT}"
 # SHA-512, 128 bits of salt, 100000 iterations (see also crypt(3) man page)
 openldap_password_crypt_salt_format: "$6$rounds=100000$%.16s"
-# new password scheme available in OpenLDAP 2.4.50
+# new password scheme available in OpenLDAP 2.4.50+
 #openldap_password_hash: "{ARGON2}"
 # Specifies whether OpenLDAP's slapd-pw-argon2 is available
-openldap_argon2_available: "{{ openldap_password_hash == '{ARGON2}' }}"
+openldap_argon2_available: "{{ lsb_id != 'CentOS' }}"
+# Specify Argon2 parameters
+# - Argon2 parameters are a trade-off between your hardware speed and security
+# - Python module argon2-cffi can be used as CLI tool to measure
+#   performance with different parameters on your particular hardware
+# - libsodium only supports p=1, so stick to p=1 if unsure how OpenLDAP was built
+# - Worth reading:
+#   https://www.twelve21.io/how-to-choose-the-right-parameters-for-argon2/
+#   https://argon2-cffi.readthedocs.io/en/stable/parameters.html
+#   https://hynek.me/articles/storing-passwords/
+openldap_argon2_params: "p=1 t=9 m=102400"
 
 # subject alternative names in CSRs
 openldap_csr_subjectdn: "/{{ openldap_tls_cert_suffixes[0].split(',')|reverse|join('/') }}/CN={{ openldap_service_fqdn }}"

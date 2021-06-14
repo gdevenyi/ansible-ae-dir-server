@@ -26,7 +26,7 @@ moduleload lastbind
 moduleload deref
 moduleload noopsrch
 {% if openldap_argon2_available %}
-moduleload pw-argon2
+moduleload pw-argon2 {{ openldap_argon2_params}}
 {% endif %}
 
 {% if openldap_role=="provider" %}
