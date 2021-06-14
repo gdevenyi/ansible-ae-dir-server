@@ -22,6 +22,7 @@ Environment=LDAPNOINIT=1
 Environment={{ evar.name }}={{ evar.value }}
 {% endfor %}
 Environment=AEDIRPWD_CFG={{ aedir_etc }}/ae-dir-pwd/aedirpwd_cnf.py
+Environment=FLASK_ENV=production
 ExecStartPre={{ rm_exec }} -f {{ aedir_rundir }}/gunicorn/ae-dir-pwd/ae-dir-pwd.sock
 ExecStart={{ aedir_gunicorn }} --workers={{ aedir_pwd_workers }} "aedir_pproc.pwd.web.app:create_app()"
 WorkingDirectory={{ aedir_rundir }}/gunicorn/ae-dir-pwd
