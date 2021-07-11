@@ -20,8 +20,8 @@
       - jwcrypto>=0.9.1
       - pyasn1>=0.4.8
       - pyasn1_modules>=0.2.8
-      - ldap0>=1.2.8
-      - aedir>=1.4.6
+      - ldap0>=1.2.11
+      - aedir>=1.4.8
       - psutil>=5.6.7
       - prometheus_client>=0.11.0
       - python-dateutil
