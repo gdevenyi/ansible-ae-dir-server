@@ -1,5 +1,5 @@
 galaxy_info:
-  role_name: ae-dir-server
+  role_name: aedir_server
   author: Michael Ströder
   description: AE-DIR servers
 
