@@ -7,33 +7,7 @@ database mdb
 suffix "{{ aedir_accesslog_suffix }}"
 directory {{ openldap_data }}/accesslog
 
-require strong
-
-# Always set rootdn since needed by internally writing overlays
-rootdn "cn=root,{{ aedir_accesslog_suffix }}"
-# rootpw not needed in production!
-#rootpw donotenable!!!
-access to
-  dn.base="cn=root,{{ aedir_accesslog_suffix }}"
-    by * none
-
-lastmod on
-
-# database parameters
-maxsize {{ openldap_db_params.accesslog.mdb_maxsize }}
-
-{% if openldap_db_params.accesslog.checkpoint %}
-# Better write performance but less crash resistance, see slapd-mdb(5) for details
-dbnosync
-checkpoint {{ openldap_db_params.accesslog.checkpoint }}
-envflags writemap mapasync
-{% endif %}
-
-# Maximum number of entries to return from a search operation
-sizelimit {{ openldap_db_params.accesslog.sizelimit }}
-
-# Maximum number of time [secs] slapd will spend answering a search request
-timelimit {{ openldap_db_params.accesslog.timelimit }}
+{{ mdb_params(openldap_db_params.accesslog, aedir_accesslog_suffix) }}
 
 # Indexing configuration
 index reqStart eq

@@ -7,33 +7,7 @@ database mdb
 suffix "{{ aedir_session_suffix }}"
 directory {{ openldap_data }}/session
 
-require strong
-
-# Always set rootdn since needed by internally writing overlays
-rootdn "cn=root,{{ aedir_session_suffix }}"
-# rootpw not needed in production!
-#rootpw donotenable!!!
-access to
-  dn.base="cn=root,{{ aedir_session_suffix }}"
-    by * none
-
-lastmod on
-
-# database parameters
-maxsize {{ openldap_db_params.session.mdb_maxsize }}
-
-{% if openldap_db_params.session.checkpoint %}
-# Better write performance but less crash resistance, see slapd-mdb(5) for details
-dbnosync
-checkpoint {{ openldap_db_params.session.checkpoint }}
-envflags writemap mapasync
-{% endif %}
-
-# Maximum number of entries to return from a search operation
-sizelimit {{ openldap_db_params.session.sizelimit }}
-
-# Maximum number of time [secs] slapd will spend answering a search request
-timelimit {{ openldap_db_params.session.timelimit }}
+{{ mdb_params(openldap_db_params.session, aedir_session_suffix) }}
 
 add_content_acl yes
 

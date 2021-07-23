@@ -4,6 +4,7 @@
 # {{ ansible_managed }}
 ############################################################################
 
+{% from 'macros.j2' import mdb_params %}
 {% include 'global.conf.j2' %}
 
 {% include 'config.conf.j2' %}
@@ -21,27 +22,7 @@ database mdb
 suffix "{{ aedir_suffix }}"
 directory {{ openldap_data }}/um
 
-require strong
-
-# Always set rootdn since needed by internally writing overlays
-rootdn "cn=root,{{ aedir_suffix }}"
-# rootpw not needed in production!
-#rootpw donotenable!!!
-access to
-  dn.base="cn=root,{{ aedir_suffix }}"
-    by * none
-
-lastmod on
-
-# database parameters
-maxsize {{ openldap_db_params.um.mdb_maxsize }}
-
-{% if openldap_db_params.um.checkpoint %}
-# Better write performance but less crash resistance, see slapd-mdb(5) for details
-dbnosync
-checkpoint {{ openldap_db_params.um.checkpoint }}
-envflags writemap mapasync
-{% endif %}
+{{ mdb_params(openldap_db_params.um, aedir_suffix) }}
 
 #---------------------------------------------------------------------------
 # Index configuration
@@ -109,12 +90,6 @@ index aeHwSerialNumber eq,sub
 #---------------------------------------------------------------------------
 # search/time limits for {{ aedir_suffix }}
 #---------------------------------------------------------------------------
-
-# Maximum number of entries to return from a search operation
-sizelimit {{ openldap_db_params.um.sizelimit }}
-
-# Maximum number of time [secs] slapd will spend answering a search request
-timelimit {{ openldap_db_params.um.timelimit }}
 
 # no limits for AE admins
 limits

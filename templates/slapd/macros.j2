@@ -1,0 +1,44 @@
+{% macro mdb_params(params, suffix) -%}
+# Always set rootdn since needed by internally writing overlays
+rootdn "cn=root,{{ suffix }}"
+# rootpw not needed in production!
+#rootpw donotenable!!!
+access to
+  dn.base="cn=root,{{ suffix }}"
+    by * none
+
+# require clients to use strong authentication
+require strong
+
+# let slapd maintain operational attributes
+lastmod on
+
+# MDB parameters, see slapd-mdb(5) for details
+
+# maximum size of MDB file
+maxsize {{ params.mdb_maxsize }}
+
+{% if params.mdb_checkpoint %}
+# Better write performance but less crash resistance
+dbnosync
+checkpoint {{ params.mdb_checkpoint }}
+envflags {{ params.mdb_envflags }}
+{% endif %}
+
+# file permissions for MDB files
+mode {{ params.mdb_mode }}
+
+# Maximum number of entries to process in a single read transaction when executing a large search
+rtxnsize {{ params.mdb_rtxnsize }}
+
+# Depth of the stack used for search filter evaluation (nested AND / OR clauses)
+# before additional memory allocation
+searchstack {{ params.mdb_searchstack }}
+
+# Maximum number of entries to return from a search operation
+sizelimit {{ params.sizelimit }}
+
+# Maximum number of time [secs] slapd will spend answering a search request
+timelimit {{ params.timelimit }}
+
+{%- endmacro %}
