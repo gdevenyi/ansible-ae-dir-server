@@ -4,7 +4,7 @@
 # {{ ansible_managed }}
 ############################################################################
 
-{% from 'macros.j2' import mdb_params %}
+{% from 'macros.j2' import mdb_params_config %}
 {% include 'global.conf.j2' %}
 
 #---------------------------------------------------------------------------
@@ -29,7 +29,7 @@ database mdb
 suffix "{{ aedir_suffix }}"
 directory {{ openldap_data }}/um
 
-{{ mdb_params(openldap_db_params.um, aedir_suffix) }}
+{{ mdb_params_config(mdb_params.um, aedir_suffix) }}
 
 add_content_acl yes
 
@@ -1454,10 +1454,10 @@ overlay lastbind
 
 # syncrepl-Overlay
 overlay syncprov
-{% if openldap_db_params.um.syncprov_checkpoint %}
-syncprov-checkpoint {{ openldap_db_params.um.syncprov_checkpoint }}
+{% if mdb_params.um.syncprov_checkpoint %}
+syncprov-checkpoint {{ mdb_params.um.syncprov_checkpoint }}
 {% endif %}
-syncprov-sessionlog {{ openldap_db_params.um.syncprov_sessionlog }}
+syncprov-sessionlog {{ mdb_params.um.syncprov_sessionlog }}
 syncprov-nopresent FALSE
 syncprov-reloadhint FALSE
 

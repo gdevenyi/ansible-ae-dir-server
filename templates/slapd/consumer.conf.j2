@@ -4,7 +4,7 @@
 # {{ ansible_managed }}
 ############################################################################
 
-{% from 'macros.j2' import mdb_params %}
+{% from 'macros.j2' import mdb_params_config %}
 {% include 'global.conf.j2' %}
 
 {% include 'config.conf.j2' %}
@@ -22,7 +22,7 @@ database mdb
 suffix "{{ aedir_suffix }}"
 directory {{ openldap_data }}/um
 
-{{ mdb_params(openldap_db_params.um, aedir_suffix) }}
+{{ mdb_params_config(mdb_params.um, aedir_suffix) }}
 
 #---------------------------------------------------------------------------
 # Indexing configuration {{ aedir_suffix }}
@@ -299,8 +299,8 @@ overlay lastbind
 
 # syncrepl-Overlay
 overlay syncprov
-{% if openldap_db_params.um.syncprov_checkpoint %}
-syncprov-checkpoint {{ openldap_db_params.um.syncprov_checkpoint }}
+{% if mdb_params.um.syncprov_checkpoint %}
+syncprov-checkpoint {{ mdb_params.um.syncprov_checkpoint }}
 {% endif %}
 syncprov-nopresent FALSE
 syncprov-reloadhint FALSE

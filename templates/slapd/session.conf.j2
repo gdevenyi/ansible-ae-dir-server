@@ -7,7 +7,7 @@ database mdb
 suffix "{{ aedir_session_suffix }}"
 directory {{ openldap_data }}/session
 
-{{ mdb_params(openldap_db_params.session, aedir_session_suffix) }}
+{{ mdb_params_config(mdb_params.session, aedir_session_suffix) }}
 
 add_content_acl yes
 
@@ -134,9 +134,9 @@ constraint_attribute
 
 # syncrepl-Overlay
 overlay syncprov
-syncprov-checkpoint {{ openldap_db_params.session.syncprov_checkpoint }}
-{% if openldap_db_params.session.syncprov_checkpoint %}
-syncprov-checkpoint {{ openldap_db_params.session.syncprov_checkpoint }}
+syncprov-checkpoint {{ mdb_params.session.syncprov_checkpoint }}
+{% if mdb_params.session.syncprov_checkpoint %}
+syncprov-checkpoint {{ mdb_params.session.syncprov_checkpoint }}
 {% endif %}
 syncprov-nopresent FALSE
 syncprov-reloadhint FALSE

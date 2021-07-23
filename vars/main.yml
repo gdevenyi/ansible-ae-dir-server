@@ -15,6 +15,47 @@ openldap_sockbuf_max_incoming_auth_default:
   provider: 4194304
   consumer: 262143
 
+# Various database-specific tuning parameters
+# mdb_*: see directives in slapd-mdb(5)
+# syncprov_*: see directives in slapo-syncprov(5)
+# sizelimit: see directive 'sizelimit' in slapd.conf(5)
+# timelimit: see directive 'timelimit' in slapd.conf(5)
+# These are default values which defaults role var openldap_db_params can override
+openldap_db_params_defaults:
+  accesslog:
+    mdb_maxsize: 500000000
+    mdb_mode: "0600"
+    mdb_rtxnsize: 10000
+    mdb_searchstack: 16
+    mdb_checkpoint: "5000 2"
+    mdb_envflags: "writemap mapasync"
+    syncprov_sessionlog: 10000
+    syncprov_checkpoint: "5000 2"
+    sizelimit: 1000
+    timelimit: 120
+  um:
+    mdb_maxsize: 100000000
+    mdb_mode: "0600"
+    mdb_rtxnsize: 10000
+    mdb_searchstack: 16
+    mdb_checkpoint: "1000 1"
+    mdb_envflags: "writemap mapasync"
+    syncprov_sessionlog: 10000
+    syncprov_checkpoint: "1000 1"
+    sizelimit: 500
+    timelimit: 60
+  session:
+    mdb_maxsize: 10000000
+    mdb_mode: "0600"
+    mdb_rtxnsize: 100
+    mdb_searchstack: 4
+    mdb_checkpoint: "20000 10"
+    mdb_envflags: "writemap mapasync"
+    syncprov_sessionlog: 1000
+    syncprov_checkpoint: "20000 10"
+    sizelimit: 50
+    timelimit: 10
+
 # system-specific limited replacement for @resources
 systemcallfilter_resources: "{{ '@resources' if ansible_lsb.id not in ('openSUSE', 'SUSE') or ansible_lsb.description=='openSUSE Tumbleweed' else 'sched_setparam sched_setscheduler sched_setaffinity setpriority setrlimit set_mempolicy migrate_pages move_pages mbind sched_setattr' }}"
 

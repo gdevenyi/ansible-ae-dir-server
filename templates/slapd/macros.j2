@@ -1,4 +1,4 @@
-{% macro mdb_params(params, suffix) -%}
+{% macro mdb_params_config(params, suffix) -%}
 # Always set rootdn since needed by internally writing overlays
 rootdn "cn=root,{{ suffix }}"
 # rootpw not needed in production!

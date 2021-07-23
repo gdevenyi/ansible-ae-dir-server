@@ -7,7 +7,7 @@ database mdb
 suffix "{{ aedir_accesslog_suffix }}"
 directory {{ openldap_data }}/accesslog
 
-{{ mdb_params(openldap_db_params.accesslog, aedir_accesslog_suffix) }}
+{{ mdb_params_config(mdb_params.accesslog, aedir_accesslog_suffix) }}
 
 #---------------------------------------------------------------------------
 # Indexing configuration {{ aedir_accesslog_suffix }}
