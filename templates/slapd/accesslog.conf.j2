@@ -22,6 +22,28 @@ index reqEntryUUID eq
 index objectClass eq
 
 #---------------------------------------------------------------------------
+# User-specific search/time limits for {{ aedir_suffix }}
+#---------------------------------------------------------------------------
+
+# no limits for AE admins
+limits
+  group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}"
+    time=unlimited
+    size=unlimited
+
+# no limits for AE auditors
+limits
+  group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}"
+    time=unlimited
+    size=unlimited
+
+# no limits for rootdn in {{ aedir_suffix }}, means local user root
+limits
+  dn.self.exact="cn=root,{{ aedir_suffix }}"
+    time=unlimited
+    size=unlimited
+
+#---------------------------------------------------------------------------
 # Access rights {{ aedir_accesslog_suffix }}
 #---------------------------------------------------------------------------
 

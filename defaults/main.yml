@@ -735,7 +735,7 @@ openldap_db_params:
     mdb_envflags: "writemap mapasync"
     syncprov_sessionlog: 10000
     syncprov_checkpoint: "5000 2"
-    sizelimit: -1
+    sizelimit: 1000
     timelimit: 120
   um:
     mdb_maxsize: 100000000
