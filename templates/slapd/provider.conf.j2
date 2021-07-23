@@ -34,11 +34,10 @@ directory {{ openldap_data }}/um
 add_content_acl yes
 
 #---------------------------------------------------------------------------
-# Index configuration
+# Indexing configuration {{ aedir_suffix }}
 #---------------------------------------------------------------------------
 
 # general eq-only indexes
-
 index objectClass eq
 index uid eq
 index departmentNumber eq
@@ -125,14 +124,8 @@ index oathTOTPToken eq
 index oathTOTPParams eq
 
 #---------------------------------------------------------------------------
-# search/time limits for {{ aedir_suffix }}
+# User-specific search/time limits for {{ aedir_suffix }}
 #---------------------------------------------------------------------------
-
-# Maximum number of entries to return from a search operation
-sizelimit {{ openldap_db_params.um.sizelimit }}
-
-# Maximum number of time [secs] slapd will spend answering a search request
-timelimit {{ openldap_db_params.um.timelimit }}
 
 # no limits for AE admins
 limits
@@ -165,7 +158,7 @@ limits
     size=unlimited
 
 #---------------------------------------------------------------------------
-# access control rules for {{ aedir_suffix }}
+# Access control lists (ACLs) for {{ aedir_suffix }}
 #---------------------------------------------------------------------------
 
 # First disallow non-active entities to proceed to rest of ACLs
@@ -993,7 +986,7 @@ access to
     by * auth
 
 #---------------------------------------------------------------------------
-# overlays used within {{ aedir_suffix }}
+# Overlays used for {{ aedir_suffix }}
 #---------------------------------------------------------------------------
 
 # for counting search results without retrieving them
@@ -1456,7 +1449,7 @@ overlay lastbind
 {% include 'slapo-rwm.conf.j2' %}
 
 #---------------------------------------------------------------------------
-# replication of {{ aedir_suffix }}
+# Replication of {{ aedir_suffix }}
 #---------------------------------------------------------------------------
 
 # syncrepl-Overlay

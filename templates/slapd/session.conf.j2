@@ -11,7 +11,10 @@ directory {{ openldap_data }}/session
 
 add_content_acl yes
 
-# Indexing configuration
+#---------------------------------------------------------------------------
+# Indexing configuration {{ aedir_session_suffix }}
+#---------------------------------------------------------------------------
+
 index objectClass eq
 index entryCSN eq
 index entryUUID eq
@@ -97,7 +100,7 @@ access
     by * none
 
 #---------------------------------------------------------------------------
-# overlays used within {{ aedir_session_suffix }}
+# Overlays used for {{ aedir_session_suffix }}
 #---------------------------------------------------------------------------
 
 # for counting search results without retrieving them
@@ -126,7 +129,7 @@ constraint_attribute
   regex "^ae-dir-{{ openldap_server_id }}-[0-9]+\.[0-9]+$"
 
 #---------------------------------------------------------------------------
-# replication of {{ aedir_session_suffix }}
+# Replication of {{ aedir_session_suffix }}
 #---------------------------------------------------------------------------
 
 # syncrepl-Overlay

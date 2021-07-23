@@ -25,11 +25,10 @@ directory {{ openldap_data }}/um
 {{ mdb_params(openldap_db_params.um, aedir_suffix) }}
 
 #---------------------------------------------------------------------------
-# Index configuration
+# Indexing configuration {{ aedir_suffix }}
 #---------------------------------------------------------------------------
 
 # general eq-only indexes
-
 index objectClass eq
 index uid eq
 index uidNumber eq
@@ -88,7 +87,7 @@ index serialNumber eq,sub
 index aeHwSerialNumber eq,sub
 
 #---------------------------------------------------------------------------
-# search/time limits for {{ aedir_suffix }}
+# User-specific search/time limits for {{ aedir_suffix }}
 #---------------------------------------------------------------------------
 
 # no limits for AE admins
@@ -116,7 +115,7 @@ limits
     size=unlimited
 
 #---------------------------------------------------------------------------
-# Access control rules for {{ aedir_suffix }}
+# Access control lists (ACLs) for {{ aedir_suffix }}
 #---------------------------------------------------------------------------
 
 # First disallow non-active entities to proceed to rest of ACLs
@@ -241,7 +240,7 @@ access to
     by * auth
 
 #---------------------------------------------------------------------------
-# overlays used within {{ aedir_suffix }}
+# Overlays used for {{ aedir_suffix }}
 #---------------------------------------------------------------------------
 
 # for counting search results without retrieving them
@@ -295,7 +294,7 @@ overlay lastbind
 {% include 'slapo-rwm.conf.j2' %}
 
 #---------------------------------------------------------------------------
-# replication of {{ aedir_suffix }}
+# Replication of {{ aedir_suffix }}
 #---------------------------------------------------------------------------
 
 # syncrepl-Overlay

@@ -9,7 +9,10 @@ directory {{ openldap_data }}/accesslog
 
 {{ mdb_params(openldap_db_params.accesslog, aedir_accesslog_suffix) }}
 
-# Indexing configuration
+#---------------------------------------------------------------------------
+# Indexing configuration {{ aedir_accesslog_suffix }}
+#---------------------------------------------------------------------------
+
 index reqStart eq
 index reqType eq
 index reqDN eq
@@ -39,7 +42,7 @@ access
     by * none
 
 #---------------------------------------------------------------------------
-# overlays used within {{ aedir_accesslog_suffix }}
+# Overlays used for {{ aedir_accesslog_suffix }}
 #---------------------------------------------------------------------------
 
 # for counting search results without retrieving them
