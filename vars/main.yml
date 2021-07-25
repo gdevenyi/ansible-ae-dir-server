@@ -4,8 +4,9 @@
 # map real LSB id to another LSB id to be used during plays
 lsb_id_map:
   openSUSE: "SUSE"
-  RedHatEnterpriseServer: "CentOS"
-  AlmaLinux: "CentOS"
+  RedHatEnterpriseServer: "RHEL"
+  AlmaLinux: "RHEL"
+  CentOS: "RHEL"
 
 # Service name for OpenLDAP slapd process
 openldap_service_name: "ae-slapd"

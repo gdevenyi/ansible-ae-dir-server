@@ -1,5 +1,5 @@
 ---
-# basic OS installation/configuration tasks on CentOS
+# basic OS installation/configuration tasks on RHEL-alike
 
 - name: "Install epel repo"
   yum:

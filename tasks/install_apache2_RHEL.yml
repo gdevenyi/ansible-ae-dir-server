@@ -1,5 +1,5 @@
 ---
-# installing apache2 on CentOS
+# installing apache2 on RHEL-alike
 
 - name: "Install packages needed for running Apache 2.4 on {{ lsb_id }}"
   yum:

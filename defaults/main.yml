@@ -675,7 +675,7 @@ openldap_password_crypt_salt_format: "$6$rounds=100000$%.16s"
 # new password scheme available in OpenLDAP 2.4.50+
 #openldap_password_hash: "{ARGON2}"
 # Specifies whether OpenLDAP's slapd-pw-argon2 is available
-openldap_argon2_available: "{{ lsb_id != 'CentOS' }}"
+openldap_argon2_available: "{{ lsb_id != 'RHEL' }}"
 # Specify Argon2 parameters
 # - Argon2 parameters are a trade-off between your hardware speed and security
 # - Python module argon2-cffi can be used as CLI tool to measure

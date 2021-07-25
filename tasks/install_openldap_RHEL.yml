@@ -1,5 +1,5 @@
 ---
-# install OpenLDAP packages on CentOS
+# install OpenLDAP packages on RHEL-alike
 
 - name: "Copy GPG key file for LTB OpenLDAP repository"
   copy:
