@@ -20,12 +20,15 @@ galaxy_info:
   - name: SLES
     versions:
     - 15SP1
+  - name: AlmaLinux
+    versions:
+    - 8
   - name: CentOS
     versions:
-    - 7
+    - 8
   - name: EL
     versions:
-    - 7
+    - 8
 
   galaxy_tags:
     - ae-dir
