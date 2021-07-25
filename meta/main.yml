@@ -10,16 +10,18 @@ galaxy_info:
   min_ansible_version: 2.9
 
   platforms:
-  - name: opensuse
+  - name: openSUSE
     versions:
     - Tumbleweed
-    - 15.1
+    - 15.2
+    - 15.3
   - name: Debian
     versions:
     - buster
   - name: SLES
     versions:
-    - 15SP1
+    - 15SP2
+    - 15SP3
   - name: AlmaLinux
     versions:
     - 8
@@ -29,8 +31,12 @@ galaxy_info:
   - name: EL
     versions:
     - 8
+  - name: Rocky
+    versions:
+    - 8
 
   galaxy_tags:
+    - aedir
     - ae-dir
 
 dependencies: []
