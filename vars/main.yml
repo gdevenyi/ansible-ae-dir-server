@@ -7,6 +7,7 @@ lsb_id_map:
   RedHatEnterpriseServer: "RHEL"
   AlmaLinux: "RHEL"
   CentOS: "RHEL"
+  Rocky: "RHEL"
 
 # Service name for OpenLDAP slapd process
 openldap_service_name: "ae-slapd"
