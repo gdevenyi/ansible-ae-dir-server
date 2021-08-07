@@ -78,10 +78,11 @@
 - name: "PIP install additional modules for Flask web apps on {{ openldap_role }}"
   pip:
     name:
-      - Flask>=1.1.0
-      - Jinja2>=2.10.0
-      - Werkzeug>=1.0.0
-      - WTForms>=2.2.0
+      - Flask>=2.0.1
+      - Jinja2>=3.0.1
+      - Werkzeug>=2.0.1
+      - WTForms>=2.3.3
+      - itsdangerous>=2.0.0
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
