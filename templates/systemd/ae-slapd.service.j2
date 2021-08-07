@@ -19,6 +19,7 @@ Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
 Environment=LDAPNOINIT=1
 PIDFile={{ openldap_rundir }}/slapd.pid
 ExecStart={{ openldap_path.slapd_exec }} -d none -n {{ openldap_service_name }} -l {{ openldap_syslog_facility }} -s {{ openldap_syslog_level }} -f {{ openldap_slapd_conf }} -h '{{ openldap_ldapi_uri|replace('%','%%') }} ldap://*:389 ldaps://*:636' -o slp=off
+WorkingDirectory={{ aedir_rundir }}/slapd
 User={{ openldap_slapd_user }}
 Group={{ openldap_slapd_group }}
 CapabilityBoundingSet=CAP_NET_BIND_SERVICE

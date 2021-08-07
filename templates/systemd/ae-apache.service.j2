@@ -24,6 +24,7 @@ UMask=0027
 ExecStart={{ apache2_config.httpd_exec }} -DSYSTEMD -DFOREGROUND -f {{ apache_conf }} -k start
 ExecReload={{ apache2_config.httpd_exec }} -DSYSTEMD -DFOREGROUND -f {{ apache_conf }} -k graceful
 ExecStop={{ apache2_config.httpd_exec }} -DSYSTEMD -DFOREGROUND -f {{ apache_conf }} -k graceful-stop
+WorkingDirectory={{ aedir_rundir }}/apache
 CapabilityBoundingSet=CAP_NET_BIND_SERVICE
 AmbientCapabilities=CAP_NET_BIND_SERVICE
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
