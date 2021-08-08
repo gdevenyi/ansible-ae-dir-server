@@ -66,9 +66,9 @@
 - name: "Install additional packages for Flask web apps on {{ openldap_role }}"
   zypper:
     name:
-      - python3-Flask >= 1.1.0
+      - python3-Flask >= 1.0.0
       - python3-Jinja2 >= 2.10.0
-      - python3-Werkzeug >= 1.0.0
+      - python3-Werkzeug
       - python3-WTForms >= 2.2.0
     state: present
     disable_recommends: yes
