@@ -18,6 +18,7 @@ galaxy_info:
   - name: Debian
     versions:
     - buster
+    - bullseye
   - name: SLES
     versions:
     - 15SP2
