@@ -323,7 +323,7 @@ aedir_ldapi_services:
     groups:
       - ae-login-proxies
   # system user for WebSSO component
-  ae-dir-web-sso:
+  ae-dir-websso:
     cn: "WebSSO component"
     uid_number: "{{ aedir_min_gid-6 }}"
     gid_number: "{{ aedir_min_gid-6 }}"
