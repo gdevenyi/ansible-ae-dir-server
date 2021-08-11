@@ -262,6 +262,11 @@ aedir_aenwdevice_visibility_sets:
   #    the aeSrvGroup can see host's network devices
   - "this/-2 & user/-1/aeRequires"
 
+# list of user names of formerly used system accounts which should be removed
+# before adding system accounts specified with aedir_ldapi_services
+aedir_obsolete_usernames:
+  - ae-dir-web-sso
+
 # Usernames and POSIX-UID/-GID numbers for system accounts of services
 # running on providers and accessing AE-DIR via LDAPI
 # Important notes:

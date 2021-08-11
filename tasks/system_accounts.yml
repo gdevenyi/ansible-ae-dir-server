@@ -1,5 +1,19 @@
 ---
 
+# Remove obsolete accounts
+
+- name: "Remove obsolete system users"
+  user:
+    name: "{{ item }}"
+    state: absent
+  with_items: "{{ aedir_obsolete_usernames }}"
+
+- name: "Remove obsolete system groups"
+  group:
+    name: "{{ item }}"
+    state: absent
+  with_items: "{{ aedir_obsolete_usernames }}"
+
 # Add system accounts/groups
 #---------------------------------------------------------------------------
 
