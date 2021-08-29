@@ -6,7 +6,7 @@ aedir_python_version: "3.8"
 
 aedir_package_repos:
   "AE-DIR":
-    repo: "deb https://ae-dir.com/repo/debian/ buster main"
+    repo: "deb https://ae-dir.com/repo/ubuntu/focal focal main"
     key: "AE-DIR-project.gpg.key"
 
 # OS-specific Python paths

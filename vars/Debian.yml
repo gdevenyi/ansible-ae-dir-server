@@ -6,9 +6,8 @@ aedir_python_version: "{{ '3.9' if ansible_distribution_release == 'bullseye' el
 
 aedir_package_repos:
   "AE-DIR":
-    repo: "deb https://ae-dir.com/repo/debian/ buster main"
+    repo: "deb https://ae-dir.com/repo/debian/{{ ansible_lsb.codename }} {{ ansible_lsb.codename }} main"
     key: "AE-DIR-project.gpg.key"
-#    repo: "deb https://ae-dir.com/repo/debian/ {{ ansible_lsb.codename }} main"
 
 # OS-specific Python paths
 aedir_python_paths:
