@@ -26,29 +26,16 @@ AmbientCapabilities=
 RestrictAddressFamilies=AF_UNIX
 RemoveIPC=yes
 # various hardening options
+{% if aedir_systemd_hardening %}
+# various hardening options from ansible var aedir_systemd_hardening
+{% for systemd_option in aedir_systemd_hardening %}
+{{ systemd_option }}
+{% endfor %}
 PrivateNetwork=yes
-PrivateUsers=no
-PrivateTmp=yes
-PrivateDevices=yes
-ProtectSystem=full
-ProtectHome=yes
-ProtectKernelModules=yes
-ProtectKernelTunables=yes
-ProtectKernelLogs=yes
-ProtectControlGroups=yes
-ProtectHostname=yes
-ProtectClock=yes
-NoNewPrivileges=yes
-MountFlags=private
 IPAddressDeny=any
-SystemCallArchitectures=native
-LockPersonality=yes
-KeyringMode=private
-RestrictRealtime=yes
-RestrictNamespaces=yes
-RestrictSUIDSGID=yes
-DevicePolicy=closed
+MemoryDenyWriteExecute=yes
 SystemCallFilter=~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete @chown @timer @privileged fork clone clone2 clone3 @resources
+{% endif %}
 
 [Install]
 WantedBy=multi-user.target
