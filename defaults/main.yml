@@ -1047,11 +1047,15 @@ apache_oath_requires: "{{ apache_htdocs_requires }}"
 apache_pwd_requires: "{{ apache_htdocs_requires }}"
 
 # Apache TLS protocol/cipher parameters
-#
-# See Apache docs: https://httpd.apache.org/docs/2.4/mod/mod_ssl.html#sslprotocol
-apache_ssl_protocol: "ALL -SSLv2 -SSLv3 -TLSv1 -TLSv1.1"
-# See Apache docs: https://httpd.apache.org/docs/2.4/mod/mod_ssl.html#sslciphersuite
-apache_ssl_cipher_suite: "{{ openldap_tls_cipher_suite }}"
+# See Apache docs: https://httpd.apache.org/docs/2.4/mod/mod_ssl.html#sslopensslconfcmd
+# See OpenSSL docs: https://www.openssl.org/docs/man1.1.1/man3/SSL_CONF_cmd.html#SUPPORTED-CONFIGURATION-FILE-COMMANDS
+apache_openssl_conf_cmd:
+  - "MinProtocol TLSv1.2"
+  - "MaxProtocol TLSv1.3"
+  - "CipherString HIGH"
+  - "Ciphersuites TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256"
+  - "Groups {{ openldap_ec_name }}"
+  - "Options +ServerPreference,-Compression"
 
 # Path name of CA cert bundle file
 apache_cacert_filename: "{{ openldap_cacert_filename }}"

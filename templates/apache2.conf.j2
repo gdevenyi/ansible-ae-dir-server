@@ -67,9 +67,9 @@ Listen 80
 Listen 443
 
 # TLS protocol and cipher settings
-SSLProtocol {{ apache_ssl_protocol }}
-SSLCipherSuite {{ apache_ssl_cipher_suite }}
-SSLHonorCipherOrder on
+{% for cmd in apache_openssl_conf_cmd %}
+SSLOpenSSLConfCmd {{ cmd }}
+{% endfor %}
 
 # TLS Session Resumption Cache
 SSLSessionCache        shmcb:{{ apache2_config.run_dir }}/ssl_scache(512000)
