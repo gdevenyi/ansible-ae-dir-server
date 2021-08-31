@@ -670,7 +670,7 @@ openldap_dhparam_numbits: 2048
 
 # The name of a curve to use for Elliptic curve Diffie-Hellman ephemeral key exchange
 # set to empty string to omit slapd.conf directive TLSECName
-openldap_ec_name: "secp521r1"
+openldap_ec_name: "secp521r1:secp384r1:prime256v1"
 
 # Password hashing scheme and hashing parameters
 # Danger zone! Think twice here! Read relevant documentation!
