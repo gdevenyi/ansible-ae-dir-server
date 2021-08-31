@@ -50,7 +50,7 @@ openldap_db_params_defaults:
     mdb_maxsize: 10000000
     mdb_mode: "0600"
     mdb_rtxnsize: 100
-    mdb_searchstack: 4
+    mdb_searchstack: 8
     mdb_checkpoint: "20000 10"
     mdb_envflags: "writemap mapasync"
     syncprov_sessionlog: 1000
