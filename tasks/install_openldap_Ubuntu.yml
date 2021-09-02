@@ -23,7 +23,6 @@
 - name: "Install AE-DIR OpenLDAP packages and dependencies"
   apt:
     name:
-      - libsodium23
       - openldap-ms
       - openldap-ms-contrib-overlays
       - openldap-ms-mdb-utils
