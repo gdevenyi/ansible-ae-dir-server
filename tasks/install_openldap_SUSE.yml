@@ -25,7 +25,6 @@
 - name: "Install OpenLDAP packages"
   zypper:
     name:
-      - "libldap-2_4-2"
       - "openldap2"
       - "openldap2-back-sock"
       - "openldap2-client"
