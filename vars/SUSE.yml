@@ -30,6 +30,9 @@ mdb_tools_dir: "{{ '/usr/bin' if ansible_lsb.description == 'openSUSE Tumbleweed
 # Pathname of rm command-line tool
 rm_exec: "/usr/bin/rm"
 
+# minimum OpenLDAP version to install
+openldap_version: "2.5.7"
+
 # OS-specific maps
 openldap_path:
   # openSUSE packages

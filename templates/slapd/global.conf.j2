@@ -26,7 +26,7 @@ moduleload lastbind
 moduleload deref
 moduleload noopsrch
 {% if openldap_argon2_available %}
-moduleload pw-argon2 {{ openldap_argon2_params}}
+moduleload {{ 'pw-argon2' if openldap_version.startswith('2.4.') else 'argon2' }} {{ openldap_argon2_params}}
 {% endif %}
 
 {% if openldap_role=="provider" %}
@@ -47,7 +47,9 @@ include {{ openldap_path.conf_prefix }}/schema/cosine.schema
 include {{ openldap_path.conf_prefix }}/schema/inetorgperson.schema
 include {{ openldap_path.conf_prefix }}/schema/dyngroup.schema
 include {{ openldap_path.conf_prefix }}/schema/openldap.schema
+{% if openldap_version.startswith('2.4.') %}
 include {{ openldap_path.conf_prefix }}/schema/ppolicy.schema
+{% endif %}
 include {{ openldap_path.conf_prefix }}/schema/nis.schema
 include {{ openldap_path.conf_prefix }}/schema/duaconf.schema
 
