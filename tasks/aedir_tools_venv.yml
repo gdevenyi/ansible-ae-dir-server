@@ -20,7 +20,7 @@
       - jwcrypto>=0.9.1
       - pyasn1>=0.4.8
       - pyasn1_modules>=0.2.8
-      - ldap0>=1.2.11
+      - ldap0>=1.3.0
       - aedir>=1.4.8
       - psutil>=5.6.7
       - prometheus_client>=0.11.0
@@ -32,6 +32,8 @@
     extra_args: "{{ aedir_pip_extra_args }}"
   environment:
     LDFLAGS: "-fuse-ld=bfd"
+    LIBLDAP0_INCLUDE_DIRS: "{{ openldap_path.prefix }}/include"
+    LIBLDAP0_LIBRARY_DIRS: "{{ openldap_path.libdir }}"
   notify:
     - restart ae-dir-pwd
     - restart hotp_validator

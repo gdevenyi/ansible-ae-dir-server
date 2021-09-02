@@ -12,7 +12,6 @@
   with_dict:
     HOME: "{{ aedir_rundir }}"
     MAILTO: ""
-    LD_LIBRARY_PATH: "{{ openldap_path.libdir }}"
     LDAPRC: "{{ aedir_etc }}/ldap.conf"
     PYTHONPATH: "{{ aedir_etc }}/ae-dir-pwd"
 

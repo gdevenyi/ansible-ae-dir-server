@@ -6,10 +6,6 @@
 LDAPNOINIT=1
 export LDAPNOINIT
 
-# explicitly use specific libldap
-LD_LIBRARY_PATH="{{ openldap_path.libdir }}:${LD_LIBRARY_PATH}"
-export LD_LIBRARY_PATH
-
 # some env vars set for Python interpreter
 {% for evar in aedir_python_env %}
 {{ evar.name }}={{ evar.value }}
