@@ -34,6 +34,7 @@
     LDFLAGS: "-fuse-ld=bfd"
     LIBLDAP0_INCLUDE_DIRS: "{{ openldap_path.prefix }}/include"
     LIBLDAP0_LIBRARY_DIRS: "{{ openldap_path.libdir }}"
+    LIBLDAP0_LIBS: "ldap"
   notify:
     - restart ae-dir-pwd
     - restart hotp_validator
