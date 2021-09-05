@@ -26,9 +26,6 @@ mdb_tools_dir: "/opt/openldap-ms/sbin"
 # Pathname of rm command-line tool
 rm_exec: "/bin/rm"
 
-# minimum OpenLDAP version to install
-openldap_version: "2.5.7"
-
 # OS-specific maps
 openldap_path:
   prefix: /opt/openldap-ms
