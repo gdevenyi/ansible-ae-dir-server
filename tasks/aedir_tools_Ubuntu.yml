@@ -31,7 +31,6 @@
       - cpp
       - libssl-dev
       - libsasl2-dev
-      - libldap2-dev
       - python3-dev
       - libpython3-dev
       - libffi-dev
