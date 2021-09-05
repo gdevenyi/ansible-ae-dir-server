@@ -12,12 +12,21 @@
     state: present
   with_dict: "{{ aedir_pkg_repos }}"
 
-- name: "Add AE-DIR Debian repository"
+- name: "Remove old AE-DIR APT repository"
   apt_repository:
+    state: absent
+    filename: "AE-DIR"
+    repo: "deb https://ae-dir.com/repo/debian/ buster main"
+    state: absent
+
+- name: "Add AE-DIR APT repository"
+  apt_repository:
+    state: present
     filename: "{{ item.key }}"
     repo: "{{ item.value.repo }}"
     state: present
     update_cache: yes
+    validate_certs: yes
   with_dict: "{{ aedir_pkg_repos }}"
 
 - name: "Install AE-DIR OpenLDAP packages and dependencies"
