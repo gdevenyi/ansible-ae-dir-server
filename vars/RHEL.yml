@@ -6,7 +6,7 @@ aedir_python_version: "3.6"
 
 aedir_package_repos:
   "sofl":
-    repo: "https://repo.symas.com/repo/rpm/SOFL/rhel$releasever"
+    repo: "https://repo.symas.com/repo/rpm/SOLDAP/release25/rhel$releasever"
     key: "RPM-GPG-KEY-symas-com-signing-key"
 
 # OS-specific Python paths
@@ -37,20 +37,20 @@ mdb_tools_dir: "/usr/libexec/openldap"
 rm_exec: "/usr/bin/rm"
 
 # minimum OpenLDAP version to install
-openldap_version: "2.4.59"
+openldap_version: "2.5.7"
 
 # OS-specific maps
 openldap_path:
   # LTB-based installation
-  prefix: /usr/local/openldap
-  bin: /usr/bin
-  sbin: /usr/sbin
-  conf_prefix: /etc/openldap
-  data: /var/lib/ldap
-  rundir: /var/run/openldap
-  slapd_exec: /usr/sbin/slapd
-  libdir: /usr/lib64
-  modules: /usr/lib64/openldap
+  prefix: /opt/symas
+  bin: /opt/symas/bin
+  sbin: /opt/symas/lib/slapd
+  conf_prefix: /opt/symas/etc/openldap
+  data: /var/symas/openldap-data
+  rundir: /var/symas/run
+  slapd_exec: /opt/symas/lib/slapd
+  libdir: /opt/symas/lib
+  modules: /opt/symas/lib/openldap
 
 cron_config:
   service_name: "crond"

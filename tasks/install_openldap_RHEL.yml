@@ -20,7 +20,8 @@
 - name: "Install Symas OpenLDAP for Linux packages"
   yum:
     name:
-      - symas-openldap
+      - symas-openldap-libs
+      - symas-openldap-devel
       - symas-openldap-clients
       - symas-openldap-servers
     state: latest
