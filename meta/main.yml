@@ -33,6 +33,10 @@ galaxy_info:
   - name: Rocky
     versions:
     - 8
+  - name: Ubuntu
+    versions:
+    - 20.04
+    - 20.10
 
   galaxy_tags:
     - aedir
