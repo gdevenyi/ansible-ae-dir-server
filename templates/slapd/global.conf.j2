@@ -25,9 +25,7 @@ moduleload syncprov
 moduleload lastbind
 moduleload deref
 moduleload noopsrch
-{% if openldap_argon2_available %}
 moduleload argon2 {{ openldap_argon2_params}}
-{% endif %}
 
 {% if openldap_role=="provider" %}
 # only on provider replicas
