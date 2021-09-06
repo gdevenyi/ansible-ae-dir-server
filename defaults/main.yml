@@ -673,11 +673,11 @@ openldap_ec_name: "X25519:secp521r1:secp384r1:prime256v1"
 # Password hashing scheme and hashing parameters
 # Danger zone! Think twice here! Read relevant documentation!
 # see https://tools.ietf.org/html/draft-stroeder-hashed-userpassword-values
-openldap_password_hash: "{CRYPT}"
+#openldap_password_hash: "{CRYPT}"
 # SHA-512, 128 bits of salt, 100000 iterations (see also crypt(3) man page)
-openldap_password_crypt_salt_format: "$6$rounds=100000$%.16s"
+#openldap_password_crypt_salt_format: "$6$rounds=100000$%.16s"
 # new password scheme available in OpenLDAP 2.4.50+
-#openldap_password_hash: "{ARGON2}"
+openldap_password_hash: "{ARGON2}"
 # Specify Argon2 parameters
 # - Argon2 parameters are a trade-off between your hardware speed and security
 # - Python module argon2-cffi can be used as CLI tool to measure
