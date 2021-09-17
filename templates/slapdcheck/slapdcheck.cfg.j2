@@ -59,3 +59,9 @@ threads_pending_warn = {{ openldap_threads // 2 }}
 # days to warn/error when checking server cert validity
 cert_error_days = 10
 cert_warn_days = 50
+
+{% if openldap_role=="provider" %}
+# minimum and maximum possible values for serverID
+server_id_min = {{ slapd_check_cfg_server_id_min }}
+server_id_max = {{ slapd_check_cfg_server_id_max }}
+{% endif %}

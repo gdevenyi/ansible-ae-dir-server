@@ -924,6 +924,10 @@ slapd_check_cron_args:
   hour: "*"
   minute: "*"
 
+# minimum and maximum possible values for serverID
+slapd_check_cfg_server_id_min: 1
+slapd_check_cfg_server_id_max: "{{ aedir_hosts.provider|length }}"
+
 #---------------------------------------------------------------------------
 # web2ldap parameters
 #---------------------------------------------------------------------------
