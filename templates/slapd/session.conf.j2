@@ -166,6 +166,6 @@ syncrepl rid=1{{ loop.index }}
   tls_cipher_suite={{ openldap_syncrepl_tls_cipher_suite }}
 
 {% endfor %}
-mirrormode true
+multiprovider on
 {% endif %}
 
