@@ -6,16 +6,12 @@ const SLAPD_FD // + SLAPD_CONN + /fd=(?P<fd>\d+) /
 # count RESULT lines with type (tag=) and LDAP result code (err=)
 #---------------------------------------------------------------------------
 
-histogram slapd_result_qtime buckets 0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0 by tag, err
-histogram slapd_result_etime buckets 0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0 by tag, err
-counter slapd_result_count by tag, err
+histogram slapd_result buckets 0.001, 0.01, 0.1, 1.0, 10.0 by tag, err
 
 const SLAPD_RESULT // + SLAPD_OP + /.*RESULT tag=(?P<tag>\d+) (oid=(?P<oid>\d+) )*err=(?P<err>\d+) qtime=(?P<qtime>\d+\.\d+) etime=(?P<etime>\d+\.\d+) (nentries=(?P<nentries>\d+) )*text=.*$/
 
 // + SLAPD_RESULT {
-    slapd_result_count[$tag, $err]++
-    slapd_result_qtime[$tag, $err] = $qtime
-    slapd_result_etime[$tag, $err] = $etime
+    slapd_result[$tag, $err] = $etime
 }
 
 # count request lines
