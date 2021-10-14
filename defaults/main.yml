@@ -1068,6 +1068,14 @@ apache_cacert_pathname: "{{ openldap_cacert_pathname }}"
 apache_cert_pathname: "{{ openldap_cert_pathname }}"
 apache_key_pathname: "{{ openldap_key_pathname }}"
 
+# MPM tuning parameters for event model
+# see for details:
+# https://httpd.apache.org/docs/2.4/en/mod/mpm_common.html
+apache_startservers: 3
+apache_minsparethreads: 3
+apache_maxsparethreads: 10
+apache_maxconnectionsperchild: 20000
+
 #---------------------------------------------------------------------------
 # AppArmor parameters
 #---------------------------------------------------------------------------

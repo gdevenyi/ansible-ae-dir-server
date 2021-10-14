@@ -45,10 +45,10 @@ KeepAlive On
 MaxKeepAliveRequests 100
 KeepAliveTimeout 15
 
-StartServers 5
-
-MaxRequestWorkers 50
-MaxConnectionsPerChild 10000
+StartServers {{ apache_startservers }}
+MinSpareThreads {{ apache_minsparethreads }}
+MaxSpareThreads {{ apache_maxsparethreads }}
+MaxConnectionsPerChild {{ apache_maxconnectionsperchild }}
 
 User {{ apache_user }}
 Group {{ apache_group }}
