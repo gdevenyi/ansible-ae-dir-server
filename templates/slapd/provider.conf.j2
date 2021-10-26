@@ -26,6 +26,10 @@ password-crypt-salt-format "{{ openldap_password_crypt_salt_format }}"
 
 {{ mdb_params_config(aedir_db_params.um) }}
 
+# Record last bind in user entry
+lastbind on
+lastbind-precision 1
+
 add_content_acl yes
 
 #---------------------------------------------------------------------------
@@ -1444,9 +1448,6 @@ overlay ppolicy
 ppolicy_default cn=ppolicy-default,cn=ae,{{ aedir_db_params.um.suffix }}
 ppolicy_hash_cleartext
 ppolicy_use_lockout
-
-# Record last bind in user entry
-overlay lastbind
 
 {% include 'slapo-rwm.conf.j2' %}
 
