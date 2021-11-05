@@ -1376,6 +1376,8 @@ logops writes
 logold "(objectClass=*)"
 logoldattr entryUUID objectClass cn uid
 logpurge {{ openldap_log_purge }}
+# only log successful operations to work around ITS#9738
+logsuccess TRUE
 
 # Referential integrity checking
 overlay refint
