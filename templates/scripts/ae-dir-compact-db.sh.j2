@@ -14,7 +14,7 @@ umask 077
 # export all real database backends found to LDIF time-stamped files
 DB_DIR_NAMES="$({{ openldap_path.bin }}/ldapsearch -Q -LLL -b 'cn=config' -s one '(olcSuffix=*)' olcDbDirectory | grep olcDbDirectory|cut -d' ' -f2)"
 
-systemctl stop ae-slapd
+systemctl stop {{ openldap_service_name }}
 
 for db_dir in ${DB_DIR_NAMES}
 do
@@ -41,4 +41,4 @@ do
 
 done
 
-systemctl start ae-slapd
+systemctl start {{ openldap_service_name }}

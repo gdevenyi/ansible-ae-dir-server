@@ -6,5 +6,5 @@ set -o nounset
 set -e
 
 systemctl stop {{ openldap_service_name }}
-rm -f {{ openldap_data }}/*/*.mdb
+{{ rm_exec }} -f {{ openldap_data }}/*/*.mdb
 systemctl start {{ openldap_service_name }}
