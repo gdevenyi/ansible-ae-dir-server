@@ -6,7 +6,7 @@ aedir_python_version: "3.6"
 
 aedir_package_repos:
   "sofl":
-    repo: "https://repo.symas.com/repo/rpm/SOLDAP/release25/rhel$releasever"
+    repo: "https://repo.symas.com/repo/rpm/SOLDAP/release26/rhel$releasever"
     key: "RPM-GPG-KEY-symas-com-signing-key"
 
 # OS-specific Python paths
