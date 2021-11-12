@@ -28,7 +28,7 @@ password-crypt-salt-format "{{ openldap_password_crypt_salt_format }}"
 
 # Record last bind in user entry
 lastbind on
-lastbind-precision 1
+lastbind-precision {{ openldap_lastbind_precision }}
 
 add_content_acl yes
 

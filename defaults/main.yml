@@ -693,6 +693,10 @@ openldap_password_hash: "{ARGON2}"
 #   https://hynek.me/articles/storing-passwords/
 openldap_argon2_params: "p=1 t=9 m=102400"
 
+# Write a new value into attribute 'pwdLastSuccess' only if the current
+# value is more than this number of seconds in the past
+openldap_lastbind_precision: 1
+
 # subject alternative names in CSRs
 openldap_csr_subjectdn: "/{{ openldap_tls_cert_suffixes[0].split(',')|reverse|join('/') }}/CN={{ openldap_service_fqdn }}"
 
