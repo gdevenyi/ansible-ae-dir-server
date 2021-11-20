@@ -51,7 +51,7 @@
     - restart hotp_validator
     - restart bind_proxy
 
-- name: "PIP install additional modules in virtualenv {{ aedir_prefix }} on {{ openldap_role }}"
+- name: "PIP install additional modules in virtualenv {{ aedir_prefix }}"
   pip:
     name:
       - gunicorn>=20.0.4
@@ -78,7 +78,7 @@
     extra_args: "{{ aedir_pip_extra_args }}"
   when: openldap_role == 'provider'
 
-- name: "PIP install additional modules for Flask web apps on {{ openldap_role }}"
+- name: "PIP install additional modules for Flask web apps"
   pip:
     name:
       - Flask>=2.0.1

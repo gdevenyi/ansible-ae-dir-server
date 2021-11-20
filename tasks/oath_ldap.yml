@@ -120,7 +120,7 @@
   notify:
     - "restart {{ oath_bind_listener }}"
 
-- name: "Install OATH-LDAP services package on {{ openldap_role }}"
+- name: "Install OATH-LDAP services package"
   zypper:
     name:
       - oath-ldap-srv >= 1.5.0

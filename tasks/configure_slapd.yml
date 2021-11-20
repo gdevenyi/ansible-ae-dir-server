@@ -90,7 +90,7 @@
   notify:
     - "restart {{ openldap_service_name }}"
 
-- name: "Create session database directory on {{ openldap_role }}"
+- name: "Create session database directory"
   file:
     path: "{{ openldap_data }}/session"
     state: directory
@@ -113,7 +113,7 @@
   notify:
     - "restart {{ openldap_service_name }}"
 
-- name: "Fix ownership session database directory on {{ openldap_role }}"
+- name: "Fix ownership session database directory"
   file:
     path: "{{ openldap_data }}/session"
     state: directory

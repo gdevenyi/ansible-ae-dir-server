@@ -1,7 +1,7 @@
 ---
 # Install and configure web2ldap
 
-- name: "PIP install web2ldap in virtualenv {{ aedir_prefix }} on {{ openldap_role }}"
+- name: "PIP install web2ldap in virtualenv {{ aedir_prefix }}"
   pip:
     name:
       - "web2ldap>={{ web2ldap_min_version }}"
@@ -12,7 +12,7 @@
   notify:
     - restart web2ldap
 
-- name: "Install web2ldap package on {{ openldap_role }}"
+- name: "Install web2ldap package"
   zypper:
     name:
       - "web2ldap >= {{ web2ldap_min_version }}"

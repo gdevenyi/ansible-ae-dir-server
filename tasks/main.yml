@@ -159,7 +159,7 @@
     - aedir_tools
 
 - block:
-    - name: "Add system accounts on {{ openldap_role }}"
+    - name: "Add system accounts"
       include_tasks: system_accounts.yml
   tags:
     - aedir_tools
@@ -189,7 +189,7 @@
     - aedir_tools
 
 - block:
-    - name: "Specific AE-DIR tool tasks on {{ openldap_role }}"
+    - name: "Specific AE-DIR tool tasks"
       include_tasks: "aedir_tools_{{ openldap_role }}.yml"
   tags:
     - aedir_tools
@@ -222,21 +222,21 @@
     - aedir_pwd
 
 - block:
-    - name: "Install and configure web2ldap on {{ openldap_role }}"
+    - name: "Install and configure web2ldap"
       include_tasks: "web2ldap.yml"
       when: openldap_role=="provider"
   tags:
     - aedir_web2ldap
 
 - block:
-    - name: "OATH-LDAP tasks on {{ openldap_role }}"
+    - name: "OATH-LDAP tasks"
       include_tasks: "oath_ldap.yml"
       when: oath_ldap_enabled == True
   tags:
     - aedir_oath
 
 - block:
-    - name: "OATH-LDAP enrollment web app on {{ openldap_role }}"
+    - name: "OATH-LDAP enrollment web app"
       include_tasks: "oathenroll.yml"
       when: oath_ldap_enabled == True and openldap_role=="provider"
   tags:
@@ -251,7 +251,7 @@
     - aedir_ekca
 
 - block:
-    - name: "Password sync tasks on {{ openldap_role }}"
+    - name: "Password sync tasks"
       include_tasks: "pwsync.yml"
       when:
         - openldap_role=="provider"
@@ -260,19 +260,19 @@
     - aedir_pwsync
 
 - block:
-    - name: "Monitoring scripts on {{ openldap_role }}"
+    - name: "Monitoring scripts"
       include_tasks: "monitoring.yml"
   tags:
     - aedir_monitoring
 
 - block:
-    - name: "Install CRON jobs on {{ openldap_role }}"
+    - name: "Install CRON jobs"
       include_tasks: "cron.yml"
   tags:
     - aedir_cron
 
 - block:
-    - name: "Services on {{ openldap_role }}"
+    - name: "Services"
       include_tasks: "services.yml"
   tags:
     - aedir_services

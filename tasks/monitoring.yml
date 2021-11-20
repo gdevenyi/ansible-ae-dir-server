@@ -10,7 +10,7 @@
     extra_args: "{{ aedir_pip_extra_args }}"
   when: aedir_pip_install
 
-- name: "Install slapdcheck package on {{ openldap_role }}"
+- name: "Install slapdcheck package"
   zypper:
     name:
       - slapdcheck >= 3.9.2

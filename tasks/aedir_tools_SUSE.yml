@@ -63,7 +63,7 @@
     type: package
   when: openldap_role == 'provider'
 
-- name: "Install additional packages for Flask web apps on {{ openldap_role }}"
+- name: "Install additional packages for Flask web apps"
   zypper:
     name:
       - python3-Flask >= 1.0.0
