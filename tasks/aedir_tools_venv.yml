@@ -26,7 +26,6 @@
       - prometheus_client>=0.11.0
       - python-dateutil
       - defusedxml
-      - gunicorn>=20.0.4
     state: present
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
@@ -55,6 +54,7 @@
 - name: "PIP install additional modules in virtualenv {{ aedir_prefix }} on {{ openldap_role }}"
   pip:
     name:
+      - gunicorn>=20.0.4
       - mailutil>=0.4.0
       - paramiko
       - xlwt
