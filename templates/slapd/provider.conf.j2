@@ -989,6 +989,11 @@ access to
 # Overlays used for {{ aedir_suffix }}
 #---------------------------------------------------------------------------
 
+{% if openldap_slapo_accesslog %}
+# for showing user's write access in operational attributes
+overlay allowed
+{% endif %}
+
 # for counting search results without retrieving them
 overlay noopsrch
 

@@ -29,6 +29,9 @@ moduleload argon2 {{ openldap_argon2_params}}
 
 {% if openldap_role=="provider" %}
 # only on provider replicas
+{% if openldap_slapo_accesslog %}
+moduleload allowed
+{% endif %}
 moduleload sssvlv
 moduleload constraint
 moduleload refint
