@@ -35,30 +35,18 @@
     mode: u=rw,g=r,o=r
     directory_mode: u=rwx,g=rx,o=rx
 
-- name: "Install replica reset script"
+- name: "Install tool scripts to {{ aedir_sbin }}"
   template:
-    src: "scripts/ae-dir-replica-reset.sh.j2"
-    dest: "{{ aedir_sbin }}/ae-dir-replica-reset.sh"
+    src: "scripts/{{ item }}.j2"
+    dest: "{{ aedir_sbin }}/{{ item }}"
     owner: root
     group: root
     mode: 0o0750
-
-- name: "Install database compacting script"
-  template:
-    src: "scripts/ae-dir-compact-db.sh.j2"
-    dest: "{{ aedir_sbin }}/ae-dir-compact-db.sh"
-    owner: root
-    group: root
-    mode: 0o0750
-  when: mdb_tools_dir != ''
-
-- name: "Install database ownership/permissions fixup script"
-  template:
-    src: "scripts/ae-dir-fix-db-permissions.sh.j2"
-    dest: "{{ aedir_sbin }}/ae-dir-fix-db-permissions.sh"
-    owner: root
-    group: root
-    mode: 0o0750
+  loop:
+    - "ae-dir-replica-reset.sh"
+    - "ae-dir-compact-db.sh"
+    - "ae-dir-fix-db-permissions.sh"
+    - "ae-dir-slapindex.sh"
 
 - name: "Create /etc/profile.d/ae-dir.sh"
   template:
