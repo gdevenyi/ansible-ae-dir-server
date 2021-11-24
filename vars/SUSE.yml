@@ -6,7 +6,6 @@ aedir_python_version: "{{ '3.8' if ansible_lsb.description == 'openSUSE Tumblewe
 
 # which repos on https://download.opensuse.org to use for openSUSE or SLES versions
 aedir_suse_repo:
-  "SUSE Linux Enterprise Server 15 SP2": "https://download.opensuse.org/repositories/home:/stroeder:/iam/SLE_15_SP2/"
   "SUSE Linux Enterprise Server 15 SP3": "https://download.opensuse.org/repositories/home:/stroeder:/iam/15.3/"
   "SUSE Linux Enterprise Server 15 SP4": "https://download.opensuse.org/repositories/home:/stroeder:/iam/15.4/"
   "openSUSE Leap 15.2": "https://download.opensuse.org/repositories/home:/stroeder:/iam/openSUSE_Leap_15.2/"
