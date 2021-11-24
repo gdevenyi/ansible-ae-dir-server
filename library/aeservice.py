@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
+# -*- coding: ascii -*-
 """
-ansible module for adding aeService entries to Æ-DIR
+ansible module for adding aeService entries to xC6-DIR
 
-Copyright: (c) 2020, Michael Stroeder <michael@stroeder.com>
+Copyright: (c) 2020-2021, Michael Stroeder <michael@stroeder.com>
 """
 
 from ansible.module_utils.basic import AnsibleModule
@@ -93,7 +93,7 @@ options:
         required: false
     ldapurl:
         description:
-            - LDAP URI of Æ-DIR server (default ldapi://%2Fopt%2Fae-dir%2Frun%2Fslapd%2Fldapi)
+            - LDAP URI of xC6-DIR server (default ldapi://%2Fopt%2Fae-dir%2Frun%2Fslapd%2Fldapi)
         required: false
     ticket_id:
         description:
