@@ -8,7 +8,6 @@ aedir_python_version: "{{ '3.8' if ansible_lsb.description == 'openSUSE Tumblewe
 aedir_suse_repo:
   "SUSE Linux Enterprise Server 15 SP3": "https://download.opensuse.org/repositories/home:/stroeder:/iam/15.3/"
   "SUSE Linux Enterprise Server 15 SP4": "https://download.opensuse.org/repositories/home:/stroeder:/iam/15.4/"
-  "openSUSE Leap 15.2": "https://download.opensuse.org/repositories/home:/stroeder:/iam/openSUSE_Leap_15.2/"
   "openSUSE Leap 15.3": "https://download.opensuse.org/repositories/home:/stroeder:/iam/15.3/"
   "openSUSE Leap 15.4": "https://download.opensuse.org/repositories/home:/stroeder:/iam/15.4/"
   "openSUSE Tumbleweed": "https://download.opensuse.org/repositories/home:/stroeder:/iam/openSUSE_Tumbleweed/"
