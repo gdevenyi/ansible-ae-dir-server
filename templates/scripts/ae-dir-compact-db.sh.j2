@@ -5,14 +5,14 @@ set -o nounset
 # After here exit on any error
 set -e
 
-# current timestamp
-DATETIME="$(date +%Y%m%d%H%M%S)"
-
 # strict permissions
 umask 077
 
+# current timestamp
+DATETIME="$(date +%Y%m%d%H%M%S)"
+
 # export all real database backends found to LDIF time-stamped files
-DB_DIR_NAMES="$({{ openldap_path.bin }}/ldapsearch -Q -LLL -b 'cn=config' -s one '(olcSuffix=*)' olcDbDirectory | grep olcDbDirectory|cut -d' ' -f2)"
+DB_DIR_NAMES="$({{ openldap_path.bin }}/ldapsearch -Q -LLL -b 'cn=config' -s one '(olcSuffix=*)' olcDbDirectory | grep olcDbDirectory | cut -d' ' -f2)"
 
 systemctl stop {{ openldap_service_name }}
 
