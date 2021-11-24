@@ -37,7 +37,7 @@ do
   chmod -c 0750 "${db_dir}"
   chmod -c 0600 ${db_dir}/*.mdb
 
-  rm -rf "${old_dir}"
+  {{ rm_exec }} -rf "${old_dir}"
 
 done
 
