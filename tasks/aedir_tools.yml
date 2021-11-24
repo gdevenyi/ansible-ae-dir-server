@@ -43,6 +43,7 @@
     group: root
     mode: 0o0750
   loop:
+    - "ae-dir-reload.sh"
     - "ae-dir-replica-reset.sh"
     - "ae-dir-compact-db.sh"
     - "ae-dir-fix-db-permissions.sh"

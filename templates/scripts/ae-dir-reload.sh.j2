@@ -1,0 +1,57 @@
+#!/bin/sh
+
+# Don't use uninitialized vars
+set -o nounset
+# After here exit on any error
+set -e
+
+# current timestamp
+DATETIME="$(date +%Y%m%d%H%M%S)"
+
+# strict permissions
+umask 077
+
+DB_SUFFIXES="$({{ openldap_path.bin }}/ldapsearch -Q -LLL -b 'cn=config' -s one '(olcSuffix=*)' olcSuffix | grep olcSuffix | cut -d' ' -f2)"
+
+for db_suffix in ${DB_SUFFIXES}
+do
+  export_file="{{ openldap_backup_path }}/${db_suffix}-${DATETIME}.ldif"
+  echo "Exporting ${db_suffix} to ${export_file}"
+  {{ openldap_path.slapd_exec }} \
+    -T cat \
+    -f "{{ openldap_slapd_conf }}" \
+    -b "${db_suffix}" \
+    -l "${export_file}"
+done
+
+# export all real database backends found to LDIF time-stamped files
+DB_DIR_NAMES="$({{ openldap_path.bin }}/ldapsearch -Q -LLL -b 'cn=config' -s one '(olcSuffix=*)' olcDbDirectory | grep olcDbDirectory | cut -d' ' -f2)"
+
+systemctl stop {{ openldap_service_name }}
+
+for db_dir in ${DB_DIR_NAMES}
+do
+  echo "Deleting DB in directory ${db_dir}"
+  {{ rm_exec }} ${db_dir}/*.mdb
+done
+
+for db_suffix in ${DB_SUFFIXES}
+do
+  import_file="{{ openldap_backup_path }}/${db_suffix}-${DATETIME}.ldif"
+  echo "Import ${db_suffix} from ${import_file}"
+  {{ openldap_path.slapd_exec }} \
+    -T add \
+    -f "{{ openldap_slapd_conf }}" \
+    -b "${db_suffix}" \
+    -l "${import_file}"
+  {{ rm_exec }} "${import_file}"
+done
+
+for db_dir in ${DB_DIR_NAMES}
+do
+  echo "Set ownership/permissions of DB in directory ${db_dir}"
+  chown -c {{ openldap_slapd_user }}:{{ openldap_slapd_group }} ${db_dir}/*.mdb
+  chmod -c 0600 ${db_dir}/*.mdb
+done
+
+systemctl start {{ openldap_service_name }}
