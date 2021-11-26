@@ -49,8 +49,7 @@ ditcontentrule ( ae-dir-oc:27
   NOT ( businessCategory $ o $ ou $ owner $ seeAlso $ userPassword ) )
 
 ditcontentrule ( ae-dir-oc:7
-  NAME 'aeSudoRule-dcr'
-  NOT ( sudoOrder ) )
+  NAME 'aeSudoRule-dcr' )
 
 ditcontentrule ( ae-dir-oc:2
   NAME 'aeUser-dcr'
