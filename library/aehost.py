@@ -232,7 +232,11 @@ def main():
         module.params['ppolicy'] = 'cn=ppolicy-systems,cn=ae,'+ldap_conn.search_base
 
     if module.params['srvgroup'] is None:
-        parent_dn = ldap_conn.find_aehost(module.params['host']).dn_o.parent()
+        try:
+            parent_dn = ldap_conn.find_aehost(module.params['host']).dn_o.parent()
+        except ldap0.err.NoUniqueEntry as ldap_err:
+            module.fail_json(
+                msg='Error finding parent DN / missing srvgroup argument: %s' % (ldap_err))
     else:
         ae_srvgroup = ldap_conn.find_aesrvgroup(module.params['srvgroup'])
         parent_dn = ae_srvgroup.dn_o
