@@ -61,17 +61,19 @@ aedir_service_manager: "{{ ansible_service_mgr }}"
 
 # base DN / search root / naming context for AE-DIR entries
 # Note: Do yourself a favour and keep it short ;-)
-aedir_suffix: "ou=ae-dir"
+# Deprecated: Set openldap_db_params.um.suffix
+#aedir_suffix: "ou=ae-dir"
 
 # base DN / search root for accesslog entries
 # For disabling accesslog DB on the read-only consumers you can set this
 # to an empty string in group_vars/ae-dir-consumers
-aedir_accesslog_suffix: "cn=accesslog-ae-dir"
+# Deprecated: Set openldap_db_params.accesslog.suffix
+#aedir_accesslog_suffix: "cn=accesslog-ae-dir"
 
 # base DN / search root for session entries
 # (if empty string, the session database is disabled)
+# Deprecated: Set openldap_db_params.session.suffix
 #aedir_session_suffix: "cn=ae-session"
-aedir_session_suffix: ""
 
 # POSIX-GID number range served by AE-DIR
 aedir_min_gid: 30000
@@ -727,10 +729,16 @@ openldap_threads: 8
 # At least you should set mdb_maxsize to match your needs.
 openldap_db_params:
   accesslog:
+    suffix: "{{ aedir_accesslog_suffix|default('cn=accesslog-ae-dir') }}"
+    directory: "{{ openldap_data }}/accesslog"
     mdb_maxsize: 500000000
   um:
+    suffix: "{{ aedir_suffix|default('ou=ae-dir') }}"
+    directory: "{{ openldap_data }}/um"
     mdb_maxsize: 100000000
   session:
+    suffix: "{{ aedir_session_suffix|default('') }}"
+    directory: "{{ openldap_data }}/session"
     mdb_maxsize: 10000000
 
 # keep for 23 days and scan once per day, see slapo-accesslog(5)
