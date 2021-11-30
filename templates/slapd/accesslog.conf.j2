@@ -1,16 +1,11 @@
 #######################################################################
-# Audit database {{ aedir_accesslog_suffix }}
+# Audit database {{ aedir_db_params.accesslog.suffix }}
 #######################################################################
 
-database mdb
-
-suffix "{{ aedir_accesslog_suffix }}"
-directory {{ openldap_data }}/accesslog
-
-{{ mdb_params_config(mdb_params.accesslog, aedir_accesslog_suffix) }}
+{{ mdb_params_config(aedir_db_params.accesslog) }}
 
 #---------------------------------------------------------------------------
-# Indexing configuration {{ aedir_accesslog_suffix }}
+# Indexing configuration {{ aedir_db_params.accesslog.suffix }}
 #---------------------------------------------------------------------------
 
 index reqStart eq
@@ -22,49 +17,49 @@ index reqEntryUUID eq
 index objectClass eq
 
 #---------------------------------------------------------------------------
-# User-specific search/time limits for {{ aedir_suffix }}
+# User-specific search/time limits for {{ aedir_db_params.um.suffix }}
 #---------------------------------------------------------------------------
 
 # no limits for AE admins
 limits
-  group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}"
+  group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_db_params.um.suffix }}"
     time=unlimited
     size=unlimited
 
 # no limits for AE auditors
 limits
-  group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}"
+  group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_db_params.um.suffix }}"
     time=unlimited
     size=unlimited
 
-# no limits for rootdn in {{ aedir_suffix }}, means local user root
+# no limits for rootdn in {{ aedir_db_params.um.suffix }}, means local user root
 limits
-  dn.self.exact="cn=root,{{ aedir_suffix }}"
+  dn.self.exact="cn=root,{{ aedir_db_params.um.suffix }}"
     time=unlimited
     size=unlimited
 
 #---------------------------------------------------------------------------
-# Access rights {{ aedir_accesslog_suffix }}
+# Access rights {{ aedir_db_params.accesslog.suffix }}
 #---------------------------------------------------------------------------
 
 access
-  to dn.base="{{ aedir_accesslog_suffix }}"
-    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" read
-    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
-    by dn.exact="cn=root,{{ aedir_suffix }}" read
-    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}" read
+  to dn.base="{{ aedir_db_params.accesslog.suffix }}"
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_db_params.um.suffix }}" read
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_db_params.um.suffix }}" read
+    by dn.exact="cn=root,{{ aedir_db_params.um.suffix }}" read
+    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,{{ aedir_db_params.um.suffix }}" read
     by * none
 
 access
-  to dn.onelevel="{{ aedir_accesslog_suffix }}"
-    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" read
-    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
-    by dn.exact="cn=root,{{ aedir_suffix }}" read
+  to dn.onelevel="{{ aedir_db_params.accesslog.suffix }}"
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_db_params.um.suffix }}" read
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_db_params.um.suffix }}" read
+    by dn.exact="cn=root,{{ aedir_db_params.um.suffix }}" read
     by dnattr=reqAuthzID read
     by * none
 
 #---------------------------------------------------------------------------
-# Overlays used for {{ aedir_accesslog_suffix }}
+# Overlays used for {{ aedir_db_params.accesslog.suffix }}
 #---------------------------------------------------------------------------
 
 # for counting search results without retrieving them

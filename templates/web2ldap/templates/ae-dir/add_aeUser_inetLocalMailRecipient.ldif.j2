@@ -1,4 +1,4 @@
-dn: uid=,cn={{ aedir_base_zone }},{{ aedir_suffix }}
+dn: uid=,cn={{ aedir_base_zone }},{{ aedir_db_params.um.suffix }}
 objectClass: account
 objectClass: person
 objectClass: organizationalPerson
@@ -14,7 +14,7 @@ aeExpiryStatus: {{ ae_expiry_status_defaults.aeUser }}
 {% endif %}
 description: primary desktop/mailbox account
 loginShell: /bin/bash
-pwdPolicySubentry: cn=ppolicy-base-users,cn=ae,{{ aedir_suffix }}
+pwdPolicySubentry: cn=ppolicy-base-users,cn=ae,{{ aedir_db_params.um.suffix }}
 aeNotBefore: now
 aeTag: pub-tag-no-welcome-yet
 

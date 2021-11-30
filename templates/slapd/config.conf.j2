@@ -14,14 +14,14 @@ restrict write
 access to
   dn.subtree="cn=config"
   attrs=entry,objectClass,olcServerID,olcSaslHost
-    by dn.onelevel="cn=ae,{{ aedir_suffix }}" read
-    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}" read
+    by dn.onelevel="cn=ae,{{ aedir_db_params.um.suffix }}" read
+    by group/aeGroup/member="cn=ae-login-proxies,cn=ae,{{ aedir_db_params.um.suffix }}" read
     by * none break
 
 access to
   dn.subtree="cn=config"
-    by dn.exact="cn=root,{{ aedir_suffix }}" read
-    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" read
-    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
+    by dn.exact="cn=root,{{ aedir_db_params.um.suffix }}" read
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_db_params.um.suffix }}" read
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_db_params.um.suffix }}" read
     by * none
 

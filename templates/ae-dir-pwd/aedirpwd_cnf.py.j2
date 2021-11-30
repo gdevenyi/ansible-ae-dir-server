@@ -4,7 +4,7 @@ Configuration module for aedir_pproc.pwd
 """
 
 # LDAP-URL describing the connection parameters and bind information
-PWD_LDAP_URL = '{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub??trace=0,x-saslmech=EXTERNAL'
+PWD_LDAP_URL = '{{ openldap_ldapi_uri }}/{{ aedir_db_params.um.suffix }}??sub??trace=0,x-saslmech=EXTERNAL'
 
 # Filter string templates for the various use-cases
 # String-keyed dictionary with input field names used

@@ -149,34 +149,34 @@ TLSECName {{ openldap_ec_name }}
 # Map root user to rootdn when SASL/EXTERNAL is used with LDAPI
 authz-regexp
   "gidnumber={{ aedir_rootdn_gid_number }}\\+uidnumber={{ aedir_rootdn_uid_number }},cn=peercred,cn=external,cn=auth"
-  "cn=root,{{ aedir_suffix }}"
+  "cn=root,{{ aedir_db_params.um.suffix }}"
 
 {% if getent_passwd.aehostd is defined %}
 # Map aehostd user to aeHost entry when SASL/EXTERNAL is used with LDAPI
 authz-regexp
   "gidnumber={{ getent_passwd.aehostd[2] }}\\+uidnumber={{ getent_passwd.aehostd[1] }},cn=peercred,cn=external,cn=auth"
-  "host={{ inventory_hostname }},cn={{ aedir_srvgroup }},cn=ae,{{ aedir_suffix }}"
+  "host={{ inventory_hostname }},cn={{ aedir_srvgroup }},cn=ae,{{ aedir_db_params.um.suffix }}"
 {% endif %}
 
 # Map user/group to existing posixAccount entry when SASL/EXTERNAL is used with LDAPI
 authz-regexp
   "gidnumber=([0-9]+)\\+uidnumber=([0-9]+),cn=peercred,cn=external,cn=auth"
-  "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=posixAccount)(uidNumber=$2)(aeStatus=0))"
+  "ldap:///{{ aedir_db_params.um.suffix }}??sub?(&(objectClass=posixAccount)(uidNumber=$2)(aeStatus=0))"
 # Map user/group to existing account entry when SASL/EXTERNAL is used with LDAPI
 # and SASL proxy authz is used with "u:foo"
 authz-regexp
   "uid=({{ aedir_aeuser_uid_regex }}|{{ aedir_aeservice_uid_regex }}),cn=external,cn=auth"
-  "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=account)(uid=$1)(aeStatus=0))"
+  "ldap:///{{ aedir_db_params.um.suffix }}??sub?(&(objectClass=account)(uid=$1)(aeStatus=0))"
 
 {% for cert_suffix in openldap_tls_cert_suffixes %}
 # Rewrite any cert with subject-DN suffix "{{ cert_suffix }}" by searching it in attribute seeAlso
 authz-regexp
 {% if cert_suffix %}
   "(cn=[^,]+,{{ cert_suffix }})"
-  "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=pkiUser)(seeAlso=$1)(seeAlso:dnSubordinateMatch:={{ cert_suffix }})(aeStatus=0))"
+  "ldap:///{{ aedir_db_params.um.suffix }}??sub?(&(objectClass=pkiUser)(seeAlso=$1)(seeAlso:dnSubordinateMatch:={{ cert_suffix }})(aeStatus=0))"
 {% else %}
   "(cn=[^,]+)"
-  "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=pkiUser)(seeAlso=$1)(aeStatus=0))"
+  "ldap:///{{ aedir_db_params.um.suffix }}??sub?(&(objectClass=pkiUser)(seeAlso=$1)(aeStatus=0))"
 {% endif %}
 
 # Rewrite server cert with subject-DN suffix "{{ cert_suffix }}" by searching CN attribute value in server entry name attributes
@@ -186,12 +186,12 @@ authz-regexp
 {% else %}
   "cn=([a-zA-Z0-9.-]+)"
 {% endif %}
-  "ldap:///{{ aedir_suffix }}??sub?(&(objectClass=aeHost)(|(cn=$1)(host=$1))(aeStatus=0))"
+  "ldap:///{{ aedir_db_params.um.suffix }}??sub?(&(objectClass=aeHost)(|(cn=$1)(host=$1))(aeStatus=0))"
 
 {% endfor %}
 # subject name is equal to AE-DIR entry DN
 authz-regexp
-  "(.+,{{ aedir_suffix }})"
+  "(.+,{{ aedir_db_params.um.suffix }})"
   "ldap:///$1??base?(&(|(objectClass=aeUser)(objectClass=aeService)(objectClass=aeHost))(aeStatus=0))"
 
 #---------------------------------------------------------------------------
@@ -242,16 +242,16 @@ access to
 access to
   dn.base=""
   attrs=namingContexts
-  val.regex="^{{ aedir_suffix }}$"
+  val.regex="^{{ aedir_db_params.um.suffix }}$"
     by * read
 
-{% if aedir_accesslog_suffix %}
+{% if aedir_db_params.accesslog.suffix %}
 # grant read access to accesslog suffix value to all zone admins
 access to
   dn.base=""
   attrs=namingContexts
-  val.regex="^{{ aedir_accesslog_suffix }}$"
-    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}" read
+  val.regex="^{{ aedir_db_params.accesslog.suffix }}$"
+    by group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,{{ aedir_db_params.um.suffix }}" read
     by * none break
 {% endif %}
 
@@ -259,9 +259,9 @@ access to
 access to
   dn.base=""
   attrs=namingContexts,configContext,monitorContext
-    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" read
-    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
-    by dn.exact="cn=root,{{ aedir_suffix }}" read
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_db_params.um.suffix }}" read
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_db_params.um.suffix }}" read
+    by dn.exact="cn=root,{{ aedir_db_params.um.suffix }}" read
     by * none
 
 {% if openldap_role=="provider" %}
@@ -269,8 +269,8 @@ access to
 access to
   dn.base=""
   attrs=children
-    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" write
-    by dn.exact="cn=root,{{ aedir_suffix }}" write
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_db_params.um.suffix }}" write
+    by dn.exact="cn=root,{{ aedir_db_params.um.suffix }}" write
 {% endif %}
 
 # allow all bound users to read rest of rootDSE

@@ -1,4 +1,4 @@
-dn: uniqueIdentifier=,cn={{ aedir_org_zone }},{{ aedir_suffix }}
+dn: uniqueIdentifier=,cn={{ aedir_org_zone }},{{ aedir_db_params.um.suffix }}
 objectClass: person
 objectClass: organizationalPerson
 objectClass: inetOrgPerson
@@ -11,6 +11,6 @@ aeExpiryStatus: {{ ae_expiry_status_defaults.aePerson }}
 {% endif %}
 aeSourceUri: https://{{ openldap_service_fqdn }}/web2ldap
 aeNotBefore: now
-aeDept: departmentNumber=0,cn={{ aedir_org_zone }},{{ aedir_suffix }}
-aeLocation: cn=no-location,cn={{ aedir_org_zone }},{{ aedir_suffix }}
+aeDept: departmentNumber=0,cn={{ aedir_org_zone }},{{ aedir_db_params.um.suffix }}
+aeLocation: cn=no-location,cn={{ aedir_org_zone }},{{ aedir_db_params.um.suffix }}
 

@@ -3,8 +3,8 @@
 <form method="POST" action="/web2ldap/searchform">
 
   <input type="hidden" name="ldapurl" value="{{ openldap_ldapi_uri }}">
-  <input type="hidden" name="dn" value="{{ aedir_suffix }}">
-  <input type="hidden" name="login_search_root" value="{{ aedir_suffix }}">
+  <input type="hidden" name="dn" value="{{ aedir_db_params.um.suffix }}">
+  <input type="hidden" name="login_search_root" value="{{ aedir_db_params.um.suffix }}">
 
   <fieldset>
     <legend>&AElig;-DIR login</legend>
@@ -69,7 +69,7 @@
   <tr>
     <td>
       <a class="CL"
-         href="/web2ldap?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub?(&(objectClass=aeUser)(aeStatus=0)(!(userPassword=*)))?bindname=">
+         href="/web2ldap?{{ openldap_ldapi_uri }}/{{ aedir_db_params.um.suffix }}??sub?(&(objectClass=aeUser)(aeStatus=0)(!(userPassword=*)))?bindname=">
         Search active personal user accounts without password
       </a>
     </td>
@@ -79,7 +79,7 @@
   </tr>
     <td>
       <a class="CL"
-         href="/web2ldap?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub?(&(objectClass=aeGroup)(aeStatus=0)(!(member=*)))?bindname=">
+         href="/web2ldap?{{ openldap_ldapi_uri }}/{{ aedir_db_params.um.suffix }}??sub?(&(objectClass=aeGroup)(aeStatus=0)(!(member=*)))?bindname=">
         Search active groups without members
       </a>
     </td>
@@ -90,7 +90,7 @@
   <tr>
     <td>
       <a class="CL"
-         href="/web2ldap?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub?(&(objectClass=aeObject)(aeStatus=0)(aeNotAfter<={value_currenttime}))?bindname=">
+         href="/web2ldap?{{ openldap_ldapi_uri }}/{{ aedir_db_params.um.suffix }}??sub?(&(objectClass=aeObject)(aeStatus=0)(aeNotAfter<={value_currenttime}))?bindname=">
         Search expired entries still active
       </a>
     </td>
@@ -101,7 +101,7 @@
   <tr>
     <td>
       <a class="CL"
-         href="/web2ldap?{{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub?(objectClass=msPwdResetObject)?bindname=">
+         href="/web2ldap?{{ openldap_ldapi_uri }}/{{ aedir_db_params.um.suffix }}??sub?(objectClass=msPwdResetObject)?bindname=">
         Search on-going password resets
       </a>
     </td>
@@ -136,7 +136,7 @@
 {% set server_id = hostvars[host].get('openldap_server_id','') -%}
   <tr>
     <td>
-      <a class="CL" href="/web2ldap/searchform?ldaps://{{ replica }}/{{ aedir_suffix }}????bindname=">{{ replica }}</a>
+      <a class="CL" href="/web2ldap/searchform?ldaps://{{ replica }}/{{ aedir_db_params.um.suffix }}????bindname=">{{ replica }}</a>
     </td>
 {% if replica!=host %}
     <td>
@@ -168,7 +168,7 @@
   </tr>
   <tr>
     <td>base DN / search root:</td>
-    <td>{{ aedir_suffix }}</td>
+    <td>{{ aedir_db_params.um.suffix }}</td>
   </tr>
   <tr>
     <td>POSIX-UID number range:</td>

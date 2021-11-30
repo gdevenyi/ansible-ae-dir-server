@@ -16,7 +16,7 @@ aeStatus: 0
 aeExpiryStatus: {{ ae_expiry_status_defaults.aeUser }}
 {% endif %}
 loginShell: /bin/bash
-pwdPolicySubentry: cn=ppolicy-users,cn=ae,{{ aedir_suffix }}
+pwdPolicySubentry: cn=ppolicy-users,cn=ae,{{ aedir_db_params.um.suffix }}
 aeNotBefore: now
 aeTag: pub-tag-no-welcome-yet
 

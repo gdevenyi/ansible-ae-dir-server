@@ -25,6 +25,8 @@ openldap_sockbuf_max_incoming_auth_default:
 # These are default values which defaults role var openldap_db_params can override
 openldap_db_params_defaults:
   accesslog:
+    suffix: "{{ aedir_accesslog_suffix }}"
+    directory: "{{ openldap_data }}/accesslog"
     mdb_maxsize: 500000000
     mdb_mode: "0600"
     mdb_rtxnsize: 10000
@@ -36,6 +38,8 @@ openldap_db_params_defaults:
     sizelimit: 1000
     timelimit: 120
   um:
+    suffix: "{{ aedir_suffix }}"
+    directory: "{{ openldap_data }}/um"
     mdb_maxsize: 100000000
     mdb_mode: "0600"
     mdb_rtxnsize: 10000
@@ -47,6 +51,8 @@ openldap_db_params_defaults:
     sizelimit: 500
     timelimit: 60
   session:
+    suffix: "{{ aedir_session_suffix }}"
+    directory: "{{ openldap_data }}/session"
     mdb_maxsize: 10000000
     mdb_mode: "0600"
     mdb_rtxnsize: 100
@@ -57,6 +63,10 @@ openldap_db_params_defaults:
     syncprov_checkpoint: "20000 10"
     sizelimit: 50
     timelimit: 10
+
+# The combined DB parameters
+# Do not override this!
+aedir_db_params: "{{ openldap_db_params_defaults|combine(openldap_db_params, recursive=True) }}"
 
 # system-specific limited replacement for @resources
 systemcallfilter_resources: "{{ '@resources' if ansible_lsb.id not in ('openSUSE', 'SUSE') or ansible_lsb.description=='openSUSE Tumbleweed' else 'sched_setparam sched_setscheduler sched_setaffinity setpriority setrlimit set_mempolicy migrate_pages move_pages mbind sched_setattr' }}"

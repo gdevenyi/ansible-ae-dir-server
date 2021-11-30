@@ -10,6 +10,6 @@ aeExpiryStatus: {{ ae_expiry_status_defaults.aeService }}
 {% endif %}
 uid: system_
 loginShell: {{ aedir_nologin_shell }}
-pwdPolicySubentry: cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}
+pwdPolicySubentry: cn=ppolicy-systems,cn=ae,{{ aedir_db_params.um.suffix }}
 aeNotBefore: now
 

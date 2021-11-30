@@ -11,11 +11,11 @@
 </datalist>
 
 <datalist id="zonedn">
-  <option value="cn=ae,{{ aedir_suffix }}">ae: &AElig;-DIR</option>
+  <option value="cn=ae,{{ aedir_db_params.um.suffix }}">ae: &AElig;-DIR</option>
 {% for zone_cn, zone_attrs in aedir_init_aezones|dictsort(case_sensitive=False, by='key') %}
-  <option value="cn={{ zone_cn|e }},{{ aedir_suffix }}">{{ zone_cn|e }}: {{ zone_attrs['description']|e }}</option>
+  <option value="cn={{ zone_cn|e }},{{ aedir_db_params.um.suffix }}">{{ zone_cn|e }}: {{ zone_attrs['description']|e }}</option>
 {% endfor %}
-  <option value="cn=pub,{{ aedir_suffix }}">pub: Public data</option>
+  <option value="cn=pub,{{ aedir_db_params.um.suffix }}">pub: Public data</option>
 </datalist>
 
 <a title="Read about searching in the user guide"

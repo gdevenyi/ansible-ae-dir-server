@@ -167,8 +167,6 @@
     group: "{{ openldap_slapd_group }}"
     mode: 0o0640
     validate: "{{ openldap_path.slapd_exec }} -T test -u -f %s -d config"
-  vars:
-    mdb_params: "{{ openldap_db_params_defaults|combine(openldap_db_params, recursive=True) }}"
   notify:
     - "restart {{ openldap_service_name }}"
 

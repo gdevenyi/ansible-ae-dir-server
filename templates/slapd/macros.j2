@@ -1,10 +1,15 @@
-{% macro mdb_params_config(params, suffix) -%}
+{% macro mdb_params_config(params) -%}
+database mdb
+
+suffix "{{ params.suffix }}"
+directory {{ params.directory }}
+
 # Always set rootdn since needed by internally writing overlays
-rootdn "cn=root,{{ suffix }}"
+rootdn "cn=root,{{ params.suffix }}"
 # rootpw not needed in production!
 #rootpw donotenable!!!
 access to
-  dn.base="cn=root,{{ suffix }}"
+  dn.base="cn=root,{{ params.suffix }}"
     by * none
 
 # require clients to use strong authentication

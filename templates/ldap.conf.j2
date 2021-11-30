@@ -5,7 +5,7 @@
 #
 # {{ ansible_managed }}
 
-BASE {{ aedir_suffix }}
+BASE {{ aedir_db_params.um.suffix }}
 URI {{ openldap_ldapi_uri }}
 
 # use SASL/EXTERNAL mechanism

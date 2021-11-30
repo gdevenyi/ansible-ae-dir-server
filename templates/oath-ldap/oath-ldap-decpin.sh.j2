@@ -13,6 +13,6 @@ export {{ evar.name }}
 {% endfor %}
 
 {{ aedir_python }} -m oathldap_tool.cli decpin \
-  --ldap-url '{{ openldap_ldapi_uri }}/{{ aedir_suffix }}' \
+  --ldap-url '{{ openldap_ldapi_uri }}/{{ aedir_db_params.um.suffix }}' \
   --key-path '{{ oath_ldap_keys_dir }}' \
   --token-id "$1"

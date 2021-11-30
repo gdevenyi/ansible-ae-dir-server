@@ -5,7 +5,7 @@ socket_path = {{ oath_ldap_socket_path }}
 
 # LDAP URI specifying the parameters for searching user entries for
 # which BIND requests have to be forwarded to OATH-LDAP providers
-proxy_user_search = {{ openldap_ldapi_uri }}/{{ aedir_suffix }}??sub?(&(objectClass=aeUser)(aeStatus=0)(oathToken=*))
+proxy_user_search = {{ openldap_ldapi_uri }}/{{ aedir_db_params.um.suffix }}??sub?(&(objectClass=aeUser)(aeStatus=0)(oathToken=*))
 
 # logging level (key-word known in logging module)
 log_level = INFO

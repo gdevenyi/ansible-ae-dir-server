@@ -9,23 +9,18 @@
 
 {% include 'config.conf.j2' %}
 
-{% if aedir_accesslog_suffix %}
+{% if aedir_db_params.accesslog.suffix %}
 {% include 'accesslog.conf.j2' %}
 {% endif %}
 
 #######################################################################
-# Database for {{ aedir_suffix }}
+# Database for {{ aedir_db_params.um.suffix }}
 #######################################################################
 
-database mdb
-
-suffix "{{ aedir_suffix }}"
-directory {{ openldap_data }}/um
-
-{{ mdb_params_config(mdb_params.um, aedir_suffix) }}
+{{ mdb_params_config(aedir_db_params.um) }}
 
 #---------------------------------------------------------------------------
-# Indexing configuration {{ aedir_suffix }}
+# Indexing configuration {{ aedir_db_params.um.suffix }}
 #---------------------------------------------------------------------------
 
 # general eq-only indexes
@@ -87,35 +82,35 @@ index serialNumber eq,sub
 index aeHwSerialNumber eq,sub
 
 #---------------------------------------------------------------------------
-# User-specific search/time limits for {{ aedir_suffix }}
+# User-specific search/time limits for {{ aedir_db_params.um.suffix }}
 #---------------------------------------------------------------------------
 
 # no limits for AE admins
 limits
-  group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}"
+  group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_db_params.um.suffix }}"
     time=unlimited
     size=unlimited
 
 # no limits for AE auditors
 limits
-  group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}"
+  group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_db_params.um.suffix }}"
     time=unlimited
     size=unlimited
 
 # no limits for all zone admins
 limits
-  group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,{{ aedir_suffix }}"
+  group/aeGroup/member="cn=ae-all-zone-admins,cn=ae,{{ aedir_db_params.um.suffix }}"
     time=unlimited
     size=unlimited
 
 # no limits for all zone auditors
 limits
-  group/aeGroup/member="cn=ae-all-zone-auditors,cn=ae,{{ aedir_suffix }}"
+  group/aeGroup/member="cn=ae-all-zone-auditors,cn=ae,{{ aedir_db_params.um.suffix }}"
     time=unlimited
     size=unlimited
 
 #---------------------------------------------------------------------------
-# Access control lists (ACLs) for {{ aedir_suffix }}
+# Access control lists (ACLs) for {{ aedir_db_params.um.suffix }}
 #---------------------------------------------------------------------------
 
 # First disallow non-active entities to proceed to rest of ACLs
@@ -125,7 +120,7 @@ limits
 
 # block access to all other stuff (except userPassword)
 access to
-  dn.subtree="{{ aedir_suffix }}"
+  dn.subtree="{{ aedir_db_params.um.suffix }}"
   attrs=!simpleSecurityObject
     by set="user/aeStatus & [0]" break
     by * auth
@@ -133,7 +128,7 @@ access to
 # give read access to pseudo-attribute 'entry' in database
 # naming context to all users and stop further ACL processing
 access to
-  dn.base="{{ aedir_suffix }}"
+  dn.base="{{ aedir_db_params.um.suffix }}"
   attrs=entry
     by users read
     by * none
@@ -151,7 +146,7 @@ access to
 # provider depending on client's peer address.
 {% endif %}
 access to
-  dn.subtree="{{ aedir_suffix }}"
+  dn.subtree="{{ aedir_db_params.um.suffix }}"
   attrs=userPassword
   filter="(&(aeStatus=0)(|(objectClass=aeUser)(objectClass=aeHost)(objectClass=aeService))(!(|(uidNumber<={{ aedir_min_gid-1 }})(gidNumber<={{ aedir_min_gid-1 }})(uidNumber>={{ aedir_max_uid+1 }})(gidNumber>={{ aedir_max_gid+1 }}))))"
     by anonymous auth
@@ -167,19 +162,19 @@ access to
 #---------------------------------------------------------------------------
 
 access to
-  dn.onelevel="cn=ae,{{ aedir_suffix }}"
+  dn.onelevel="cn=ae,{{ aedir_db_params.um.suffix }}"
   attrs=authzTo
-  filter="(&(objectClass=aeService)(aeStatus=0)(memberOf=cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}))"
-    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =csrw
-    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" =csr
-    by set="user/memberOf & ([cn=ae-login-proxies,cn=ae,{{ aedir_suffix }}])" read
+  filter="(&(objectClass=aeService)(aeStatus=0)(memberOf=cn=ae-login-proxies,cn=ae,{{ aedir_db_params.um.suffix }}))"
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_db_params.um.suffix }}" =csrw
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_db_params.um.suffix }}" =csr
+    by set="user/memberOf & ([cn=ae-login-proxies,cn=ae,{{ aedir_db_params.um.suffix }}])" read
     by * none
 
 access to
-  dn.subtree="{{ aedir_suffix }}"
+  dn.subtree="{{ aedir_db_params.um.suffix }}"
   attrs=authzTo,authzFrom
-    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" =csrz
-    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" =csr
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_db_params.um.suffix }}" =csrz
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_db_params.um.suffix }}" =csr
     by * none
 
 #---------------------------------------------------------------------------
@@ -190,9 +185,9 @@ access to
 # Global first-catch ACLs which fire no matter what else happens afterwards...
 # AE admins can manage everything else, AE auditors can read everything else
 access to
-  dn.subtree="{{ aedir_suffix }}"
-    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_suffix }}" read
-    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_suffix }}" read
+  dn.subtree="{{ aedir_db_params.um.suffix }}"
+    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_db_params.um.suffix }}" read
+    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_db_params.um.suffix }}" read
     by * none break
 
 # Inactive entries not visible to normal users/systems from here
@@ -202,13 +197,13 @@ access to
 
 # block cross-zone access to zone 'ae'
 access to
-  dn.subtree="cn=ae,{{ aedir_suffix }}"
-    by dn.subtree="cn=ae,{{ aedir_suffix }}" none break
+  dn.subtree="cn=ae,{{ aedir_db_params.um.suffix }}"
+    by dn.subtree="cn=ae,{{ aedir_db_params.um.suffix }}" none break
     by * auth
 
 # Public entries
 access to
-  dn.subtree="cn=pub,{{ aedir_suffix }}"
+  dn.subtree="cn=pub,{{ aedir_db_params.um.suffix }}"
   attrs=entry,entryDN,entryUUID,children,objectClass,hasSubordinates,modifyTimestamp,cn,description,@namedObject,@posixGroup,@sudoRole,@DUAConfigProfile,@pkiCA
     by users read
 
@@ -218,9 +213,9 @@ access to
 #------------------------------------------------------------------
 
 access to
-  dn.regex="^.*cn=({{ aedir_aezone_cn_regex }}),{{ aedir_suffix }}$"
-    by set.expand="user & [cn=${d1},{{ aedir_suffix }}]/aeZoneAdmins/member" read
-    by set.expand="user & [cn=${d1},{{ aedir_suffix }}]/aeZoneAuditors/member" read
+  dn.regex="^.*cn=({{ aedir_aezone_cn_regex }}),{{ aedir_db_params.um.suffix }}$"
+    by set.expand="user & [cn=${d1},{{ aedir_db_params.um.suffix }}]/aeZoneAdmins/member" read
+    by set.expand="user & [cn=${d1},{{ aedir_db_params.um.suffix }}]/aeZoneAuditors/member" read
     by * none break
 
 {% include 'service_access.conf.j2' %}
@@ -229,18 +224,18 @@ access to
 #------------------------------------------------------------------
 
 access to
-  dn.base="{{ aedir_suffix }}"
+  dn.base="{{ aedir_db_params.um.suffix }}"
   attrs=children,objectClass,ou,description
     by users read
     by * auth
 
 access to
-  dn.subtree="{{ aedir_suffix }}"
+  dn.subtree="{{ aedir_db_params.um.suffix }}"
     by users search
     by * auth
 
 #---------------------------------------------------------------------------
-# Overlays used for {{ aedir_suffix }}
+# Overlays used for {{ aedir_db_params.um.suffix }}
 #---------------------------------------------------------------------------
 
 # for counting search results without retrieving them
@@ -249,10 +244,10 @@ overlay noopsrch
 # for dereferencing attributes
 overlay deref
 
-{% if aedir_accesslog_suffix %}
+{% if aedir_db_params.accesslog.suffix %}
 # Where to log LDAP write operations (for auditing)
 overlay accesslog
-logdb "{{ aedir_accesslog_suffix }}"
+logdb "{{ aedir_db_params.accesslog.suffix }}"
 logops writes
 logold "(objectClass=*)"
 logoldattr entryUUID objectClass cn uid
@@ -286,7 +281,7 @@ sockdnpat "{{ oath_ldap_dn_regex }}"
 # (after bind-DN rewriting with slapo-rwm)
 overlay ppolicy
 # the default password policy is deliberatly unusable
-ppolicy_default cn=ppolicy-default,cn=ae,{{ aedir_suffix }}
+ppolicy_default cn=ppolicy-default,cn=ae,{{ aedir_db_params.um.suffix }}
 ppolicy_hash_cleartext
 ppolicy_use_lockout
 
@@ -296,13 +291,13 @@ overlay lastbind
 {% include 'slapo-rwm.conf.j2' %}
 
 #---------------------------------------------------------------------------
-# Replication of {{ aedir_suffix }}
+# Replication of {{ aedir_db_params.um.suffix }}
 #---------------------------------------------------------------------------
 
 # syncrepl-Overlay
 overlay syncprov
-{% if mdb_params.um.syncprov_checkpoint %}
-syncprov-checkpoint {{ mdb_params.um.syncprov_checkpoint }}
+{% if aedir_db_params.um.syncprov_checkpoint %}
+syncprov-checkpoint {{ aedir_db_params.um.syncprov_checkpoint }}
 {% endif %}
 syncprov-nopresent FALSE
 syncprov-reloadhint FALSE
@@ -318,7 +313,7 @@ syncrepl rid=0{{ loop.index }}
   interval=00:00:01:00
   retry="30 +"
   keepalive=240:10:30
-  searchbase="{{ aedir_suffix }}"
+  searchbase="{{ aedir_db_params.um.suffix }}"
   filter="(objectClass=*)"
   scope=sub
   schemachecking=on
