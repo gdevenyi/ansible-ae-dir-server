@@ -51,7 +51,7 @@ openldap_db_params_defaults:
     sizelimit: 500
     timelimit: 60
   session:
-    suffix: "cn=ae-session"
+    suffix: ""
     directory: "{{ openldap_data }}/session"
     mdb_maxsize: 10000000
     mdb_mode: "0600"
