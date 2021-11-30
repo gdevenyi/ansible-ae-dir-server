@@ -199,6 +199,7 @@
       include_role:
         name: aedir_htdocs
       vars:
+        db_suffix: "{{ aedir_db_params.um.suffix }}"
         document_root: "{{ aedir_htdocsdir }}"
         htdocs_templates: "{{ aedir_htdocs_templates }}"
         htdocs_layout: "{{ aedir_htdocs_layout }}"
