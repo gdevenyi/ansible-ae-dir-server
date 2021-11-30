@@ -13,7 +13,7 @@
 - block:
 
   - name: "Check whether DB has content"
-    command: "{{ openldap_path.bin }}/ldapsearch -LLL -b '{{ aedir_suffix }}' -s base '(objectClass=*)' 1.1"
+    command: "{{ openldap_path.bin }}/ldapsearch -LLL -b '{{ aedir_db_params.um.suffix }}' -s base '(objectClass=*)' 1.1"
     ignore_errors: yes
     register: check_db_cmd
 

@@ -479,7 +479,7 @@ aedir_user_mail_enabled: "{{ inventory_hostname == aedir_main_provider_hostname 
 
 # some stupid LDAP clients insist on searching user or group entries in
 # separate container trees beneath the separately configured search root
-# => always map to {{ aedir_suffix }}
+# => always map to {{ aedir_db_params.um.suffix }}
 #aedir_fake_search_roots:
 #  - "ou=users"
 #  - "ou=groups"
@@ -763,7 +763,7 @@ openldap_slapo_accesslog: "{{ lsb_id != 'RHEL' }}"
 
 # regex pattern for limiting the entries for which password changes are exported
 # Example: Restrict syncing passwords to aeUser and aeService entries within zones "base" and "test"
-# aedir_pwsync_dn_regex: "^uid=({{ aedir_aeuser_uid_regex }}|{{ aedir_aeservice_uid_regex }}),cn=(base|test),{{ aedir_suffix }}$"
+# aedir_pwsync_dn_regex: "^uid=({{ aedir_aeuser_uid_regex }}|{{ aedir_aeservice_uid_regex }}),cn=(base|test),{{ aedir_db_params.um.suffix }}$"
 aedir_pwsync_dn_regex: ""
 
 # password of authenticating to sync target (should be ansible vault or similar)
@@ -806,7 +806,7 @@ oath_ldap_enabled: False
 # are sent to external OATH-LDAP listener
 # Note:
 # This needs OpenLDAP built with ITS#8051 in otherwise slapd won't start!
-oath_ldap_dn_regex: "^(uid={{ aedir_aeuser_uid_regex }}|serialNumber={{ aedir_aeauthctoken_serial_regex }}),cn={{ aedir_aezone_cn_regex }},{{ aedir_suffix }}$"
+oath_ldap_dn_regex: "^(uid={{ aedir_aeuser_uid_regex }}|serialNumber={{ aedir_aeauthctoken_serial_regex }}),cn={{ aedir_aezone_cn_regex }},{{ aedir_db_params.um.suffix }}$"
 
 # map slapd role to bind listener parameters
 oath_dict:
@@ -910,7 +910,7 @@ slapd_check_ldaps_uri: "ldaps://{{ slapd_check_service_fqdn }}"
 
 # expected authz-ID for local LDAPS connection
 # very likely you have to adjust this one
-slapd_check_authz_id: "dn:uid=ae-dir-slapd_{{ slapd_check_service_fqdn }},cn=ae,{{ aedir_suffix }}"
+slapd_check_authz_id: "dn:uid=ae-dir-slapd_{{ slapd_check_service_fqdn }},cn=ae,{{ aedir_db_params.um.suffix }}"
 
 # Template used for generating slapdcheck.conf
 # (see example file ansible-ae-dir-server/templates/slapdcheck/slapdcheck.cfg.j2)

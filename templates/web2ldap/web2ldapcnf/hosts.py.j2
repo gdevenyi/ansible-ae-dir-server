@@ -1064,6 +1064,6 @@ ldap_def = {
     'ldap:///{{ aedir_db_params.um.suffix }}': AE_DIR_CONFIG,
 
     # AE-DIR's accesslog
-    'ldap:///{{ aedir_accesslog_suffix }}': OPENLDAP_ACCESSLOG_CONFIG,
+    'ldap:///{{ aedir_db_params.accesslog.suffix }}': OPENLDAP_ACCESSLOG_CONFIG,
 
 }

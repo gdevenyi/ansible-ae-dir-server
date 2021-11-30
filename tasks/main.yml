@@ -302,7 +302,7 @@
       srvgroup: "{{ aedir_srvgroup }}"
       description: "AE-DIR {{ openldap_role }} host {{ openldap_service_fqdn }}"
       ticket_id: "{{ aedir_init_ticket_id }}"
-      ppolicy: "cn=ppolicy-systems,cn=ae,{{ aedir_suffix }}"
+      ppolicy: "cn=ppolicy-systems,cn=ae,{{ aedir_db_params.um.suffix }}"
       askotp: "no"
     vars:
       ansible_ssh_user: "{{ aedir_init_user|default(omit) }}"
@@ -326,7 +326,7 @@
       zone: "ae"
       uid_number: "{{ item.value.uid_number|int }}"
       gid_number: "{{ item.value.gid_number|int }}"
-      ppolicy: "cn=ppolicy-sasl-external,cn=ae,{{ aedir_suffix }}"
+      ppolicy: "cn=ppolicy-sasl-external,cn=ae,{{ aedir_db_params.um.suffix }}"
       login_shell: "{{ aedir_nologin_shell }}"
       home_directory: "{{ aedir_rundir+'/'+item.key }}"
       ticket_id: "{{ aedir_init_ticket_id }}"
@@ -354,7 +354,7 @@
       zone: "ae"
       description: "AE-DIR slapd {{ openldap_role }} {{ openldap_service_fqdn }} running on {{ inventory_hostname }}"
       ticket_id: "{{ aedir_init_ticket_id }}"
-      ppolicy: "cn=ppolicy-sasl-external,cn=ae,{{ aedir_suffix }}"
+      ppolicy: "cn=ppolicy-sasl-external,cn=ae,{{ aedir_db_params.um.suffix }}"
       see_also: "{{ hostvars[inventory_hostname].openldap_cert_subject }}"
       login_shell: "{{ aedir_nologin_shell }}"
       groups:
