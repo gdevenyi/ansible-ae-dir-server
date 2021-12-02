@@ -71,7 +71,7 @@
   file:
     path: "{{ openldap_data }}"
     state: directory
-    owner: "{{ openldap_slapd_user }}"
+    owner: "root"
     group: "{{ openldap_slapd_group }}"
     mode: 0o0750
   notify:
@@ -79,7 +79,7 @@
 
 - name: "Create database directories"
   file:
-    path: "{{ openldap_data }}/{{ item }}"
+    path: "{{ aedir_db_params[item].directory }}"
     state: directory
     owner: "{{ openldap_slapd_user }}"
     group: "{{ openldap_slapd_group }}"
@@ -89,21 +89,10 @@
     - um
   notify:
     - "restart {{ openldap_service_name }}"
-
-- name: "Create session database directory"
-  file:
-    path: "{{ openldap_data }}/session"
-    state: directory
-    owner: "{{ openldap_slapd_user }}"
-    group: "{{ openldap_slapd_group }}"
-    mode: 0o0750
-  notify:
-    - "restart {{ openldap_service_name }}"
-  when: openldap_role == 'provider'
 
 - name: "Fix ownership database directories"
   file:
-    path: "{{ openldap_data }}/{{ item }}"
+    path: "{{ aedir_db_params[item].directory }}"
     owner: "{{ openldap_slapd_user }}"
     group: "{{ openldap_slapd_group }}"
     recurse: yes
@@ -113,13 +102,24 @@
   notify:
     - "restart {{ openldap_service_name }}"
 
-- name: "Fix ownership session database directory"
-  file:
-    path: "{{ openldap_data }}/session"
-    state: directory
-    owner: "{{ openldap_slapd_user }}"
-    group: "{{ openldap_slapd_group }}"
-    recurse: yes
+- block:
+
+  - name: "Create session database directory"
+    file:
+      path: "{{ openldap_data }}/session"
+      state: directory
+      owner: "{{ openldap_slapd_user }}"
+      group: "{{ openldap_slapd_group }}"
+      mode: 0o0750
+
+  - name: "Fix ownership session database directory"
+    file:
+      path: "{{ openldap_data }}/session"
+      state: directory
+      owner: "{{ openldap_slapd_user }}"
+      group: "{{ openldap_slapd_group }}"
+      recurse: yes
+
   notify:
     - "restart {{ openldap_service_name }}"
   when: openldap_role == 'provider'
