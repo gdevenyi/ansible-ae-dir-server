@@ -111,6 +111,8 @@
       owner: "{{ openldap_slapd_user }}"
       group: "{{ openldap_slapd_group }}"
       mode: 0o0750
+    notify:
+      - "restart {{ openldap_service_name }}"
 
   - name: "Fix ownership session database directory"
     file:
@@ -119,9 +121,9 @@
       owner: "{{ openldap_slapd_user }}"
       group: "{{ openldap_slapd_group }}"
       recurse: yes
+    notify:
+      - "restart {{ openldap_service_name }}"
 
-  notify:
-    - "restart {{ openldap_service_name }}"
   when: openldap_role == 'provider'
 
 # slapd.conf and schema files
