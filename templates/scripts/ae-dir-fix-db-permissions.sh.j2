@@ -5,8 +5,12 @@ set -o nounset
 # After here exit on any error
 set -e
 
-# set ownership
-chown -c {{ openldap_slapd_user }}:{{ openldap_slapd_group }} {{ openldap_data }}/*/*.mdb
-
-# set permissions
-chmod -c 0600 {{ openldap_data }}/*/*.mdb
+{% for db_name, db_params in aedir_db_params.items() %}
+{% if db_params.suffix %}
+echo "Fixing ownership/permissions in directory {{ db_params.directory }}"
+chown -c {{ openldap_slapd_user }}:{{ openldap_slapd_group }} {{ db_params.directory }}
+chown -c {{ openldap_slapd_user }}:{{ openldap_slapd_group }} {{ db_params.directory }}/*.mdb
+chmod -c 0750 {{ db_params.directory }}
+chmod -c {{ db_params.mdb_mode }} {{ db_params.directory }}/*.mdb
+{% endif %}
+{% endfor %}

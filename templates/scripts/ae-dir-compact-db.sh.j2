@@ -11,34 +11,25 @@ umask 077
 # current timestamp
 DATETIME="$(date +%Y%m%d%H%M%S)"
 
-# export all real database backends found to LDIF time-stamped files
-DB_DIR_NAMES="$({{ openldap_path.bin }}/ldapsearch -Q -LLL -b 'cn=config' -s one '(olcSuffix=*)' olcDbDirectory | grep olcDbDirectory | cut -d' ' -f2)"
-
 systemctl stop {{ openldap_service_name }}
 
-for db_dir in ${DB_DIR_NAMES}
-do
-
-  echo "Compacting DB in directory ${db_dir}"
-
-  old_dir="${db_dir}.old-${DATETIME}"
-  tmp_dir="${db_dir}.tmp-${DATETIME}"
-
-  mkdir "${tmp_dir}"
-
-  {{ mdb_tools_dir }}/mdb_copy -c "${db_dir}" "${tmp_dir}"
-
-  mv "${db_dir}" "${old_dir}"
-  mv "${tmp_dir}" "${db_dir}"
-
-  # set ownership
-  chown -Rc {{ openldap_slapd_user }}:{{ openldap_slapd_group }} "${db_dir}"
-  # set permissions
-  chmod -c 0750 "${db_dir}"
-  chmod -c 0600 ${db_dir}/*.mdb
-
-  {{ rm_exec }} -rf "${old_dir}"
-
-done
+{% for db_name, db_params in aedir_db_params.items() %}
+{% if db_params.suffix %}
+# ----------- compact database {{ db_name }} ------------
+echo "Compacting DB in directory {{ db_params.directory }}"
+old_dir="{{ db_params.directory }}.old-${DATETIME}"
+tmp_dir="{{ db_params.directory }}.tmp-${DATETIME}"
+mkdir "${tmp_dir}"
+{{ mdb_tools_dir }}/mdb_copy -c "{{ db_params.directory }}" "${tmp_dir}"
+mv "{{ db_params.directory }}" "${old_dir}"
+mv "${tmp_dir}" "{{ db_params.directory }}"
+{{ rm_exec }} -rf "${old_dir}"
+echo "Fixing ownership/permissions in directory {{ db_params.directory }}"
+chown -c {{ openldap_slapd_user }}:{{ openldap_slapd_group }} {{ db_params.directory }}
+chown -c {{ openldap_slapd_user }}:{{ openldap_slapd_group }} {{ db_params.directory }}/*.mdb
+chmod -c 0750 {{ db_params.directory }}
+chmod -c {{ db_params.mdb_mode }} {{ db_params.directory }}/*.mdb
+{% endif %}
+{% endfor %}
 
 systemctl start {{ openldap_service_name }}

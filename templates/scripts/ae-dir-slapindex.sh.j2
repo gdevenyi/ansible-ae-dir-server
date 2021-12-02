@@ -8,14 +8,13 @@ set -e
 # strict permissions
 umask 077
 
-DB_SUFFIXES="$({{ openldap_path.bin }}/ldapsearch -Q -LLL -b 'cn=config' -s one '(olcSuffix=*)' olcSuffix | grep olcSuffix | cut -d' ' -f2)"
-
 systemctl stop {{ openldap_service_name }}
 
-for db_suffix in ${DB_SUFFIXES}
-do
-  echo "Re-indexing ${db_suffix}"
-  {{ openldap_path.slapd_exec }} -T index -f "{{ openldap_slapd_conf }}" -b "${db_suffix}"
-done
+{% for db_name, db_params in aedir_db_params.items() %}
+{% if db_params.suffix %}
+echo "Re-indexing database {{ db_name }} / {{ db_params.suffix }}"
+{{ openldap_path.slapd_exec }} -T index -f "{{ openldap_slapd_conf }}" -b "{{ db_params.suffix }}"
+{% endif %}
+{% endfor %}
 
 systemctl start {{ openldap_service_name }}

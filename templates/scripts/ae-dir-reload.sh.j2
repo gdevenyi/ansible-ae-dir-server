@@ -11,47 +11,40 @@ DATETIME="$(date +%Y%m%d%H%M%S)"
 # strict permissions
 umask 077
 
-DB_SUFFIXES="$({{ openldap_path.bin }}/ldapsearch -Q -LLL -b 'cn=config' -s one '(olcSuffix=*)' olcSuffix | grep olcSuffix | cut -d' ' -f2)"
-
-for db_suffix in ${DB_SUFFIXES}
-do
-  export_file="{{ openldap_backup_path }}/${db_suffix}-${DATETIME}.ldif"
-  echo "Exporting ${db_suffix} to ${export_file}"
-  {{ openldap_path.slapd_exec }} \
-    -T cat \
-    -f "{{ openldap_slapd_conf }}" \
-    -b "${db_suffix}" \
-    -l "${export_file}"
-done
-
-# export all real database backends found to LDIF time-stamped files
-DB_DIR_NAMES="$({{ openldap_path.bin }}/ldapsearch -Q -LLL -b 'cn=config' -s one '(olcSuffix=*)' olcDbDirectory | grep olcDbDirectory | cut -d' ' -f2)"
+{% for db_name, db_params in aedir_db_params.items() %}
+# ----------- export database {{ db_name }} ------------
+{% if db_params.suffix %}
+export_file="{{ openldap_backup_path }}/{{ db_name }}-${DATETIME}.ldif"
+echo "Exporting database {{ db_name }} with suffix {{ db_params.suffix }} to ${export_file}"
+{{ openldap_path.slapd_exec }} \
+  -T cat \
+  -f "{{ openldap_slapd_conf }}" \
+  -b "{{ db_params.suffix }}" \
+  -l "${export_file}"
+{% endif %}
+{% endfor %}
 
 systemctl stop {{ openldap_service_name }}
 
-for db_dir in ${DB_DIR_NAMES}
-do
-  echo "Deleting DB in directory ${db_dir}"
-  {{ rm_exec }} ${db_dir}/*.mdb
-done
-
-for db_suffix in ${DB_SUFFIXES}
-do
-  import_file="{{ openldap_backup_path }}/${db_suffix}-${DATETIME}.ldif"
-  echo "Import ${db_suffix} from ${import_file}"
-  {{ openldap_path.slapd_exec }} \
-    -T add \
-    -f "{{ openldap_slapd_conf }}" \
-    -b "${db_suffix}" \
-    -l "${import_file}"
-  {{ rm_exec }} "${import_file}"
-done
-
-for db_dir in ${DB_DIR_NAMES}
-do
-  echo "Set ownership/permissions of DB in directory ${db_dir}"
-  chown -c {{ openldap_slapd_user }}:{{ openldap_slapd_group }} ${db_dir}/*.mdb
-  chmod -c 0600 ${db_dir}/*.mdb
-done
+{% for db_name, db_params in aedir_db_params.items() %}
+# ----------- delete and re-import database {{ db_name }} ------------
+{% if db_params.suffix %}
+echo "Deleting database {{ db_name }} in directory {{ db_params.directory }}"
+{{ rm_exec }}  -f {{ db_params.directory }}/*.mdb
+import_file="{{ openldap_backup_path }}/{{ db_name }}-${DATETIME}.ldif"
+echo "Importing database {{ db_name }} with suffix {{ db_params.suffix }} from ${export_file}"
+{{ openldap_path.slapd_exec }} \
+  -T add \
+  -f "{{ openldap_slapd_conf }}" \
+  -b "{{ db_params.suffix }}" \
+  -l "${import_file}"
+{{ rm_exec }} "${import_file}"
+echo "Fixing ownership/permissions in directory {{ db_params.directory }}"
+chown -c {{ openldap_slapd_user }}:{{ openldap_slapd_group }} {{ db_params.directory }}
+chown -c {{ openldap_slapd_user }}:{{ openldap_slapd_group }} {{ db_params.directory }}/*.mdb
+chmod -c 0750 {{ db_params.directory }}
+chmod -c {{ db_params.mdb_mode }} {{ db_params.directory }}/*.mdb
+{% endif %}
+{% endfor %}
 
 systemctl start {{ openldap_service_name }}

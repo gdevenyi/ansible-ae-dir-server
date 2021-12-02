@@ -11,18 +11,18 @@ DATETIME="$(date +%Y%m%d%H%M%S)"
 # strict permissions
 umask 077
 
-DB_SUFFIXES="$({{ openldap_path.bin }}/ldapsearch -Q -LLL -b 'cn=config' -s one '(olcSuffix=*)' olcSuffix | grep olcSuffix | cut -d' ' -f2)"
-
-for db_suffix in ${DB_SUFFIXES}
-do
-  export_file="{{ openldap_backup_path }}/${db_suffix}-${DATETIME}.ldif"
-  echo "Exporting ${db_suffix} to ${export_file}"
-  {{ openldap_path.slapd_exec }} \
-    -T cat \
-    -f "{{ openldap_slapd_conf }}" \
-    -b "${db_suffix}" \
-    -l "${export_file}"
-done
+{% for db_name, db_params in aedir_db_params.items() %}
+# ----------- export database {{ db_name }} ------------
+{% if db_params.suffix %}
+export_file="{{ openldap_backup_path }}/{{ db_name }}-${DATETIME}.ldif"
+echo "Exporting database {{ db_name }} with suffix {{ db_params.suffix }} to ${export_file}"
+{{ openldap_path.slapd_exec }} \
+  -T cat \
+  -f "{{ openldap_slapd_conf }}" \
+  -b "{{ db_params.suffix }}" \
+  -l "${export_file}"
+{% endif %}
+{% endfor %}
 
 echo "Remove backup files older than {{ openldap_backup_max_days }} days"
 find "{{ openldap_backup_path }}" -type f -name "*.ldif*" -mtime +{{ openldap_backup_max_days }} -delete
