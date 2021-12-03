@@ -79,52 +79,24 @@
 
 - name: "Create database directories"
   file:
-    path: "{{ aedir_db_params[item].directory }}"
+    path: "{{ item.value.directory }}"
     state: directory
     owner: "{{ openldap_slapd_user }}"
     group: "{{ openldap_slapd_group }}"
     mode: 0o0750
-  loop:
-    - accesslog
-    - um
+  with_dict: "{{ aedir_db_params }}"
   notify:
     - "restart {{ openldap_service_name }}"
 
 - name: "Fix ownership database directories"
   file:
-    path: "{{ aedir_db_params[item].directory }}"
+    path: "{{ item.value.directory }}"
     owner: "{{ openldap_slapd_user }}"
     group: "{{ openldap_slapd_group }}"
     recurse: yes
-  loop:
-    - accesslog
-    - um
+  with_dict: "{{ aedir_db_params }}"
   notify:
     - "restart {{ openldap_service_name }}"
-
-- block:
-
-  - name: "Create session database directory"
-    file:
-      path: "{{ openldap_data }}/session"
-      state: directory
-      owner: "{{ openldap_slapd_user }}"
-      group: "{{ openldap_slapd_group }}"
-      mode: 0o0750
-    notify:
-      - "restart {{ openldap_service_name }}"
-
-  - name: "Fix ownership session database directory"
-    file:
-      path: "{{ openldap_data }}/session"
-      state: directory
-      owner: "{{ openldap_slapd_user }}"
-      group: "{{ openldap_slapd_group }}"
-      recurse: yes
-    notify:
-      - "restart {{ openldap_service_name }}"
-
-  when: openldap_role == 'provider'
 
 # slapd.conf and schema files
 #-----------------------------------------------------------------------
