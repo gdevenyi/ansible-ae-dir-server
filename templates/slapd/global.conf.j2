@@ -14,7 +14,6 @@ moduleload back_sock
 # Load dynamic overlay modules:
 #---------------------------------------------------------------------------
 
-moduleload accesslog
 moduleload ppolicy
 moduleload memberof
 moduleload rwm
@@ -29,6 +28,7 @@ moduleload argon2 {{ openldap_argon2_params}}
 
 {% if openldap_role=="provider" %}
 # only on provider replicas
+moduleload accesslog
 {% if openldap_slapo_accesslog %}
 moduleload allowed
 {% endif %}
@@ -245,7 +245,7 @@ access to
   val.regex="^{{ aedir_db_params.um.suffix }}$"
     by * read
 
-{% if aedir_db_params.accesslog.suffix %}
+{% if aedir_db_params.accesslog is defined %}
 # grant read access to accesslog suffix value to all zone admins
 access to
   dn.base=""

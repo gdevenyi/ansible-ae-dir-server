@@ -9,10 +9,6 @@
 
 {% include 'config.conf.j2' %}
 
-{% if aedir_db_params.accesslog.suffix %}
-{% include 'accesslog.conf.j2' %}
-{% endif %}
-
 #######################################################################
 # Database for {{ aedir_db_params.um.suffix }}
 #######################################################################
@@ -243,18 +239,6 @@ overlay noopsrch
 
 # for dereferencing attributes
 overlay deref
-
-{% if aedir_db_params.accesslog.suffix %}
-# Where to log LDAP write operations (for auditing)
-overlay accesslog
-logdb "{{ aedir_db_params.accesslog.suffix }}"
-logops writes
-logold "(objectClass=*)"
-logoldattr entryUUID objectClass cn uid
-logpurge {{ openldap_log_purge }}
-# only log successful operations to work around ITS#9738
-logsuccess TRUE
-{% endif %}
 
 # for back-links to group entries in member entries
 overlay memberof

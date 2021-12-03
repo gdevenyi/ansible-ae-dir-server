@@ -25,7 +25,7 @@ openldap_sockbuf_max_incoming_auth_default:
 # These are default values which defaults role var openldap_db_params can override
 openldap_db_params_defaults:
   accesslog:
-    suffix: "cn=accesslog-ae-dir"
+    suffix: "{{ 'cn=accesslog-ae-dir' if openldap_role == 'provider' else '' }}"
     directory: "{{ openldap_data }}/accesslog"
     mdb_maxsize: 500000000
     mdb_mode: "0600"
