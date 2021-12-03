@@ -8,10 +8,8 @@ set -e
 systemctl stop {{ openldap_service_name }}
 
 {% for db_name, db_params in aedir_db_params.items() %}
-{% if db_params.suffix %}
 echo "Delete database files in directory {{ db_params.directory }}"
 {{ rm_exec }} -f {{ db_params.directory }}/*.mdb
-{% endif %}
 {% endfor %}
 
 systemctl start {{ openldap_service_name }}

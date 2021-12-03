@@ -66,7 +66,7 @@ openldap_db_params_defaults:
 
 # The combined DB parameters
 # Do not override this!
-aedir_db_params: "{{ openldap_db_params_defaults|combine(openldap_db_params, recursive=True) }}"
+aedir_db_params: "{{ openldap_db_params_defaults|combine(openldap_db_params, recursive=True)|dict2items|rejectattr('value.suffix', 'equalto', '')|list|items2dict }}"
 
 # system-specific limited replacement for @resources
 systemcallfilter_resources: "{{ '@resources' if ansible_lsb.id not in ('openSUSE', 'SUSE') or ansible_lsb.description=='openSUSE Tumbleweed' else 'sched_setparam sched_setscheduler sched_setaffinity setpriority setrlimit set_mempolicy migrate_pages move_pages mbind sched_setattr' }}"

@@ -1491,7 +1491,7 @@ syncrepl rid=0{{ loop.index }}
 multiprovider on
 {% endif %}
 
-{% if aedir_db_params.session.suffix %}
+{% if aedir_db_params.session is defined %}
 {% include 'session.conf.j2' %}
 {% endif %}
 

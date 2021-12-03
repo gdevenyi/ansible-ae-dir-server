@@ -11,10 +11,8 @@ umask 077
 systemctl stop {{ openldap_service_name }}
 
 {% for db_name, db_params in aedir_db_params.items() %}
-{% if db_params.suffix %}
 echo "Re-indexing database {{ db_name }} / {{ db_params.suffix }}"
 {{ openldap_path.slapd_exec }} -T index -f "{{ openldap_slapd_conf }}" -b "{{ db_params.suffix }}"
-{% endif %}
 {% endfor %}
 
 systemctl start {{ openldap_service_name }}
