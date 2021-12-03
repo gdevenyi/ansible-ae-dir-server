@@ -984,7 +984,7 @@ access to
 # Overlays used for {{ aedir_db_params.um.suffix }}
 #---------------------------------------------------------------------------
 
-{% if openldap_slapo_accesslog %}
+{% if openldap_slapo_allowed %}
 # for showing user's write access in operational attributes
 overlay allowed
 {% endif %}
