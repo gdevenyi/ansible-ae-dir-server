@@ -30,10 +30,9 @@ profile {{ openldap_service_name }} flags=(attach_disconnected) {
   {{ openldap_rundir }}/slapd.args rw,
 
   # allow r/w access to database files
-  owner {{ openldap_data }}/{um,accesslog}/{DUMMY,data.mdb,lock.mdb} rwk,
-{% if openldap_role=="provider" %}
-  owner {{ openldap_data }}/session/{DUMMY,data.mdb,lock.mdb} rwk,
-{% endif %}
+{% for db_name, db_params in aedir_db_params.items() %}
+  owner {{ db_params.directory }}/{DUMMY,data.mdb,lock.mdb} rwk,
+{% endfor %}
 
   # access to TLS-related files
   {{ openldap_cacert_pathname }} r,
