@@ -19,6 +19,7 @@
     - playbook_dir
     - role_path
     - openldap_role
+    - aedir_db_params
     - aedir_hosts
     - aedir_files_dirs
     - aedir_templates_dirs
