@@ -501,6 +501,7 @@ aedir_htdocs_templates:
   - faq
   - fun
   - install
+  - news
   - oath
   - pwd
   - python
