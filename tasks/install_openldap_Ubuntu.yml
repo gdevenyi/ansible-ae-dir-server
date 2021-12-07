@@ -12,13 +12,17 @@
     state: present
   with_dict: "{{ aedir_pkg_repos }}"
 
-- name: "Remove old AE-DIR APT repository"
-  apt_repository:
-    state: absent
-    filename: "AE-DIR"
-    repo: "deb https://ae-dir.com/repo/debian/ buster main"
+- name: "Set custom AE-DIR APT repository"
+  ansible.builtin.copy:
+    content: "{{ item.value.repo }}"
+    dest: "/etc/apt/sources.list.d/{{ item.key }}.list"
+    owner: "root"
+    group: "root"
+    mode: 0o644
+  register: aedir_apt_repo
+  with_dict: "{{ aedir_pkg_repos }}"
 
-- name: "Add AE-DIR APT repository"
+- name: "Refresh AE-DIR APT repository"
   apt_repository:
     state: present
     filename: "{{ item.key }}"
@@ -26,6 +30,7 @@
     update_cache: yes
     validate_certs: yes
   with_dict: "{{ aedir_pkg_repos }}"
+  when: aedir_apt_repo.changed
 
 - name: "Install AE-DIR OpenLDAP packages and dependencies"
   apt:
