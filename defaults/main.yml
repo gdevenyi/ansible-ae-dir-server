@@ -763,7 +763,7 @@ openldap_sockbuf_max_incoming_auth: "{{ openldap_sockbuf_max_incoming_auth_defau
 openldap_idletimeout: "900"
 
 # Boolean which specifies whether overlay slapo-allowed is enabled
-openldap_slapo_allowed: "{{ lsb_id != 'RHEL' }}"
+openldap_slapo_allowed: True
 
 #---------------------------------------------------------------------------
 # password sync parameters
