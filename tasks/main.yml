@@ -296,7 +296,7 @@
     include_tasks: "aedir_init.yml"
     when: aedir_init is defined and openldap_role == "provider"
 
-  - name: "Init aeHost entry on {{ aedir_main_provider_hostname }}"
+  - name: "Init aeHost entry on {{ aedir_init_user}}@{{ aedir_main_provider_hostname }}"
     aehost:
       name: "{{ inventory_hostname }}"
       state: "{{ aedir_aehost_state }}"
@@ -307,13 +307,13 @@
       ppolicy: "cn=ppolicy-systems,cn=ae,{{ aedir_db_params.um.suffix }}"
       askotp: "no"
     vars:
-      ansible_ssh_user: "{{ aedir_init_user|default(omit) }}"
+      ansible_ssh_user: "{{ aedir_init_user }}"
       ansible_python_interpreter: "{{ hostvars[aedir_main_provider_hostname].aedir_python3|default(aedir_python3) }}"
     delegate_to: "{{ aedir_main_provider_hostname }}"
     become: "{{ aedir_init_become }}"
     register: aehost_result
 
-  - name: "Update aeService entries for local system accounts via {{ aedir_main_provider_hostname }}"
+  - name: "Update aeService entries for local system accounts via {{ aedir_init_user}}@{{ aedir_main_provider_hostname }}"
     aeservice:
       name: "{{ item.value.cn }}"
       state: "present"
@@ -336,7 +336,7 @@
     with_dict:
       "{{ aedir_ldapi_services }}"
     vars:
-      ansible_ssh_user: "{{ aedir_init_user|default(omit) }}"
+      ansible_ssh_user: "{{ aedir_init_user }}"
       ansible_python_interpreter: "{{ hostvars[aedir_main_provider_hostname].aedir_python3|default(aedir_python3) }}"
     run_once: yes
     delegate_to: "{{ aedir_main_provider_hostname }}"
