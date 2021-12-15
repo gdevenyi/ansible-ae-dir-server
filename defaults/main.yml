@@ -399,8 +399,9 @@ aedir_unique_person_zones:
 # loading data into the empty database
 aedir_init_template: "ae-dir-base.ldif.j2"
 
-# user used to connect to primary provider
-#aedir_init_user: "xkcd"
+# user used to connect to primary provider for creating replica's
+# aeHost and aeService entries
+aedir_init_user: "root"
 
 # use become when doing initial load
 # useful in case the initial installation is done with non-root ansible user
