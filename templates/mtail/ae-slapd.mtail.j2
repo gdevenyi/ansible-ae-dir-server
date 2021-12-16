@@ -83,6 +83,17 @@ const SLAPD_SYNCREPL_RETRYING /^.* {{ openldap_service_name }}\[\d+\]: do_syncre
     slapd_syncrepl_retrying[$rid, $errno]++
 }
 
+# count "slap_client_connect..ldap_sasl_interactive_bind_s failed" messages
+#---------------------------------------------------------------------------
+
+counter slapd_syncrepl_bind_failed by uri, errno
+
+const SLAPD_SYNCREPL_BIND_FAILED /^.* (slapd|{{ openldap_service_name }})\[\d+\]: .* slap_client_connect: URI=(?P<uri>[^ ]+) ldap_sasl_interactive_bind_s failed \(-(?P<errno>\d+)\)$/
+
+// + SLAPD_SYNCREPL_BIND_FAILED {
+    slapd_syncrepl_bind_failed[$uri, $errno]++
+}
+
 # count different "closed" messages
 #---------------------------------------------------------------------------
 
