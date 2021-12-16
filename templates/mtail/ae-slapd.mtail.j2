@@ -72,6 +72,17 @@ const SLAPD_DEFERRING /^.* {{ openldap_service_name }}\[\d+\]: connection_input:
     slapd_deferred_ops_count[$defer_type]++
 }
 
+# count "do_syncrepl..retrying" messages
+#---------------------------------------------------------------------------
+
+counter slapd_syncrepl_retrying by rid, errno
+
+const SLAPD_SYNCREPL_RETRYING /^.* {{ openldap_service_name }}\[\d+\]: do_syncrepl: rid=(?P<rid>\d+) rc -(?P<errno>\d+) retrying$/
+
+// + SLAPD_SYNCREPL_RETRYING {
+    slapd_syncrepl_retrying[$rid, $errno]++
+}
+
 # count different "closed" messages
 #---------------------------------------------------------------------------
 
