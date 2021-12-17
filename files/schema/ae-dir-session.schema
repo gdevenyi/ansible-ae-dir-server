@@ -71,4 +71,5 @@ objectclass ( ae-dir-session-oc:1
 
 ditcontentrule ( ae-dir-session-oc:1
   NAME 'aeSession-dcr'
-  X-ORIGIN 'AE-DIR' )
+  X-ORIGIN 'AE-DIR'
+  AUX dynamicObject )
