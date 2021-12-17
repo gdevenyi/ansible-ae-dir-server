@@ -2,8 +2,11 @@
 dn: 
 defaultNamingContext: {{ aedir_db_params.um.suffix }}
 aeRoot: {{ aedir_db_params.um.suffix }}
+{% if aedir_db_params.session is defined %}
+aeSessionContext: {{ aedir_db_params.session.suffix }}
+{% endif %}
 host: {{ openldap_service_fqdn }}
 {% for host in openldap_rootdse_alt_servers %}
 altServer: ldaps://{{ hostvars[host].get('openldap_service_fqdn',host) }}
-{% endfor%}
+{% endfor %}
 

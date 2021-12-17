@@ -6,6 +6,13 @@
 objectidentifier ae-dir-session-at stroeder-com-pub-ae-dir:10.4
 objectidentifier ae-dir-session-oc stroeder-com-pub-ae-dir:10.6
 
+attributetype ( ae-dir-session-at:7
+  NAME 'aeSessionContext'
+  X-ORIGIN 'AE-DIR'
+  DESC 'AE-DIR: Suffix DN of session database (found in rootDSE)'
+  SUP distinguishedName
+  SINGLE-VALUE )
+
 # session ID also to be used for RDN of session entries
 attributetype ( ae-dir-session-at:1
   NAME 'aeSessionId'
