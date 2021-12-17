@@ -328,8 +328,8 @@ AE_DIR_CONFIG = Web2LDAPConfig(
         'aeNotAfter',
         'aeNotBefore',
         'aeNwDevice',
-        'aePasswordAdmins',
         'aeOwner',
+        'aePasswordAdmins',
         'aePerson',
         'aeProxyFor',
         'aeRemoteHost',
@@ -569,6 +569,7 @@ AE_DIR_CONFIG = Web2LDAPConfig(
         ),
     },
     read_template={
+        'OpenLDAProotDSE': os.path.join(TEMPLATES_DIR, 'ae-dir', 'read_OpenLDAProotDSE.html'),
         'msPwdResetObject': os.path.join(TEMPLATES_DIR, 'read_msPwdResetObject.html'),
         'posixAccount': os.path.join(TEMPLATES_DIR, 'read_posixAccount.html'),
         'aePolicy': os.path.join(TEMPLATES_DIR, 'ae-dir', 'read_aePolicy.html'),
@@ -879,6 +880,7 @@ GLOBAL_DEFAULTS = Web2LDAPConfig(
     # HTML template file used for displaying entries of specific object class
     read_template={
         # 'object class': 'pathname of HTML template file'
+        'OpenLDAProotDSE': os.path.join(TEMPLATES_DIR, 'read_OpenLDAProotDSE.html'),
         'inetOrgPerson': os.path.join(TEMPLATES_DIR, 'read_inetOrgPerson.html'),
         'account': os.path.join(TEMPLATES_DIR, 'read_account.html'),
         'organizationalPerson': os.path.join(TEMPLATES_DIR, 'read_inetOrgPerson.html'),
