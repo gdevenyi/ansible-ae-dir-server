@@ -61,3 +61,8 @@ objectclass ( ae-dir-session-oc:1
   MUST ( aeSessionId $ aeSessionSecret $ aeOwner $ aeSessionCounter $
          aeNotBefore $ aeNotAfter )
   MAY ( aeSessionBindings $ aeSessionAccessTime ) )
+
+ditcontentrule ( ae-dir-session-oc:1
+  NAME 'aeSession-dcr'
+  X-ORIGIN 'AE-DIR'
+  AUX dynamicObject )
