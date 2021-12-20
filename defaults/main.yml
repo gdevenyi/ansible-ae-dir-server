@@ -160,6 +160,7 @@ aedir_systemd_logging: []
 
 # various systemd.exec options for hardening the service units
 aedir_systemd_hardening:
+  - "StandardInput=null"
   - "UMask=0077"
   - "PrivateUsers=no"
   - "PrivateTmp=yes"
