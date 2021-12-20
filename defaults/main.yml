@@ -550,6 +550,11 @@ aedir_providers_restrictions: []
 # aedir_replicas_restrictions: ['peername.ip="10.54.1.0%255.255.255.0"']
 aedir_replicas_restrictions: "{{ aedir_providers_restrictions }}"
 
+# additional restrictions added to <who> clauses of provider ACLs
+# granting write access to userPassword attribute of active aeUser entries
+aedir_aeuser_write_pw_restrictions:
+  - "peername.path={{ openldap_ldapi_socket }}"
+
 # name of CRON file in /etc/cron.d
 aedir_cron_file: "ae-dir-{{ openldap_role }}"
 

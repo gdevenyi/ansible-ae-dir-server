@@ -271,12 +271,20 @@ access to
   dn.subtree="{{ aedir_db_params.um.suffix }}"
   attrs=userPassword
   filter="(&(objectClass=aeUser)(aeStatus=0))"
-    by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_db_params.um.suffix }}" =sw
-    by self =sw
-    by group/aeGroup/member="cn=ae-auditors,cn=ae,{{ aedir_db_params.um.suffix }}" =s
-    by dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_db_params.um.suffix }}" =w
-    by set="(user & this/-1/aePasswordAdmins/member) & (user & this/-1/aeZoneAdmins/member)" =w
     by anonymous auth
+{% for restriction in aedir_aeuser_write_pw_restrictions or [''] %}
+    by {{ restriction }} group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_db_params.um.suffix }}" =w
+{% endfor %}
+{% for restriction in aedir_aeuser_write_pw_restrictions or [''] %}
+    by {{ restriction }} self =w
+{% endfor %}
+{% for restriction in aedir_aeuser_write_pw_restrictions or [''] %}
+    by {{ restriction }} dn.base="uid=ae-dir-pwd,cn=ae,{{ aedir_db_params.um.suffix }}" =w
+{% endfor %}
+{% for restriction in aedir_aeuser_write_pw_restrictions or [''] %}
+    by {{ restriction }} set="(user & this/-1/aePasswordAdmins/member) & (user & this/-1/aeZoneAdmins/member)" =w
+{% endfor %}
+    by * none
 
 # Subordinate aeHost and aeService entries beneath aeSrvGroup entries
 # Important note:
@@ -286,11 +294,12 @@ access to
 access to
   attrs=userPassword
   filter="(&(|(objectClass=aeHost)(objectClass=aeService))(aeStatus=0)(!(|(uidNumber<={{ aedir_min_uid-1 }})(gidNumber<={{ aedir_min_gid-1 }})(uidNumber>={{ aedir_max_uid+1 }})(gidNumber>={{ aedir_max_gid+1 }}))))"
+    by anonymous auth
     by group/aeGroup/member="cn=ae-admins,cn=ae,{{ aedir_db_params.um.suffix }}" =w
     by set="user & this/-2/aeZoneAdmins/member" =w
     by set="user & this/-1/aeZoneAdmins/member" =w
     by set="user & this/-1/aeSetupGroups/member" =w
-    by anonymous auth
+    by * none
 
 # no access to userPassword as last catch
 access to
