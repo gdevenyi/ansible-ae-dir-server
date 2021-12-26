@@ -68,6 +68,9 @@ EMAIL_TEMPLATE_ADMIN = '{{ aedir_etc }}/ae-dir-pwd/templates/en/requestpw_admin.
 EMAIL_SUBJECT_NOTIFICATION = 'Password of your account "{username}" was changed!'
 EMAIL_TEMPLATE_NOTIFICATION = '{{ aedir_etc }}/ae-dir-pwd/templates/en/changepw_notification.txt'
 
+# Specifies whether a user shall be informed about a password change via e-mail
+CHANGEPW_NOTIFICATION_ENABLED = True
+
 # SMTP server used as smart host (SMTP relay)
 SMTP_URL = '{{ smtp_relay_url }}'
 
