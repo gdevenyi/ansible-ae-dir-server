@@ -1,7 +1,13 @@
 ---
 
 - name: "Check whether all C wrapper modules are installed"
-  command: "{{ aedir_python }} -c 'import ldap0, psutil'"
+  pip:
+    name:
+      - ldap0>=1.4.3
+      - psutil>=5.6.7
+    state: present
+    virtualenv: "{{ aedir_prefix }}"
+    extra_args: "{{ aedir_pip_extra_args }}"
   ignore_errors: yes
   when: aedir_pip_install
   register: ldap0_installed
@@ -38,7 +44,7 @@
     update_cache: no
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
-  when: aedir_pip_install_compiler is defined or ldap0_installed.rc != 0
+  when: aedir_pip_install_compiler is defined or ldap0_installed.failed
 
 - name: "Generate /etc/python{{ aedir_python_version }}/sitecustomize.py"
   copy:
