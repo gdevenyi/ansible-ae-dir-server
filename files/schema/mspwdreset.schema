@@ -99,6 +99,5 @@ objectclass ( stroeder-com-pub-ldap-oc:331
       NAME 'msPwdResetPolicy'
       DESC 'Entry defining the password reset policy'
       AUXILIARY
-      MUST ( msPwdResetMaxAge $ msPwdResetEnabled $ msPwdResetHashAlgorithm $
-             msPwdResetPwLen $ msPwdResetAdminPwLen )
-      MAY ( msPwdChangeNotification ) )
+      MAY ( msPwdResetMaxAge $ msPwdResetEnabled $ msPwdResetHashAlgorithm $
+             msPwdResetPwLen $ msPwdResetAdminPwLen $ msPwdChangeNotification ) )
