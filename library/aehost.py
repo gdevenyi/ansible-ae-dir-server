@@ -2,7 +2,7 @@
 """
 ansible module for adding aeHost entries to xC6-DIR
 
-Copyright: (c) 2020-2021, Michael Stroeder <michael@stroeder.com>
+Copyright: (C) 2020-2022, Michael Stroeder <michael@stroeder.com>
 """
 
 import getpass

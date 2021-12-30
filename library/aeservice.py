@@ -2,7 +2,7 @@
 """
 ansible module for adding aeService entries to xC6-DIR
 
-Copyright: (c) 2020-2021, Michael Stroeder <michael@stroeder.com>
+Copyright: (C) 2020-2022, Michael Stroeder <michael@stroeder.com>
 """
 
 from ansible.module_utils.basic import AnsibleModule
