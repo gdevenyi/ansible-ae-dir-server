@@ -1071,6 +1071,11 @@ apache_oath_requires: "{{ apache_htdocs_requires }}"
 # which IP nets are allowed to access password self-service
 apache_pwd_requires: "{{ apache_htdocs_requires }}"
 
+# Access control restrictions for status page
+apache_status_requires:
+  - "ip 127.0.0.1"
+  - "ip ::1"
+
 # Apache TLS protocol/cipher parameters
 # See Apache docs: https://httpd.apache.org/docs/2.4/mod/mod_ssl.html#sslopensslconfcmd
 # See OpenSSL docs: https://www.openssl.org/docs/man1.1.1/man3/SSL_CONF_cmd.html#SUPPORTED-CONFIGURATION-FILE-COMMANDS
