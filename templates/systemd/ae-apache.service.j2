@@ -41,6 +41,7 @@ RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 {% endfor %}
 MemoryDenyWriteExecute=yes
 SystemCallFilter={{ systemd_systemcallfilter.apache }}
+SystemCallLog={{ systemd_systemcalllog.apache }}
 {% endif %}
 {% if apparmor_enabled %}
 AppArmorProfile=ae-apache

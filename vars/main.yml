@@ -77,3 +77,14 @@ systemd_systemcallfilter:
   apache: "~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete @chown @privileged {{ systemcallfilter_resources }} @pkey @setuid"
   gunicorn: "~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete {{ systemcallfilter_resources }} @pkey @timer fork"
   slapdsock: "~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete @chown @privileged {{ systemcallfilter_resources }} @pkey @setuid @timer fork"
+  ekca_agent: "~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete @chown @timer @privileged fork clone clone2 clone3 {{ systemcallfilter_resources }}"
+
+# values for SystemCallLog= (see systemd.exec(5) for details)
+# to log disallowed syscalls
+# currently just set to the inverse of systemd_systemcallfilter values
+systemd_systemcalllog:
+  default: "{{ systemd_systemcallfilter.default[2:] }}"
+  apache: "{{ systemd_systemcallfilter.apache[2:] }}"
+  gunicorn: "{{ systemd_systemcallfilter.gunicorn[2:] }}"
+  slapdsock: "{{ systemd_systemcallfilter.slapdsock[2:] }}"
+  ekca_agent: "{{ systemd_systemcallfilter.ekca_agent[2:] }}"

@@ -45,6 +45,7 @@ NotifyAccess=all
 {% endfor %}
 MemoryDenyWriteExecute={{ 'yes' if lsb_id != 'SUSE' or ansible_lsb.description == 'openSUSE Tumbleweed' else 'no' }}
 SystemCallFilter={{ systemd_systemcallfilter.gunicorn }}
+SystemCallLog={{ systemd_systemcalllog.gunicorn }}
 {% endif %}
 {% if apparmor_enabled %}
 AppArmorProfile=ekca-service
