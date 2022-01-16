@@ -98,14 +98,6 @@ access
 # Overlays used for {{ aedir_db_params.session.suffix }}
 #---------------------------------------------------------------------------
 
-# for dynamic entries (RFC 2589)
-overlay dds
-dds-interval 20
-dds-default-ttl 300
-dds-min-ttl 0
-dds-max-ttl 86400
-dds-max-dynamicObjects 1000
-
 # for counting search results without retrieving them
 overlay noopsrch
 
