@@ -38,16 +38,19 @@
     enabled: yes
   when: oath_ldap_enabled == True
 
-- name: "Ensure {{ slapdcheck_service_name }}.service is enabled"
-  service:
-    name: "{{ slapdcheck_service_name }}.service"
-    enabled: yes
+- block:
 
-- name: "Ensure {{ slapdcheck_service_name }}.timer is enabled"
-  service:
-    name: "{{ slapdcheck_service_name }}.timer"
-    state: "started"
-    enabled: yes
+  - name: "Ensure {{ slapdcheck_service_name }}.service is enabled"
+    service:
+      name: "{{ slapdcheck_service_name }}.service"
+      enabled: yes
+
+  - name: "Ensure {{ slapdcheck_service_name }}.timer is enabled"
+    service:
+      name: "{{ slapdcheck_service_name }}.timer"
+      state: "started"
+      enabled: yes
+
   when: slapdcheck_interval > 0
 
 - block:
