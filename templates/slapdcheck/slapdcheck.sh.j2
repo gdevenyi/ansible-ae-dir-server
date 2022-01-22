@@ -12,4 +12,4 @@ export LDAPNOINIT
 export {{ evar.name }}
 {% endfor %}
 
-{{ aedir_python }} -m slapdcheck.metrics {{ aedir_etc }}/slapdcheck.cfg
+{{ aedir_python }} -m slapdcheck.{{ slapdcheck_module }} {{ aedir_etc }}/slapdcheck.cfg

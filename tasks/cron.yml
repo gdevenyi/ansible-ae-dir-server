@@ -25,23 +25,11 @@
     cron_file: "{{ aedir_cron_file }}"
   loop: "{{ aedir_python_env }}"
 
-- name: "Remove metrics text export CRON job"
+- name: "Remove obsolete metrics text export CRON job"
   cron:
     name: "slapd_metrics"
     state: absent
     cron_file: "{{ aedir_cron_file }}"
-  when: aedir_metricsdir == ""
-
-- name: "Install metrics text export CRON job"
-  cron:
-    name: "slapd_metrics"
-    state: present
-    user: "{{ slapd_check_cron_args.user }}"
-    cron_file: "{{ aedir_cron_file }}"
-    hour: "{{ slapd_check_cron_args.hour }}"
-    minute: "{{ slapd_check_cron_args.minute }}"
-    job: "{{ aedir_sbin }}/slapd_metrics.sh > {{ aedir_metricsdir }}/{{ openldap_service_name }}.prom.tmp && mv {{ aedir_metricsdir }}/{{ openldap_service_name }}.prom.tmp {{ aedir_metricsdir }}/{{ openldap_service_name }}.prom"
-  when: aedir_metricsdir != ""
 
 - name: "Role-specific CRON jobs"
   include_tasks: "cron_{{ openldap_role }}.yml"

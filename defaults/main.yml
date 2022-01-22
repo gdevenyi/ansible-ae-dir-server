@@ -380,6 +380,15 @@ aedir_ldapi_services:
     description: "The system user for running EKCA services"
     roles:
       - provider
+  # system user for running slapdcheck
+  ae-dir-slapdcheck:
+    cn: "slapdcheck demon user"
+    uid_number: "{{ aedir_min_gid-12 }}"
+    gid_number: "{{ aedir_min_gid-12 }}"
+    description: "The system user for periodically running slapdcheck"
+    roles:
+      - provider
+      - consumer
 
 # POSIX UID and GID which is mapped to rootdn
 aedir_rootdn_uid_number: 0
@@ -920,42 +929,57 @@ cron_pkg_name: "{{ cron_config.pkg_name }}"
 # Parameters for monitoring script
 #---------------------------------------------------------------------------
 
-# directory where to install slapd_check.sh
-# Probably there's no check_mk agent installed, so set other dir as default
-slapd_checkmk_local: "{{ aedir_sbin }}"
+# directory where to install slapd_checkmk.sh
+# (see also: https://checkmk.com/integrations/mrpe)
+
+slapd_checkmk_local: ""
 
 # fully-qualified domain name of local LDAPS service
-slapd_check_service_fqdn: "{{ openldap_service_fqdn }}"
+slapdcheck_service_fqdn: "{{ openldap_service_fqdn }}"
 
 # local LDAPS URI
-slapd_check_ldaps_uri: "ldaps://{{ slapd_check_service_fqdn }}"
+slapdcheck_ldaps_uri: "ldaps://{{ slapdcheck_service_fqdn }}"
 
 # expected authz-ID for local LDAPS connection
 # very likely you have to adjust this one
-slapd_check_authz_id: "dn:uid=ae-dir-slapd_{{ slapd_check_service_fqdn }},cn=ae,{{ aedir_db_params.um.suffix }}"
+slapdcheck_authz_id: "dn:uid=ae-dir-slapd_{{ slapdcheck_service_fqdn }},cn=ae,{{ aedir_db_params.um.suffix }}"
 
 # Template used for generating slapdcheck.conf
 # (see example file ansible-ae-dir-server/templates/slapdcheck/slapdcheck.cfg.j2)
-slapd_check_cfg_template: "slapdcheck/slapdcheck.cfg.j2"
+slapdcheck_cfg_template: "slapdcheck/slapdcheck.cfg.j2"
+
+# Runtime directory for slapdcheck
+slapdcheck_rundir: "{{ aedir_rundir }}/slapdcheck"
 
 # Path name of slapdcheck's state file (e.g. for rate-calculation)
 # Should reside in a tmpfs in /run as counters are reset after reboot anyway
-slapd_check_state_file: "{{ aedir_rundir }}/slapdcheck/slapdcheck.state"
+slapdcheck_state_file: "{{ slapdcheck_rundir }}/slapdcheck.state"
 
 # number of minimum connections expected
 # if real connection count falls below this treshold it could mean
 # that slapd is not reachable from LDAP clients
-slapd_check_cfg_connections_warn_lower: 3
-
-# Arguments for cron job exporting metrics
-slapd_check_cron_args:
-  user: "root"
-  hour: "*"
-  minute: "*"
+slapdcheck_cfg_connections_warn_lower: 3
 
 # minimum and maximum possible values for serverID
-slapd_check_cfg_server_id_min: 1
-slapd_check_cfg_server_id_max: "{{ aedir_hosts.provider|length }}"
+slapdcheck_cfg_server_id_min: 1
+slapdcheck_cfg_server_id_max: "{{ aedir_hosts.provider|length }}"
+
+# service name for running slapdcheck triggered by systemd-timer
+slapdcheck_service_name: "slapdcheck"
+
+# slapdcheck sub-module to run
+# (see also: https://code.stroeder.com/ldap/slapdcheck/src/branch/master/README.md)
+slapdcheck_module: "{{ 'metrics' if aedir_metricsdir else 'html' }}"
+
+# Interval [secs] how often to run slapdcheck
+slapdcheck_interval: 30
+
+# Pathname of slapdcheck output file
+slapdcheck_output_file: "{{ aedir_metricsdir+'/'+openldap_service_name+'.prom' if aedir_metricsdir else slapdcheck_rundir+'/slapcheck.'+slapdcheck_module }}"
+
+# User account and group with which to run slapcheck 
+slapdcheck_user: "ae-dir-slapdcheck"
+slapdcheck_group: "{{ slapdcheck_user }}"
 
 #---------------------------------------------------------------------------
 # web2ldap parameters

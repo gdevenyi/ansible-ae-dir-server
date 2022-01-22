@@ -4,16 +4,16 @@
 [slapdcheck]
 
 # Path name of state file
-state_file: {{ slapd_check_state_file }}
+state_file: {{ slapdcheck_state_file }}
 
 # LDAP URI for local connection over IPC (Unix domain socket)
 ldapi_uri = {{ openldap_ldapi_uri }}
 
 # LDAPS URL for checking local TLS connection
-ldaps_uri = {{ slapd_check_ldaps_uri }}
+ldaps_uri = {{ slapdcheck_ldaps_uri }}
 
 # expected authz-Id returned for LDAPS connection
-ldaps_authz_id = {{ slapd_check_authz_id }}
+ldaps_authz_id = {{ slapdcheck_authz_id }}
 
 # Timeout in seconds when connecting to local and remote LDAP servers
 # used for ldap0.OPT_NETWORK_TIMEOUT and ldap0.OPT_TIMEOUT
@@ -39,7 +39,7 @@ ops_waiting_crit = 60
 # number of minimum connections expected
 # if real connection count falls below this treshold it could mean
 # that slapd is not reachable from LDAP clients
-connections_warn_lower = {{ slapd_check_cfg_connections_warn_lower }}
+connections_warn_lower = {{ slapdcheck_cfg_connections_warn_lower }}
 # warn if this percentage of max. file descriptors is reached
 connections_warn_percentage = 80.0
 
@@ -57,6 +57,6 @@ cert_warn_days = 50
 
 {% if openldap_role=="provider" %}
 # minimum and maximum possible values for serverID
-server_id_min = {{ slapd_check_cfg_server_id_min }}
-server_id_max = {{ slapd_check_cfg_server_id_max }}
+server_id_min = {{ slapdcheck_cfg_server_id_min }}
+server_id_max = {{ slapdcheck_cfg_server_id_max }}
 {% endif %}

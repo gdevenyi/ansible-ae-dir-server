@@ -26,7 +26,7 @@
 
 - name: "Install slapdcheck configuration {{ aedir_etc }}/slapdcheck.cfg"
   template:
-    src: "{{ slapd_check_cfg_template }}"
+    src: "{{ slapdcheck_cfg_template }}"
     dest: "{{ aedir_etc }}/slapdcheck.cfg"
     owner: root
     group: root
@@ -39,14 +39,39 @@
     owner: root
     group: root
     mode: 0o0755
+  when: slapd_checkmk_local != ""
 
-- name: "Install metrics wrapper script {{ aedir_sbin }}/slapd_metrics.sh"
+- name: "Remove obsolete wrapper scripts"
+  file:
+    path: "{{ item }}"
+    state: "absent"
+  loop:
+    - "{{ aedir_sbin }}/slapd_metrics.sh"
+    - "{{ aedir_sbin }}/slapd_checkmk.sh"
+
+- name: "Install slapdcheck wrapper script {{ aedir_sbin }}/slapdcheck.sh"
   template:
-    src: "slapdcheck/slapd_metrics.sh.j2"
-    dest: "{{ aedir_sbin }}/slapd_metrics.sh"
+    src: "slapdcheck/slapdcheck.sh.j2"
+    dest: "{{ aedir_sbin }}/slapdcheck.sh"
     owner: root
     group: root
     mode: 0o0755
+
+- name: "Install systemd service unit {{ slapdcheck_service_name }}.service"
+  ansible.builtin.template:
+    src: "systemd/slapdcheck.service.j2"
+    dest: "/etc/systemd/system/{{ slapdcheck_service_name }}.service"
+    owner: "root"
+    group: "root"
+    mode: 0o0644
+
+- name: "Install systemd timer unit {{ slapdcheck_service_name }}.timer"
+  ansible.builtin.template:
+    src: "systemd/slapdcheck.timer.j2"
+    dest: "/etc/systemd/system/{{ slapdcheck_service_name }}.timer"
+    owner: "root"
+    group: "root"
+    mode: 0o0644
 
 - name: "Copy mtail programs to {{ mtail_progs }}/"
   template:
