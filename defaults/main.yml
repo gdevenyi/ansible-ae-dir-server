@@ -975,11 +975,7 @@ slapdcheck_module: "{{ 'metrics' if aedir_metricsdir else 'html4' }}"
 slapdcheck_interval: 30
 
 # Pathname of slapdcheck output file
-slapdcheck_output_file: "{{ aedir_metricsdir+'/'+openldap_service_name+'.prom' if aedir_metricsdir else slapdcheck_rundir+'/slapcheck.'+slapdcheck_module }}"
-
-# User account and group with which to run slapcheck 
-slapdcheck_user: "ae-dir-slapdcheck"
-slapdcheck_group: "{{ slapdcheck_user }}"
+slapdcheck_output_file: "{{ aedir_metricsdir+'/'+openldap_service_name+'.prom' if aedir_metricsdir else slapdcheck_rundir+'/slapdcheck.'+slapdcheck_module }}"
 
 #---------------------------------------------------------------------------
 # web2ldap parameters

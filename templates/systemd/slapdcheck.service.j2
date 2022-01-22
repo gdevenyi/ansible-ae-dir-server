@@ -22,6 +22,7 @@ Environment=LDAPNOINIT=1
 Environment={{ evar.name }}={{ evar.value }}
 {% endfor %}
 ExecStart={{ aedir_python }} -m slapdcheck.{{ slapdcheck_module }} {{ aedir_etc }}/slapdcheck.cfg
+ExecStart=chmod 0644 {{ slapdcheck_output_file }}.tmp
 ExecStart=mv {{ slapdcheck_output_file }}.tmp {{ slapdcheck_output_file }}
 StandardOutput=file:{{ slapdcheck_output_file }}.tmp
 User={{ slapdcheck_user }}

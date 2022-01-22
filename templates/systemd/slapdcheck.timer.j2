@@ -5,8 +5,8 @@ Description=Run slapdcheck periodically
 Unit={{ slapdcheck_service_name }}.service
 OnBootSec={{ slapdcheck_interval }}
 OnUnitInactiveSec={{ slapdcheck_interval }}
-RandomizedDelaySec={{ slapdcheck_interval / 10 }}
-AccuracySec={{ slapdcheck_interval / 5 }}
+RandomizedDelaySec=2
+AccuracySec=2
 
 [Install]
 WantedBy=timers.target
