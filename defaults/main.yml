@@ -969,7 +969,7 @@ slapdcheck_service_name: "slapdcheck"
 
 # slapdcheck sub-module to run
 # (see also: https://code.stroeder.com/ldap/slapdcheck/src/branch/master/README.md)
-slapdcheck_module: "{{ 'metrics' if aedir_metricsdir else 'html' }}"
+slapdcheck_module: "{{ 'metrics' if aedir_metricsdir else 'html4' }}"
 
 # Interval [secs] how often to run slapdcheck
 slapdcheck_interval: 30
