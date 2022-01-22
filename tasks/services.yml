@@ -48,6 +48,7 @@
     name: "{{ slapdcheck_service_name }}.timer"
     state: "started"
     enabled: yes
+  when: slapdcheck_interval > 0
 
 - block:
 

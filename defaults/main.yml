@@ -972,7 +972,8 @@ slapdcheck_service_name: "slapdcheck"
 slapdcheck_module: "{{ 'metrics' if aedir_metricsdir else 'mrpe' }}"
 
 # Interval [secs] how often to run slapdcheck
-slapdcheck_interval: 30
+# The systemd service and timer units will only be installed and activated if this is > 0
+slapdcheck_interval: 0
 
 # Pathname of slapdcheck output file
 slapdcheck_output_file: "{{ aedir_metricsdir+'/'+openldap_service_name+'.prom' if aedir_metricsdir else slapdcheck_rundir+'/slapdcheck.'+slapdcheck_module }}"

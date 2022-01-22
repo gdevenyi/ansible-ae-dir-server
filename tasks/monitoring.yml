@@ -57,21 +57,26 @@
     group: root
     mode: 0o0755
 
-- name: "Install systemd service unit {{ slapdcheck_service_name }}.service"
-  ansible.builtin.template:
-    src: "systemd/slapdcheck.service.j2"
-    dest: "/etc/systemd/system/{{ slapdcheck_service_name }}.service"
-    owner: "root"
-    group: "root"
-    mode: 0o0644
-
-- name: "Install systemd timer unit {{ slapdcheck_service_name }}.timer"
+- name: "Install systemd units for slapdcheck"
   ansible.builtin.template:
     src: "systemd/slapdcheck.timer.j2"
     dest: "/etc/systemd/system/{{ slapdcheck_service_name }}.timer"
     owner: "root"
     group: "root"
     mode: 0o0644
+  loop:
+    - "timer"
+    - "service"
+  when: slapdcheck_interval > 0
+
+- name: "Install systemd units for slapdcheck"
+  ansible.builtin.file:
+    state: "absent"
+    path: "/etc/systemd/system/{{ slapdcheck_service_name }}.timer"
+  loop:
+    - "timer"
+    - "service"
+  when: slapdcheck_interval <= 0
 
 - name: "Copy mtail programs to {{ mtail_progs }}/"
   template:
