@@ -3,6 +3,9 @@
 
 [slapdcheck]
 
+# Path name of state file
+state_file: {{ slapd_check_state_file }}
+
 # LDAP URI for local connection over IPC (Unix domain socket)
 ldapi_uri = {{ openldap_ldapi_uri }}
 
