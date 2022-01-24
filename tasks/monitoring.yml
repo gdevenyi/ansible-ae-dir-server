@@ -59,8 +59,8 @@
 
 - name: "Install systemd units for slapdcheck"
   ansible.builtin.template:
-    src: "systemd/slapdcheck.timer.j2"
-    dest: "/etc/systemd/system/{{ slapdcheck_service_name }}.timer"
+    src: "systemd/slapdcheck.{{ item }}.j2"
+    dest: "/etc/systemd/system/{{ slapdcheck_service_name }}.{{ item }}"
     owner: "root"
     group: "root"
     mode: 0o0644
