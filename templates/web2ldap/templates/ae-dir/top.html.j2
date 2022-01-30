@@ -14,7 +14,7 @@
       rel="stylesheet"
       type="text/css"
       media="all"
-      integrity="sha512-d1dbFX2hBuDKzlrN3D+/+8a6drWoqTQcOrdon8Ead4Q9BEEPYY1Pezuj2Uo+v3vhyiYOLLPH32diYHsvgcF8DA=="
+      integrity="sha512-DW9DwpPc8lqVqFFiEtWuOphtchak9OQJSiYGjQM9PuqLG4RZJoKSA46qcxBaCBV7eJ1O592z4BlW2Ym63mptWg=="
       href="/css/web2ldap/default.css"
     >
     <link
@@ -64,22 +64,20 @@
 
           <table>
             <tr>
-              <th>
-                Connected to:
-              </th>
               <td>
+                {description} &#9657;
                 <a
                   href="{script_name}/{command}?{ldap_url}"
                   target="_blank"
                   rel="bookmark"
                   title="Bookmark URL"
                 >
-                  <span class="server">{ldap_uri} {description}</span>
+                  {ldap_uri}
                 </a>
               </td>
               <td rowspan="2">
                 <form
-                  action="{script_name}/search/{sid}"
+                  action="{script_name}/{sid}/search"
                   method="GET"
                   enctype="application/x-www-form-urlencoded"
                   accept-charset="utf-8"
@@ -98,15 +96,12 @@
               </td>
             </tr>
             <tr>
-              <th>
-                Bound as:
-              </th>
-              <td>
+              <td colspan="2">
                 <span class="whoami">{who}</span>
               </td>
               <td class="About">
                 <a
-                  href="{script_name}/urlredirect/{sid}?/web2ldap.html"
+                  href="{script_name}/{sid}/urlredirect?/web2ldap.html"
                   title="&AElig;-DIR user guide for web2ldap"
                 >
                   User guide
@@ -119,18 +114,21 @@
         </div>
 
         <div id="DITNavigation" role="navigation" aria-label="DIT navigation">
-
           <nav title="Current search base in directory information tree (DIT)">
             {dit_navi}
           </nav>
         </div>
 
         <menu role="navigation" aria-label="main menu">
-        {main_menu}
+          <p id="MainMenu" class="CT">
+            {main_menu}
+          </p>
         </menu>
 
         <menu role="navigation" aria-label="context menu">
-        {context_menu}
+          <p id="ContextMenu" class="CT">
+            {context_menu}
+          </p>
         </menu>
 
       </div>
