@@ -165,7 +165,7 @@ aedir_systemd_hardening:
   - "PrivateUsers=no"
   - "PrivateTmp=yes"
   - "PrivateDevices=yes"
-  - "ProtectSystem=full"
+  - "ProtectSystem=strict"
   - "ProtectProc=invisible"
   - "ProtectHome=yes"
   - "ProtectKernelModules=yes"

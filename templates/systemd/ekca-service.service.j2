@@ -26,6 +26,7 @@ Environment=PYTHONNOUSERSITE=1
 Environment=FLASK_ENV={{ ekca_flask_env }}
 ExecStart={{ ekca_service_execstart }}
 WorkingDirectory={{ ekca_service_socketdir }}
+ReadWritePaths={{ ekca_sshca_dir }} {{ ekca_service_socketdir }}
 CapabilityBoundingSet=
 AmbientCapabilities=
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX

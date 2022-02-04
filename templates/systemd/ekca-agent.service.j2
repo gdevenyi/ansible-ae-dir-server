@@ -24,6 +24,7 @@ Group=ae-dir-ekca
 CapabilityBoundingSet=
 AmbientCapabilities=
 RestrictAddressFamilies=AF_UNIX
+ReadWritePaths={{ ekca_agent_socket|dirname }}
 {% if aedir_systemd_logging %}
 # various logging options from ansible var aedir_systemd_logging
 {% for systemd_option in aedir_systemd_logging %}

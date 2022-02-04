@@ -23,6 +23,7 @@ Environment={{ evar.name }}={{ evar.value }}
 {% endfor %}
 ExecStart={{ aedir_python }} -m oathldap_srv.{{ oath_bind_listener }} {{ oath_ldap_cfg_dir }}/{{ oath_bind_listener }}/{{ oath_bind_listener }}.cfg
 WorkingDirectory={{ aedir_rundir }}/{{ oath_bind_listener }}
+ReadWritePaths={{ aedir_rundir }}/{{ oath_bind_listener }}
 User={{ oath_listener_user }}
 Group={{ oath_listener_user }}
 CapabilityBoundingSet=
