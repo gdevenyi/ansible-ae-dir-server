@@ -12,8 +12,9 @@
     job: "{{ aedir_python }} -m {{ item.value.pyjob }}"
   with_dict:
     aedir_pproc:
+      user: "ae-dir-updater"
       minute: "{{ aedir_cron_minutes.aedir_pproc }}"
-      pyjob: "aedir_pproc.cron {{ aedir_rundir }}/aedir_pproc_update.state"
+      pyjob: "aedir_pproc.cron {{ aedir_rundir }}/ae-dir-updater/ae-dir-updater.state"
     aedir_pproc_pwd:
       user: "ae-dir-pwd"
       minute: "{{ aedir_cron_minutes.aedir_pproc_pwd }}"

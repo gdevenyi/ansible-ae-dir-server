@@ -389,6 +389,16 @@ aedir_ldapi_services:
     roles:
       - provider
       - consumer
+  # system user for sync processes
+  ae-dir-updater:
+    cn: "aedir_pproc.cron demon user"
+    uid_number: "{{ aedir_min_gid-13 }}"
+    gid_number: "{{ aedir_min_gid-13 }}"
+    description: "The system user allowed to update aeUser and aeGroup entries over LDAPI"
+    roles:
+      - provider
+    groups:
+      - "ae-admins"
 
 # POSIX UID and GID which is mapped to rootdn
 aedir_rootdn_uid_number: 0
