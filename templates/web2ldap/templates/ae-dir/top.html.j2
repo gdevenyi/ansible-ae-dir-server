@@ -85,7 +85,7 @@
                   <input
                       type="hidden"
                       name="filterstr"
-                      value="(|(cn=*{{av}}*)(mail=*{{av}}*)(host={{av}}*)(uid={{av}})(uidNumber={{av}})(gidNumber={{av}})(entryUUID={{av}}))"
+                      value="{% raw %}(|(cn=*{{av}}*)(mail=*{{av}}*)(host={{av}}*)(uid={{av}})(uidNumber={{av}})(gidNumber={{av}})(entryUUID={{av}})){% endraw %}"
                   >
                   <input type="hidden" name="search_option" value="">
                   <input type="hidden" name="search_attr" value="">
