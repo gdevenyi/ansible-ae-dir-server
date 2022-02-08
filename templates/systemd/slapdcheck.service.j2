@@ -32,7 +32,7 @@ CapabilityBoundingSet=CAP_SYS_PTRACE CAP_DAC_OVERRIDE
 AmbientCapabilities=CAP_SYS_PTRACE CAP_DAC_OVERRIDE
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 WorkingDirectory={{ slapdcheck_rundir }}
-ReadWritePaths={{ slapdcheck_output_file|dirname }}
+ReadWritePaths={{ slapdcheck_rundir }} {{ slapdcheck_output_file|dirname }}
 
 {% if aedir_systemd_logging %}
 # various logging options from ansible var aedir_systemd_logging
