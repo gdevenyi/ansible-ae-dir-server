@@ -131,7 +131,6 @@
         mode: u=rwx,g=rx,o=rx
       loop:
         - "{{ aedir_etc }}"
-        - "{{ aedir_etc }}/gunicorn"
         - "{{ aedir_bin }}"
         - "{{ aedir_sbin }}"
 
