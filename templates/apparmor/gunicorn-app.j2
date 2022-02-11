@@ -32,10 +32,10 @@ profile {{ name }} flags=(attach_disconnected) {
   signal peer=@{profile_name},
 {% endif %}
 
-  {{ aedir_rundir }}/gunicorn/{{ name }}/ rw,
+  {{ aedir_rundir }}/{{ name }}/ rw,
   # allow r/w access to own heart-beat temporary file
-  owner {{ aedir_rundir }}/gunicorn/{{ name }}/wgunicorn-[0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_] rw,
+  owner {{ aedir_rundir }}/{{ name }}/wgunicorn-[0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_] rw,
   # allow r/w access to own Unix domain socket
-  owner {{ aedir_rundir }}/gunicorn/{{ name }}/{{ name }}.sock rw,
+  owner {{ aedir_rundir }}/{{ name }}/{{ name }}.sock rw,
 
 }

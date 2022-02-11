@@ -174,7 +174,7 @@ ProxyPreserveHost On
   #---------------------------------------------------------------------
 
   <Location /web2ldap>
-    ProxyPass unix:{{ aedir_rundir }}/gunicorn/web2ldap/web2ldap.sock|http://127.0.0.1:8080/web2ldap
+    ProxyPass unix:{{ aedir_rundir }}/web2ldap/web2ldap.sock|http://127.0.0.1:8080/web2ldap
     # Tell mod_ssl to set the SSL standard env vars
     SSLOptions +StdEnvVars
     <Limit GET POST>
@@ -200,7 +200,7 @@ ProxyPreserveHost On
 
   RedirectPermanent /pwd /pwd/
   <Location /pwd/>
-    ProxyPass unix:{{ aedir_rundir }}/gunicorn/ae-dir-pwd/ae-dir-pwd.sock|http://127.0.0.1:8081/
+    ProxyPass unix:{{ aedir_rundir }}/ae-dir-pwd/ae-dir-pwd.sock|http://127.0.0.1:8081/
     <Limit GET POST>
 {% for require in apache_pwd_requires %}
       Require {{ require }}
@@ -215,7 +215,7 @@ ProxyPreserveHost On
 
   RedirectPermanent /oath /oath/
   <Location /oath/>
-    ProxyPass unix:{{ aedir_rundir }}/gunicorn/oathenroll/oathenroll.sock|http://127.0.0.1:8082/
+    ProxyPass unix:{{ aedir_rundir }}/oathenroll/oathenroll.sock|http://127.0.0.1:8082/
     <Limit GET POST>
 {% for require in apache_oath_requires %}
       Require {{ require }}

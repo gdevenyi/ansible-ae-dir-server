@@ -152,7 +152,6 @@
         mode: 0o0755
       loop:
         - "{{ aedir_rundir }}"
-        - "{{ aedir_rundir }}/gunicorn"
       when: aedir_service_manager != "systemd" or not aedir_rundir.startswith("/run")
 
   tags:

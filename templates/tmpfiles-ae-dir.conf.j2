@@ -7,13 +7,12 @@ d {{ aedir_rundir }}/{{ oath_bind_listener }} 0750 {{ oath_listener_user }} {{ o
 {% if openldap_role=="provider" %}
 # only present on AE-DIR providers
 d {{ aedir_rundir }}/apache 0775 root {{ apache_group }}
-d {{ aedir_rundir }}/gunicorn 0755 root root
-d {{ aedir_rundir }}/gunicorn/web2ldap 0750 {{ web2ldap_user }} {{ apache_group }}
-d {{ aedir_rundir }}/gunicorn/oathenroll 0750 {{ oath_ldap_oathenroll_web_user }} {{ apache_group }}
-d {{ aedir_rundir }}/gunicorn/ae-dir-pwd 0750 ae-dir-pwd {{ apache_group }}
+d {{ aedir_rundir }}/web2ldap 0750 {{ web2ldap_user }} {{ apache_group }}
+d {{ aedir_rundir }}/oathenroll 0750 {{ oath_ldap_oathenroll_web_user }} {{ apache_group }}
+d {{ aedir_rundir }}/ae-dir-pwd 0750 ae-dir-pwd {{ apache_group }}
 d {{ aedir_rundir }}/ae-dir-updater 0750 ae-dir-updater ae-dir-updater
 {% if ekca_enabled %}
-d {{ aedir_rundir }}/gunicorn/ekca 0750 ae-dir-ekca {{ apache_group }}
+d {{ aedir_rundir }}/ekca 0750 ae-dir-ekca {{ apache_group }}
 d {{ ekca_agent_socket|dirname }} 0750 ae-dir-ekca ae-dir-ekca
 {% endif %}
 {% endif %}

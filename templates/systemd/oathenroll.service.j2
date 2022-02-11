@@ -23,10 +23,10 @@ Environment={{ evar.name }}={{ evar.value }}
 {% endfor %}
 Environment=OATHENROLL_CFG={{ oath_ldap_cfg_dir }}/oathenroll/oathenroll.cfg
 Environment=FLASK_ENV=production
-ExecStartPre={{ rm_exec }} -f {{ aedir_rundir }}/gunicorn/oathenroll/oathenroll.sock
+ExecStartPre={{ rm_exec }} -f {{ aedir_rundir }}/oathenroll/oathenroll.sock
 ExecStart={{ aedir_gunicorn }} --workers={{ oath_ldap_oathenroll_workers }} "oathldap_web.app:create_app()"
-WorkingDirectory={{ aedir_rundir }}/gunicorn/oathenroll
-ReadWritePaths={{ aedir_rundir }}/gunicorn/oathenroll
+WorkingDirectory={{ aedir_rundir }}/oathenroll
+ReadWritePaths={{ aedir_rundir }}/oathenroll
 User={{ oath_ldap_oathenroll_web_user }}
 Group={{ oath_ldap_oathenroll_web_group }}
 KillSignal=SIGQUIT

@@ -122,8 +122,8 @@ aedir_gunicorn_args:
   - "--preload"
   - "--forwarded-allow-ips=*"
   - "--graceful-timeout=2"
-  - "--worker-tmp-dir={{ aedir_rundir }}/gunicorn/%N"
-  - "--bind=unix:{{ aedir_rundir }}/gunicorn/%N/%N.sock"
+  - "--worker-tmp-dir={{ aedir_rundir }}/%N"
+  - "--bind=unix:{{ aedir_rundir }}/%N/%N.sock"
 # Command for starting gunicorn application potentially in virtual env
 aedir_gunicorn: "{{ aedir_python }} -m gunicorn.app.wsgiapp {{ aedir_gunicorn_args | join(' ') }}"
 
@@ -1165,7 +1165,7 @@ ekca_enabled: False
 ekca_name: "ssh-ca-{{ openldap_server_id }}"
 
 # directory where EKCA service sockets are created
-ekca_service_socketdir: "{{ aedir_rundir }}/gunicorn/ekca"
+ekca_service_socketdir: "{{ aedir_rundir }}/ekca"
 
 # EKCA service socket
 ekca_service_socket: "{{ ekca_service_socketdir }}/ekca-service.sock"

@@ -41,9 +41,9 @@
   notify:
     - "restart ae-dir-pwd"
 
-- name: "Create socket directory {{ aedir_rundir }}/gunicorn/ae-dir-pwd"
+- name: "Create socket directory {{ aedir_rundir }}/ae-dir-pwd"
   file:
-    path: "{{ aedir_rundir }}/gunicorn/ae-dir-pwd"
+    path: "{{ aedir_rundir }}/ae-dir-pwd"
     state: directory
     owner: ae-dir-pwd
     group: ae-dir-httpd
