@@ -13,7 +13,7 @@ const SLAPD_RESULT // + SLAPD_OP + /.*RESULT tag=(?P<tag>\d+) (oid=(?P<oid>\d+) 
 
 // + SLAPD_RESULT {
     slapd_result[$tag, $err] = $etime
-    len($nentries) > 0 {
+    $tag == 101 && $err == 0 {
         slapd_search_result_size = $nentries
     }
 }
