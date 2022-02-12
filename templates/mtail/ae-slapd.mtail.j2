@@ -7,11 +7,15 @@ const SLAPD_FD // + SLAPD_CONN + /fd=(?P<fd>\d+) /
 #---------------------------------------------------------------------------
 
 histogram slapd_result buckets 0.001, 0.01, 0.1, 1.0, 10.0 by tag, err
+histogram slapd_search_result_size buckets 1, 10, 100, 1000, 10000
 
 const SLAPD_RESULT // + SLAPD_OP + /.*RESULT tag=(?P<tag>\d+) (oid=(?P<oid>\d+) )*err=(?P<err>\d+) qtime=(?P<qtime>\d+\.\d+) etime=(?P<etime>\d+\.\d+) (nentries=(?P<nentries>\d+) )*text=.*$/
 
 // + SLAPD_RESULT {
     slapd_result[$tag, $err] = $etime
+    len($nentries) > 0 {
+        slapd_search_result_size = $nentries
+    }
 }
 
 # count request lines
