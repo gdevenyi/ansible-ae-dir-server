@@ -12,7 +12,7 @@ d {{ aedir_rundir }}/oathenroll 0750 {{ oath_ldap_oathenroll_web_user }} {{ apac
 d {{ aedir_rundir }}/ae-dir-pwd 0750 ae-dir-pwd {{ apache_group }}
 d {{ aedir_rundir }}/ae-dir-updater 0750 ae-dir-updater ae-dir-updater
 {% if ekca_enabled %}
-d {{ aedir_rundir }}/ekca 0750 ae-dir-ekca {{ apache_group }}
+d {{ ekca_service_socket|dirname }} 0750 ae-dir-ekca {{ apache_group }}
 d {{ ekca_agent_socket|dirname }} 0750 ae-dir-ekca ae-dir-ekca
 {% endif %}
 {% endif %}
