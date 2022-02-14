@@ -30,7 +30,6 @@ ReadWritePaths={{ ekca_sshca_dir }} {{ ekca_service_socketdir }}
 CapabilityBoundingSet=
 AmbientCapabilities=
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
-Restart=always
 KillSignal=SIGQUIT
 NotifyAccess=all
 {% if aedir_systemd_logging %}
