@@ -31,7 +31,6 @@ CapabilityBoundingSet=
 AmbientCapabilities=
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 KillSignal=SIGQUIT
-NotifyAccess=all
 {% if aedir_systemd_logging %}
 # various logging options from ansible var aedir_systemd_logging
 {% for systemd_option in aedir_systemd_logging %}
