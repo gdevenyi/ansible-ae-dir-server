@@ -44,9 +44,9 @@
     group: root
     mode: 0o0700
 
-- name: "Create EKCA socket directory {{ ekca_service_socketdir }}"
+- name: "Create EKCA socket directory {{ ekca_service_socket|dirname }}"
   file:
-    path: "{{ ekca_service_socketdir }}"
+    path: "{{ ekca_service_socket|dirname }}"
     state: directory
     owner: ae-dir-ekca
     group: "{{ apache_group }}"

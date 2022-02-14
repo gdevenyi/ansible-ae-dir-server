@@ -27,9 +27,9 @@ profile ekca-service flags=(attach_disconnected) {
   # Allow us to signal ourselves
   signal peer=@{profile_name},
 
-  {{ ekca_service_socketdir }}/ rw,
+  {{ ekca_service_socket|dirname }}/ rw,
   # allow r/w access to own heart-beat temporary file
-  owner {{ ekca_service_socketdir }}/wgunicorn-[0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_] rw,
+  owner {{ ekca_service_socket|dirname }}/wgunicorn-[0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_] rw,
   # allow r/w access to own Unix domain socket
   owner {{ ekca_service_socket }} rw,
 

@@ -1164,11 +1164,8 @@ ekca_enabled: False
 # Only one EKCA instance on Æ-DIR provider
 ekca_name: "ssh-ca-{{ openldap_server_id }}"
 
-# directory where EKCA service sockets are created
-ekca_service_socketdir: "{{ aedir_rundir }}/ekca"
-
 # EKCA service socket
-ekca_service_socket: "{{ ekca_service_socketdir }}/ekca-service.sock"
+ekca_service_socket: "{{ aedir_rundir }}/ekca-service/ekca-service.sock"
 
 # number of EKCA service worker processes
 ekca_service_workers: "4"
