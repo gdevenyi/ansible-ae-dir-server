@@ -63,8 +63,14 @@ access to
 access to
   dn.subtree="{{ aedir_db_params.um.suffix }}"
   filter="(objectClass=sudoRole)"
-  attrs=entry,entryDN,entryUUID,objectClass,structuralObjectClass,aeStatus,modifyTimestamp,@sudoRole
+  attrs=entry,entryDN,entryUUID,objectClass,structuralObjectClass,aeStatus,modifyTimestamp,cn,sudoCommand,sudoHost,sudoNotAfter,sudoNotBefore,sudoOption,sudoOrder,sudoRunAs,sudoRunAsGroup,sudoRunAsUser
     by set="(user/-1 | user/aeSrvGroup)/aeVisibleSudoers & this" read
+    by * none
+access to
+  dn.subtree="{{ aedir_db_params.um.suffix }}"
+  attrs=sudoUser
+  val.regex="^%(.+)$"
+    by set.expand="(user/-1 | user/aeSrvGroup)/aeLoginGroups & [ldap:///{{ aedir_db_params.um.suffix }}?entryDN?sub?(&(objectClass=aeGroup)(aeStatus=0)(cn=${v1}))]/entryDN" read
     by * none
 
 # Grant read access to personal names and e-mail addresses for services/hosts
