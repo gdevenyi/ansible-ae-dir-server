@@ -22,7 +22,9 @@ moduleload syncprov
 
 # contrib modules
 moduleload deref
-#moduleload noopsrch
+{% if openldap_slapo_noopsrch %}
+moduleload noopsrch
+{% endif %}
 moduleload argon2 {{ openldap_argon2_params}}
 
 {% if openldap_role=="provider" %}

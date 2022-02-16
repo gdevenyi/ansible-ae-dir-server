@@ -800,6 +800,9 @@ openldap_idletimeout: "900"
 # Boolean which specifies whether overlay slapo-allowed is enabled
 openldap_slapo_allowed: "{{ lsb_id != 'Arch' }}"
 
+# Boolean which specifies whether overlay slapo-noopsrch is enabled
+openldap_slapo_noopsrch: "{{ lsb_id != 'Arch' }}"
+
 #---------------------------------------------------------------------------
 # password sync parameters
 #---------------------------------------------------------------------------

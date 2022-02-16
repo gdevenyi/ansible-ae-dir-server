@@ -1004,7 +1004,9 @@ overlay allowed
 {% endif %}
 
 # for counting search results without retrieving them
-#overlay noopsrch
+{% if openldap_slapo_noopsrch %}
+overlay noopsrch
+{% endif %}
 
 # for dereferencing attributes
 overlay deref
