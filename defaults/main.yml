@@ -620,6 +620,14 @@ openldap_slapd_group: "ae-dir-slapd"
 openldap_syslog_facility: "LOCAL4"
 openldap_syslog_level: "7"
 
+# List of LDAP URIs to listen on, see the description for argument -h in slapd(8).
+# Do not remove values without exactly knowing what you do! Leave alone if unsure!
+openldap_listen_uris:
+  - "{{ openldap_ldapi_uri }}/????x-mod=0777"
+  - "ldap://*:389"
+  - "ldaps://*:636"
+#  - "pldaps://*:1636"
+
 aedir_schema_prefix: "{{ openldap_slapd_conf|dirname }}/schema"
 
 # All additional schema files needed

@@ -18,7 +18,7 @@ Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
 {% endif %}
 Environment=LDAPNOINIT=1
 PIDFile={{ openldap_rundir }}/slapd.pid
-ExecStart={{ openldap_path.slapd_exec }} -d none -n {{ openldap_service_name }} -l {{ openldap_syslog_facility }} -s {{ openldap_syslog_level }} -f {{ openldap_slapd_conf }} -h '{{ openldap_ldapi_uri|replace('%','%%') }}/????x-mod=0777 ldap://*:389 ldaps://*:636' -o slp=off
+ExecStart={{ openldap_path.slapd_exec }} -d none -n {{ openldap_service_name }} -l {{ openldap_syslog_facility }} -s {{ openldap_syslog_level }} -f {{ openldap_slapd_conf }} -h '{{ openldap_listen_uris|join(' ')|replace('%','%%') }}' -o slp=off
 WorkingDirectory={{ aedir_rundir }}/slapd
 ReadWritePaths={{ openldap_rundir }} {{ aedir_db_params.values()|map(attribute='directory')|join(' ') }}
 User={{ openldap_slapd_user }}
