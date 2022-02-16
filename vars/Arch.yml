@@ -2,55 +2,44 @@
 # vars file for roles/ae-dir-server
 
 # explicit use of a specific Python version
-aedir_python_version: "3.6"
+aedir_python_version: "3.10"
 
-aedir_package_repos:
-  "sofl":
-    repo: "https://repo.symas.com/repo/rpm/SOLDAP/release26/rhel$releasever"
-    key: "RPM-GPG-KEY-symas-com-signing-key"
+#aedir_package_repos:
+#  "AE-DIR":
+#    repo: "deb https://ae-dir.com/repo/debian/{{ ansible_lsb.codename }} {{ ansible_lsb.codename }} main"
+#    key: "AE-DIR-project.gpg.key"
 
 # OS-specific Python paths
 aedir_python_paths:
   python_exec: "{{ aedir_prefix }}/bin/python{{ aedir_python_version.split('.')[0] }}"
   site_packages: "{{ aedir_prefix }}/lib/python{{ aedir_python_version }}/site-packages"
 
-# release-specific Python packages needed for ansible
-python_base_packages:
-  "7":
-    - python
-    - libxml2-python
-    - libselinux-python
-  "8":
-    - python3
-    - python3-libselinux
-
-# use Python3 venv module
+# use virtualenv tool
 virtualenv_command: "/usr/bin/python{{ aedir_python_version }} -m venv"
 
 # Pathname of OpenSSL command-line tool
 openssl_exec: "/usr/bin/openssl"
 
 # Directory where lmdb command-line tools (mdb_stat, mdb_copy etc.) are installed
-mdb_tools_dir: "/usr/libexec/openldap"
+mdb_tools_dir: "/opt/openldap-ms/sbin"
 
 # Pathname of rm command-line tool
-rm_exec: "/usr/bin/rm"
+rm_exec: "/bin/rm"
 
 # OS-specific maps
 openldap_path:
-  # LTB-based installation
-  prefix: /opt/symas
-  bin: /opt/symas/bin
-  sbin: /opt/symas/lib/slapd
-  conf_prefix: /opt/symas/etc/openldap
-  data: /var/symas/openldap-data
-  rundir: /var/symas/run
-  slapd_exec: /opt/symas/lib/slapd
-  libdir: /opt/symas/lib
-  modules: /opt/symas/lib/openldap
+  prefix: /usr
+  bin: /usr/bin
+  sbin: /usr/sbin
+  conf_prefix: /etc/openldap
+  data: /var/lib/openldap
+  rundir: /run/openldap/
+  slapd_exec: /usr/bin/slapd
+  libdir: /usr/lib/openldap
+  modules: /usr/lib/openldap
 
 cron_config:
-  service_name: "crond"
+  service_name: "cronie"
   pkg_name: "cronie"
 
 # conf_pathname: where to place the monolithic apache configuration file
@@ -58,32 +47,32 @@ cron_config:
 # modules: which modules to load
 apache2_config:
   service_name: "httpd"
-  user: "apache"
-  group: "apache"
-  pid_file: ""
-  httpd_exec: "/usr/sbin/httpd"
+  user: "www-data"
+  group: "www-data"
+  pid_file: "${APACHE_PID_FILE}"
+  httpd_exec: "/usr/bin/httpd"
   conf_pathname: "/etc/httpd/conf/httpd.conf"
-  mime_types: "/etc/mime.types"
-  mod_dir: "/usr/lib64/httpd/modules"
-  run_dir: "/var/run/httpd"
+  mime_types: "/etc/httpd/conf/mime.types"
+  mod_dir: "/usr/lib/httpd/modules"
+  run_dir: "/run/httpd"
   modules:
+    - mpm_event
     - socache_shmcb
     - env
-    - unixd
     - dir
     - alias
     - ssl
     - mime
+    - logio
+    - log_config
     - authz_core
     - authz_host
     - headers
     - deflate
     - filter
-    - logio
-    - log_config
-    - mpm_worker
     - proxy
     - proxy_http
+    - unixd
 
 web2ldap_paths:
   configdir: "{{ aedir_prefix }}/etc/web2ldap"

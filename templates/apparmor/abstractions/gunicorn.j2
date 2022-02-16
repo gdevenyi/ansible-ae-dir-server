@@ -4,7 +4,7 @@
   #include <ae-dir/abstractions/python>
 
   # we need MIME types
-  /etc/mime.types r,
+  {{ apache2_config.mime_types }} r,
 
   /{usr/,}bin/uname ix,
   /bin/dash ix,

@@ -29,7 +29,7 @@ profile ae-apache flags=(attach_disconnected) {
 
   # access to config files
   {{ apache_conf }} r,
-  /etc/mime.types r,
+  {{ apache2_config.mime_types }} r,
 
 {% if apache_pid_file!="" %}
   # the PID file

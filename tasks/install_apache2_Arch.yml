@@ -1,0 +1,11 @@
+---
+# installing apache2 on Arch-Linux
+
+- name: "Install packages needed for running Apache 2.4 on {{ lsb_id }}"
+  pacman:
+    name:
+      - apache
+    state: present
+    update_cache: no
+  notify:
+    - "restart ae-apache"
