@@ -1,0 +1,23 @@
+---
+# basic OS installation/configuration tasks on Debian
+
+- name: "Install base OS packages"
+  pacman:
+    name:
+      - acl
+      - ca-certificates-utils
+      - "{{ cron_pkg_name }}"
+      - gzip
+      - gnupg
+      - openssl
+      - python
+      - tar
+    state: present
+    update_cache: no
+
+- name: "Install alternative malloc package {{ aedir_malloc_package }}"
+  pacman:
+    name: "{{ aedir_malloc_package }}"
+    state: present
+    update_cache: no
+  when: aedir_malloc_package!=""

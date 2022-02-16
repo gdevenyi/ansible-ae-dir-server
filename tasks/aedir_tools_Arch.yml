@@ -1,0 +1,47 @@
+---
+
+- name: "Check whether all C wrapper modules are installed"
+  pip:
+    name:
+      - ldap0>=1.4.3
+      - psutil>=5.6.7
+    state: present
+    virtualenv: "{{ aedir_prefix }}"
+    extra_args: "{{ aedir_pip_extra_args }}"
+  ignore_errors: yes
+  when: aedir_pip_install
+  register: ldap0_installed
+
+- name: "Install Python {{ aedir_python_version }} packages on {{ lsb_id }}"
+  pacman:
+    name:
+      - "python"
+      - "python-setuptools"
+      - "python-pip"
+    state: present
+    update_cache: no
+  notify:
+    - restart ae-dir-pwd
+    - restart hotp_validator
+    - restart oathenroll
+    - restart bind_proxy
+    - restart web2ldap
+
+- name: "Install C compiler packages on {{ lsb_id }}"
+  pacman:
+    name:
+      - gcc
+    state: present
+    update_cache: no
+  when: aedir_pip_install_compiler is defined or ldap0_installed.failed
+
+- name: "AE-DIR tools installation in virtualenv {{ aedir_prefix }}"
+  include_tasks: "aedir_tools_venv.yml"
+
+- name: "Uninstall C compiler packages on {{ lsb_id }}"
+  pacman:
+    name:
+      - gcc
+      - cpp
+    state: absent
+    extra_args: "--recursive"

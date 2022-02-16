@@ -240,7 +240,9 @@ access to
 #---------------------------------------------------------------------------
 
 # for counting search results without retrieving them
+{% if openldap_slapo_noopsrch %}
 overlay noopsrch
+{% endif %}
 
 # for dereferencing attributes
 overlay deref

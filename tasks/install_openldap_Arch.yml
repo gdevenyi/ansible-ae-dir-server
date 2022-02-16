@@ -1,0 +1,18 @@
+---
+# install OpenLDAP packages on Arch-Linux
+
+- name: create /etc/sasl2
+  file:
+    path: /etc/sasl2
+    state: directory
+
+- name: "Install OpenLDAP packages and dependencies"
+  pacman:
+    name:
+      - libsasl
+      - libldap
+      - openldap
+    state: latest
+    update_cache: no
+  notify:
+    - "restart {{ openldap_service_name }}"

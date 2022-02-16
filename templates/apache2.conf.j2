@@ -20,7 +20,7 @@ ServerSignature EMail
 ServerName {{ apache_service_fqdn }}
 
 # MIME-Types initialisieren
-TypesConfig /etc/mime.types
+TypesConfig {{ apache2_config.mime_types }}
 
 # where to send error log messages (e.g. web2ldap traceback of unhandled exceptions)
 ErrorLog {{ apache_error_log }}

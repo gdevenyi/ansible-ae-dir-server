@@ -1,0 +1,18 @@
+---
+# install AppArmor on Arch-Linux
+
+- name: "Install AppArmor packages on {{ lsb_id }}"
+  pacman:
+    name:
+      - apparmor
+    state: present
+    update_cache: no
+  notify:
+    - restart apparmor
+    - restart ae-dir-pwd
+    - restart hotp_validator
+    - restart oathenroll
+    - restart bind_proxy
+    - restart web2ldap
+    - "restart {{ openldap_service_name }}"
+    - "restart ae-apache"

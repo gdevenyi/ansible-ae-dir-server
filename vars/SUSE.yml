@@ -60,6 +60,7 @@ apache2_config:
   pid_file: ""
   httpd_exec: "/usr/sbin/httpd-{{ apache2_mpm_model }}"
   conf_pathname: "/etc/apache2/httpd.conf"
+  mime_types: "/etc/mime.types"
   mod_dir: "/usr/lib64/apache2{{ '-'+apache2_mpm_model if ansible_lsb.description == 'openSUSE Tumbleweed' else '' }}"
   run_dir: "/var/run/apache2"
   modules:
