@@ -5,7 +5,6 @@
   apt:
     name:
       - libapparmor1
-      - libapparmor-perl
       - apparmor
     state: present
     update_cache: no

@@ -2,7 +2,7 @@
 # vars file for roles/ae-dir-server
 
 # explicit use of a specific Python version
-aedir_python_version: "{{ '3.9' if ansible_distribution_release == 'bullseye' else '3.7' }}"
+aedir_python_version: "3.9"
 
 aedir_package_repos:
   "AE-DIR":
