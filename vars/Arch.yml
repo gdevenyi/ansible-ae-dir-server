@@ -7,7 +7,7 @@ aedir_python_version: "3.10"
 #aedir_package_repos:
 #  "AE-DIR":
 #    repo: "deb https://ae-dir.com/repo/debian/{{ ansible_lsb.codename }} {{ ansible_lsb.codename }} main"
-#    key: "AE-DIR-project.gpg.key"
+#    key: "AE-DIR-project-2022-03-07.gpg.key"
 
 # OS-specific Python paths
 aedir_python_paths:
