@@ -618,7 +618,7 @@ openldap_slapd_user: "ae-dir-slapd"
 openldap_slapd_group: "ae-dir-slapd"
 # syslog(3) parameters used for slapd's logging
 openldap_syslog_facility: "LOCAL4"
-openldap_syslog_level: "7"
+openldap_syslog_level: "6"
 
 # List of LDAP URIs to listen on, see the description for argument -h in slapd(8).
 # Do not remove values without exactly knowing what you do! Leave alone if unsure!
