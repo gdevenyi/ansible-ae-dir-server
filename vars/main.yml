@@ -69,26 +69,30 @@ openldap_db_params_defaults:
 aedir_db_params: "{{ openldap_db_params_defaults|combine(openldap_db_params, recursive=True)|dict2items|rejectattr('value.suffix', 'equalto', '')|list|items2dict }}"
 
 # system-specific limited replacement for @resources
-systemcallfilter_resources: "{{ '@resources' if ansible_lsb.id not in ('openSUSE', 'SUSE') or ansible_lsb.description=='openSUSE Tumbleweed' else 'sched_setparam sched_setscheduler sched_setaffinity setpriority setrlimit set_mempolicy migrate_pages move_pages mbind sched_setattr' }}"
+systemd_systemcallfilter_resources: "{{ '@resources' if ansible_lsb.id not in ('openSUSE', 'SUSE') or ansible_lsb.description=='openSUSE Tumbleweed' else 'sched_setparam sched_setscheduler sched_setaffinity setpriority setrlimit set_mempolicy migrate_pages move_pages mbind sched_setattr' }}"
 
-# values for SystemCallFilter= (see systemd.exec(5) for details)
+# values for SystemCallFilter= used for all services (see systemd.exec(5) for details)
+systemd_systemcallfilter_common: "~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete splice {{ systemd_systemcallfilter_resources }}"
+
+# service-specific values for SystemCallFilter=
 systemd_systemcallfilter:
-  default: "~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete @chown @privileged {{ systemcallfilter_resources }} @pkey @setuid @timer"
-  apache: "~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete @chown @privileged {{ systemcallfilter_resources }} @pkey @setuid"
-  gunicorn: "~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete {{ systemcallfilter_resources }} @pkey @timer fork"
-  slapdsock: "~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete @chown @privileged {{ systemcallfilter_resources }} @pkey @setuid @timer fork"
-  ekca_agent: "~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete @chown @timer @privileged fork clone clone2 clone3 {{ systemcallfilter_resources }}"
-  slapdcheck: "~ @clock @cpu-emulation @debug @keyring @module @mount @raw-io @reboot @swap @obsolete @chown @timer @privileged fork clone clone2 clone3 {{ systemcallfilter_resources }}"
+  slapd: "{{ systemd_systemcallfilter_common }} @chown @privileged @pkey @setuid @timer"
+  apache: "{{ systemd_systemcallfilter_common }} @chown @privileged @pkey @setuid"
+  gunicorn: "{{ systemd_systemcallfilter_common }} @pkey @timer fork"
+  slapdsock: "{{ systemd_systemcallfilter_common }} @chown @privileged @pkey @setuid @timer fork clone clone2 clone3"
+  ekca_agent: "{{ systemd_systemcallfilter_common }} @chown @timer @privileged fork clone clone2 clone3"
+  slapdcheck: "{{ systemd_systemcallfilter_common }} @chown @timer @privileged fork clone clone2 clone3"
 
 # values for SystemCallLog= (see systemd.exec(5) for details)
 # to log disallowed syscalls
 # currently just set to the inverse of systemd_systemcallfilter values
 systemd_systemcalllog:
-  default: "{{ systemd_systemcallfilter.default[2:] }}"
+  slapd: "{{ systemd_systemcallfilter.slapd[2:] }}"
   apache: "{{ systemd_systemcallfilter.apache[2:] }}"
   gunicorn: "{{ systemd_systemcallfilter.gunicorn[2:] }}"
   slapdsock: "{{ systemd_systemcallfilter.slapdsock[2:] }}"
   ekca_agent: "{{ systemd_systemcallfilter.ekca_agent[2:] }}"
+  slapdcheck: "{{ systemd_systemcallfilter.slapdcheck[2:] }}"
 
 # User account and group with which to run slapcheck
 # (currently only works as root)

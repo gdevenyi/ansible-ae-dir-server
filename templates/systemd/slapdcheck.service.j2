@@ -46,8 +46,8 @@ ReadWritePaths={{ [slapdcheck_rundir, slapdcheck_output_file|dirname]|unique|joi
 {{ systemd_option }}
 {% endfor %}
 MemoryDenyWriteExecute=yes
-SystemCallFilter={{ systemd_systemcallfilter.slapdsock }}
-SystemCallLog={{ systemd_systemcalllog.slapdsock }}
+SystemCallFilter={{ systemd_systemcallfilter.slapdcheck }}
+SystemCallLog={{ systemd_systemcalllog.slapdcheck }}
 {% endif %}
 
 [Install]
