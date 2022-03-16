@@ -1057,18 +1057,34 @@ GLOBAL_DEFAULTS = Web2LDAPConfig(
 
 ldap_def = {
 
-    '_': GLOBAL_DEFAULTS,
+    '_': GLOBAL_DEFAULTS.clone(
+        description='\xC6-DIR',
+        top_template=os.path.join(TEMPLATES_DIR, 'ae-dir', 'top.html'),
+        binddn_mapping='ldap:///uid={user},{{ aedir_db_params.um.suffix }}??base',
+        boundas_template={
+            'aeUser':r'<span title="%(displayName)s: %(description)s">%(uid)s: %(description)s</span>',
+        },
+        session_track_control=True,
+        login_template=os.path.join(TEMPLATES_DIR, 'ae-dir', 'login.html'),
+    ),
 
     # Example for cn=Monitor covering various server implementations
-    'ldap:///cn=Monitor': OPENLDAP_MONITOR_CONFIG,
+    'ldap:///cn=Monitor': OPENLDAP_MONITOR_CONFIG.clone(
+        description='\xC6-DIR monitor',
+    ),
 
     # For dynamic configuration via cn=config
-    'ldap:///cn=config': CN_CONFIG,
+    'ldap:///cn=config': CN_CONFIG.clone(
+        description='\xC6-DIR config',
+    ),
 
     # AE-DIR's main DB
-    'ldap:///{{ aedir_db_params.um.suffix }}': AE_DIR_CONFIG,
+    'ldap:///{{ aedir_db_params.um.suffix }}': AE_DIR_CONFIG.clone(
+        binddn_mapping='ldap:///uid={user},{{ aedir_db_params.um.suffix }}??base',
+    ),
 
     # AE-DIR's accesslog
-    'ldap:///{{ aedir_db_params.accesslog.suffix }}': OPENLDAP_ACCESSLOG_CONFIG,
-
+    'ldap:///{{ aedir_db_params.accesslog.suffix }}': OPENLDAP_ACCESSLOG_CONFIG.clone(
+        description='\xC6-DIR accesslog',
+    ),
 }
