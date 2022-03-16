@@ -82,7 +82,7 @@ systemd_systemcallfilter:
   slapdsock: "{{ systemd_systemcallfilter_common }} @chown @privileged @pkey @setuid @timer fork clone clone2 clone3"
   bind_proxy: "{{ systemd_systemcallfilter_common }} @chown @privileged @pkey @setuid @timer fork"
   ekca_agent: "{{ systemd_systemcallfilter_common }} @chown @timer @privileged fork clone clone2 clone3"
-  slapdcheck: "{{ systemd_systemcallfilter_common }} @chown @timer @privileged fork clone clone2 clone3"
+  slapdcheck: "{{ systemd_systemcallfilter_common }} @chown @timer @privileged fork"
 
 # values for SystemCallLog= (see systemd.exec(5) for details)
 # to log disallowed syscalls
