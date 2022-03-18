@@ -38,7 +38,6 @@ ReadWritePaths={{ ekca_agent_socket|dirname }}
 {% endfor %}
 PrivateNetwork=yes
 IPAddressDeny=any
-MemoryDenyWriteExecute=yes
 SystemCallFilter={{ systemd_systemcallfilter.ekca_agent }}
 SystemCallLog={{ systemd_systemcalllog.ekca_agent }}
 {% endif %}

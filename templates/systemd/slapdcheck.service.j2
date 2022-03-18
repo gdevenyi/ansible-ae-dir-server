@@ -45,7 +45,6 @@ ReadWritePaths={{ [slapdcheck_rundir, slapdcheck_output_file|dirname]|unique|joi
 {% for systemd_option in aedir_systemd_hardening %}
 {{ systemd_option }}
 {% endfor %}
-MemoryDenyWriteExecute=yes
 SystemCallFilter={{ systemd_systemcallfilter.slapdcheck }}
 SystemCallLog={{ systemd_systemcalllog.slapdcheck }}
 {% endif %}

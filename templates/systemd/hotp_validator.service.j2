@@ -42,7 +42,6 @@ IPAddressDeny=any
 {% for systemd_option in aedir_systemd_hardening %}
 {{ systemd_option }}
 {% endfor %}
-MemoryDenyWriteExecute=yes
 SystemCallFilter={{ systemd_systemcallfilter.slapdsock }}
 SystemCallLog={{ systemd_systemcalllog.slapdsock }}
 {% endif %}

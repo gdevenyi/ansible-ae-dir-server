@@ -183,7 +183,9 @@ aedir_systemd_hardening:
   - "RestrictNamespaces=yes"
   - "RestrictSUIDSGID=yes"
   - "DevicePolicy=closed"
+  - "PrivateIPC=yes"
   - "RemoveIPC=yes"
+  - "MemoryDenyWriteExecute=yes"
 #  - "InaccessiblePaths=/run/systemd"
 
 # regex patterns for enforcing naming conventions (substring match!)
