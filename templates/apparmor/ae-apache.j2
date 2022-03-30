@@ -14,6 +14,10 @@ profile ae-apache flags=(attach_disconnected) {
 
   capability net_bind_service,
 
+  # crypto lib rules
+  @{PROC}/sys/crypto/fips_enabled r,
+  deny /usr/share/crypto-policies/*/*.txt r,
+
   # Allow unconfined processes to send us signals by default
   signal (receive) peer=unconfined,
   # Allow us to signal ourselves
