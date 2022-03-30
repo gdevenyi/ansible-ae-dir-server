@@ -10,4 +10,5 @@
   {{ openldap_cacert_pathname }} r,
 
   # allow r/w access to own Unix domain socket
+  {{ oath_ldap_socket_path|dirname }}/ r,
   {{ oath_ldap_socket_path }} rw,
