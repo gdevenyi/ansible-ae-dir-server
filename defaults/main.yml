@@ -96,9 +96,13 @@ aedir_bin: "{{ aedir_prefix }}/bin"
 aedir_sbin: "{{ aedir_prefix }}/sbin"
 aedir_etc: "{{ aedir_prefix }}/etc"
 aedir_etc_openldap: "{{ aedir_etc }}/openldap"
-aedir_rundir: "{{ aedir_prefix }}/run"
 aedir_python_sitepackages: "{{ aedir_python_paths.site_packages }}"
 aedir_htdocsdir: "{{ aedir_prefix }}/htdocs"
+
+# Let run-time directories reside in /run typically mounted as tmpfs on modern Linux distributions
+# Changing this for an already existing installation requires to stop all
+# services before ansible play!
+aedir_rundir: "/run/ae-dir"
 
 # Directory for metrics text exports picked up by Prometheus node-exporter.
 # If empty, no text exporter CRON jobs are installed.
