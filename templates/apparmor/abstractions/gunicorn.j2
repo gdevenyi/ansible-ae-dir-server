@@ -6,15 +6,18 @@
   # we need MIME types
   {{ apache2_config.mime_types }} r,
 
+  # allow to determine platform
   /{usr/,}bin/uname ix,
-  /bin/dash ix,
 
   # read access to Python interpreter
   /usr/bin/python{{ aedir_python_version }} r,
 
+  # Allow us to signal ourselves
+  signal peer=@{profile_name},
+
   # read-write access to /tmp
   /tmp/ r,
-  owner /tmp/#[0-9][0-9][0-9][0-9][0-9][0-9] mwr,
+  owner /tmp/#[0-9]* mwr,
 
   # read access to own mount points
   @{PROC}/@{pid}/mounts r,

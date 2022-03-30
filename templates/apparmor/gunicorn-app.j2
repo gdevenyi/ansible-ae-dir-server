@@ -27,14 +27,12 @@ profile {{ name }} flags=(attach_disconnected) {
 {% if name=="ae-dir-pwd" or name=="oathenroll" %}
   # access to CA cert for sending e-mail
   {{ smtp_cacert_pathname }} r,
-
-  # Allow us to signal ourselves
-  signal peer=@{profile_name},
 {% endif %}
 
-  {{ aedir_rundir }}/{{ name }}/ rw,
+  owner {{ aedir_rundir }}/{{ name }}/ rw,
   # allow r/w access to own heart-beat temporary file
   owner {{ aedir_rundir }}/{{ name }}/wgunicorn-[0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_][0-9a-z_] rw,
+  owner {{ aedir_rundir }}/{{ name }}/#[0-9]* rwm,
   # allow r/w access to own Unix domain socket
   owner {{ aedir_rundir }}/{{ name }}/{{ name }}.sock rw,
 
