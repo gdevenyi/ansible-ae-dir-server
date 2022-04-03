@@ -20,7 +20,6 @@
     disable_recommends: yes
     extra_args: "--allow-vendor-change"
     type: package
-  when: mdb_tools_dir != ''
 
 - name: "Install OpenLDAP packages"
   zypper:
