@@ -26,7 +26,7 @@ aedir_python_paths:
 openssl_exec: "/usr/bin/openssl"
 
 # Directory where lmdb command-line tools (mdb_stat, mdb_copy etc.) are installed
-mdb_tools_dir: "{{ '/usr/bin' if ansible_lsb.description == 'openSUSE Tumbleweed' else '' }}"
+mdb_tools_dir: "/usr/bin"
 
 # Pathname of rm command-line tool
 rm_exec: "/usr/bin/rm"
