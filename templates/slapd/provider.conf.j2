@@ -1016,22 +1016,22 @@ overlay sssvlv
 
 # Check sub-tree wide uniqueness of certain attributes
 overlay unique
-unique_uri "ldap:///{{ aedir_db_params.um.suffix }}?uid,uidNumber?sub?(objectClass=*)"
-unique_uri "ldap:///{{ aedir_db_params.um.suffix }}?nickName?sub?(objectClass=*)"
-unique_uri "ldap:///{{ aedir_db_params.um.suffix }}?mailLocalAddress?sub?(objectClass=*)"
-unique_uri "ldap:///{{ aedir_db_params.um.suffix }}?seeAlso?sub?(objectClass=*)"
-unique_uri "ldap:///{{ aedir_db_params.um.suffix }}?ipHostNumber,host,aeFqdn,macAddress?sub?(objectClass=*)"
-unique_uri "ldap:///{{ aedir_db_params.um.suffix }}?employeeNumber,uniqueIdentifier,displayName?sub"
+unique_uri "serialize ldap:///{{ aedir_db_params.um.suffix }}?uid,uidNumber?sub?(objectClass=*)"
+unique_uri "serialize ldap:///{{ aedir_db_params.um.suffix }}?nickName?sub?(objectClass=*)"
+unique_uri "serialize ldap:///{{ aedir_db_params.um.suffix }}?mailLocalAddress?sub?(objectClass=*)"
+unique_uri "serialize ldap:///{{ aedir_db_params.um.suffix }}?seeAlso?sub?(objectClass=*)"
+unique_uri "serialize ldap:///{{ aedir_db_params.um.suffix }}?ipHostNumber,host,aeFqdn,macAddress?sub?(objectClass=*)"
+unique_uri "serialize ldap:///{{ aedir_db_params.um.suffix }}?employeeNumber,uniqueIdentifier,displayName?sub"
 {% if aedir_unique_person_zones %}
 # only one aeUser entry per aePerson in these zones
 {% for zone in aedir_unique_person_zones %}
-unique_uri "ldap:///cn={{ zone }},{{ aedir_db_params.um.suffix }}?aePerson?sub"
+unique_uri "serialize ldap:///cn={{ zone }},{{ aedir_db_params.um.suffix }}?aePerson?sub"
 {% endfor %}
 {% endif %}
 # these two constraints are only possible with a negation filter
-unique_uri "ldap:///{{ aedir_db_params.um.suffix }}?cn?sub?(!(|(objectClass=aePerson)(objectClass=aeUser)(objectClass=aeNwDevice)))"
-unique_uri "ldap:///{{ aedir_db_params.um.suffix }}?gidNumber?sub"
-unique_uri "ldap:///{{ aedir_db_params.um.suffix }}?serialNumber?sub?(objectClass=*)"
+unique_uri "serialize ldap:///{{ aedir_db_params.um.suffix }}?cn?sub?(!(|(objectClass=aePerson)(objectClass=aeUser)(objectClass=aeNwDevice)))"
+unique_uri "serialize ldap:///{{ aedir_db_params.um.suffix }}?gidNumber?sub"
+unique_uri "serialize ldap:///{{ aedir_db_params.um.suffix }}?serialNumber?sub?(objectClass=*)"
 
 # Enforce constraints on attribute values
 overlay constraint

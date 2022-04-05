@@ -107,7 +107,7 @@ overlay noopsrch
 overlay deref
 
 overlay unique
-unique_uri "ldap:///{{ aedir_db_params.session.suffix }}?aeOwner?sub?(objectClass=*)"
+unique_uri "serialize ldap:///{{ aedir_db_params.session.suffix }}?aeOwner?sub?(objectClass=*)"
 
 overlay constraint
 
