@@ -10,6 +10,8 @@
 Description=AE-DIR OpenLDAP server
 Requires=local-fs.target network.target
 After=local-fs.target network.target
+Before=nss-user-lookup.target{{ ' aehostd.service' if getent_passwd.aehostd is defined }}
+Wants=nss-user-lookup.target
 
 [Service]
 Type=simple
