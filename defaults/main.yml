@@ -124,7 +124,7 @@ aedir_python_warnings: "default"
 # Python interpreter and command-line arguments to use
 # meaning of command-line arguments:
 # https://docs.python.org/3/using/cmdline.html#miscellaneous-options
-aedir_python: "{{ aedir_python_paths.python_exec }} -R -OO -B -I -S -W {{ aedir_python_warnings }}"
+aedir_python: "{{ aedir_python_paths.python_exec }} -R -OO -B -I -W {{ aedir_python_warnings }}"
 
 # Common arguments for running gunicorn
 aedir_gunicorn_args:
