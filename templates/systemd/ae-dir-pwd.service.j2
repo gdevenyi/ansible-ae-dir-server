@@ -18,9 +18,6 @@ Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
 {% endif %}
 Environment=LDAPNOINIT=1
 # some env vars set for Python interpreter
-{% for evar in aedir_python_env %}
-Environment={{ evar.name }}={{ evar.value }}
-{% endfor %}
 Environment=AEDIRPWD_CFG={{ aedir_etc }}/ae-dir-pwd/aedirpwd_cnf.py
 Environment=FLASK_ENV=production
 ExecStartPre={{ rm_exec }} -f {{ aedir_rundir }}/ae-dir-pwd/ae-dir-pwd.sock

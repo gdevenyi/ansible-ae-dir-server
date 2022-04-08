@@ -6,12 +6,6 @@
 LDAPNOINIT=1
 export LDAPNOINIT
 
-# some env vars set for Python interpreter
-{% for evar in aedir_python_env %}
-{{ evar.name }}={{ evar.value }}
-export {{ evar.name }}
-{% endfor %}
-
 {{ aedir_python }} -m oathldap_tool.cli decpin \
   --ldap-url '{{ openldap_ldapi_uri }}/{{ aedir_db_params.um.suffix }}' \
   --key-path '{{ oath_ldap_keys_dir }}' \

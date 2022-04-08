@@ -13,17 +13,7 @@
     HOME: "{{ aedir_rundir }}"
     MAILTO: ""
     LDAPRC: "{{ aedir_etc }}/ldap.conf"
-    PYTHONPATH: "{{ aedir_etc }}/ae-dir-pwd"
-
-- name: "Set Python env vars in {{ aedir_cron_file }}"
-  cron:
-    env: yes
-    name: "{{ item.name }}"
-    value: "{{ item.value }}"
-    state: present
-    user: root
-    cron_file: "{{ aedir_cron_file }}"
-  loop: "{{ aedir_python_env }}"
+    AEDIRPWD_CFG: "{{ aedir_etc }}/ae-dir-pwd/aedirpwd_cnf.py"
 
 - name: "Remove obsolete metrics text export CRON job"
   cron:

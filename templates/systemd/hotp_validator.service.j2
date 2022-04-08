@@ -18,9 +18,6 @@ Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
 {% endif %}
 Environment=LDAPNOINIT=1
 # some env vars set for Python interpreter
-{% for evar in aedir_python_env %}
-Environment={{ evar.name }}={{ evar.value }}
-{% endfor %}
 ExecStart={{ aedir_python }} -m oathldap_srv.{{ oath_bind_listener }} {{ oath_ldap_cfg_dir }}/{{ oath_bind_listener }}/{{ oath_bind_listener }}.cfg
 WorkingDirectory={{ aedir_rundir }}/{{ oath_bind_listener }}
 ReadWritePaths={{ aedir_rundir }}/{{ oath_bind_listener }}

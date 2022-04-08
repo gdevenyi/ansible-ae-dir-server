@@ -116,8 +116,15 @@ aedir_metricsdir: ""
 # This group has to already exist on the system!
 aedir_metrics_owner_group: "root"
 
-# which Python interpreter to use
-aedir_python: "{{ aedir_python_paths.python_exec }} -ROOBs"
+# which value to set for Python CLI option -W
+# look up possible values here:
+# https://docs.python.org/3/using/cmdline.html#cmdoption-W
+aedir_python_warnings: "default"
+
+# Python interpreter and command-line arguments to use
+# meaning of command-line arguments:
+# https://docs.python.org/3/using/cmdline.html#miscellaneous-options
+aedir_python: "{{ aedir_python_paths.python_exec }} -R -OO -B -I -S -W {{ aedir_python_warnings }}"
 
 # Common arguments for running gunicorn
 aedir_gunicorn_args:
@@ -130,22 +137,6 @@ aedir_gunicorn_args:
   - "--bind=unix:{{ aedir_rundir }}/%N/%N.sock"
 # Command for starting gunicorn application potentially in virtual env
 aedir_gunicorn: "{{ aedir_python }} -m gunicorn.app.wsgiapp {{ aedir_gunicorn_args | join(' ') }}"
-
-# which value to set for PYTHONWARNINGS
-aedir_python_warnings: "default"
-
-# environment variables set when running Python code
-aedir_python_env:
-  - name: "PYTHONBREAKPOINT"
-    value: "0"
-  - name: "PYTHONOPTIMIZE"
-    value: "2"
-  - name: "PYTHONDONTWRITEBYTECODE"
-    value: "1"
-  - name: "PYTHONWARNINGS"
-    value: "{{ aedir_python_warnings }}"
-  - name: "PYTHONNOUSERSITE"
-    value: "1"
 
 # where to install systemd files
 aedir_systemd_dir: "/etc/systemd/system"

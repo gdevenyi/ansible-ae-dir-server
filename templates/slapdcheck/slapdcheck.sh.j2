@@ -6,10 +6,4 @@
 LDAPNOINIT=1
 export LDAPNOINIT
 
-# some env vars set for Python interpreter
-{% for evar in aedir_python_env %}
-{{ evar.name }}={{ evar.value }}
-export {{ evar.name }}
-{% endfor %}
-
 {{ aedir_python }} -m slapdcheck.{{ slapdcheck_module }} {{ aedir_etc }}/slapdcheck.cfg
