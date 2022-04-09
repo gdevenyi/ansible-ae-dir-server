@@ -37,8 +37,8 @@ RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 {% for systemd_option in aedir_systemd_hardening %}
 {{ systemd_option }}
 {% endfor %}
-SystemCallFilter={{ systemd_systemcallfilter.bind_proxy }}
-SystemCallLog={{ systemd_systemcalllog.bind_proxy }}
+SystemCallFilter={{ systemd_systemcallfilter.slapdsock }}
+SystemCallLog={{ systemd_systemcalllog.slapdsock }}
 {% endif %}
 {% if apparmor_enabled %}
 AppArmorProfile={{ oath_bind_listener }}

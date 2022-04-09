@@ -79,8 +79,7 @@ systemd_systemcallfilter:
   slapd: "{{ systemd_systemcallfilter_common }} @chown @privileged @pkey @setuid @timer"
   apache: "{{ systemd_systemcallfilter_common }} @chown @privileged @pkey @setuid"
   gunicorn: "{{ systemd_systemcallfilter_common }} @pkey @timer fork"
-  slapdsock: "{{ systemd_systemcallfilter_common }} @chown @privileged @pkey @setuid @timer fork clone clone2 clone3"
-  bind_proxy: "{{ systemd_systemcallfilter_common }} @chown @privileged @pkey @setuid @timer fork"
+  slapdsock: "{{ systemd_systemcallfilter_common }} @chown @privileged @pkey @setuid @timer fork"
   ekca_agent: "{{ systemd_systemcallfilter_common }} @chown @timer @privileged fork clone clone2 clone3"
   slapdcheck: "{{ systemd_systemcallfilter_common }} @chown @timer @privileged fork"
 
@@ -92,7 +91,6 @@ systemd_systemcalllog:
   apache: "{{ systemd_systemcallfilter.apache[2:] }}"
   gunicorn: "{{ systemd_systemcallfilter.gunicorn[2:] }}"
   slapdsock: "{{ systemd_systemcallfilter.slapdsock[2:] }}"
-  bind_proxy: "{{ systemd_systemcallfilter.bind_proxy[2:] }}"
   ekca_agent: "{{ systemd_systemcallfilter.ekca_agent[2:] }}"
   slapdcheck: "{{ systemd_systemcallfilter.slapdcheck[2:] }}"
 
