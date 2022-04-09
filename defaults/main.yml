@@ -903,6 +903,7 @@ oath_ldap_oathenroll_workers: 4
 oath_ldap_noproxy_peer_addrs:
   - "{{ openldap_ldapi_socket }}"
   - "127.0.0.1"
+  - "::1"
 
 # 2. peer addresses proxied to OTP validator (after checking noproxy_peer_addrs)
 oath_ldap_proxy_peer_addrs: []
@@ -910,6 +911,7 @@ oath_ldap_proxy_peer_addrs: []
 # 3. peer address nets proxied to OTP validator (final check)
 oath_ldap_proxy_peer_nets:
   - "0.0.0.0/0"
+  - "::/0"
 
 #---------------------------------------------------------------------------
 # SMTP parameters
