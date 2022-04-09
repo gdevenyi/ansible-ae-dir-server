@@ -1,5 +1,8 @@
 [bind_proxy]
 
+# number of worker threads
+threads = {{ openldap_threads }}
+
 # Pathname of Unix domain socket where slapd-sock sends requests to
 socket_path = {{ oath_ldap_socket_path }}
 
