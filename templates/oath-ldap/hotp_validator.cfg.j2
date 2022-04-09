@@ -1,7 +1,7 @@
 [hotp_validator]
 
 # number of worker threads
-threads = {{ (1, openldap_threads/4)|max }}
+threads = {{ (1, openldap_threads/4)|max|int }}
 
 # Pathname of Unix domain socket where slapd-sock sends requests to
 socket_path = {{ oath_ldap_socket_path }}
