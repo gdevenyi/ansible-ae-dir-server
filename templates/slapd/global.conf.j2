@@ -25,6 +25,9 @@ moduleload deref
 {% if openldap_slapo_noopsrch %}
 moduleload noopsrch
 {% endif %}
+{% if openldap_slapo_authzid %}
+moduleload authzid
+{% endif %}
 moduleload argon2 {{ openldap_argon2_params}}
 
 {% if openldap_role=="provider" %}
@@ -311,3 +314,6 @@ sortvals
   memberUid
   rfc822MailMember
 
+{% if openldap_slapo_authzid %}
+overlay authzid
+{% endif %}
