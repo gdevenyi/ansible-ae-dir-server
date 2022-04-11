@@ -801,7 +801,7 @@ openldap_slapo_allowed: "{{ lsb_id != 'Arch' }}"
 openldap_slapo_noopsrch: "{{ lsb_id != 'Arch' }}"
 
 # Boolean which specifies whether overlay slapo-authzid is enabled
-openldap_slapo_authzid: "{{ lsb_id in ('SUSE',) }}"
+openldap_slapo_authzid: "{{ lsb_id in ('SUSE', 'Debian', 'Ubuntu') }}"
 
 #---------------------------------------------------------------------------
 # password sync parameters
