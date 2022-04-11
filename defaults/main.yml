@@ -454,7 +454,8 @@ aedir_init_aezones:
 aedir_init_aepersons: {}
 
 # list of dicts for aeUser entries to be added to ae-dir-base.ldif
-# - user names must match aedir_aeservice_uid_regex pattern defined above
+# - user names must match aedir_aeservice_uid_regex pattern
+#   (check also aedir_username_minlen and aedir_username_maxlen)
 # - unique_identifier has to be an entry in aedir_init_aepersons
 #aedir_init_aeadmins:
 #  - uid: xkcd
