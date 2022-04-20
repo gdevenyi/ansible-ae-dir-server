@@ -2,11 +2,11 @@
 # vars file for roles/ae-dir-server
 
 # explicit use of a specific Python version
-aedir_python_version: "3.8"
+aedir_python_version: "{{ '3.8' if ansible_lsb.codename == 'focal' else '3.10' }}"
 
 aedir_package_repos:
   "AE-DIR":
-    repo: "deb https://ae-dir.com/repo/ubuntu/focal focal main"
+    repo: "deb https://ae-dir.com/repo/ubuntu/{{ ansible_lsb.codename }} {{ ansible_lsb.codename }} main"
     key: "AE-DIR-project-2022-03-07.gpg.key"
 
 # OS-specific Python paths
