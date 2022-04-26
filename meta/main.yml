@@ -16,8 +16,8 @@ galaxy_info:
     - 15.3
   - name: Debian
     versions:
-    - buster
     - bullseye
+    - bookworm
   - name: SLES
     versions:
     - 15SP3
