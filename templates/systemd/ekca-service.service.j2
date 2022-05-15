@@ -16,6 +16,9 @@ Documentation=https://www.ae-dir.com/ekca.html
 Type=simple
 User=ae-dir-ekca
 Group=ae-dir-ekca
+{% if aedir_malloc_ld_preload %}
+Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
+{% endif %}
 Environment=LDAPNOINIT=1
 Environment=SSH_AUTH_SOCK="{{ ekca_agent_socket }}"
 Environment=EKCA_CFG={{ ekca_cfg }}
