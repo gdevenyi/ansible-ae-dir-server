@@ -1,6 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 
-# exit on error
+# Don't use uninitialized vars
+set -o nounset
+# After here exit on any error
 set -e
 
 # be strict on permissions
