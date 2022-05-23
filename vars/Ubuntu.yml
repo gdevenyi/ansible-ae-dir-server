@@ -7,7 +7,7 @@ aedir_python_version: "{{ '3.8' if ansible_lsb.codename == 'focal' else '3.10' }
 aedir_package_repos:
   "AE-DIR":
     repo: "deb https://ae-dir.com/repo/ubuntu/{{ ansible_lsb.codename }} {{ ansible_lsb.codename }} main"
-    key: "AE-DIR-project-2022-03-07.gpg.key"
+    key: "AE-DIR-project-2022-03-07.gpg"
 
 # OS-specific Python paths
 aedir_python_paths:
