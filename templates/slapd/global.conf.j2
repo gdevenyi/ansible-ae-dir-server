@@ -17,8 +17,6 @@ moduleload back_sock
 moduleload ppolicy
 moduleload memberof
 moduleload rwm
-# on provider *and* consumer as a work-around for ITS#8396
-moduleload syncprov
 
 # contrib modules
 moduleload deref
@@ -32,6 +30,7 @@ moduleload argon2 {{ openldap_argon2_params}}
 
 {% if openldap_role=="provider" %}
 # only on provider replicas
+moduleload syncprov
 moduleload accesslog
 {% if openldap_slapo_allowed %}
 moduleload allowed
