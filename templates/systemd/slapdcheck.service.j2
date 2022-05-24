@@ -9,7 +9,7 @@
 [Unit]
 Description=slapdcheck - Run slapdcheck once
 Requires=local-fs.target network.target
-After=local-fs.target network.target
+After=local-fs.target network.target {{ openldap_service_name }}.service
 
 [Service]
 Type=oneshot
