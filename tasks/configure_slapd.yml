@@ -125,7 +125,7 @@
 - name: "Create /etc/sasl2/slapd.conf on {{ lsb_id }}"
   template:
     src: "slapd/sasl2.conf.j2"
-    dest: "/etc/sasl2/slapd.conf"
+    dest: "{{ openldap_slapd_conf|dirname }}/sasl2.conf"
     owner: root
     group: "{{ openldap_slapd_group }}"
     mode: 0o0640

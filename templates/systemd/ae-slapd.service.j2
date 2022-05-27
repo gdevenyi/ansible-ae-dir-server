@@ -18,6 +18,7 @@ Type=simple
 {% if aedir_malloc_ld_preload %}
 Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
 {% endif %}
+Environment=SASL_CONF_PATH={{ openldap_slapd_conf|dirname }}/sasl2.conf
 Environment=LDAPNOINIT=1
 PIDFile={{ openldap_rundir }}/slapd.pid
 ExecStart={{ openldap_path.slapd_exec }} -d none -n {{ openldap_service_name }} -l {{ openldap_syslog_facility }} -s {{ openldap_syslog_level }} -f {{ openldap_slapd_conf }} -h '{{ openldap_listen_uris|join(' ')|replace('%','%%') }}' -o slp=off
