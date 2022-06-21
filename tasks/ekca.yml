@@ -5,8 +5,8 @@
 - name: "PIP install EKCA in virtualenv {{ aedir_prefix }}"
   pip:
     name:
-      - ekca-service >= 1.0.2
-      - ekca-plugin-aedir
+      - ekca-service >= 1.1.0
+      - ekca-plugin-aedir >= 0.1.3
     state: latest
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
@@ -17,8 +17,8 @@
 - name: "Install EKCA packages"
   zypper:
     name:
-      - ekca-service >= 1.0.2
-      - ekca-plugin-aedir
+      - ekca-service >= 1.1.0
+      - ekca-plugin-aedir >= 0.1.3
     state: latest
     disable_recommends: yes
     type: package

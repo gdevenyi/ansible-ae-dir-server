@@ -13,6 +13,10 @@ LOG_LEVEL = 'INFO'
 # maximum byte size of incoming requests
 MAX_CONTENT_LENGTH = 500
 
+# number of proxy levels
+# see https://werkzeug.palletsprojects.com/en/1.0.x/middleware/proxy_fix/
+PROXY_LEVEL = 1
+
 # global timeout default passed to socket.setdefaulttimeout()
 SOCKET_TIMEOUT = 5.0
 
