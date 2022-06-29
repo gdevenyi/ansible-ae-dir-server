@@ -3,6 +3,17 @@
 Configuration module for aedir_pproc.pwd
 """
 
+# default log level
+LOG_LEVEL = 'info'
+# logger name
+LOG_NAME = 'aedir_pproc.pwd.web'
+# path of logging config file
+LOG_CONFIG = '{{ aedir_etc }}/ae-logging.conf'
+
+# number of proxy levels
+# see https://werkzeug.palletsprojects.com/en/1.0.x/middleware/proxy_fix/
+PROXY_LEVEL = 1
+
 # LDAP-URL describing the connection parameters and bind information
 PWD_LDAP_URL = '{{ openldap_ldapi_uri }}/{{ aedir_db_params.um.suffix }}??sub??trace=0,x-saslmech=EXTERNAL'
 
