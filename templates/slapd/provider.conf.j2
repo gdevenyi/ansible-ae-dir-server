@@ -192,7 +192,26 @@ access to
 
 access to
   dn.subtree="{{ aedir_db_params.um.suffix }}"
-  attrs=authTimestamp,pwdFailureTime,pwdHistory,msPwdResetAdminPw
+  attrs=authTimestamp,pwdFailureTime,pwdHistory
+{% for restriction in aedir_providers_restrictions or [''] %}
+    by {{ restriction }} group/aeGroup/member="cn=ae-providers,cn=ae,{{ aedir_db_params.um.suffix }}" read
+{% endfor %}
+    by group/aeGroup/member="cn=ae-replicas,cn=ae,{{ aedir_db_params.um.suffix }}" none
+    by * none break
+
+# password reset data only required on providers
+access to
+  dn.subtree="{{ aedir_db_params.um.suffix }}"
+  attrs=objectClass
+  val.regex="^msPwdResetObject$"
+{% for restriction in aedir_providers_restrictions or [''] %}
+    by {{ restriction }} group/aeGroup/member="cn=ae-providers,cn=ae,{{ aedir_db_params.um.suffix }}" read
+{% endfor %}
+    by group/aeGroup/member="cn=ae-replicas,cn=ae,{{ aedir_db_params.um.suffix }}" none
+    by * none break
+access to
+  dn.subtree="{{ aedir_db_params.um.suffix }}"
+  attrs=@msPwdResetObject
 {% for restriction in aedir_providers_restrictions or [''] %}
     by {{ restriction }} group/aeGroup/member="cn=ae-providers,cn=ae,{{ aedir_db_params.um.suffix }}" read
 {% endfor %}
