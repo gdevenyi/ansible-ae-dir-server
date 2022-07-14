@@ -131,3 +131,14 @@ const SLAPD_PPOLICY_EXPIRED_PASSWORD /^.* {{ openldap_service_name }}\[\d+\]: pp
 // + SLAPD_PPOLICY_EXPIRED_PASSWORD {
     slapd_ppolicy_expired++
 }
+
+# count "TLS negotiation failure" messages
+#---------------------------------------------------------------------------
+
+counter slapd_tls_failure
+
+const SLAPD_TLS_FAILURE // + SLAPD_FD + /closed \(TLS negotiation failure\)$/
+
+// + SLAPD_TLS_FAILURE {
+    slapd_tls_failure++
+}
