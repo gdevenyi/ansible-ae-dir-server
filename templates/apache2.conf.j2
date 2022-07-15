@@ -48,6 +48,7 @@ KeepAliveTimeout 15
 StartServers {{ apache_startservers }}
 MinSpareThreads {{ apache_minsparethreads }}
 MaxSpareThreads {{ apache_maxsparethreads }}
+ThreadsPerChild {{ apache_threadsperchild }}
 MaxConnectionsPerChild {{ apache_maxconnectionsperchild }}
 
 User {{ apache_user }}

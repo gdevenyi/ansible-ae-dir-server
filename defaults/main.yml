@@ -1153,6 +1153,7 @@ apache_key_pathname: "{{ openldap_key_pathname }}"
 apache_startservers: 3
 apache_minsparethreads: 3
 apache_maxsparethreads: 10
+apache_threadsperchild: 4
 apache_maxconnectionsperchild: 20000
 
 #---------------------------------------------------------------------------
