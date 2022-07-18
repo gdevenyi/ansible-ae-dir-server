@@ -13,14 +13,14 @@ galaxy_info:
   - name: openSUSE
     versions:
     - Tumbleweed
-    - 15.3
+    - 15.4
   - name: Debian
     versions:
     - bullseye
     - bookworm
   - name: SLES
     versions:
-    - 15SP3
+    - 15SP4
   - name: AlmaLinux
     versions:
     - 8
