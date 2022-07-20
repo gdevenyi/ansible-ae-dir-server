@@ -69,7 +69,7 @@
     - "service"
   when: slapdcheck_interval > 0
 
-- name: "Install systemd units for slapdcheck"
+- name: "Remove systemd units for slapdcheck"
   ansible.builtin.file:
     state: "absent"
     path: "/etc/systemd/system/{{ slapdcheck_service_name }}.timer"
