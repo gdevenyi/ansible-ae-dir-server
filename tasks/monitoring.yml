@@ -72,7 +72,7 @@
 - name: "Remove systemd units for slapdcheck"
   ansible.builtin.file:
     state: "absent"
-    path: "/etc/systemd/system/{{ slapdcheck_service_name }}.timer"
+    path: "/etc/systemd/system/{{ slapdcheck_service_name }}.{{ item }}"
   loop:
     - "timer"
     - "service"
