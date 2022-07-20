@@ -1,0 +1,62 @@
+# AppArmor profile for node-exporter
+#
+# Ansible managed: {{ ansible_managed }}
+
+abi <abi/3.0>,
+
+#include <tunables/global>
+
+profile {{ slapdcheck_service_name }} flags=(attach_disconnected) {
+
+  #include <abstractions/consoles>
+  #include <ae-dir/abstractions/python>
+
+  capability dac_override,
+  capability sys_ptrace,
+  ptrace (read) peer={{ openldap_service_name }},
+
+  # for local NTP access
+  network inet dgram,
+  network inet6 dgram,
+
+  network inet  stream,
+  network inet6 stream,
+
+  # access to config
+  {{ aedir_etc }}/slapdcheck.cfg r,
+
+  # read access to TLS-related files
+  {{ openldap_cacert_pathname }} r,
+{% if openldap_cert_pathname %}
+  {{ openldap_cert_pathname }} r,
+{% endif %}
+{% if openldap_key_pathname %}
+  {{ openldap_key_pathname }} r,
+{% endif %}
+
+  # Grant read access to kernel and performance data of all processes
+  /dev/ r,
+  @{PROC} r,
+  @{PROC}/** r,
+#  @{sys} r,
+#  @{sys}/** r,
+
+  # Access needed for writing output to file
+  {{ slapdcheck_output_file|dirname }} r,
+  {{ slapdcheck_output_file }}.tmp rw,
+  {{ slapdcheck_output_file }} w,
+
+  # Access needed for reading/writing state-file
+  {{ slapdcheck_rundir }} r,
+  owner {{ slapdcheck_state_file }} rw,
+
+  # Silently block read access to globally installed crypto policy files
+  deny /usr/share/crypto-policies/DEFAULT/openssl.txt r,
+  deny /var/lib/ca-certificates/ca-bundle.pem r,  
+
+  # Access needed to PID and arg files of slapd
+  {{ openldap_rundir }}/ r,
+  {{ openldap_rundir }}/slapd.pid r,
+  {{ openldap_rundir }}/slapd.args r,
+    
+}

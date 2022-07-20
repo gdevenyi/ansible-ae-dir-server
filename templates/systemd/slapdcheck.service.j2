@@ -45,6 +45,9 @@ ReadWritePaths={{ [slapdcheck_rundir, slapdcheck_output_file|dirname]|unique|joi
 SystemCallFilter={{ systemd_systemcallfilter.slapdcheck }}
 SystemCallLog={{ systemd_systemcalllog.slapdcheck }}
 {% endif %}
+{% if apparmor_enabled %}
+AppArmorProfile={{ slapdcheck_service_name }}
+{% endif %}
 
 [Install]
 WantedBy=multi-user.target

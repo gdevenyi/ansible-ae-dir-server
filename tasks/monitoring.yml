@@ -78,6 +78,17 @@
     - "service"
   when: slapdcheck_interval <= 0
 
+- name: "Create AppArmor profile for {{ slapdcheck_service_name }}"
+  template:
+    src: "apparmor/{{ slapdcheck_service_name }}.j2"
+    dest: "{{ apparmor_profiles_dir }}/{{ slapdcheck_service_name }}"
+    owner: root
+    group: root
+    mode: 0o0644
+  notify:
+    - "restart apparmor"
+  when: apparmor_enabled == True
+
 - name: "Copy mtail programs to {{ mtail_progs }}/"
   template:
     src: "mtail/{{ item }}.mtail.j2"

@@ -16,6 +16,9 @@ profile {{ openldap_service_name }} flags=(attach_disconnected) {
 
   capability net_bind_service,
 
+  # needed for slapdcheck
+  ptrace (readby) peer={{ slapdcheck_service_name }},
+
   # crypto lib rules
   @{PROC}/sys/crypto/fips_enabled r,
   deny /usr/share/crypto-policies/*/*.txt r,
