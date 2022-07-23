@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Don't use uninitialized vars
+set -o nounset
+# After here exit on any error
+set -e
+
+# strict permissions
+umask 077
+
+systemctl stop {{ openldap_service_name }}
+
+{{ aedir_sbin }}/ae-dir-fix-db-permissions.sh
+
+setpriv \
+  --clear-groups \
+  --ambient-caps '+net_bind_service,+setgid,+setuid' \
+  --bounding-set '+net_bind_service,+setgid,+setuid' \
+  --reset-env \
+  -- \
+  {{ openldap_path.slapd_exec }} \
+      -d -1 \
+      -u {{ openldap_slapd_user }} \
+      -g {{ openldap_slapd_group }} \
+      -n {{ openldap_service_name }} \
+      -l {{ openldap_syslog_facility }} \
+      -s {{ openldap_syslog_level }} \
+      -f {{ openldap_slapd_conf }} \
+      -h '{{ openldap_listen_uris|join(' ') }}' \
+      -o slp=off

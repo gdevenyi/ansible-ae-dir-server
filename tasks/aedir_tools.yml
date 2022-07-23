@@ -48,6 +48,7 @@
     - "ae-dir-compact-db.sh"
     - "ae-dir-fix-db-permissions.sh"
     - "ae-dir-slapindex.sh"
+    - "ae-dir-slapd-debug.sh"
 
 - name: "Create /etc/profile.d/ae-dir.sh"
   template:
