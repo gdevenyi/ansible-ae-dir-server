@@ -75,6 +75,7 @@
 - name: "restart ekca-service"
   listen:
     - "restart ekca-service"
+    - "restart flask-apps"
   service:
     name: "ekca-service"
     state: restarted
