@@ -1,7 +1,7 @@
 ---
 # installing apache2 on Arch-Linux
 
-- name: "Install packages needed for running Apache 2.4 on {{ lsb_id }}"
+- name: "Install packages needed for running Apache 2.4"
   pacman:
     name:
       - apache

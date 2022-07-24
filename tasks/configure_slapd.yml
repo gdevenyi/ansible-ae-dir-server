@@ -122,7 +122,7 @@
   notify:
     - "restart {{ openldap_service_name }}"
 
-- name: "Create /etc/sasl2/slapd.conf on {{ lsb_id }}"
+- name: "Create /etc/sasl2/slapd.conf"
   template:
     src: "slapd/sasl2.conf.j2"
     dest: "{{ openldap_slapd_conf|dirname }}/sasl2.conf"

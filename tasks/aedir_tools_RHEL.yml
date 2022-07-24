@@ -12,7 +12,7 @@
   when: aedir_pip_install
   register: ldap0_installed
 
-- name: "Install C compiler packages on {{ lsb_id }}"
+- name: "Install C compiler packages"
   yum:
     name:
       - gcc
@@ -25,7 +25,7 @@
     update_cache: no
   when: aedir_pip_install_compiler is defined or ldap0_installed.failed
 
-- name: "Install base packages on {{ lsb_id }}"
+- name: "Install Python 3 packages"
   yum:
     name:
       - python3-setuptools
@@ -33,16 +33,12 @@
     state: present
     update_cache: no
   notify:
-    - restart ae-dir-pwd
-    - restart hotp_validator
-    - restart oathenroll
-    - restart bind_proxy
-    - restart web2ldap
+    - "restart python-services"
 
 - name: "AE-DIR tools installation in virtualenv {{ aedir_prefix }}"
   include_tasks: "aedir_tools_venv.yml"
 
-- name: "Uninstall C compiler packages on {{ lsb_id }}"
+- name: "Uninstall C compiler packages"
   yum:
     name:
       - gcc

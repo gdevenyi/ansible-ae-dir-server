@@ -12,7 +12,7 @@
   when: aedir_pip_install
   register: ldap0_installed
 
-- name: "Install Python {{ aedir_python_version }} packages on {{ lsb_id }}"
+- name: "Install Python {{ aedir_python_version }} packages"
   pacman:
     name:
       - "python"
@@ -21,13 +21,9 @@
     state: present
     update_cache: no
   notify:
-    - restart ae-dir-pwd
-    - restart hotp_validator
-    - restart oathenroll
-    - restart bind_proxy
-    - restart web2ldap
+    - "restart python-services"
 
-- name: "Install C compiler packages on {{ lsb_id }}"
+- name: "Install C compiler packages"
   pacman:
     name:
       - gcc
@@ -38,7 +34,7 @@
 - name: "AE-DIR tools installation in virtualenv {{ aedir_prefix }}"
   include_tasks: "aedir_tools_venv.yml"
 
-- name: "Uninstall C compiler packages on {{ lsb_id }}"
+- name: "Uninstall C compiler packages"
   pacman:
     name:
       - gcc

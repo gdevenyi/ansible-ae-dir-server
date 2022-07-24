@@ -1,7 +1,7 @@
 ---
 # install AppArmor on Debian
 
-- name: "Install AppArmor packages on {{ lsb_id }}"
+- name: "Install AppArmor packages"
   apt:
     name:
       - libapparmor1

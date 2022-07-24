@@ -1,7 +1,7 @@
 ---
 # installing apache2 on openSUSE/SLE
 
-- name: "Install packages needed for running Apache 2.4 on {{ lsb_id }}"
+- name: "Install packages needed for running Apache 2.4"
   zypper:
     name:
       - apache2

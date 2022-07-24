@@ -55,11 +55,7 @@
     LIBLDAP0_LIBRARY_DIRS: "{{ openldap_path.libdir }}"
     LIBLDAP0_LIBS: "ldap"
   notify:
-    - restart ae-dir-pwd
-    - restart hotp_validator
-    - restart oathenroll
-    - restart bind_proxy
-    - restart web2ldap
+    - "restart python-services"
 
 - name: "PIP package slapdsock in virtualenv {{ aedir_prefix }}"
   pip:
@@ -68,8 +64,8 @@
     virtualenv: "{{ aedir_prefix }}"
     extra_args: "{{ aedir_pip_extra_args }}"
   notify:
-    - restart hotp_validator
-    - restart bind_proxy
+    - "restart hotp_validator"
+    - "restart bind_proxy"
 
 - name: "PIP install additional modules in virtualenv {{ aedir_prefix }}"
   pip:
@@ -84,10 +80,9 @@
     extra_args: "{{ aedir_pip_extra_args }}"
   when: openldap_role == 'provider'
   notify:
-    - restart ae-dir-pwd
-    - restart oathenroll
-    - restart hotp_validator
-    - restart web2ldap
+    - "restart flask-apps"
+    - "restart hotp_validator"
+    - "restart web2ldap"
 
 - name: "PIP install ae-dir-tool in virtualenv on provider"
   pip:
@@ -122,4 +117,5 @@
     extra_args: "{{ aedir_pip_extra_args }}"
   when: openldap_role == 'provider'
   notify:
-    - restart ae-dir-pwd
+    - "restart ae-dir-pwd"
+    - "restart pwsync"

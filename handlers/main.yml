@@ -12,6 +12,7 @@
 - name: "restart ae-slapd"
   listen:
     - "restart ae-slapd"
+    - "restart all-services"
   service:
     name: "ae-slapd"
     state: restarted
@@ -19,7 +20,9 @@
 - name: "restart ae-dir-pwd"
   listen:
     - "restart ae-dir-pwd"
+    - "restart python-services"
     - "restart flask-apps"
+    - "restart all-services"
   service:
     name: "ae-dir-pwd"
     state: restarted
@@ -28,6 +31,8 @@
 - name: "restart hotp_validator"
   listen:
     - "restart hotp_validator"
+    - "restart python-services"
+    - "restart all-services"
   service:
     name: hotp_validator
     state: restarted
@@ -38,7 +43,9 @@
 - name: "restart oathenroll"
   listen:
     - "restart oathenroll"
+    - "restart python-services"
     - "restart flask-apps"
+    - "restart all-services"
   service:
     name: "oathenroll"
     state: restarted
@@ -49,6 +56,8 @@
 - name: "restart bind_proxy"
   listen:
     - "restart bind_proxy"
+    - "restart python-services"
+    - "restart all-services"
   service:
     name: "bind_proxy"
     state: restarted
@@ -59,6 +68,7 @@
 - name: "restart ae-apache"
   listen:
     - "restart ae-apache"
+    - "restart all-services"
   service:
     name: "ae-apache"
     state: restarted
@@ -67,6 +77,8 @@
 - name: "restart web2ldap"
   listen:
     - "restart web2ldap"
+    - "restart python-services"
+    - "restart all-services"
   service:
     name: "web2ldap"
     state: restarted
@@ -75,7 +87,9 @@
 - name: "restart ekca-service"
   listen:
     - "restart ekca-service"
+    - "restart python-services"
     - "restart flask-apps"
+    - "restart all-services"
   service:
     name: "ekca-service"
     state: restarted
@@ -86,6 +100,7 @@
 - name: "restart ekca-agent"
   listen:
     - "restart ekca-agent"
+    - "restart all-services"
   service:
     name: "ekca-agent"
     state: restarted
@@ -96,6 +111,8 @@
 - name: "restart pwsync"
   listen:
     - "restart pwsync"
+    - "restart python-services"
+    - "restart all-services"
   service:
     name: "pwsync"
     state: restarted

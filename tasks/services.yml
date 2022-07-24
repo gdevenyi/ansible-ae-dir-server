@@ -14,7 +14,9 @@
 
 - block:
 
-  # must be done after(!) system accounts/groups were created
+  # Creating the run-time directories in tmpfs must be done
+  # after(!) system accounts/groups were created
+  # but before(!) enabling/starting the services
   - name: "Update run-time directories in {{ aedir_rundir }}"
     command: "systemd-tmpfiles --create --remove --prefix={{ aedir_rundir }}"
     when: aedir_rundir.startswith("/run")

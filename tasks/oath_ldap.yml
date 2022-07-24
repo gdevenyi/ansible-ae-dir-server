@@ -142,7 +142,7 @@
     - "restart {{ oath_bind_listener }}"
   when: aedir_service_manager == "systemd"
 
-- name: "Install OATH-LDAP tool package on {{ lsb_id }}"
+- name: "Install OATH-LDAP tool package"
   zypper:
     name: "oath-ldap-tool>=1.3.4"
     state: latest
@@ -150,7 +150,7 @@
     type: package
   when: openldap_role == 'provider' and lsb_id == 'SUSE'
 
-- name: "PIP-install OATH-LDAP tool on {{ lsb_id }}"
+- name: "PIP-install OATH-LDAP tool"
   pip:
     name: "oath-ldap-tool>=1.3.4"
     state: present

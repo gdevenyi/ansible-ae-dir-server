@@ -1,7 +1,7 @@
 ---
 # install AppArmor on Arch-Linux
 
-- name: "Install AppArmor packages on {{ lsb_id }}"
+- name: "Install AppArmor packages"
   pacman:
     name:
       - apparmor

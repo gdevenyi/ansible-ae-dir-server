@@ -12,7 +12,7 @@
   when: aedir_pip_install
   register: ldap0_installed
 
-- name: "Install Python {{ aedir_python_version }} packages on {{ lsb_id }}"
+- name: "Install Python 3 packages"
   apt:
     name:
       - "libpython{{ aedir_python_version }}"
@@ -24,13 +24,9 @@
     install_recommends: no
     dpkg_options: 'force-confold,force-confdef'
   notify:
-    - restart ae-dir-pwd
-    - restart hotp_validator
-    - restart oathenroll
-    - restart bind_proxy
-    - restart web2ldap
+    - "restart python-services"
 
-- name: "Install C compiler packages on {{ lsb_id }}"
+- name: "Install C compiler packages"
   apt:
     name:
       - gcc
@@ -57,7 +53,7 @@
 - name: "AE-DIR tools installation in virtualenv {{ aedir_prefix }}"
   include_tasks: "aedir_tools_venv.yml"
 
-- name: "Uninstall C compiler packages on {{ lsb_id }}"
+- name: "Uninstall C compiler packages"
   apt:
     name:
       - gcc

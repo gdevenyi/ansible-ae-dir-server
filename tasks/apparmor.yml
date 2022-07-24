@@ -16,7 +16,7 @@
     - "ae-dir"
     - "ae-dir/abstractions"
   notify:
-    - restart apparmor
+    - "restart apparmor"
 
 - name: "Create AppArmor abstractions files in {{ apparmor_profiles_dir }}/ae-dir/abstractions/"
   template:
@@ -33,10 +33,5 @@
     - cli
     - gunicorn
   notify:
-    - restart apparmor
-    - restart ae-apache
-    - "restart {{ openldap_service_name }}"
-    - restart ae-dir-pwd
-    - restart oathenroll
-    - "restart {{ oath_bind_listener }}"
-    - restart web2ldap
+    - "restart apparmor"
+    - "restart all-services"
