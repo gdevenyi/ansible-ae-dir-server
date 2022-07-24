@@ -61,9 +61,9 @@
   file:
     path: "{{ openldap_rundir }}"
     state: directory
-    owner: root
+    owner: "{{ openldap_slapd_user }}"
     group: "{{ openldap_slapd_group }}"
-    mode: 0o0775
+    mode: 0o0755
   notify:
     - "restart {{ openldap_service_name }}"
 
