@@ -1,6 +1,36 @@
 ---
 
-- name: "Prepare virtualenv {{ aedir_prefix }} for Python 3"
+- name: "Check for Python version in virtualenv {{ aedir_prefix }}"
+  command: "{{ aedir_bin }}/python --version"
+  ignore_errors: yes
+  register: current_venv_python_version
+
+- debug:
+    var: "{{ item }}"
+    verbosity: 0
+  loop:
+    - aedir_python_version
+    - current_venv_python_version
+    - current_venv_python_version.stdout[7:]
+  tags:
+    - always
+
+- name: "Remove stale virtualenv {{ aedir_prefix }}"
+  file:
+    path: "{{ item }}"
+    state: absent
+  ignore_errors: yes
+  loop:
+    - "{{ aedir_bin }}"
+    - "{{ aedir_prefix }}/include"
+    - "{{ aedir_prefix }}/lib"
+    - "{{ aedir_prefix }}/lib64"
+    - "{{ aedir_prefix }}/share"
+    - "{{ aedir_prefix }}/pip-selfcheck.json"
+    - "{{ aedir_prefix }}/pyvenv.cfg"
+  when: not current_venv_python_version.stdout[7:].startswith(aedir_python_version)
+
+- name: "Prepare virtualenv {{ aedir_prefix }} for Python"
   pip:
     name:
       - pip
