@@ -78,7 +78,9 @@
   service:
     name: "ekca-service"
     state: restarted
-  when: openldap_role == 'provider'
+  when:
+    - ekca_enabled == True
+    - openldap_role == 'provider'
 
 - name: "restart ekca-agent"
   listen:
@@ -86,7 +88,9 @@
   service:
     name: "ekca-agent"
     state: restarted
-  when: openldap_role == 'provider'
+  when:
+    - ekca_enabled == True
+    - openldap_role == 'provider'
 
 - name: "restart pwsync"
   listen:
