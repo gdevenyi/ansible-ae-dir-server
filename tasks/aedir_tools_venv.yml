@@ -5,16 +5,6 @@
   ignore_errors: yes
   register: current_venv_python_version
 
-- debug:
-    var: "{{ item }}"
-    verbosity: 0
-  loop:
-    - aedir_python_version
-    - current_venv_python_version
-    - current_venv_python_version.stdout[7:]
-  tags:
-    - always
-
 - name: "Remove stale virtualenv {{ aedir_prefix }}"
   file:
     path: "{{ item }}"
