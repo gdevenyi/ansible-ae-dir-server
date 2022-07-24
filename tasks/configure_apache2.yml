@@ -45,13 +45,13 @@
     group: root
     mode: 0o0644
 
-- name: "Create Apache run directory {{ apache_rundir }}"
+- name: "Create Apache run-time directory {{ apache_rundir }}"
   file:
     path: "{{ apache_rundir }}"
     state: directory
-    owner: root
+    owner: "{{ apache_user }}"
     group: "{{ apache_group }}"
-    mode: 0o0775
+    mode: 0o0750
   notify:
     - "restart ae-apache"
 
