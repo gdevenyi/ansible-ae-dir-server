@@ -3,12 +3,16 @@
 d {{ aedir_rundir }} 0755 root root
 d {{ slapdcheck_rundir }} 0750 {{ slapdcheck_user }} {{ slapdcheck_group }}
 d {{ aedir_rundir }}/slapd 0755 {{ openldap_slapd_user }} {{ openldap_slapd_group }}
+{% if oath_ldap_enabled %}
 d {{ aedir_rundir }}/{{ oath_bind_listener }} 0750 {{ oath_listener_user }} {{ openldap_slapd_group }}
+{% endif %}
 {% if openldap_role=="provider" %}
 # only present on AE-DIR providers
 d {{ aedir_rundir }}/apache 0750 {{ apache_user }} {{ apache_group }}
 d {{ aedir_rundir }}/web2ldap 0750 {{ web2ldap_user }} {{ apache_group }}
+{% if oath_ldap_enabled %}
 d {{ aedir_rundir }}/oathenroll 0750 {{ oath_ldap_oathenroll_web_user }} {{ apache_group }}
+{% endif %}
 d {{ aedir_rundir }}/ae-dir-pwd 0750 ae-dir-pwd {{ apache_group }}
 d {{ aedir_rundir }}/ae-dir-updater 0750 ae-dir-updater ae-dir-updater
 {% if ekca_enabled %}
