@@ -16,7 +16,7 @@
   zypper:
     name:
       - "web2ldap >= {{ web2ldap_min_version }}"
-    state: present
+    state: "{{ aedir_zypper_state }}"
     disable_recommends: yes
     type: package
   when: not aedir_pip_install

@@ -13,14 +13,14 @@
       - ca-certificates
       - python3-base
       - zypper
-    state: present
+    state: "{{ aedir_zypper_state }}"
     disable_recommends: yes
     type: package
 
 - name: "Install alternative malloc package {{ aedir_malloc_package }}"
   zypper:
     name: "{{ aedir_malloc_package }}"
-    state: present
+    state: "{{ aedir_zypper_state }}"
     disable_recommends: yes
     type: package
   when: aedir_malloc_package!=""

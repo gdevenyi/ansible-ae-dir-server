@@ -17,6 +17,9 @@ aedir_package_repos:
     repo: "{{ aedir_suse_repo.get(ansible_lsb.description, '') }}"
     key: ""
 
+# which state to reach for zypper-based package installation
+aedir_zypper_state: "latest"
+
 # OS-specific Python paths
 aedir_python_paths:
   python_exec: "/usr/bin/python{{ aedir_python_version }}"

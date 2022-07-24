@@ -19,7 +19,7 @@
     name:
       - ekca-service >= 1.1.0
       - ekca-plugin-aedir >= 0.1.3
-    state: latest
+    state: "{{ aedir_zypper_state }}"
     disable_recommends: yes
     type: package
   when: lsb_id == 'SUSE'

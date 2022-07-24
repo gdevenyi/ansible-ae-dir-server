@@ -14,7 +14,7 @@
   zypper:
     name:
       - slapdcheck >= 3.10.2
-    state: present
+    state: "{{ aedir_zypper_state }}"
     disable_recommends: yes
     type: package
   when: lsb_id == 'SUSE'

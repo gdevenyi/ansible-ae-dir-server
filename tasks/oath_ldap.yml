@@ -124,7 +124,7 @@
   zypper:
     name:
       - oath-ldap-srv >= 1.7.2
-    state: latest
+    state: "{{ aedir_zypper_state }}"
     disable_recommends: yes
     type: package
   when: lsb_id == 'SUSE'
@@ -145,7 +145,7 @@
 - name: "Install OATH-LDAP tool package"
   zypper:
     name: "oath-ldap-tool>=1.3.4"
-    state: latest
+    state: "{{ aedir_zypper_state }}"
     disable_recommends: yes
     type: package
   when: openldap_role == 'provider' and lsb_id == 'SUSE'

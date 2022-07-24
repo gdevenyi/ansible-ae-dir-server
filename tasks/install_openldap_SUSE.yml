@@ -6,7 +6,7 @@
     name:
       - "libsasl2-3"
       - "cyrus-sasl"
-    state: latest
+    state: "{{ aedir_zypper_state }}"
     disable_recommends: yes
     type: package
   notify:
@@ -16,7 +16,7 @@
   zypper:
     name:
       - "lmdb"
-    state: latest
+    state: "{{ aedir_zypper_state }}"
     disable_recommends: yes
     extra_args: "--allow-vendor-change"
     type: package
@@ -28,7 +28,7 @@
       - "openldap2-back-sock"
       - "openldap2-client"
       - "openldap2-contrib"
-    state: latest
+    state: "{{ aedir_zypper_state }}"
     disable_recommends: yes
     extra_args: "--allow-vendor-change"
     type: package

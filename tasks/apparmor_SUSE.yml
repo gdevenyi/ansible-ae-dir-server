@@ -6,7 +6,7 @@
     name:
       - apparmor-parser
       - apparmor-abstractions
-    state: present
+    state: "{{ aedir_zypper_state }}"
     disable_recommends: yes
     type: package
   notify:

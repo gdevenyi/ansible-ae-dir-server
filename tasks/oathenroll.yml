@@ -16,7 +16,7 @@
   zypper:
     name:
       - oath-ldap-web
-    state: latest
+    state: "{{ aedir_zypper_state }}"
     disable_recommends: yes
     type: package
   when: lsb_id == 'SUSE'

@@ -6,7 +6,7 @@
     name:
       - apache2
       - "apache2-{{ apache2_mpm_model }}"
-    state: present
+    state: "{{ aedir_zypper_state }}"
     disable_recommends: yes
     type: package
   notify:
