@@ -132,6 +132,17 @@ const SLAPD_PPOLICY_EXPIRED_PASSWORD /^.* {{ openldap_service_name }}\[\d+\]: pp
     slapd_ppolicy_expired++
 }
 
+# count "TLS established" messages and extract protocol version and cipher
+#---------------------------------------------------------------------------
+
+counter slapd_tls_established by proto, cipher
+
+const SLAPD_TLS_ESTABLISHED // + SLAPD_FD + /TLS established tls_ssf=\d+ ssf=\d+ tls_proto=(?P<proto>.+) tls_cipher=(?P<cipher>.+)$/
+
+// + SLAPD_TLS_ESTABLISHED {
+    slapd_tls_established[$proto, $cipher]++
+}
+
 # count "TLS negotiation failure" messages
 #---------------------------------------------------------------------------
 
