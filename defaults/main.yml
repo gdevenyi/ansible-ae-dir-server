@@ -181,6 +181,8 @@ aedir_systemd_hardening:
   - "PrivateIPC=yes"
   - "RemoveIPC=yes"
   - "MemoryDenyWriteExecute=yes"
+  - "ProcSubset=pid"
+  - "SocketBindDeny=any"
 #  - "InaccessiblePaths=/run/systemd"
 
 # regex patterns for enforcing naming conventions (substring match!)
@@ -625,6 +627,13 @@ openldap_listen_uris:
   - "ldap://*:389"
   - "ldaps://*:636"
 #  - "pldaps://*:1636"
+
+# List of TCP ports to listen on
+# (add all ports mentioned in openldap_listen_uris)
+openldap_tcp_ports:
+  - 389
+  - 636
+#  - 1636
 
 aedir_schema_prefix: "{{ openldap_slapd_conf|dirname }}/schema"
 

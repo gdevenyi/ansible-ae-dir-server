@@ -30,6 +30,10 @@ CapabilityBoundingSet=CAP_NET_BIND_SERVICE
 AmbientCapabilities=CAP_NET_BIND_SERVICE
 LimitNOFILE={{ openldap_limit_nofile }}
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+{% for port in openldap_tcp_ports %}
+SocketBindAllow=ipv4:tcp:{{ port }}
+SocketBindAllow=ipv6:tcp:{{ port }}
+{% endfor %}
 {% if aedir_systemd_logging %}
 # various logging options from ansible var aedir_systemd_logging
 {% for systemd_option in aedir_systemd_logging %}

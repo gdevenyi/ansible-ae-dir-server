@@ -29,6 +29,10 @@ ReadWritePaths={{ apache_rundir }} {{ apache_access_log|dirname }}
 CapabilityBoundingSet=CAP_NET_BIND_SERVICE
 AmbientCapabilities=CAP_NET_BIND_SERVICE
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+SocketBindAllow=ipv4:tcp:80
+SocketBindAllow=ipv4:tcp:443
+SocketBindAllow=ipv6:tcp:80
+SocketBindAllow=ipv6:tcp:443
 {% if aedir_systemd_logging %}
 # various logging options from ansible var aedir_systemd_logging
 {% for systemd_option in aedir_systemd_logging %}
