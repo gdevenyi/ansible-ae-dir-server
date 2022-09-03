@@ -48,6 +48,8 @@ SystemCallLog={{ systemd_systemcalllog.slapdcheck }}
 {% if apparmor_enabled %}
 AppArmorProfile={{ slapdcheck_service_name }}
 {% endif %}
+# slapdcheck needs to read /proc name-space of ae-slapd.service
+ProcSubset=all
 
 [Install]
 WantedBy=multi-user.target
