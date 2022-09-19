@@ -37,8 +37,9 @@ aedir_pip_needs_compiler: "{{ aedir_pip_index_url == 'https://pypi.python.org/si
 #aedir_pip_install_compiler: 1
 
 aedir_pip_install_options:
-  - "--upgrade"
   - "--index-url {{ aedir_pip_index_url }}"
+  - "--upgrade"
+  - "--upgrade-strategy eager"
 
 aedir_pip_extra_args: "{{ aedir_pip_install_options|join(' ') }}"
 
