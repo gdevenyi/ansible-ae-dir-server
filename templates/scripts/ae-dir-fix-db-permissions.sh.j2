@@ -6,7 +6,7 @@ set -o nounset
 set -e
 
 {% for db_name, db_params in aedir_db_params.items() %}
-echo "Fixing ownership/permissions in directory {{ db_params.directory }}"
+echo "Checking/fixing ownership/permissions in directory {{ db_params.directory }}"
 chown -c {{ openldap_slapd_user }}:{{ openldap_slapd_group }} {{ db_params.directory }}
 chown -c {{ openldap_slapd_user }}:{{ openldap_slapd_group }} {{ db_params.directory }}/*.mdb
 chmod -c 0750 {{ db_params.directory }}
