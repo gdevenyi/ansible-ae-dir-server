@@ -22,7 +22,6 @@ Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
 Environment=LDAPNOINIT=1
 Environment=SSH_AUTH_SOCK="{{ ekca_agent_socket }}"
 Environment=EKCA_CFG={{ ekca_cfg }}
-Environment=FLASK_ENV={{ ekca_flask_env }}
 ExecStart={{ ekca_service_execstart }}
 WorkingDirectory={{ ekca_service_socket|dirname }}
 ReadWritePaths={{ ekca_sshca_dir }} {{ ekca_service_socket|dirname }}
