@@ -21,7 +21,7 @@ Environment=LDAPNOINIT=1
 Environment=LOG_CONFIG={{ aedir_etc }}/ae-logging.conf
 Environment=LOG_QUALNAME=web2ldap
 ExecStartPre={{ rm_exec }} -f {{ aedir_rundir }}/web2ldap/web2ldap.sock
-ExecStart={{ aedir_gunicorn }} --threads={{ web2ldap_wsgi_threads }} web2ldap.wsgi:application
+ExecStart={{ aedir_gunicorn }} --threads={{ web2ldap_wsgi_threads }} web2ldap.__main__:application
 WorkingDirectory={{ aedir_rundir }}/web2ldap
 ReadWritePaths={{ aedir_rundir }}/web2ldap
 User={{ web2ldap_user }}
