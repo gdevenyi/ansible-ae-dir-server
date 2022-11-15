@@ -77,6 +77,15 @@
   notify:
     - "restart {{ openldap_service_name }}"
 
+- name: "Create OpenLDAP database root directory"
+  file:
+    path: "{{ openldap_backup_path }}"
+    state: directory
+    owner: "root"
+    group: "{{ openldap_slapd_group }}"
+    mode: 0o0750
+  when: openldap_backup_path != openldap_data
+
 - name: "Create database directories"
   file:
     path: "{{ item.value.directory }}"
