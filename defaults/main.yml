@@ -609,7 +609,7 @@ openldap_service_fqdn: "{{ inventory_hostname }}"
 
 # On some platforms where OpenLDAP was built --with-systemd one can use "notify"
 # for better systemd integration
-openldap_systemd_service_type: "simple"
+openldap_systemd_service_type: "{{ 'notify' if lsb_id in ('SUSE', 'Debian', 'Ubuntu') else 'simple' }}"
 
 # Some paths
 openldap_rundir: "{{ aedir_rundir }}/slapd"
