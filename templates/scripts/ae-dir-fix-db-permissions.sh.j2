@@ -8,7 +8,11 @@ set -e
 {% for db_name, db_params in aedir_db_params.items() %}
 echo "Checking/fixing ownership/permissions in directory {{ db_params.directory }}"
 chown -c {{ openldap_slapd_user }}:{{ openldap_slapd_group }} {{ db_params.directory }}
-chown -c {{ openldap_slapd_user }}:{{ openldap_slapd_group }} {{ db_params.directory }}/{data,lock}.mdb
 chmod -c 0750 {{ db_params.directory }}
-chmod -c {{ db_params.mdb_mode }} {{ db_params.directory }}/{data,lock}.mdb
+if [ -e {{ db_params.directory }}/data.mdb ]
+then
+  chown -c {{ openldap_slapd_user }}:{{ openldap_slapd_group }} {{ db_params.directory }}/{data,lock}.mdb
+  chmod -c {{ db_params.mdb_mode }} {{ db_params.directory }}/{data,lock}.mdb
+fi
+
 {% endfor %}
