@@ -14,7 +14,7 @@ Before=nss-user-lookup.target{{ ' aehostd.service' if getent_passwd.aehostd is d
 Wants=nss-user-lookup.target
 
 [Service]
-Type=simple
+Type={{ openldap_systemd_service_type }}
 {% if aedir_malloc_ld_preload %}
 Environment=LD_PRELOAD={{ aedir_malloc_ld_preload }}
 {% endif %}

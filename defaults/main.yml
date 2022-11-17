@@ -607,6 +607,10 @@ openldap_role: "{{ (inventory_hostname in aedir_hosts.provider)|ternary('provide
 # default FQDN in LDAP service URL
 openldap_service_fqdn: "{{ inventory_hostname }}"
 
+# On some platforms where OpenLDAP was built --with-systemd one can use "notify"
+# for better systemd integration
+openldap_systemd_service_type: "simple"
+
 # Some paths
 openldap_rundir: "{{ aedir_rundir }}/slapd"
 openldap_data: "{{ aedir_prefix }}/slapd-db"
