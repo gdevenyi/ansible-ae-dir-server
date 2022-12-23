@@ -735,6 +735,7 @@ openldap_password_hash: "{ARGON2}"
 #   performance with different parameters on your particular hardware
 # - libsodium only supports p=1, so stick to p=1 if unsure how OpenLDAP was built
 # - Worth reading:
+#   https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#argon2id
 #   https://www.twelve21.io/how-to-choose-the-right-parameters-for-argon2/
 #   https://argon2-cffi.readthedocs.io/en/stable/parameters.html
 #   https://hynek.me/articles/storing-passwords/
